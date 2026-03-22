@@ -1947,3 +1947,341 @@ button, .btn-analyse {
     transform: translateY(0);
   }
 }
+
+/* ==========================================================================
+   UX POLISH LAYER — Ameliorations visuelles sans casser le code David
+   Applied AFTER all existing styles (cascade override)
+   ========================================================================== */
+
+/* ── Background plus doux ── */
+body { background: #f0f2f5; }
+
+/* ── Sidebar: gradient + meilleur espacement ── */
+.sidebar {
+  background: linear-gradient(180deg, var(--navy) 0%, #0f2440 100%) !important;
+}
+.sidebar-logo {
+  padding: 24px 20px 18px !important;
+  border-bottom: 1px solid rgba(255,255,255,.06) !important;
+}
+.sidebar-logo h1 { font-size: 22px !important; font-weight: 800 !important; }
+.sidebar-logo h1 span { color: var(--gold) !important; }
+
+/* Sidebar nav items: rounded, hover translateX, active gold border */
+.sidebar-nav { padding: 8px 0 !important; }
+.sidebar-nav a,
+.sidebar-nav-item {
+  margin: 2px 10px !important;
+  border-radius: 10px !important;
+  padding: 11px 14px !important;
+  transition: all .2s ease !important;
+  border-left: 3px solid transparent !important;
+  font-size: 13px !important;
+}
+.sidebar-nav a:hover,
+.sidebar-nav-item:hover {
+  background: rgba(255,255,255,.08) !important;
+  transform: translateX(3px);
+  color: #fff !important;
+}
+.sidebar-nav a.active,
+.sidebar-nav-item.active {
+  background: rgba(255,255,255,.12) !important;
+  border-left-color: var(--gold) !important;
+  color: #fff !important;
+}
+
+/* Section titles: smaller, more spacing */
+.sidebar-section-title,
+.nav-section-label {
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase !important;
+  color: rgba(255,255,255,.3) !important;
+  padding: 18px 22px 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+/* Badges PRO / PREMIUM / NOUVEAU */
+.pro-badge, .nav-badge.pro {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+  color: #fff !important;
+  font-size: 8px !important;
+  padding: 2px 7px !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  letter-spacing: .5px !important;
+}
+.premium-badge, .nav-badge.premium {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light)) !important;
+  color: #1a1a2e !important;
+  font-size: 8px !important;
+  padding: 2px 7px !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+}
+.new-badge, .nav-badge.new {
+  background: linear-gradient(135deg, var(--alert), #ff8a65) !important;
+  color: #fff !important;
+  font-size: 8px !important;
+  padding: 2px 7px !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  animation: ux-pulse 2s ease-in-out infinite;
+}
+@keyframes ux-pulse { 0%,100%{opacity:1}50%{opacity:.6} }
+
+/* Sidebar footer */
+.sidebar-footer {
+  padding: 16px 18px !important;
+  border-top: 1px solid rgba(255,255,255,.06) !important;
+  display: flex !important; align-items: center !important; gap: 10px !important;
+}
+.sidebar-footer .avatar,
+.sidebar-footer .user-info .avatar {
+  width: 36px !important; height: 36px !important; border-radius: 10px !important;
+  background: linear-gradient(135deg, var(--primary), var(--gold)) !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  font-weight: 700 !important; font-size: 13px !important;
+}
+
+/* ── Topbar: clean border ── */
+.topbar {
+  border-bottom: 1px solid #e8ecf1 !important;
+  background: #fff !important;
+  padding: 12px 28px !important;
+}
+.topbar h2, #viewTitle { font-size: 18px !important; font-weight: 700 !important; }
+.breadcrumb { font-size: 12px !important; color: var(--text-light) !important; }
+
+/* Live dot animation */
+.live-dot, .status-dot {
+  width: 8px !important; height: 8px !important;
+  background: #22c55e !important; border-radius: 50% !important;
+  animation: ux-live 2s ease-in-out infinite;
+}
+@keyframes ux-live {
+  0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,.6); }
+  50% { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+}
+
+/* Topbar buttons */
+.topbar-btn {
+  padding: 8px 14px !important; border-radius: 10px !important;
+  border: 1px solid #e8ecf1 !important; background: #fff !important;
+  font-size: 12px !important; font-weight: 600 !important;
+  transition: all .2s !important;
+}
+.topbar-btn:hover {
+  background: #f8f9fa !important;
+  border-color: var(--primary) !important;
+}
+
+/* ── Ticker LIVE: gradient background ── */
+.ticker-bar {
+  background: linear-gradient(90deg, rgba(26,58,92,.95), rgba(45,106,79,.95)) !important;
+  border-radius: 0 !important;
+  margin-bottom: 0 !important;
+  padding: 9px 0 !important;
+}
+.ticker-badge, .badge-live-ticker {
+  background: #ef4444 !important; color: #fff !important;
+  font-size: 9px !important; font-weight: 800 !important;
+  padding: 3px 8px !important; border-radius: 6px !important;
+  letter-spacing: 1px !important;
+  animation: ux-blink 1.5s infinite;
+}
+@keyframes ux-blink { 0%,100%{opacity:1}50%{opacity:.5} }
+
+/* ── Hero card: vert gradient au lieu de navy ── */
+.hero-executive {
+  background: linear-gradient(135deg, #2d6a4f 0%, #40916c 60%, #52b788 100%) !important;
+  border-radius: 20px !important;
+  padding: 28px 32px !important;
+}
+.hero-executive::after {
+  background: radial-gradient(circle, rgba(255,255,255,.08) 0%, transparent 70%) !important;
+}
+.hero-executive h1 { font-size: 26px !important; font-weight: 800 !important; }
+
+/* Hero KPI cards: glass effect */
+.hero-kpi {
+  background: rgba(255,255,255,.1) !important;
+  backdrop-filter: blur(10px) !important;
+  border-radius: 14px !important;
+  padding: 18px 16px !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  transition: all .3s !important;
+}
+.hero-kpi:hover {
+  background: rgba(255,255,255,.18) !important;
+  transform: translateY(-2px);
+}
+.hero-kpi-value { font-size: 24px !important; font-weight: 800 !important; }
+
+/* Hero tip/conseil */
+.hero-tip, .hero-conseil {
+  background: rgba(255,255,255,.12) !important;
+  backdrop-filter: blur(10px) !important;
+  padding: 12px 16px !important;
+  border-radius: 12px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+/* ── Cards: bigger radius, better shadow, hover lift ── */
+.card, .stat-card, .glass-card {
+  border-radius: 18px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,.05) !important;
+  border: 1px solid rgba(0,0,0,.04) !important;
+  transition: all .3s cubic-bezier(.4,0,.2,1) !important;
+  opacity: 1 !important;
+}
+.card:hover, .stat-card:hover, .glass-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0,0,0,.1) !important;
+}
+
+/* ── Alerts section ── */
+.announcement-item {
+  border-radius: 14px !important;
+  padding: 14px 18px !important;
+  transition: all .2s !important;
+  border: 1px solid #f3f4f6 !important;
+}
+.announcement-item:hover {
+  background: #f8faf9 !important;
+  transform: translateX(4px);
+}
+
+/* Alert badges colorés */
+.alert-badge, .price-change-badge {
+  font-size: 11px !important; font-weight: 700 !important;
+  padding: 4px 10px !important; border-radius: 8px !important;
+  min-width: 52px !important; text-align: center !important;
+}
+
+/* ── Boutons principaux: gradient vert ── */
+.content .btn-analyse,
+.view-container .btn-analyse,
+button.btn-primary,
+.cta-btn {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light)) !important;
+  color: #fff !important;
+  border: none !important;
+  padding: 14px 28px !important;
+  border-radius: 14px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 16px rgba(45,106,79,.3) !important;
+  transition: all .3s ease !important;
+  text-transform: uppercase !important;
+  letter-spacing: .5px !important;
+}
+.content .btn-analyse:hover,
+.view-container .btn-analyse:hover,
+button.btn-primary:hover,
+.cta-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 24px rgba(45,106,79,.45) !important;
+}
+
+/* Bouton doré CTA */
+.btn-gold, .btn-analyse-tendances {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light)) !important;
+  color: #1a1a2e !important;
+  border: none !important;
+  padding: 14px 28px !important;
+  border-radius: 14px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 16px rgba(212,160,23,.3) !important;
+}
+
+/* ── Auth screen: bouton demo mode visible ── */
+.btn-demo-mode {
+  background: transparent !important;
+  border: 2px dashed var(--primary) !important;
+  color: var(--primary) !important;
+  padding: 12px 24px !important;
+  border-radius: 12px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  width: 100% !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+}
+.btn-demo-mode:hover {
+  background: var(--primary-lighter) !important;
+}
+
+/* ── Bottom nav: better active state ── */
+.bottom-nav {
+  border-top: 1px solid #e8ecf1 !important;
+  box-shadow: 0 -2px 12px rgba(0,0,0,.04) !important;
+  background: #fff !important;
+}
+.bottom-nav a, .bottom-nav-item {
+  transition: all .2s !important;
+}
+.bottom-nav a.active, .bottom-nav-item.active {
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+}
+
+/* ── Forms: bigger radius, nicer focus ── */
+input, select, textarea {
+  border-radius: 12px !important;
+  border: 1px solid #e0e0e0 !important;
+  padding: 12px 16px !important;
+  font-size: 14px !important;
+  transition: all .2s !important;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(45,106,79,.1) !important;
+  outline: none !important;
+}
+
+/* ── Custom checkboxes ── */
+input[type="checkbox"] {
+  width: 18px !important; height: 18px !important;
+  accent-color: var(--primary) !important;
+  border-radius: 4px !important;
+}
+
+/* ── Quick action cards (si présents dans le HTML) ── */
+.quick-action, .module-card {
+  background: #fff !important;
+  border-radius: 16px !important;
+  padding: 20px 16px !important;
+  text-align: center !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,.05) !important;
+  cursor: pointer !important;
+  transition: all .3s !important;
+  border: 1px solid transparent !important;
+}
+.quick-action:hover, .module-card:hover {
+  transform: translateY(-4px) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,.1) !important;
+}
+
+/* ── Scoring jauge ── */
+.scoring-gauge { filter: drop-shadow(0 4px 12px rgba(45,106,79,.2)); }
+
+/* ── Smooth scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,.25); }
+
+/* ── Print-friendly: hide nav for PDF export ── */
+@media print {
+  .sidebar, .bottom-nav, .topbar, .ticker-bar { display: none !important; }
+  .main { margin-left: 0 !important; }
+}
