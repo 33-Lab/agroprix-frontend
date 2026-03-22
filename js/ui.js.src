@@ -1,0 +1,106 @@
+// AgroPrix UI Module
+(function(AP) {
+
+  // Show a specific view
+  function showView(viewId, el) {
+    document.querySelectorAll('.view-container').forEach(function(v) { v.classList.remove('show'); v.style.display = 'none'; });
+    var targetId = AP.viewIdMap[viewId] || 'viewAnalyse';
+    var target = document.getElementById(targetId);
+    if (target) { target.classList.add('show'); target.style.display = 'block'; }
+
+    document.querySelectorAll('.sidebar-nav a, .bottom-nav a').forEach(function(a) { a.classList.remove('active'); });
+    if (el) el.classList.add('active');
+
+    var titleEl = document.getElementById('viewTitle');
+    if (titleEl) titleEl.textContent = AP.viewTitles[viewId] || 'AgroPrix';
+
+    // Init modules
+    if (viewId === 'negoce' || viewId === 'opportunites') { if (AP.negoce && AP.negoce.init) AP.negoce.init(); }
+    if (viewId === 'export') { if (AP.exportModule && AP.exportModule.init) AP.exportModule.init(); }
+    if (viewId === 'inputs') { if (AP.inputs && AP.inputs.init) AP.inputs.init(); }
+    if (viewId === 'market') { if (AP.marketplace && AP.marketplace.init) AP.marketplace.init(); }
+    if (viewId === 'financing') { if (AP.financing && AP.financing.init) AP.financing.init(); }
+    if (viewId === 'scoring') { if (AP.scoring && AP.scoring.render) AP.scoring.render(); }
+    if (viewId === 'ndvi') { if (AP.ndvi && AP.ndvi.init) AP.ndvi.init(); }
+
+    // V6 Fix: Scroll to top when showing production view
+    if (viewId === 'production') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    closeMobileMenu();
+  }
+
+  // Toggle switch
+  function toggleSwitch(el) {
+    el.classList.toggle('active');
+  }
+
+  // Toggle custom date fields
+  function toggleCustomDates() {
+    var sel = document.getElementById('periodSelect');
+    var custom = document.getElementById('dateCustom');
+    if (sel && custom) {
+      custom.style.display = sel.value === 'custom' ? 'flex' : 'none';
+    }
+  }
+
+  // Update markets grid based on selected country
+  function updateMarkets() {
+    var countrySelect = document.getElementById('countrySelect');
+    var marketList = document.getElementById('marketsGrid');
+    if (!countrySelect || !marketList) return;
+
+    var country = countrySelect.value;
+    var markets = AP.marketsByCountry[country] || [];
+
+    marketList.innerHTML = markets.map(function(mk, idx) {
+      return '<label class="market-check"><input type="checkbox" value="' + idx + '" checked><span>' + mk.name + '</span></label>';
+    }).join('');
+  }
+
+  // Toggle all market checkboxes
+  function toggleAllMarkets(state) {
+    var marketList = document.getElementById('marketsGrid');
+    if (!marketList) return;
+    marketList.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+      cb.checked = state;
+    });
+  }
+
+  // Mobile menu toggle
+  function toggleMobileMenu() {
+    var sidebar = document.getElementById('sidebarEl');
+    var overlay = document.getElementById('sidebarOverlay');
+    if (sidebar) sidebar.classList.toggle('open');
+    if (overlay) overlay.classList.toggle('active');
+  }
+
+  function closeMobileMenu() {
+    var sidebar = document.getElementById('sidebarEl');
+    var overlay = document.getElementById('sidebarOverlay');
+    if (sidebar) sidebar.classList.remove('open');
+    if (overlay) overlay.classList.remove('active');
+  }
+
+  // Expose
+  AP.ui = {
+    showView: showView,
+    toggleSwitch: toggleSwitch,
+    toggleCustomDates: toggleCustomDates,
+    updateMarkets: updateMarkets,
+    toggleAllMarkets: toggleAllMarkets,
+    toggleMobileMenu: toggleMobileMenu,
+    closeMobileMenu: closeMobileMenu
+  };
+
+  // Also expose as globals for onclick handlers in HTML
+  window.showView = showView;
+  window.toggleSwitch = toggleSwitch;
+  window.toggleCustomDates = toggleCustomDates;
+  window.updateMarkets = updateMarkets;
+  window.toggleAllMarkets = toggleAllMarkets;
+  window.toggleMobileMenu = toggleMobileMenu;
+  window.closeMobileMenu = closeMobileMenu;
+
+})(window.AgroPrix);

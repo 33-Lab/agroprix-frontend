@@ -1,0 +1,421 @@
+// AgroPrix — Credit Scoring Module
+// Calcul du score 0-1000 basé sur profil enrichi + activité
+// 6 dimensions : profil, production, transactions, stabilité, utilisation, ancienneté
+(function(AP) {
+  'use strict';
+
+  var SCORE_HISTORY_KEY = 'agroprix_score_history';
+  var PROFILE_KEY = 'agroprix_farmer_profile';
+  var SEARCHES_KEY = 'agroprix_financing_searches';
+  var USER_KEY = 'agroprix_user';
+  var ANALYSES_KEY = 'agroprix_analyses_count';
+
+  // Score dimensions (total = 1000)
+  var DIMENSIONS = [
+    { id: 'profile',      label: 'Profil complet',       icon: '👤', max: 150, color: '#2d6a4f' },
+    { id: 'production',   label: 'Activite production',  icon: '🌾', max: 200, color: '#40916C' },
+    { id: 'transactions', label: 'Historique transactions', icon: '💰', max: 250, color: '#52B788' },
+    { id: 'stability',    label: 'Stabilite financiere', icon: '🏛️', max: 150, color: '#d4a017' },
+    { id: 'usage',        label: 'Utilisation app',      icon: '📱', max: 100, color: '#264653' },
+    { id: 'seniority',    label: 'Anciennete',           icon: '📅', max: 150, color: '#6C757D' }
+  ];
+
+  // Badge thresholds
+  var BADGES = [
+    { min: 800, label: 'Excellent',       emoji: '⭐', color: '#2d6a4f', bg: '#D8F3DC' },
+    { min: 600, label: 'Bon',             emoji: '✅', color: '#40916C', bg: '#E8F5E9' },
+    { min: 400, label: 'Moyen',           emoji: '🔶', color: '#d4a017', bg: '#FFF8E1' },
+    { min: 200, label: 'En construction', emoji: '🔸', color: '#e76f51', bg: '#FFF3E0' },
+    { min: 0,   label: 'Nouveau',         emoji: '⬜', color: '#999',    bg: '#F5F5F5' }
+  ];
+
+  // =========================================================================
+  // Score calculation engine
+  // =========================================================================
+  function calculate() {
+    var profile = getProfile();
+    var user = getUser();
+    var scores = {};
+
+    // 1. PROFIL COMPLET (150 pts)
+    var profilePts = 0;
+    if (profile.country) profilePts += 15;
+    if (profile.crops && profile.crops.length > 0) profilePts += 25;
+    if (profile.farmSize && profile.farmSize > 0) profilePts += 20;
+    if (profile.age) profilePts += 15;
+    if (profile.gender) profilePts += 10;
+    if (profile.experience !== null && profile.experience !== undefined) profilePts += 20;
+    if (profile.farmerType && profile.farmerType !== 'individual') profilePts += 15; // PME/coop = bonus
+    if (user && user.nom) profilePts += 10;
+    if (user && user.telephone) profilePts += 10;
+    if (user && user.email) profilePts += 10;
+    scores.profile = Math.min(profilePts, 150);
+
+    // 2. ACTIVITÉ PRODUCTION (200 pts)
+    var prodPts = 0;
+    if (profile.crops) {
+      prodPts += Math.min(profile.crops.length * 20, 60); // 20 pts/culture, max 60
+    }
+    if (profile.farmSize) {
+      if (profile.farmSize >= 10) prodPts += 50;
+      else if (profile.farmSize >= 5) prodPts += 40;
+      else if (profile.farmSize >= 2) prodPts += 30;
+      else if (profile.farmSize >= 0.5) prodPts += 20;
+      else prodPts += 10;
+    }
+    if (profile.experience) {
+      if (profile.experience >= 10) prodPts += 50;
+      else if (profile.experience >= 5) prodPts += 40;
+      else if (profile.experience >= 3) prodPts += 30;
+      else if (profile.experience >= 1) prodPts += 20;
+      else prodPts += 10;
+    }
+    // Production volume (if marketplace has data)
+    var marketData = getMarketplaceData();
+    if (marketData.offers > 0) prodPts += Math.min(marketData.offers * 10, 40);
+    scores.production = Math.min(prodPts, 200);
+
+    // 3. HISTORIQUE TRANSACTIONS (250 pts)
+    var transPts = 0;
+    if (marketData.confirmedSales > 0) {
+      transPts += Math.min(marketData.confirmedSales * 30, 120); // 30 pts/vente confirmée
+    }
+    if (marketData.totalVolumeFCFA > 0) {
+      if (marketData.totalVolumeFCFA >= 10000000) transPts += 80;
+      else if (marketData.totalVolumeFCFA >= 5000000) transPts += 60;
+      else if (marketData.totalVolumeFCFA >= 1000000) transPts += 40;
+      else transPts += 20;
+    }
+    if (marketData.rating && marketData.rating >= 4) transPts += 50;
+    else if (marketData.rating && marketData.rating >= 3) transPts += 30;
+    scores.transactions = Math.min(transPts, 250);
+
+    // 4. STABILITÉ FINANCIÈRE (150 pts)
+    var stabPts = 0;
+    if (profile.isCoop) stabPts += 40;
+    if (profile.hasBusinessPlan) stabPts += 40;
+    if (profile.farmerType === 'sme') stabPts += 30;
+    else if (profile.farmerType === 'cooperative') stabPts += 25;
+    else stabPts += 10; // individual
+    // Recherches financement = intention sérieuse
+    var searches = getFinancingSearches();
+    if (searches.length >= 3) stabPts += 20;
+    else if (searches.length >= 1) stabPts += 10;
+    // Régularité des données
+    if (profile.crops && profile.crops.length > 0 && profile.farmSize > 0 && profile.experience > 0) {
+      stabPts += 20; // Cohérence données
+    }
+    scores.stability = Math.min(stabPts, 150);
+
+    // 5. UTILISATION APP (100 pts)
+    var usagePts = 0;
+    var analysesCount = parseInt(localStorage.getItem(ANALYSES_KEY) || '0');
+    if (analysesCount >= 10) usagePts += 40;
+    else if (analysesCount >= 5) usagePts += 30;
+    else if (analysesCount >= 1) usagePts += 15;
+    if (searches.length >= 5) usagePts += 30;
+    else if (searches.length >= 2) usagePts += 20;
+    else if (searches.length >= 1) usagePts += 10;
+    // Input prices contributions
+    var inputPrices = JSON.parse(localStorage.getItem('agroprix_input_prices') || '[]');
+    if (inputPrices.length >= 5) usagePts += 30;
+    else if (inputPrices.length >= 1) usagePts += 15;
+    scores.usage = Math.min(usagePts, 100);
+
+    // 6. ANCIENNETÉ (150 pts)
+    var senPts = 0;
+    if (user && user.cree_le) {
+      var created = new Date(user.cree_le);
+      var now = new Date();
+      var daysSince = Math.floor((now - created) / (1000 * 60 * 60 * 24));
+      if (daysSince >= 365) senPts += 80;
+      else if (daysSince >= 180) senPts += 60;
+      else if (daysSince >= 90) senPts += 40;
+      else if (daysSince >= 30) senPts += 25;
+      else if (daysSince >= 7) senPts += 15;
+      else senPts += 5;
+    }
+    // Regular logins
+    if (user && user.derniere_connexion) {
+      var lastLogin = new Date(user.derniere_connexion);
+      var now2 = new Date();
+      var daysSinceLogin = Math.floor((now2 - lastLogin) / (1000 * 60 * 60 * 24));
+      if (daysSinceLogin <= 1) senPts += 40;
+      else if (daysSinceLogin <= 7) senPts += 30;
+      else if (daysSinceLogin <= 30) senPts += 15;
+    }
+    // Profile completeness over time
+    var history = getScoreHistory();
+    if (history.length >= 5) senPts += 30; // Long-term user
+    else if (history.length >= 2) senPts += 15;
+    scores.seniority = Math.min(senPts, 150);
+
+    // TOTAL
+    var total = 0;
+    DIMENSIONS.forEach(function(d) { total += (scores[d.id] || 0); });
+    total = Math.min(total, 1000);
+
+    // Save to history
+    saveScoreToHistory(total, scores);
+
+    return { total: total, dimensions: scores };
+  }
+
+  // =========================================================================
+  // Data access helpers
+  // =========================================================================
+  function getProfile() {
+    try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}'); } catch(e) { return {}; }
+  }
+
+  function getUser() {
+    try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch(e) { return null; }
+  }
+
+  function getFinancingSearches() {
+    try { return JSON.parse(localStorage.getItem(SEARCHES_KEY) || '[]'); } catch(e) { return []; }
+  }
+
+  function getMarketplaceData() {
+    try {
+      var offers = JSON.parse(localStorage.getItem('agroprix_my_offers') || '[]');
+      var confirmed = offers.filter(function(o) { return o.status === 'confirmed' || o.status === 'sold'; });
+      var totalVol = 0;
+      confirmed.forEach(function(o) { totalVol += (o.price || 0) * (o.quantity || 0); });
+      return {
+        offers: offers.length,
+        confirmedSales: confirmed.length,
+        totalVolumeFCFA: totalVol,
+        rating: parseFloat(localStorage.getItem('agroprix_seller_rating') || '0')
+      };
+    } catch(e) { return { offers: 0, confirmedSales: 0, totalVolumeFCFA: 0, rating: 0 }; }
+  }
+
+  function getScoreHistory() {
+    try { return JSON.parse(localStorage.getItem(SCORE_HISTORY_KEY) || '[]'); } catch(e) { return []; }
+  }
+
+  function saveScoreToHistory(total, dimensions) {
+    var history = getScoreHistory();
+    var entry = { date: new Date().toISOString().split('T')[0], score: total, dimensions: dimensions };
+    // Avoid duplicate entries on same day
+    if (history.length > 0 && history[history.length - 1].date === entry.date) {
+      history[history.length - 1] = entry;
+    } else {
+      history.push(entry);
+    }
+    // Keep last 90 days
+    if (history.length > 90) history = history.slice(-90);
+    localStorage.setItem(SCORE_HISTORY_KEY, JSON.stringify(history));
+  }
+
+  // =========================================================================
+  // Badge helper
+  // =========================================================================
+  function getBadge(score) {
+    for (var i = 0; i < BADGES.length; i++) {
+      if (score >= BADGES[i].min) return BADGES[i];
+    }
+    return BADGES[BADGES.length - 1];
+  }
+
+  // =========================================================================
+  // Generate improvement tips
+  // =========================================================================
+  function getTips(result) {
+    var tips = [];
+    var dims = result.dimensions;
+
+    if (dims.profile < 100) {
+      var missing = [];
+      var p = getProfile();
+      if (!p.crops || p.crops.length === 0) missing.push('cultures');
+      if (!p.farmSize) missing.push('superficie');
+      if (!p.age) missing.push('age');
+      if (!p.gender) missing.push('genre');
+      if (!p.experience && p.experience !== 0) missing.push('experience');
+      if (missing.length > 0) {
+        tips.push({ icon: '👤', text: 'Completez votre profil (' + missing.join(', ') + ') pour gagner jusqu\'a ' + (150 - dims.profile) + ' points.', pts: 150 - dims.profile });
+      }
+    }
+
+    if (dims.transactions < 50) {
+      tips.push({ icon: '💰', text: 'Publiez des offres sur le Marche et confirmez des ventes pour gagner jusqu\'a 250 points.', pts: 250 - dims.transactions });
+    }
+
+    if (dims.stability < 80) {
+      var p2 = getProfile();
+      if (!p2.isCoop) tips.push({ icon: '🤝', text: 'Rejoignez une cooperative pour +40 points de stabilite.', pts: 40 });
+      if (!p2.hasBusinessPlan) tips.push({ icon: '📝', text: 'Preparez un business plan pour +40 points.', pts: 40 });
+    }
+
+    if (dims.usage < 50) {
+      tips.push({ icon: '📱', text: 'Utilisez l\'app regulierement (analyses, recherches financement) pour ameliorer votre score.', pts: 100 - dims.usage });
+    }
+
+    // Sort by potential points gain
+    tips.sort(function(a, b) { return b.pts - a.pts; });
+    return tips.slice(0, 4);
+  }
+
+  // =========================================================================
+  // SVG circular gauge
+  // =========================================================================
+  function renderGauge(score, size) {
+    size = size || 180;
+    var badge = getBadge(score);
+    var radius = (size / 2) - 12;
+    var circumference = 2 * Math.PI * radius;
+    var progress = (score / 1000) * circumference;
+    var cx = size / 2;
+    var cy = size / 2;
+
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">'
+      + '<circle cx="' + cx + '" cy="' + cy + '" r="' + radius + '" fill="none" stroke="#e9ecef" stroke-width="10"/>'
+      + '<circle cx="' + cx + '" cy="' + cy + '" r="' + radius + '" fill="none" '
+      + 'stroke="' + badge.color + '" stroke-width="10" stroke-linecap="round" '
+      + 'stroke-dasharray="' + progress + ' ' + circumference + '" '
+      + 'transform="rotate(-90 ' + cx + ' ' + cy + ')" '
+      + 'style="transition:stroke-dasharray 1s ease;"/>'
+      + '<text x="' + cx + '" y="' + (cy - 8) + '" text-anchor="middle" font-size="36" font-weight="800" fill="' + badge.color + '">' + score + '</text>'
+      + '<text x="' + cx + '" y="' + (cy + 14) + '" text-anchor="middle" font-size="11" fill="#999">/1000</text>'
+      + '<text x="' + cx + '" y="' + (cy + 32) + '" text-anchor="middle" font-size="12" font-weight="700" fill="' + badge.color + '">' + badge.emoji + ' ' + badge.label + '</text>'
+      + '</svg>';
+  }
+
+  // =========================================================================
+  // Render score widget (compact, for GPS Financement header)
+  // =========================================================================
+  function renderWidget() {
+    var result = calculate();
+    var badge = getBadge(result.total);
+
+    return '<div onclick="showView(\'scoring\')" style="cursor:pointer;display:flex;align-items:center;gap:12px;'
+      + 'padding:12px 16px;border-radius:12px;background:' + badge.bg + ';border:1.5px solid ' + badge.color + '33;margin-bottom:16px;">'
+      + '<div style="width:48px;height:48px;border-radius:50%;background:' + badge.color + ';display:flex;align-items:center;justify-content:center;">'
+      + '<span style="color:#fff;font-size:16px;font-weight:800;">' + result.total + '</span></div>'
+      + '<div>'
+      + '<div style="font-size:13px;font-weight:700;color:' + badge.color + ';">' + badge.emoji + ' Score Credit : ' + badge.label + '</div>'
+      + '<div style="font-size:11px;color:#666;">Cliquez pour voir le detail et ameliorer votre score →</div>'
+      + '</div></div>';
+  }
+
+  // =========================================================================
+  // Render full dashboard (dedicated view)
+  // =========================================================================
+  function render() {
+    var result = calculate();
+    var badge = getBadge(result.total);
+    var tips = getTips(result);
+    var history = getScoreHistory();
+
+    var html = '<div style="text-align:center;margin-bottom:20px;">'
+      + '<h3 style="margin:0 0 4px;color:var(--primary);">Mon Score Credit AgroPrix</h3>'
+      + '<p style="font-size:13px;color:var(--text-light);">Plus votre score est eleve, plus vous etes eligible aux financements.</p>'
+      + '</div>';
+
+    // Gauge
+    html += '<div style="text-align:center;margin-bottom:20px;">'
+      + renderGauge(result.total, 200)
+      + '</div>';
+
+    // Dimensions detail
+    html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
+      + '<div class="card-title"><span class="icon">📊</span> Detail par dimension</div>';
+
+    DIMENSIONS.forEach(function(d) {
+      var pts = result.dimensions[d.id] || 0;
+      var pct = Math.round((pts / d.max) * 100);
+      html += '<div style="margin-bottom:10px;">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">'
+        + '<span style="font-size:12px;font-weight:600;">' + d.icon + ' ' + d.label + '</span>'
+        + '<span style="font-size:12px;font-weight:700;color:' + d.color + ';">' + pts + '/' + d.max + '</span>'
+        + '</div>'
+        + '<div style="height:8px;background:#e9ecef;border-radius:4px;overflow:hidden;">'
+        + '<div style="height:100%;width:' + pct + '%;background:' + d.color + ';border-radius:4px;transition:width 0.8s ease;"></div>'
+        + '</div></div>';
+    });
+    html += '</div>';
+
+    // Tips
+    if (tips.length > 0) {
+      html += '<div class="card" style="padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #f59e0b;">'
+        + '<div class="card-title" style="color:#b45309;"><span class="icon">💡</span> Comment ameliorer votre score</div>';
+      tips.forEach(function(t) {
+        html += '<div style="display:flex;align-items:start;gap:8px;margin-bottom:8px;">'
+          + '<span style="font-size:14px;">' + t.icon + '</span>'
+          + '<div style="font-size:12px;color:#92400e;">' + t.text
+          + ' <span style="font-weight:700;color:#b45309;">(+' + t.pts + ' pts)</span></div>'
+          + '</div>';
+      });
+      html += '</div>';
+    }
+
+    // Score history chart (mini sparkline)
+    if (history.length >= 2) {
+      html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
+        + '<div class="card-title"><span class="icon">📈</span> Evolution du score</div>';
+      var maxH = 60;
+      var barW = Math.max(4, Math.min(16, Math.floor(280 / history.length)));
+      var maxScore = 1000;
+      html += '<div style="display:flex;align-items:end;gap:2px;height:' + (maxH + 20) + 'px;overflow-x:auto;">';
+      history.slice(-30).forEach(function(h) {
+        var barH = Math.max(2, Math.round((h.score / maxScore) * maxH));
+        var b = getBadge(h.score);
+        html += '<div style="display:flex;flex-direction:column;align-items:center;min-width:' + barW + 'px;">'
+          + '<div style="font-size:7px;color:#999;margin-bottom:2px;">' + h.score + '</div>'
+          + '<div style="width:' + barW + 'px;height:' + barH + 'px;background:' + b.color + ';border-radius:2px;"></div>'
+          + '</div>';
+      });
+      html += '</div>';
+      html += '<div style="font-size:10px;color:#999;margin-top:6px;">Derniers ' + Math.min(30, history.length) + ' jours</div>';
+      html += '</div>';
+    }
+
+    // What institutions see (B2B preview)
+    html += '<div class="card" style="padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#D8F3DC,#B7E4C7);border:1px solid #2d6a4f33;">'
+      + '<div class="card-title" style="color:#1B4332;"><span class="icon">🏦</span> Ce que voient les institutions</div>'
+      + '<p style="font-size:12px;color:#2d6a4f;margin-bottom:8px;">Quand une banque ou un fonds consulte votre profil via l\'API AgroPrix, elle voit :</p>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
+
+    var previewItems = [
+      { label: 'Score global', value: result.total + '/1000' },
+      { label: 'Badge', value: badge.emoji + ' ' + badge.label },
+      { label: 'Cultures', value: (getProfile().crops || []).length + ' culture(s)' },
+      { label: 'Superficie', value: (getProfile().farmSize || '—') + ' ha' },
+      { label: 'Experience', value: (getProfile().experience || '—') + ' ans' },
+      { label: 'Transactions', value: getMarketplaceData().confirmedSales + ' confirmees' }
+    ];
+    previewItems.forEach(function(item) {
+      html += '<div style="background:white;padding:8px;border-radius:8px;">'
+        + '<div style="font-size:10px;color:#666;">' + item.label + '</div>'
+        + '<div style="font-size:13px;font-weight:700;color:#1B4332;">' + item.value + '</div>'
+        + '</div>';
+    });
+    html += '</div></div>';
+
+    var container = document.getElementById('scoringContent');
+    if (container) container.innerHTML = html;
+  }
+
+  // =========================================================================
+  // Get current score (for other modules)
+  // =========================================================================
+  function getScore() {
+    var result = calculate();
+    return result.total;
+  }
+
+  // =========================================================================
+  // Expose
+  // =========================================================================
+  AP.scoring = {
+    calculate: calculate,
+    render: render,
+    renderWidget: renderWidget,
+    renderGauge: renderGauge,
+    getScore: getScore,
+    getBadge: getBadge
+  };
+
+})(window.AgroPrix);

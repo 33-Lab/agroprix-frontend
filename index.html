@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="AgroPrix — Intelligence des prix agricoles UEMOA. Analysez, négociez, exportez.">
+  <meta name="theme-color" content="#2d6a4f">
+
+  <!-- Security: CSP -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.qrserver.com https://api.open-meteo.com https://agromonitoring.com https://*.railway.app https://*.vercel.app;">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <!-- PWA Meta -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AgroPrix">
+  <link rel="apple-touch-icon" href="/img/icon-192.png">
+
+  <title>AgroPrix V6 by 33 Lab — Prix agricoles UEMOA</title>
+
+  <!-- Fonts & Libraries -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+<!-- ═══ AUTH SCREEN ═══ -->
+<div class="auth-screen" id="authScreen" style="display:none;">
+  <div class="auth-container">
+    <div class="auth-header">
+      <h1>Agro<span style="color:var(--gold)">Prix</span></h1>
+      <p>Intelligence des prix agricoles UEMOA</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="authTabLogin" onclick="showAuthScreen('login')">Connexion</button>
+      <button class="auth-tab" id="authTabRegister" onclick="showAuthScreen('register')">Inscription</button>
+    </div>
+
+    <!-- Login Form -->
+    <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" id="loginEmail" placeholder="votre@email.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mot de passe</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required>
+      </div>
+      <div class="auth-error" id="loginError"></div>
+      <button type="submit" class="btn-analyse" id="loginBtn" style="width:100%;margin-top:8px;">Se connecter</button>
+      <div class="auth-link" style="margin-top:12px;text-align:center;">
+        <span style="font-size:13px;color:var(--text-light);">Pas encore de compte ?</span>
+        <a href="#" onclick="showAuthScreen('register');return false;" style="font-size:13px;color:var(--green);font-weight:600;"> S'inscrire</a>
+      </div>
+    </form>
+
+    <!-- Register Form -->
+    <form class="auth-form" id="registerForm" style="display:none;" onsubmit="handleRegister(event)">
+      <div class="form-group">
+        <label class="form-label">Nom complet *</label>
+        <input type="text" id="regName" placeholder="Votre nom" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email *</label>
+        <input type="email" id="regEmail" placeholder="votre@email.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telephone</label>
+        <input type="tel" id="regPhone" placeholder="+229 XX XX XX XX">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pays</label>
+        <select id="regCountry">
+          <option value="benin">Benin</option>
+          <option value="burkina_faso">Burkina Faso</option>
+          <option value="cote_divoire">Cote d'Ivoire</option>
+          <option value="guinee_bissau">Guinee-Bissau</option>
+          <option value="mali">Mali</option>
+          <option value="niger">Niger</option>
+          <option value="senegal">Senegal</option>
+          <option value="togo">Togo</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mot de passe * <small>(min. 6 car.)</small></label>
+        <input type="password" id="regPassword" placeholder="••••••••" required minlength="6">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirmer *</label>
+        <input type="password" id="regConfirm" placeholder="••••••••" required>
+      </div>
+      <div class="auth-error" id="registerError"></div>
+      <button type="submit" class="btn-analyse" id="registerBtn" style="width:100%;margin-top:8px;">Creer mon compte</button>
+      <div class="auth-link" style="margin-top:12px;text-align:center;">
+        <span style="font-size:13px;color:var(--text-light);">Deja un compte ?</span>
+        <a href="#" onclick="showAuthScreen('login');return false;" style="font-size:13px;color:var(--green);font-weight:600;"> Se connecter</a>
+      </div>
+    </form>
+
+    <!-- Demo Mode Button (V6) -->
+    <div style="margin-top:20px;text-align:center;">
+      <button type="button" class="btn-demo-mode" onclick="demoMode()">
+        Mode Demo — Explorer sans compte
+      </button>
+    </div>
+
+    <div class="auth-footer">
+      <p style="font-size:11px;color:var(--text-light);text-align:center;margin-top:16px;">by 33 Lab &mdash; Cotonou, Benin</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP CONTAINER ═══ -->
+<div id="appContainer">
+
+<!-- ═══ SIDEBAR (Desktop) ═══ -->
+<button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu()"><span></span></button>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileMenu()"></div>
+
+<aside class="sidebar" id="sidebarEl">
+  <div class="sidebar-logo">
+    <h1>Agro<span>Prix</span></h1>
+    <p>by 33 Lab</p>
+  </div>
+  <nav class="sidebar-nav">
+    <!-- ANALYSE -->
+    <div class="nav-section-label">ANALYSE</div>
+    <a class="active" id="navAnalyse" onclick="showView('analyse', this)"><span class="nav-icon">📊</span> Nouvelle analyse</a>
+    <a id="navHistorique" onclick="showView('historique', this)"><span class="nav-icon">📈</span> Historique</a>
+    <a id="navCarte" onclick="showView('carte', this)"><span class="nav-icon">🗺</span> Carte</a>
+
+    <!-- NEGOCE -->
+    <div class="nav-section-label">NEGOCE <span class="pro-badge">PRO</span></div>
+    <a id="navNegoce" onclick="showView('negoce', this)"><span class="nav-icon">📒</span> Carnet de negoce</a>
+    <a id="navOpportunites" onclick="showView('opportunites', this)"><span class="nav-icon">🎯</span> Opportunites</a>
+
+    <!-- PRODUCTION -->
+    <div class="nav-section-label">PRODUCTION <span class="pro-badge">PRO</span></div>
+    <a id="navProduction" onclick="showView('production', this)"><span class="nav-icon">🌱</span> Assistant Production</a>
+    <a id="navConseils" onclick="showView('conseilsProducteur', this)"><span class="nav-icon">📋</span> Conseils <span class="lock-icon">🔒</span></a>
+
+    <!-- EXPORT -->
+    <div class="nav-section-label">EXPORT <span class="premium-badge">PREMIUM</span></div>
+    <a id="navExport" onclick="showView('export', this)"><span class="nav-icon">🚢</span> Tableau Export</a>
+    <a id="navConformite" onclick="showView('conformite', this)"><span class="nav-icon">✅</span> Conformite <span class="lock-icon">🔒</span></a>
+
+    <!-- INTRANTS -->
+    <div class="nav-section-label">INTRANTS <span class="new-badge">NOUVEAU</span></div>
+    <a id="navInputs" onclick="showView('inputs', this)"><span class="nav-icon">🧪</span> Prix Intrants</a>
+
+    <!-- FINANCEMENT -->
+    <div class="nav-section-label">FINANCEMENT <span class="new-badge">NOUVEAU</span></div>
+    <a id="navFinancing" onclick="showView('financing', this)"><span class="nav-icon">💰</span> GPS Financement</a>
+    <a id="navNdvi" onclick="showView('ndvi', this)"><span class="nav-icon">🛰️</span> Sante Parcelle</a>
+    <a id="navScoring" onclick="showView('scoring', this)"><span class="nav-icon">📊</span> Mon Score Credit</a>
+
+    <!-- MARKET -->
+    <div class="nav-section-label">MARKET</div>
+    <a id="navMarket" onclick="showView('market', this)"><span class="nav-icon">🤝</span> Offres & Demandes</a>
+
+    <div class="nav-separator"></div>
+    <a id="navParams" onclick="showView('params', this)"><span class="nav-icon">⚙</span> Parametres</a>
+    <a onclick="logout()" style="color:#e76f51;"><span class="nav-icon">🚪</span> Deconnexion</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="avatar">AP</div>
+      <div>
+        <div class="user-name">Utilisateur</div>
+        <div class="user-role">Plan Gratuit</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN CONTENT ═══ -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h2 id="viewTitle">Nouvelle Analyse</h2>
+      <span class="breadcrumb">AgroPrix &rsaquo; Analyse de prix</span>
+    </div>
+    <div class="topbar-right">
+      <div class="live-dot"></div>
+      <span style="font-size:12px;color:var(--green);font-weight:600;">En ligne</span>
+      <button class="topbar-btn" id="installBtn" style="display:none;">📲 Installer</button>
+      <button class="topbar-btn">🔔 Alertes</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══ VIEW: ANALYSE ═══ -->
+    <div class="view-container show" id="viewAnalyse">
+
+      <!-- ═══ DASHBOARD HERO ═══ -->
+      <div id="dashboardHero"></div>
+
+      <!-- Form -->
+      <div class="card" id="formCard">
+        <div class="card-title"><span class="icon">⚙</span> Configuration de l'analyse</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Pays</label>
+            <select id="countrySelect" onchange="updateMarkets()">
+              <option value="benin">Benin</option>
+              <option value="burkina_faso">Burkina Faso</option>
+              <option value="cote_divoire">Cote d'Ivoire</option>
+              <option value="guinee_bissau">Guinee-Bissau</option>
+              <option value="mali">Mali</option>
+              <option value="niger">Niger</option>
+              <option value="senegal">Senegal</option>
+              <option value="togo">Togo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Culture</label>
+            <select id="cultureSelect">
+              <optgroup label="Cereales">
+                <option value="mais">Mais</option>
+                <option value="mil">Mil</option>
+                <option value="sorgho">Sorgho</option>
+                <option value="riz_local">Riz local</option>
+                <option value="riz_importe">Riz importe</option>
+              </optgroup>
+              <optgroup label="Legumineuses">
+                <option value="niebe">Niebe</option>
+              </optgroup>
+              <optgroup label="Maraichers">
+                <option value="tomate">Tomate</option>
+                <option value="oignon">Oignon</option>
+              </optgroup>
+              <optgroup label="Export">
+                <option value="cajou">Cajou</option>
+                <option value="arachide">Arachide</option>
+              </optgroup>
+              <optgroup label="Tubercules">
+                <option value="manioc">Manioc</option>
+                <option value="igname">Igname</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Periode</label>
+            <select id="periodSelect" onchange="toggleCustomDates()">
+              <option value="12m">12 derniers mois</option>
+              <option value="3y" selected>3 dernieres annees</option>
+              <option value="5y">5 dernieres annees</option>
+              <option value="10y">10 dernieres annees</option>
+              <option value="custom">Personnalise</option>
+            </select>
+            <div class="date-custom" id="dateCustom">
+              <input type="date" id="dateStart" value="2023-01-01">
+              <input type="date" id="dateEnd" value="2026-03-01">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Marches</label>
+            <div class="form-sublabel">Selectionnez les marches a inclure</div>
+          </div>
+          <div class="form-group full">
+            <div class="markets-controls">
+              <button onclick="toggleAllMarkets(true)">Tout selectionner</button>
+              <button onclick="toggleAllMarkets(false)">Tout deselectionner</button>
+            </div>
+            <div class="markets-grid" id="marketsGrid"></div>
+          </div>
+          <div class="form-group full">
+            <label class="form-label" style="margin-bottom:8px;">Options</label>
+            <div class="toggle-row">
+              <label>📈 Comparer avec annee precedente</label>
+              <div class="toggle-switch active" id="togCompare" onclick="toggleSwitch(this)"></div>
+            </div>
+            <div class="toggle-row">
+              <label>🤖 Previsions IA (J+30, J+90)</label>
+              <div class="toggle-switch active" id="togForecast" onclick="toggleSwitch(this)"></div>
+            </div>
+            <div class="toggle-row">
+              <label>🌧 Donnees meteo</label>
+              <div class="toggle-switch active" id="togMeteo" onclick="toggleSwitch(this)"></div>
+            </div>
+          </div>
+          <div class="form-group full">
+            <button class="btn-analyse" onclick="launchAnalysis()">🔍 Lancer l'analyse</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="card">
+          <div class="card-title"><span class="icon">⚙</span> Analyse en cours...</div>
+          <div class="loading-bar-wrap"><div class="loading-bar" id="loadingBar"></div></div>
+          <div class="loading-steps" id="loadingSteps"></div>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div id="results" style="display:none;">
+        <div class="section-sep"><h3>📊 Resume Executif</h3></div>
+        <div class="exec-hero glass-card" id="execHero">
+          <div class="hero-left">
+            <h3 id="heroSubtitle">Analyse de prix</h3>
+            <h2 id="heroTitle">Mais — Benin</h2>
+          </div>
+          <div class="hero-price">
+            <div class="big" id="heroPrice">—</div>
+            <div class="unit">FCFA/kg</div>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat"><div class="hs-label">vs mois dernier</div><div class="hs-value" id="heroMom">—</div></div>
+            <div class="hero-stat"><div class="hs-label">vs annee derniere</div><div class="hs-value" id="heroYoy">—</div></div>
+            <div class="hero-stat"><div class="hs-label">Tendance</div><div id="heroTrend"><span class="trend-badge">—</span></div></div>
+            <div class="hero-stat"><div class="hs-label">Volatilite</div><div class="hs-value" id="heroVol">—</div></div>
+          </div>
+        </div>
+
+        <div class="section-sep"><h3>📈 Evolution des Prix</h3></div>
+        <div class="card glass-card">
+          <div class="chart-container"><canvas id="priceChart"></canvas></div>
+          <div class="stat-row">
+            <div class="stat-mini"><div class="sm-label">Minimum</div><div class="sm-value" id="statMin">—</div></div>
+            <div class="stat-mini"><div class="sm-label">Maximum</div><div class="sm-value" id="statMax">—</div></div>
+            <div class="stat-mini"><div class="sm-label">Meilleur achat</div><div class="sm-value" id="statBuy">—</div></div>
+            <div class="stat-mini"><div class="sm-label">Meilleure vente</div><div class="sm-value" id="statSell">—</div></div>
+          </div>
+        </div>
+
+        <div class="section-sep"><h3>🗺 Carte des Prix</h3></div>
+        <div class="card"><div id="priceMap"></div></div>
+
+        <div class="section-sep"><h3>⚠ Facteurs d'Influence</h3></div>
+        <div class="factors-grid" id="factorsGrid"></div>
+
+        <div class="section-sep" style="margin-top:28px;"><h3>🌐 Comparaison Regionale UEMOA</h3></div>
+        <div class="card"><div class="bar-chart-container"><canvas id="regionChart"></canvas></div></div>
+
+        <div class="section-sep"><h3>📰 Actualites & Alertes</h3></div>
+        <div class="card"><div class="news-feed" id="newsFeed"></div></div>
+
+        <div class="section-sep"><h3>🤖 Recommandations IA</h3></div>
+        <div class="reco-card" id="recoCard"><div id="recoContainer"></div></div>
+
+        <div class="action-bar">
+          <button class="action-btn primary">📄 Telecharger PDF</button>
+          <button class="action-btn secondary">📊 Exporter Excel</button>
+          <button class="action-btn outline" onclick="document.getElementById('formCard').scrollIntoView({behavior:'smooth'})">🔄 Nouvelle analyse</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: NEGOCE ═══ -->
+    <div class="view-container" id="viewNegoce">
+      <div class="stats-row">
+        <div class="stat-card glass-card"><div class="sc-label">Transactions</div><div class="sc-value" id="negoceStatTransactions">—</div></div>
+        <div class="stat-card glass-card"><div class="sc-label">Stock</div><div class="sc-value" id="negoceStatStock">—</div></div>
+        <div class="stat-card glass-card"><div class="sc-label">Marge moyenne</div><div class="sc-value" id="negoceStatMarge" style="color:var(--green)">—</div></div>
+        <div class="stat-card glass-card"><div class="sc-label">Valeur stock</div><div class="sc-value" id="negoceStatValeur">—</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">📒</span> Dernieres Transactions</div>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead><tr><th>Date</th><th>Culture</th><th>Marche</th><th>Qte</th><th>Prix achat</th><th>Prix vente</th><th>Marge</th></tr></thead>
+            <tbody id="transactionsBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🎯</span> Opportunites</div>
+        <div id="opportunitiesGrid"></div>
+      </div>
+      <button class="btn-analyse" style="max-width:320px;" onclick="addTransaction()">📒 Ajouter une transaction</button>
+    </div>
+
+    <!-- ═══ VIEW: PRODUCTION ═══ -->
+    <div class="view-container" id="viewProduction">
+      <!-- Product Photo Banner (V6 - from V5 Surge) -->
+      <div class="product-photo-banner">
+        <div class="photo-banner-scroll">
+          <div class="photo-banner-item">
+            <div class="photo-banner-emoji">🍅</div>
+            <span>Tomate</span>
+          </div>
+          <div class="photo-banner-item">
+            <div class="photo-banner-emoji">🌽</div>
+            <span>Mais</span>
+          </div>
+          <div class="photo-banner-item">
+            <div class="photo-banner-emoji">🧅</div>
+            <span>Oignon</span>
+          </div>
+          <div class="photo-banner-item">
+            <div class="photo-banner-emoji">🫘</div>
+            <span>Niebe</span>
+          </div>
+          <div class="photo-banner-item">
+            <div class="photo-banner-emoji">🥔</div>
+            <span>Manioc</span>
+          </div>
+          <div class="photo-banner-item">
+            <div class="photo-banner-emoji">🍠</div>
+            <span>Igname</span>
+          </div>
+          <div class="photo-banner-item">
+            <div class="photo-banner-emoji">🥜</div>
+            <span>Cajou</span>
+          </div>
+          <div class="photo-banner-item">
+            <div class="photo-banner-emoji">🌾</div>
+            <span>Mil</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🌱</span> Simulateur de Production</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Culture</label>
+            <select id="prodCulture">
+              <option value="tomate">Tomate</option>
+              <option value="mais">Mais</option>
+              <option value="oignon">Oignon</option>
+              <option value="niebe">Niebe</option>
+              <option value="manioc">Manioc</option>
+              <option value="igname">Igname</option>
+              <option value="sorgho">Sorgho</option>
+              <option value="mil">Mil</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pays</label>
+            <select id="prodPays">
+              <option value="benin">Benin</option>
+              <option value="burkina_faso">Burkina Faso</option>
+              <option value="cote_divoire">Cote d'Ivoire</option>
+              <option value="mali">Mali</option>
+              <option value="niger">Niger</option>
+              <option value="senegal">Senegal</option>
+              <option value="togo">Togo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Surface (ha)</label>
+            <input type="number" id="prodSurface" value="1" min="0.1" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Saison</label>
+            <select id="prodSaison">
+              <option value="contre_saison">Contre-saison irriguee</option>
+              <option value="pluies">Saison des pluies</option>
+              <option value="grande_saison">Grande saison</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Niveau</label>
+            <select id="prodNiveau">
+              <option value="traditionnel">Traditionnel</option>
+              <option value="ameliore" selected>Ameliore</option>
+              <option value="intensif">Intensif</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <button class="btn-analyse" onclick="calculateProduction()">🧮 Calculer</button>
+          </div>
+        </div>
+      </div>
+      <div id="productionResults" style="display:none;"></div>
+    </div>
+
+    <!-- ═══ VIEW: EXPORT ═══ -->
+    <div class="view-container" id="viewExport">
+      <div class="stats-row">
+        <div class="stat-card glass-card"><div class="sc-label">Cajou WW320 FOB</div><div class="sc-value">1 250</div><div class="sc-sub">USD/t</div></div>
+        <div class="stat-card glass-card"><div class="sc-label">USD / XOF</div><div class="sc-value">598.5</div><div class="sc-sub up">+0.3%</div></div>
+        <div class="stat-card glass-card"><div class="sc-label">Conteneur 20' Cotonou</div><div class="sc-value">1 850</div><div class="sc-sub">USD</div></div>
+        <div class="stat-card glass-card"><div class="sc-label">Prochaine fenetre</div><div class="sc-value" style="color:var(--gold);">Avr-Mai</div><div class="sc-sub">Cajou, Sesame</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🌍</span> Prix Internationaux vs Locaux</div>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead><tr><th>Produit</th><th>Prix local</th><th>Prix FOB</th><th>Cours mondial</th><th>Ecart</th><th>Tendance</th></tr></thead>
+            <tbody>
+              <tr><td>Cajou (WW320)</td><td>750</td><td>1 250 USD/t</td><td>1 380 USD/t</td><td class="positive">+10.4%</td><td><span class="trend-badge hausse">hausse</span></td></tr>
+              <tr><td>Cacao</td><td>1 850</td><td>3 200 USD/t</td><td>8 450 USD/t</td><td class="positive">+164%</td><td><span class="trend-badge hausse">hausse</span></td></tr>
+              <tr><td>Coton fibre</td><td>320</td><td>1 680 USD/t</td><td>1 750 USD/t</td><td class="positive">+4.2%</td><td><span class="trend-badge stable">stable</span></td></tr>
+              <tr><td>Sesame</td><td>580</td><td>1 450 USD/t</td><td>1 620 USD/t</td><td class="positive">+11.7%</td><td><span class="trend-badge hausse">hausse</span></td></tr>
+              <tr><td>Arachide</td><td>450</td><td>980 USD/t</td><td>1 050 USD/t</td><td class="positive">+7.1%</td><td><span class="trend-badge stable">stable</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">💱</span> Taux de Change</div>
+        <div class="currency-grid">
+          <div class="currency-card"><div class="cc-pair">USD / XOF</div><div class="cc-rate">598.5</div><div class="cc-trend up">+0.3%</div></div>
+          <div class="currency-card"><div class="cc-pair">EUR / XOF</div><div class="cc-rate">655.957</div><div class="cc-trend">Fixe</div></div>
+          <div class="currency-card"><div class="cc-pair">NGN / XOF</div><div class="cc-rate">0.387</div><div class="cc-trend down">-2.1%</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: CONSEILS (Lock) ═══ -->
+    <div class="view-container" id="viewConseils">
+      <div class="lock-overlay">
+        <div class="lock-icon-big">🔒</div>
+        <h2>Extension Conseils Producteur</h2>
+        <p>Accompagnez vos producteurs avec des rapports personnalises.</p>
+        <ul class="features-list">
+          <li>Planification de campagne par producteur</li>
+          <li>Rapport PDF personnalise par parcelle</li>
+          <li>Suivi parcelles et historique rendements</li>
+        </ul>
+        <button class="btn-upgrade">Passer a Pro - 2 900 FCFA/mois</button>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: CONFORMITE (Lock) ═══ -->
+    <div class="view-container" id="viewConformite">
+      <div class="lock-overlay">
+        <div class="lock-icon-big">🔒</div>
+        <h2>Module Conformite Export</h2>
+        <p>Normes phytosanitaires par destination, check-lists automatisees.</p>
+        <ul class="features-list">
+          <li>Normes par pays de destination</li>
+          <li>Check-list automatisee par produit</li>
+          <li>Alertes reglementaires</li>
+        </ul>
+        <button class="btn-upgrade">Passer a Expert - 14 900 FCFA/mois</button>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: MARKET ═══ -->
+    <!-- ═══ VIEW: INPUTS (Prix Intrants) ═══ -->
+    <div class="view-container" id="viewInputs">
+      <div id="inputsContent">
+        <div style="text-align:center;padding:40px;">
+          <div style="font-size:48px;margin-bottom:12px;">🧪</div>
+          <p style="color:var(--text-light);">Chargement du module Prix Intrants...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: FINANCING (GPS Financement) ═══ -->
+    <div class="view-container" id="viewFinancing">
+      <div id="financingContent">
+        <div style="text-align:center;padding:40px;">
+          <div style="font-size:48px;margin-bottom:12px;">💰</div>
+          <p style="color:var(--text-light);">Chargement du GPS Financement...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: NDVI (Santé Parcelle) ═══ -->
+    <div class="view-container" id="viewNdvi">
+      <div id="ndviContent">
+        <div style="text-align:center;padding:40px;">
+          <div style="font-size:48px;margin-bottom:12px;">🛰️</div>
+          <p style="color:var(--text-light);">Chargement Sante Parcelle...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: SCORING (Mon Score Crédit) ═══ -->
+    <div class="view-container" id="viewScoring">
+      <div id="scoringContent">
+        <div style="text-align:center;padding:40px;">
+          <div style="font-size:48px;margin-bottom:12px;">📊</div>
+          <p style="color:var(--text-light);">Calcul de votre score...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: MARKET (Marketplace P2P) ═══ -->
+    <div class="view-container" id="viewMarket">
+      <div id="marketplaceContent">
+        <div style="text-align:center;padding:40px;">
+          <div style="font-size:48px;margin-bottom:12px;">🏪</div>
+          <p style="color:var(--text-light);">Chargement de la Marketplace...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: HISTORIQUE ═══ -->
+    <div class="view-container" id="viewHistorique">
+      <div class="card">
+        <div class="card-title"><span class="icon">📈</span> Historique des analyses</div>
+        <p style="padding:20px;text-align:center;color:var(--text-light);">Vos analyses precedentes apparaitront ici.<br>Lancez une premiere analyse pour commencer.</p>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: CARTE ═══ -->
+    <div class="view-container" id="viewCarte">
+      <div class="card">
+        <div class="card-title"><span class="icon">🗺</span> Carte des marches UEMOA</div>
+        <div id="fullMap" style="height:500px;border-radius:8px;"></div>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: PARAMS ═══ -->
+    <div class="view-container" id="viewParams">
+      <div class="card">
+        <div class="card-title"><span class="icon">👤</span> Mon Profil</div>
+        <div id="profileInfo" style="padding:8px 0;">
+          <p><strong>Nom :</strong> <span id="profileName">—</span></p>
+          <p><strong>Email :</strong> <span id="profileEmail">—</span></p>
+          <p><strong>Pays :</strong> <span id="profileCountry">—</span></p>
+          <p><strong>Plan :</strong> <span id="profilePlan" style="color:var(--green);font-weight:600;">—</span></p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">💰</span> Plans & Tarifs</div>
+        <div class="stats-row" style="margin-top:12px;">
+          <div class="stat-card" style="border-top:3px solid var(--green);">
+            <div class="sc-value" style="color:var(--green);">Gratuit</div>
+            <div class="sc-label">0 FCFA/mois</div>
+            <ul style="font-size:12px;margin-top:8px;padding-left:16px;color:var(--text-light);">
+              <li>Analyse de prix (1 pays)</li>
+              <li>50 requetes/heure</li>
+            </ul>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--gold);">
+            <div class="sc-value" style="color:var(--gold);">Pro</div>
+            <div class="sc-label">2 900 FCFA/mois</div>
+            <ul style="font-size:12px;margin-top:8px;padding-left:16px;color:var(--text-light);">
+              <li>Tous les pays UEMOA</li>
+              <li>Negoce + Production</li>
+              <li>500 requetes/heure</li>
+            </ul>
+          </div>
+          <div class="stat-card" style="border-top:3px solid var(--navy);">
+            <div class="sc-value" style="color:var(--navy);">Expert</div>
+            <div class="sc-label">14 900 FCFA/mois</div>
+            <ul style="font-size:12px;margin-top:8px;padding-left:16px;color:var(--text-light);">
+              <li>Export + Conformite</li>
+              <li>API acces illimite</li>
+              <li>Support prioritaire</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- V6: Legal Section -->
+      <div class="card">
+        <div class="card-title"><span class="icon">📜</span> Legal</div>
+        <div style="padding:8px 0;">
+          <p style="margin-bottom:8px;"><a href="#" onclick="AgroPrix.cgu.forceShow();return false;" style="font-size:13px;color:var(--primary);font-weight:600;">Conditions Generales d'Utilisation (CGU)</a></p>
+          <p><a href="#" style="font-size:13px;color:var(--primary);font-weight:600;">Politique de confidentialite</a></p>
+        </div>
+      </div>
+
+      <!-- V6: Partenaire officiel -->
+      <div class="card">
+        <div class="card-title"><span class="icon">🤝</span> Partenaire officiel</div>
+        <div style="padding:8px 0;">
+          <p style="font-size:13px;color:var(--text-light);line-height:1.6;">
+            <strong>Les Domaines du Terroir (LDT)</strong><br>
+            Partenaire de croissance AgroPrix — Benin<br>
+            <span style="font-size:11px;color:var(--text-muted);">SARL — Cotonou, Benin</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">ℹ️</span> A propos</div>
+        <p style="font-size:13px;color:var(--text-light);line-height:1.6;">
+          AgroPrix est une plateforme d'intelligence des prix agricoles pour l'Afrique de l'Ouest (UEMOA).<br>
+          Developpe par <strong>33 Lab</strong> — Cotonou, Benin.<br>
+          Version 6.0.0 - Mars 2026
+        </p>
+      </div>
+      <button class="btn-analyse" style="max-width:320px;background:var(--alert);" onclick="logout()">🚪 Se deconnecter</button>
+    </div>
+
+  </div><!-- /.content -->
+</div><!-- /.main -->
+
+<!-- ═══ BOTTOM NAV (Mobile - V6: 5 tabs) ═══ -->
+<nav class="bottom-nav" id="bottomNav">
+  <a class="active" onclick="showView('analyse', this)"><span>📊</span><span>Analyse</span></a>
+  <a onclick="showView('negoce', this)"><span>📒</span><span>Negoce</span></a>
+  <a onclick="showView('production', this)"><span>🌱</span><span>Production</span></a>
+  <a onclick="showView('export', this)"><span>🚢</span><span>Export</span></a>
+  <a onclick="showView('financing', this)"><span>💰</span><span>Finance</span></a>
+</nav>
+
+</div><!-- /#appContainer -->
+
+<!-- ═══ SCRIPTS ═══ -->
+<script src="/js/security.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/data.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/ui.js?v=2"></script>
+<script src="/js/analysis.js"></script>
+<script src="/js/negoce.js"></script>
+<script src="/js/production.js"></script>
+<script src="/js/export.js"></script>
+<script src="/js/cgu.js"></script>
+<script src="/js/inputs.js"></script>
+<script src="/js/marketplace.js"></script>
+<script src="/js/financing.js"></script>
+<script src="/js/scoring.js"></script>
+<script src="/js/ndvi.js"></script>
+<script src="/js/dashboard.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/app.js"></script>
+
+</body>
+</html>

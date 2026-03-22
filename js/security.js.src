@@ -1,0 +1,133 @@
+// AgroPrix Security Module
+// Anti-inspection + Session timeout + XSS sanitization + CSP
+(function() {
+  'use strict';
+
+  // =========================================================================
+  // 1. ANTI-INSPECTION (dissuasion)
+  // =========================================================================
+
+  // Disable right-click
+  document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+  // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'F12') { e.preventDefault(); return false; }
+    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) { e.preventDefault(); return false; }
+    if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j')) { e.preventDefault(); return false; }
+    if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) { e.preventDefault(); return false; }
+  });
+
+  // Console warning
+  console.log('%c⚠️ ATTENTION', 'color:red;font-size:24px;font-weight:bold;');
+  console.log('%cCette console est reservee aux developpeurs. Ne collez jamais de code ici.', 'color:#333;font-size:14px;');
+  console.log('%cSi quelqu\'un vous a demande de copier-coller quelque chose ici, c\'est une arnaque.', 'color:#e76f51;font-size:12px;');
+
+  // =========================================================================
+  // 2. SESSION TIMEOUT (30 minutes)
+  // =========================================================================
+  var SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+  var timeoutTimer = null;
+  var warningTimer = null;
+
+  function resetSessionTimer() {
+    if (timeoutTimer) clearTimeout(timeoutTimer);
+    if (warningTimer) clearTimeout(warningTimer);
+
+    // Warning at 25 minutes
+    warningTimer = setTimeout(function() {
+      var banner = document.createElement('div');
+      banner.id = 'sessionWarning';
+      banner.innerHTML = '⏰ Votre session expire dans 5 minutes. <button onclick="this.parentElement.remove()" style="margin-left:8px;padding:2px 8px;background:white;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:11px;">OK</button>';
+      banner.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:10px;background:#FEF3C7;color:#92400E;text-align:center;font-size:12px;font-weight:600;z-index:10000;';
+      var existing = document.getElementById('sessionWarning');
+      if (existing) existing.remove();
+      document.body.appendChild(banner);
+    }, SESSION_TIMEOUT - 5 * 60 * 1000);
+
+    // Logout at 30 minutes
+    timeoutTimer = setTimeout(function() {
+      localStorage.removeItem('agroprix_user');
+      localStorage.removeItem('agroprix_token');
+      var warning = document.getElementById('sessionWarning');
+      if (warning) warning.remove();
+      alert('Session expiree. Veuillez vous reconnecter.');
+      location.reload();
+    }, SESSION_TIMEOUT);
+  }
+
+  // Reset on user activity
+  ['click', 'keydown', 'scroll', 'mousemove', 'touchstart'].forEach(function(evt) {
+    document.addEventListener(evt, resetSessionTimer, { passive: true });
+  });
+
+  // Start timer
+  resetSessionTimer();
+
+  // =========================================================================
+  // 3. XSS SANITIZATION
+  // =========================================================================
+  window.sanitizeInput = function(str) {
+    if (typeof str !== 'string') return '';
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;')
+      .replace(/\//g, '&#x2F;');
+  };
+
+  // Override innerHTML to auto-sanitize user inputs in forms
+  var originalFormSubmit = HTMLFormElement.prototype.submit;
+  HTMLFormElement.prototype.submit = function() {
+    var inputs = this.querySelectorAll('input[type="text"], textarea');
+    inputs.forEach(function(input) {
+      if (input.value) {
+        input.value = input.value.replace(/<script/gi, '').replace(/javascript:/gi, '').replace(/on\w+=/gi, '');
+      }
+    });
+    return originalFormSubmit.call(this);
+  };
+
+  // Sanitize all text inputs on blur
+  document.addEventListener('blur', function(e) {
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+      if (e.target.type === 'text' || e.target.type === 'search' || e.target.tagName === 'TEXTAREA') {
+        e.target.value = e.target.value.replace(/<script/gi, '').replace(/javascript:/gi, '').replace(/on\w+=/gi, '');
+      }
+    }
+  }, true);
+
+  // =========================================================================
+  // 4. LOCAL STORAGE PROTECTION
+  // =========================================================================
+  // Prevent localStorage tampering from console
+  var originalSetItem = localStorage.setItem;
+  localStorage.setItem = function(key, value) {
+    // Block suspicious keys
+    if (key === 'agroprix_user' || key === 'agroprix_token') {
+      var caller = new Error().stack || '';
+      if (caller.indexOf('security.js') === -1 && caller.indexOf('auth.js') === -1 && caller.indexOf('app.js') === -1) {
+        console.warn('[Security] Tentative de modification bloquee:', key);
+        return;
+      }
+    }
+    return originalSetItem.call(localStorage, key, value);
+  };
+
+  // =========================================================================
+  // 5. LINK PROTECTION (prevent open redirect)
+  // =========================================================================
+  document.addEventListener('click', function(e) {
+    var link = e.target.closest('a[href]');
+    if (link) {
+      var href = link.getAttribute('href');
+      if (href && (href.indexOf('javascript:') === 0 || href.indexOf('data:') === 0)) {
+        e.preventDefault();
+        console.warn('[Security] Lien dangereux bloque:', href);
+      }
+    }
+  });
+
+})();

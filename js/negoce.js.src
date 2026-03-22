@@ -1,0 +1,80 @@
+(function(AP) {
+  function init() {
+    // Transaction data
+    var transactions = [
+      { date:'14/03/2026', culture:'Maïs', marche:'Dantokpa', qty:2500, prixAchat:245, prixVente:298, status:'vendu' },
+      { date:'12/03/2026', culture:'Niébé', marche:'Bohicon', qty:1800, prixAchat:410, prixVente:485, status:'vendu' },
+      { date:'10/03/2026', culture:'Sorgho', marche:'Parakou', qty:3200, prixAchat:195, prixVente:228, status:'vendu' },
+      { date:'08/03/2026', culture:'Maïs', marche:'Glazoué', qty:1500, prixAchat:252, prixVente:290, status:'vendu' },
+      { date:'05/03/2026', culture:'Riz local', marche:'Malanville', qty:2000, prixAchat:380, prixVente:425, status:'vendu' },
+      { date:'03/03/2026', culture:'Tomate', marche:'Dantokpa', qty:800, prixAchat:350, prixVente:520, status:'vendu' },
+      { date:'28/02/2026', culture:'Oignon', marche:'Parakou', qty:1200, prixAchat:280, prixVente:265, status:'vendu' },
+      { date:'25/02/2026', culture:'Maïs', marche:'Natitingou', qty:2800, prixAchat:238, prixVente:275, status:'vendu' },
+      { date:'15/03/2026', culture:'Maïs', marche:'Dantokpa', qty:3000, prixAchat:248, prixVente:null, status:'en_stock' },
+      { date:'13/03/2026', culture:'Niébé', marche:'Glazoué', qty:1500, prixAchat:405, prixVente:null, status:'en_stock' },
+      { date:'11/03/2026', culture:'Sorgho', marche:'Bohicon', qty:2200, prixAchat:198, prixVente:null, status:'en_stock' }
+    ];
+
+    // Populate transactions table
+    var tbody = document.getElementById('transactionsBody');
+    if (!tbody) return;
+
+    var rows = '';
+    var totalMargeSum = 0, totalMargeCount = 0, totalValeurStock = 0, nbVendues = 0, nbStock = 0;
+
+    for (var i = 0; i < transactions.length; i++) {
+      var t = transactions[i];
+      var qtyF = t.qty.toLocaleString('fr-FR');
+      var paF = t.prixAchat.toLocaleString('fr-FR');
+
+      if (t.status === 'en_stock') {
+        nbStock++;
+        totalValeurStock += t.qty * t.prixAchat;
+        rows += '<tr><td>' + t.date + '</td><td>' + t.culture + '</td><td>' + t.marche + '</td><td>' + qtyF + ' kg</td><td>' + paF + ' FCFA/kg</td><td colspan="2" style="text-align:center;color:#d4a017;font-weight:600;">En stock</td></tr>';
+      } else {
+        nbVendues++;
+        var margin = ((t.prixVente - t.prixAchat) / t.prixAchat * 100).toFixed(1);
+        var marginColor = parseFloat(margin) >= 0 ? '#2d6a4f' : '#e76f51';
+        var marginSign = parseFloat(margin) >= 0 ? '+' : '';
+        totalMargeSum += parseFloat(margin);
+        totalMargeCount++;
+        var pvF = t.prixVente.toLocaleString('fr-FR');
+        rows += '<tr><td>' + t.date + '</td><td>' + t.culture + '</td><td>' + t.marche + '</td><td>' + qtyF + ' kg</td><td>' + paF + ' FCFA/kg</td><td>' + pvF + ' FCFA/kg</td><td style="color:' + marginColor + ';font-weight:600;">' + marginSign + margin + '%</td></tr>';
+      }
+    }
+    tbody.innerHTML = rows;
+
+    // Update stat cards
+    var el;
+    el = document.getElementById('negoceStatTransactions');
+    if (el) el.textContent = transactions.length;
+    el = document.getElementById('negoceStatStock');
+    if (el) el.textContent = nbStock + ' lots';
+    el = document.getElementById('negoceStatMarge');
+    if (el) el.textContent = '+' + (totalMargeCount > 0 ? (totalMargeSum / totalMargeCount).toFixed(1) : '0') + '%';
+    el = document.getElementById('negoceStatValeur');
+    if (el) el.textContent = totalValeurStock.toLocaleString('fr-FR') + ' FCFA';
+
+    // Populate opportunities
+    var opportunities = [
+      { culture:'Maïs', achat:'Glazoué', vente:'Dantokpa (Cotonou)', pa:242, pv:298, marge:23.1, raison:"Déficit d'approvisionnement à Cotonou, stocks Glazoué abondants post-récolte", urgence:'high' },
+      { culture:'Niébé', achat:'Malanville', vente:'Bohicon', pa:395, pv:478, marge:21.0, raison:'Arrivage frontalier depuis le Niger, prix bas à Malanville. Demande forte au sud.', urgence:'high' },
+      { culture:'Sorgho', achat:'Natitingou', vente:'Parakou', pa:188, pv:225, marge:19.7, raison:"Surplus régional dans l'Atacora. Transport court.", urgence:'medium' }
+    ];
+
+    var oppGrid = document.getElementById('opportunitiesGrid');
+    if (oppGrid) {
+      oppGrid.innerHTML = opportunities.map(function(o) {
+        return '<div class="opportunity-card severity-' + o.urgence + '"><div class="opp-header"><span class="opp-culture">' + o.culture + '</span><span class="opp-margin" style="background:rgba(45,106,79,.15);color:#2d6a4f;">+' + o.marge + '%</span></div><div class="opp-market">' + o.achat + ' → ' + o.vente + '</div><div class="opp-price">Achat: ' + o.pa + ' CFA/kg · Vente estimée: ' + o.pv + ' CFA/kg</div><div class="opp-reco">' + o.raison + '</div></div>';
+      }).join('');
+    }
+  }
+
+  function addTransaction() {
+    alert('Fonctionnalité disponible en version complète — Connectez-vous à AgroPrix Pro');
+  }
+
+  AP.negoce = { init: init, addTransaction: addTransaction };
+  window.addTransaction = addTransaction;
+
+})(window.AgroPrix);

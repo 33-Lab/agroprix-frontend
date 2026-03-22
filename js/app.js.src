@@ -1,0 +1,133 @@
+// AgroPrix — Main Application Entry Point
+// Initializes the app, checks API, sets up event listeners
+
+(function(AP) {
+  'use strict';
+
+  function init() {
+    console.log('[AgroPrix] Initialisation V6...');
+
+    // Check API availability
+    if (AP.api && AP.api.checkAPI) {
+      AP.api.checkAPI();
+    }
+
+    // Initialize markets grid for default country
+    if (AP.ui && AP.ui.updateMarkets) {
+      AP.ui.updateMarkets();
+    }
+
+    // Set up service worker
+    registerServiceWorker();
+
+    // Set up install prompt
+    setupInstallPrompt();
+
+    // Initialize authentication (check session, show login if needed)
+    if (AP.auth && AP.auth.initAuth) {
+      AP.auth.initAuth();
+    }
+
+    // Check CGU revalidation
+    if (AP.cgu && AP.cgu.checkOnStartup) {
+      AP.cgu.checkOnStartup();
+    }
+
+    console.log('[AgroPrix] Application V6 prete');
+  }
+
+  // Register PWA Service Worker
+  function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(function(reg) {
+          console.log('[AgroPrix] Service Worker enregistre', reg.scope);
+        })
+        .catch(function(err) {
+          console.log('[AgroPrix] Service Worker non disponible:', err.message);
+        });
+    }
+  }
+
+  // Handle PWA install prompt
+  var deferredPrompt = null;
+
+  function setupInstallPrompt() {
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      // Show install button if exists
+      var installBtn = document.getElementById('installBtn');
+      if (installBtn) {
+        installBtn.style.display = 'flex';
+        installBtn.addEventListener('click', function() {
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(function(result) {
+              console.log('[AgroPrix] Installation:', result.outcome);
+              deferredPrompt = null;
+              installBtn.style.display = 'none';
+            });
+          }
+        });
+      }
+    });
+  }
+
+  // V6: Demo Mode — skip auth, set fake demo user
+  function demoMode() {
+    console.log('[AgroPrix] Mode Demo active');
+
+    var demoUser = {
+      nom: 'Utilisateur Demo',
+      name: 'Utilisateur Demo',
+      email: 'demo@agroprix.app',
+      pays: 'benin',
+      country: 'benin',
+      role: 'pro',
+      demo: true
+    };
+
+    // Save demo user to localStorage
+    localStorage.setItem('agroprix_user', JSON.stringify(demoUser));
+    localStorage.setItem('agroprix_token', 'demo-token-v6');
+
+    // Hide auth screen, show app
+    var authScreen = document.getElementById('authScreen');
+    var appContainer = document.getElementById('appContainer');
+    if (authScreen) authScreen.style.display = 'none';
+    if (appContainer) appContainer.style.display = '';
+
+    // Update UI with demo user info
+    var nameEl = document.querySelector('.user-name');
+    var roleEl = document.querySelector('.user-role');
+    var avatarEl = document.querySelector('.sidebar-footer .avatar');
+    if (nameEl) nameEl.textContent = 'Utilisateur Demo';
+    if (roleEl) roleEl.textContent = 'Mode Demo';
+    if (avatarEl) avatarEl.textContent = 'DM';
+
+    // Update params profile
+    var profileName = document.getElementById('profileName');
+    var profileEmail = document.getElementById('profileEmail');
+    var profileCountry = document.getElementById('profileCountry');
+    var profilePlan = document.getElementById('profilePlan');
+    if (profileName) profileName.textContent = 'Utilisateur Demo';
+    if (profileEmail) profileEmail.textContent = 'demo@agroprix.app';
+    if (profileCountry) profileCountry.textContent = 'Benin';
+    if (profilePlan) profilePlan.textContent = 'Demo (Pro)';
+  }
+
+  // Expose
+  AP.app = { init: init, demoMode: demoMode };
+
+  // Also expose demoMode globally for onclick handler
+  window.demoMode = demoMode;
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})(window.AgroPrix);

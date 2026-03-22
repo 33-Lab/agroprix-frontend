@@ -1,0 +1,1319 @@
+[
+  {
+    "id": "fnda-bj",
+    "name": "FNDA",
+    "fullName": "Fonds National de Développement Agricole",
+    "country": "BJ",
+    "type": "fund",
+    "emoji": "🏛️",
+    "website": "https://fnda.agriculture.gouv.bj/",
+    "phone": "+229 91 53 11 11",
+    "products": [
+      {
+        "name": "Crédit PME via banques partenaires",
+        "minAmount": 1000000,
+        "maxAmount": 500000000,
+        "rate": "2% effectif/an (bonification FNDA)",
+        "rateValue": 2,
+        "duration": "5 ans max",
+        "guarantee": "50% couvert par FNDA",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative", "sme"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["business_plan", "id", "bank_account", "tax_compliance"]
+        },
+        "howToApply": "Contactez une banque partenaire agréée par le FNDA avec votre business plan."
+      },
+      {
+        "name": "Crédit petit producteur via IMF",
+        "minAmount": 100000,
+        "maxAmount": 50000000,
+        "rate": "2% effectif/an (bonification FNDA)",
+        "rateValue": 2,
+        "duration": "3 ans max",
+        "guarantee": "50% couvert par FNDA",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "proof_of_activity"]
+        },
+        "howToApply": "Rendez-vous dans une institution de microfinance partenaire du FNDA."
+      }
+    ]
+  },
+  {
+    "id": "fnm-bj",
+    "name": "FNM",
+    "fullName": "Fonds National de Micro Finance",
+    "country": "BJ",
+    "type": "fund",
+    "emoji": "💰",
+    "website": "https://www.fnm.bj/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Microcrédit aux Plus Pauvres (MCPP)",
+        "minAmount": 30000,
+        "maxAmount": 50000,
+        "rate": "2% (après retour épargne)",
+        "rateValue": 2,
+        "duration": "Renouvelable",
+        "guarantee": "Groupe solidaire 5-15 personnes",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id"]
+        },
+        "howToApply": "Formez un groupe solidaire de 5-15 personnes et contactez une IMF partenaire du FNM."
+      }
+    ]
+  },
+  {
+    "id": "fececam-bj",
+    "name": "FECECAM",
+    "fullName": "Faîtière des Caisses d'Épargne et de Crédit Agricole Mutuel",
+    "country": "BJ",
+    "type": "cooperative",
+    "emoji": "🤝",
+    "website": "https://fececam.org/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Crédit agricole coopératif",
+        "minAmount": 50000,
+        "maxAmount": 10000000,
+        "rate": "Inférieur aux banques commerciales",
+        "rateValue": 10,
+        "duration": "Variable",
+        "guarantee": "Adhésion coopérative",
+        "eligibility": {
+          "crops": ["mais", "coton", "anacarde", "soja", "niebe", "arachide"],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": true,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "membership_card"]
+        },
+        "howToApply": "Adhérez à la CLCAM (Caisse Locale) de votre commune. 33 CLCAMs dans 77 communes."
+      }
+    ]
+  },
+  {
+    "id": "unacrep-bj",
+    "name": "UNACREP",
+    "fullName": "Union Nationale des Caisses Rurales d'Épargne et de Prêt",
+    "country": "BJ",
+    "type": "cooperative",
+    "emoji": "🌾",
+    "website": "https://unacrep.bj/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Crédit agricole rural",
+        "minAmount": 50000,
+        "maxAmount": 5000000,
+        "rate": "Taux coopératif",
+        "rateValue": 12,
+        "duration": "Variable",
+        "guarantee": "Adhésion + épargne",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": true,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "membership_card"]
+        },
+        "howToApply": "Adhérez à une CREP locale. 159 000+ membres, 75 points de service dans 12 départements."
+      }
+    ]
+  },
+  {
+    "id": "renaca-bj",
+    "name": "RENACA",
+    "fullName": "Réseau National des Caisses Villageoises d'Épargne et de Crédit Autogérées",
+    "country": "BJ",
+    "type": "cooperative",
+    "emoji": "🏘️",
+    "website": "https://www.renacabenin.org/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Microcrédit villageois",
+        "minAmount": 25000,
+        "maxAmount": 2000000,
+        "rate": "Adapté milieu rural",
+        "rateValue": 12,
+        "duration": "Court terme",
+        "guarantee": "Groupe villageois",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id"]
+        },
+        "howToApply": "Contactez la CAVECA de votre département. 238 000 membres dans 7 départements."
+      }
+    ]
+  },
+  {
+    "id": "agrifinance-bj",
+    "name": "AgriFinance",
+    "fullName": "Coopérative de Financement Agricole",
+    "country": "BJ",
+    "type": "cooperative",
+    "emoji": "🌱",
+    "website": "https://www.agrifinance.bj/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Crédit de campagne agricole",
+        "minAmount": 100000,
+        "maxAmount": 10000000,
+        "rate": "Variable",
+        "rateValue": 12,
+        "duration": "Saisonnier",
+        "guarantee": "Adhésion",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "proof_of_activity"]
+        },
+        "howToApply": "Contactez un des 6 points de service AgriFinance."
+      }
+    ]
+  },
+  {
+    "id": "fnec-bj",
+    "name": "FNEC",
+    "fullName": "Fonds National pour l'Environnement et le Climat",
+    "country": "BJ",
+    "type": "fund",
+    "emoji": "🌍",
+    "website": "https://fnec-benin.org/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Subvention projet agro-climatique",
+        "minAmount": 500000,
+        "maxAmount": 50000000,
+        "rate": "0% (subvention)",
+        "rateValue": 0,
+        "duration": "Projet",
+        "guarantee": "Aucune",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative", "sme"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["project_proposal", "id"]
+        },
+        "howToApply": "Répondez aux appels à projets du FNEC (accrédité Fonds Vert pour le Climat)."
+      }
+    ]
+  },
+  {
+    "id": "padme-bj",
+    "name": "PADME",
+    "fullName": "Société pour la Promotion et l'Appui au Développement des Micro-Entreprises",
+    "country": "BJ",
+    "type": "mfi",
+    "emoji": "📊",
+    "website": "https://padme.bj/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Crédit fonds de roulement agricole",
+        "minAmount": 50000,
+        "maxAmount": 5000000,
+        "rate": "Variable",
+        "rateValue": 15,
+        "duration": "Court à moyen terme",
+        "guarantee": "Standard",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "sme"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "proof_of_activity"]
+        },
+        "howToApply": "Rendez-vous dans un des points de service PADME."
+      }
+    ]
+  },
+  {
+    "id": "firca-nsia-ci",
+    "name": "FIRCA + NSIA Banque",
+    "fullName": "Fonds Interprofessionnel pour la Recherche et le Conseil Agricoles + NSIA Banque",
+    "country": "CI",
+    "type": "fund",
+    "emoji": "🏦",
+    "website": "https://firca.ci/",
+    "phone": "+225 27 22 52 81 81",
+    "products": [
+      {
+        "name": "Crédit PME agricole (appel à projets)",
+        "minAmount": 5000000,
+        "maxAmount": 400000000,
+        "rate": "8.5-9% HT/an",
+        "rateValue": 9,
+        "duration": "2-6 ans",
+        "guarantee": "10% apport personnel + 30% garantie progressive",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["sme"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": 2,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["business_plan", "financial_statements", "id", "tax_compliance"]
+        },
+        "howToApply": "Appel à projets ouvert 5 mars - 20 avril 2026 via NSIA Banque. Revenus < 1 milliard FCFA."
+      }
+    ]
+  },
+  {
+    "id": "advans-ci",
+    "name": "Advans CI",
+    "fullName": "Advans Côte d'Ivoire",
+    "country": "CI",
+    "type": "mfi",
+    "emoji": "💳",
+    "website": "https://www.advanscotedivoire.com/",
+    "phone": "+225 05 75 58 45 60",
+    "products": [
+      {
+        "name": "Crédit agricole (BFR + campagne)",
+        "minAmount": 150000,
+        "maxAmount": 300000000,
+        "rate": "1.33-1.6%/mois HT",
+        "rateValue": 16,
+        "duration": "3-36 mois",
+        "guarantee": "Simplifiée",
+        "eligibility": {
+          "crops": ["cacao", "anacarde", "cafe"],
+          "farmerTypes": ["individual", "cooperative", "sme"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "proof_of_activity"]
+        },
+        "howToApply": "Contactez Advans via WhatsApp +225 05 75 58 45 60 ou en agence."
+      }
+    ]
+  },
+  {
+    "id": "baobab-ci",
+    "name": "Baobab CI",
+    "fullName": "Baobab Côte d'Ivoire",
+    "country": "CI",
+    "type": "mfi",
+    "emoji": "🌳",
+    "website": "https://baobab.com/ci/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Crédit agricole",
+        "minAmount": 5000000,
+        "maxAmount": 300000000,
+        "rate": "1.25-1.6%/mois",
+        "rateValue": 15,
+        "duration": "3-8 mois",
+        "guarantee": "Pas d'épargne préalable requise",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": 2,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "proof_of_activity"]
+        },
+        "howToApply": "Contactez une agence Baobab ou postulez en ligne sur baobab.com/ci."
+      }
+    ]
+  },
+  {
+    "id": "apromac-ci",
+    "name": "APROMAC",
+    "fullName": "Organisation Interprofessionnelle Agricole de la filière Hévéa",
+    "country": "CI",
+    "type": "fund",
+    "emoji": "🌿",
+    "website": "",
+    "phone": "",
+    "products": [
+      {
+        "name": "Programme plantation hévéa (500 000 ha)",
+        "minAmount": 0,
+        "maxAmount": 5000000000,
+        "rate": "Subventionné",
+        "rateValue": 0,
+        "duration": "Programme 2026-2035",
+        "guarantee": "Aucune",
+        "eligibility": {
+          "crops": ["hevea"],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id"]
+        },
+        "howToApply": "Contactez les bureaux régionaux APROMAC pour le programme d'urgence hévéa."
+      }
+    ]
+  },
+  {
+    "id": "bpci-ci",
+    "name": "BPCI",
+    "fullName": "Banque Populaire de Côte d'Ivoire",
+    "country": "CI",
+    "type": "bank",
+    "emoji": "🏛️",
+    "website": "https://www.bponline.ci/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Crédit agricole prioritaire",
+        "minAmount": 1000000,
+        "maxAmount": 100000000,
+        "rate": "Compétitif",
+        "rateValue": 10,
+        "duration": "Variable",
+        "guarantee": "Standard bancaire",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "sme"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["business_plan", "id", "bank_account"]
+        },
+        "howToApply": "Rendez-vous en agence BPCI avec votre dossier de crédit."
+      }
+    ]
+  },
+  {
+    "id": "bridge-ci",
+    "name": "Bridge Bank",
+    "fullName": "Bridge Bank Group Côte d'Ivoire",
+    "country": "CI",
+    "type": "bank",
+    "emoji": "🌉",
+    "website": "https://www.bridgebankgroup.com/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Financement PME agro-alimentaire",
+        "minAmount": 5000000,
+        "maxAmount": 200000000,
+        "rate": "Compétitif",
+        "rateValue": 10,
+        "duration": "Moyen à long terme",
+        "guarantee": "Standard",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["sme"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": 2,
+          "gender": "female_priority",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["business_plan", "financial_statements", "id"]
+        },
+        "howToApply": "Agences Bridge Bank à Abidjan. Priorité femmes entrepreneures."
+      }
+    ]
+  },
+  {
+    "id": "fdfp-ci",
+    "name": "FDFP",
+    "fullName": "Fonds de Développement de la Formation Professionnelle",
+    "country": "CI",
+    "type": "fund",
+    "emoji": "📚",
+    "website": "https://www.fdfp.ci/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Formation + accompagnement agricole",
+        "minAmount": 0,
+        "maxAmount": 60000000,
+        "rate": "0% (subvention formation)",
+        "rateValue": 0,
+        "duration": "Projet",
+        "guarantee": "Aucune",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id"]
+        },
+        "howToApply": "Inscrivez-vous aux programmes de formation FDFP dans votre région."
+      }
+    ]
+  },
+  {
+    "id": "banque-agricole-sn",
+    "name": "La Banque Agricole",
+    "fullName": "Caisse Nationale de Crédit Agricole du Sénégal (CNCAS)",
+    "country": "SN",
+    "type": "bank",
+    "emoji": "🏦",
+    "website": "https://www.labanqueagricole.sn/",
+    "phone": "+221 33 839 36 36",
+    "products": [
+      {
+        "name": "Crédit de campagne",
+        "minAmount": 500000,
+        "maxAmount": 50000000,
+        "rate": "7.5%/an (subventionné)",
+        "rateValue": 7.5,
+        "duration": "Saisonnier",
+        "guarantee": "Standard",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "proof_of_activity"]
+        },
+        "howToApply": "Rendez-vous dans l'une des 38 agences. Réseau le plus décentralisé du Sénégal."
+      },
+      {
+        "name": "Crédit d'investissement Agreenfi",
+        "minAmount": 2000000,
+        "maxAmount": 100000000,
+        "rate": "~5%/an",
+        "rateValue": 5,
+        "duration": "5-10 ans",
+        "guarantee": "Garantie requise",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative", "sme"],
+          "requiresCoop": false,
+          "minFarmSize": 1,
+          "minExperience": 2,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["business_plan", "id", "bank_account", "proof_of_activity"]
+        },
+        "howToApply": "Demandez le programme Agreenfi (soutenu par l'AFD) dans votre agence."
+      }
+    ]
+  },
+  {
+    "id": "der-fj-sn",
+    "name": "DER/FJ",
+    "fullName": "Délégation à l'Entrepreneuriat Rapide des Femmes et des Jeunes",
+    "country": "SN",
+    "type": "fund",
+    "emoji": "🚀",
+    "website": "https://www.der.sn/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Financement projet agricole (taux 0%)",
+        "minAmount": 500000,
+        "maxAmount": 20000000,
+        "rate": "0% (sans intérêt)",
+        "rateValue": 0,
+        "duration": "Moyen terme",
+        "guarantee": "Projet viable",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "female_priority",
+          "maxAge": 40,
+          "minAge": 18,
+          "documents": ["id", "business_plan"]
+        },
+        "howToApply": "Passez par les Pôles Emploi et Entrepreneuriat (PEEFJ) dans chaque région."
+      }
+    ]
+  },
+  {
+    "id": "fongip-sn",
+    "name": "FONGIP",
+    "fullName": "Fonds de Garantie des Investissements Prioritaires",
+    "country": "SN",
+    "type": "fund",
+    "emoji": "🛡️",
+    "website": "https://www.fongip.sn/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Garantie de prêt agricole",
+        "minAmount": 0,
+        "maxAmount": 0,
+        "rate": "N/A (garantie, pas prêt direct)",
+        "rateValue": 0,
+        "duration": "Selon partenaire bancaire",
+        "guarantee": "FONGIP couvre le risque",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative", "sme"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["business_plan", "id"]
+        },
+        "howToApply": "Demandez la garantie FONGIP via votre banque ou IMF partenaire."
+      }
+    ]
+  },
+  {
+    "id": "cms-sn",
+    "name": "CMS",
+    "fullName": "Crédit Mutuel du Sénégal",
+    "country": "SN",
+    "type": "mfi",
+    "emoji": "🤝",
+    "website": "https://www.cms.sn/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Crédit agricole coopératif",
+        "minAmount": 100000,
+        "maxAmount": 30000000,
+        "rate": "Compétitif",
+        "rateValue": 12,
+        "duration": "Saisonnier à moyen terme",
+        "guarantee": "Récépissé d'entrepôt (SRE) accepté",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "proof_of_activity"]
+        },
+        "howToApply": "218+ agences dans toute la zone UEMOA. 44 départements couverts au Sénégal."
+      }
+    ]
+  },
+  {
+    "id": "acep-sn",
+    "name": "ACEP",
+    "fullName": "Alliance de Crédit et d'Épargne pour la Production",
+    "country": "SN",
+    "type": "mfi",
+    "emoji": "🌾",
+    "website": "https://www.acepsenegal.com/",
+    "phone": "+221 201 201",
+    "products": [
+      {
+        "name": "Crédit TPE agricole",
+        "minAmount": 100000,
+        "maxAmount": 15000000,
+        "rate": "Compétitif",
+        "rateValue": 12,
+        "duration": "Court à moyen terme",
+        "guarantee": "Standard coopératif",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "proof_of_activity"]
+        },
+        "howToApply": "19 agences + 88 sous-bureaux. WhatsApp : +221 70 621 00. 30+ ans d'expérience agri."
+      }
+    ]
+  },
+  {
+    "id": "cofina-sn",
+    "name": "COFINA",
+    "fullName": "Compagnie Financière Africaine",
+    "country": "SN",
+    "type": "mfi",
+    "emoji": "📈",
+    "website": "https://www.cofinasenegal.com/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Financement PME agricole (BEI)",
+        "minAmount": 5000000,
+        "maxAmount": 50000000,
+        "rate": "Réduit (subventionné BEI/UE)",
+        "rateValue": 8,
+        "duration": "Adapté au cycle de production",
+        "guarantee": "Standard",
+        "eligibility": {
+          "crops": ["cereales", "horticulture"],
+          "farmerTypes": ["sme"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "female_priority",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["business_plan", "id"]
+        },
+        "howToApply": "Contactez COFINA Sénégal. Priorité céréales et horticulture."
+      }
+    ]
+  },
+  {
+    "id": "visionfund-sn",
+    "name": "Vision Fund",
+    "fullName": "VisionFund Sénégal",
+    "country": "SN",
+    "type": "mfi",
+    "emoji": "👁️",
+    "website": "https://www.visionfund-senegal.org/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Microcrédit groupe (femmes rurales)",
+        "minAmount": 100000,
+        "maxAmount": 2000000,
+        "rate": "Compétitif microfinance",
+        "rateValue": 15,
+        "duration": "Saisonnier à 12 mois",
+        "guarantee": "Groupe solidaire (tontine)",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "female_priority",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id"]
+        },
+        "howToApply": "95% des clients sont des femmes. 86% en milieu rural. Contactez une agence locale."
+      }
+    ]
+  },
+  {
+    "id": "pamecas-sn",
+    "name": "PAMECAS",
+    "fullName": "Partenariat pour la Mobilisation de l'Épargne et du Crédit au Sénégal",
+    "country": "SN",
+    "type": "cooperative",
+    "emoji": "💎",
+    "website": "",
+    "phone": "",
+    "products": [
+      {
+        "name": "Crédit coopératif agricole",
+        "minAmount": 100000,
+        "maxAmount": 15000000,
+        "rate": "Compétitif (épargne ~6% net)",
+        "rateValue": 12,
+        "duration": "Court à moyen terme",
+        "guarantee": "Adhésion + épargne",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": true,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "membership_card"]
+        },
+        "howToApply": "1.1 million de membres. 106+ points de vente fixes. Adhérez à une coopérative locale."
+      }
+    ]
+  },
+  {
+    "id": "bnda-ml",
+    "name": "BNDA",
+    "fullName": "Banque Nationale de Développement Agricole",
+    "country": "ML",
+    "type": "bank",
+    "emoji": "🏦",
+    "website": "https://www.bnda-mali.com/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Crédit agricole adapté",
+        "minAmount": 500000,
+        "maxAmount": 50000000,
+        "rate": "Variable",
+        "rateValue": 10,
+        "duration": "Flexible",
+        "guarantee": "Standard",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "proof_of_activity"]
+        },
+        "howToApply": "50+ agences au Mali. Partenariat IFC (40M$ en 2025)."
+      }
+    ]
+  },
+  {
+    "id": "kafo-jiginew-ml",
+    "name": "Kafo Jiginew",
+    "fullName": "Kafo Jiginew (Union des Greniers)",
+    "country": "ML",
+    "type": "cooperative",
+    "emoji": "🌾",
+    "website": "https://www.kafojiginew.com/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Crédit équipement paysan",
+        "minAmount": 200000,
+        "maxAmount": 10000000,
+        "rate": "1.5%/mois (18%/an)",
+        "rateValue": 18,
+        "duration": "36 mois max",
+        "guarantee": "10% dépôt sur montant emprunté",
+        "eligibility": {
+          "crops": ["coton"],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": true,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "membership_card"]
+        },
+        "howToApply": "500 000 membres. 158 points de vente (128 ruraux). 40%+ du marché microfinance Mali."
+      },
+      {
+        "name": "Crédit intrants agricoles",
+        "minAmount": 50000,
+        "maxAmount": 5000000,
+        "rate": "12% forfaitaire",
+        "rateValue": 12,
+        "duration": "10 mois",
+        "guarantee": "Coopérative",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": true,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "membership_card"]
+        },
+        "howToApply": "Adhérez à une caisse locale Kafo Jiginew."
+      }
+    ]
+  },
+  {
+    "id": "bms-ml",
+    "name": "BMS",
+    "fullName": "Banque Malienne de Solidarité",
+    "country": "ML",
+    "type": "bank",
+    "emoji": "🤲",
+    "website": "http://www.bms-sa.ml/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Crédit agricole solidaire",
+        "minAmount": 200000,
+        "maxAmount": 20000000,
+        "rate": "8%/an (OP/SFD) ou 13-15%/an (standard)",
+        "rateValue": 8,
+        "duration": "Variable",
+        "guarantee": "Allégée pour OP",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "proof_of_activity"]
+        },
+        "howToApply": "40+ agences au Mali. Taux réduit à 8% pour organisations paysannes."
+      }
+    ]
+  },
+  {
+    "id": "inclusif-ml",
+    "name": "Projet INCLUSIF",
+    "fullName": "Projet d'Inclusion Financière des Filières Agricoles",
+    "country": "ML",
+    "type": "fund",
+    "emoji": "🎯",
+    "website": "https://inclusifmali.org/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Inclusion bancaire + crédit adapté",
+        "minAmount": 100000,
+        "maxAmount": 10000000,
+        "rate": "Variable (via IMF partenaires)",
+        "rateValue": 10,
+        "duration": "Variable",
+        "guarantee": "Via institutions partenaires",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "female_priority",
+          "maxAge": 40,
+          "minAge": 18,
+          "documents": ["id"]
+        },
+        "howToApply": "440 000 bénéficiaires ciblés (50% femmes, 50% jeunes). 5 régions : Koulikoro, Sikasso, Kayes, Ségou, Mopti."
+      }
+    ]
+  },
+  {
+    "id": "badf-bf",
+    "name": "BADF",
+    "fullName": "Banque Agricole Du Faso",
+    "country": "BF",
+    "type": "bank",
+    "emoji": "🏦",
+    "website": "https://www.badf.bf/",
+    "phone": "+226 25 32 99 00",
+    "products": [
+      {
+        "name": "Crédit production céréalière",
+        "minAmount": 1000000,
+        "maxAmount": 100000000,
+        "rate": "7-9%/an (5% pour riz)",
+        "rateValue": 7,
+        "duration": "Saisonnier à 3 ans",
+        "guarantee": "Pas de condition sine qua non",
+        "eligibility": {
+          "crops": ["mais", "sorgho", "mil", "niebe", "soja", "riz"],
+          "farmerTypes": ["individual", "cooperative", "sme"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "proof_of_activity"]
+        },
+        "howToApply": "8 agences : Ouaga, Bobo, Dédougou, Banfora, Bagré, Diébougou, Houndé, Kaya."
+      }
+    ]
+  },
+  {
+    "id": "rcpb-bf",
+    "name": "RCPB",
+    "fullName": "Réseau des Caisses Populaires du Burkina",
+    "country": "BF",
+    "type": "cooperative",
+    "emoji": "🤝",
+    "website": "http://rcpb.bf/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Crédit agricole coopératif",
+        "minAmount": 50000,
+        "maxAmount": 10000000,
+        "rate": "Compétitif coopératif",
+        "rateValue": 12,
+        "duration": "Court à moyen terme",
+        "guarantee": "Adhésion coopérative",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": true,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "membership_card"]
+        },
+        "howToApply": "70%+ du marché MFI au Burkina. 212 points de vente. Fondé en 1972."
+      }
+    ]
+  },
+  {
+    "id": "faij-bf",
+    "name": "FAIJ",
+    "fullName": "Fonds d'Appui aux Initiatives des Jeunes",
+    "country": "BF",
+    "type": "fund",
+    "emoji": "🚀",
+    "website": "https://www.faij.gov.bf/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Prêt jeune entrepreneur agricole",
+        "minAmount": 200000,
+        "maxAmount": 2000000,
+        "rate": "2% (handicap), 3.5% (femmes), 4% (hommes)",
+        "rateValue": 3.5,
+        "duration": "3-36 mois",
+        "guarantee": "Parrain/mentor de 40+ ans",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "female_priority",
+          "maxAge": 35,
+          "minAge": 18,
+          "documents": ["id", "training_certificate"]
+        },
+        "howToApply": "Formation entrepreneuriat obligatoire. 13 bureaux régionaux. Trouvez un parrain de 40+ ans."
+      }
+    ]
+  },
+  {
+    "id": "pamf-bf",
+    "name": "PAMF-BF",
+    "fullName": "Première Agence de Microfinance – Burkina Faso",
+    "country": "BF",
+    "type": "mfi",
+    "emoji": "🌱",
+    "website": "",
+    "phone": "",
+    "products": [
+      {
+        "name": "Crédit agricole spécialisé",
+        "minAmount": 100000,
+        "maxAmount": 5000000,
+        "rate": "Variable",
+        "rateValue": 12,
+        "duration": "Saisonnier",
+        "guarantee": "Standard",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "proof_of_activity"]
+        },
+        "howToApply": "84% du portefeuille dédié à l'agriculture. 20 000+ petits producteurs accompagnés."
+      }
+    ]
+  },
+  {
+    "id": "fucec-tg",
+    "name": "FUCEC",
+    "fullName": "Faîtière des Unités Coopératives d'Épargne et de Crédit du Togo",
+    "country": "TG",
+    "type": "cooperative",
+    "emoji": "🤝",
+    "website": "https://www.fucec-togo.com/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Financement chaîne de valeur agricole",
+        "minAmount": 100000,
+        "maxAmount": 20000000,
+        "rate": "Compétitif coopératif",
+        "rateValue": 12,
+        "duration": "Variable",
+        "guarantee": "Contrat tripartite (producteur, acheteur, FUCEC)",
+        "eligibility": {
+          "crops": ["cacao", "soja", "ananas"],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "proof_of_activity"]
+        },
+        "howToApply": "46% des actifs MFI au Togo. 1.4M+ membres. 40+ institutions affiliées."
+      }
+    ]
+  },
+  {
+    "id": "mifa-tg",
+    "name": "MIFA",
+    "fullName": "Mécanisme Incitatif de Financement Agricole",
+    "country": "TG",
+    "type": "fund",
+    "emoji": "🎯",
+    "website": "",
+    "phone": "",
+    "products": [
+      {
+        "name": "Crédit agricole garanti par l'État",
+        "minAmount": 500000,
+        "maxAmount": 50000000,
+        "rate": "8%/an",
+        "rateValue": 8,
+        "duration": "Saisonnier à 4 ans (équipement)",
+        "guarantee": "Mécanisme de partage de risque État",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "proof_of_activity"]
+        },
+        "howToApply": "200 000+ producteurs soutenus. 10 banques partenaires (Ecobank, Orabank, BOA, etc.)."
+      }
+    ]
+  },
+  {
+    "id": "orabank-tg",
+    "name": "Orabank Togo",
+    "fullName": "Orabank Togo",
+    "country": "TG",
+    "type": "bank",
+    "emoji": "🏛️",
+    "website": "https://www.orabank.net/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Crédit agricole via MIFA",
+        "minAmount": 500000,
+        "maxAmount": 30000000,
+        "rate": "8%/an",
+        "rateValue": 8,
+        "duration": "Saisonnier",
+        "guarantee": "MIFA",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "proof_of_activity"]
+        },
+        "howToApply": "330M+ FCFA distribués à 392 producteurs en 2023-2024. Plateforme en ligne : credittogo.orabank.net."
+      }
+    ]
+  },
+  {
+    "id": "bagri-ne",
+    "name": "BAGRI",
+    "fullName": "Banque Agricole du Niger",
+    "country": "NE",
+    "type": "bank",
+    "emoji": "🏦",
+    "website": "https://bagri.ne/",
+    "phone": "+227 20 73 13 50",
+    "products": [
+      {
+        "name": "Crédit petit producteur",
+        "minAmount": 200000,
+        "maxAmount": 20000000,
+        "rate": "Variable",
+        "rateValue": 10,
+        "duration": "Saisonnier à moyen terme",
+        "guarantee": "Allégée",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id", "proof_of_activity"]
+        },
+        "howToApply": "Seule banque agricole dédiée au Niger. 5 000+ petits producteurs soutenus. 1ère banque UEMOA hors BOAD à obtenir le Fonds Vert (10M$)."
+      }
+    ]
+  },
+  {
+    "id": "i3n-ne",
+    "name": "i3N / FISAN",
+    "fullName": "Initiative les Nigériens Nourrissent les Nigériens / Fonds d'Investissement pour la Sécurité Alimentaire",
+    "country": "NE",
+    "type": "fund",
+    "emoji": "🌾",
+    "website": "http://www.initiative3n.ne/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Appui sécurité alimentaire",
+        "minAmount": 0,
+        "maxAmount": 10000000,
+        "rate": "0% (subvention/appui)",
+        "rateValue": 0,
+        "duration": "Programme",
+        "guarantee": "Aucune",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual", "cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id"]
+        },
+        "howToApply": "200 000 ha restaurés. 67 000 agriculteurs formés. Contactez la Maison du Paysan de votre zone."
+      }
+    ]
+  },
+  {
+    "id": "boad-regional",
+    "name": "BOAD",
+    "fullName": "Banque Ouest Africaine de Développement",
+    "country": "ALL",
+    "type": "bank",
+    "emoji": "🌍",
+    "website": "https://www.boad.org/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Financement projets agricoles structurants",
+        "minAmount": 500000000,
+        "maxAmount": 50000000000,
+        "rate": "Concessionnel",
+        "rateValue": 3,
+        "duration": "Long terme (10-20 ans)",
+        "guarantee": "Garantie souveraine",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["sme", "cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": 5,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["business_plan", "financial_statements", "feasibility_study"]
+        },
+        "howToApply": "Pour projets structurants uniquement. Contactez via les institutions nationales."
+      }
+    ]
+  },
+  {
+    "id": "fagace-regional",
+    "name": "FAGACE",
+    "fullName": "Fonds Africain de Garantie et de Coopération Économique",
+    "country": "ALL",
+    "type": "fund",
+    "emoji": "🛡️",
+    "website": "https://www.fagace.org/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Garantie bancaire PME agricole",
+        "minAmount": 0,
+        "maxAmount": 0,
+        "rate": "N/A (garantie)",
+        "rateValue": 0,
+        "duration": "Selon prêt garanti",
+        "guarantee": "FAGACE couvre le risque de défaut",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["sme"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["business_plan", "id"]
+        },
+        "howToApply": "3 000 milliards FCFA mobilisés depuis 1977. Demandez via votre banque. 14 pays membres."
+      }
+    ]
+  }
+]
