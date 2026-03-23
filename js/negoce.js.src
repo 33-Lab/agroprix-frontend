@@ -30,11 +30,11 @@
       if (t.status === 'en_stock') {
         nbStock++;
         totalValeurStock += t.qty * t.prixAchat;
-        rows += '<tr><td>' + t.date + '</td><td>' + t.culture + '</td><td>' + t.marche + '</td><td>' + qtyF + ' kg</td><td>' + paF + ' FCFA/kg</td><td colspan="2" style="text-align:center;color:#d4a017;font-weight:600;">En stock</td></tr>';
+        rows += '<tr><td>' + t.date + '</td><td>' + t.culture + '</td><td>' + t.marche + '</td><td>' + qtyF + ' kg</td><td>' + paF + ' FCFA/kg</td><td colspan="2" style="text-align:center;color:#E8862A;font-weight:600;">En stock</td></tr>';
       } else {
         nbVendues++;
         var margin = ((t.prixVente - t.prixAchat) / t.prixAchat * 100).toFixed(1);
-        var marginColor = parseFloat(margin) >= 0 ? '#2d6a4f' : '#e76f51';
+        var marginColor = parseFloat(margin) >= 0 ? '#2D6A4F' : '#e76f51';
         var marginSign = parseFloat(margin) >= 0 ? '+' : '';
         totalMargeSum += parseFloat(margin);
         totalMargeCount++;
@@ -65,7 +65,7 @@
     var oppGrid = document.getElementById('opportunitiesGrid');
     if (oppGrid) {
       oppGrid.innerHTML = opportunities.map(function(o) {
-        return '<div class="opportunity-card severity-' + o.urgence + '"><div class="opp-header"><span class="opp-culture">' + o.culture + '</span><span class="opp-margin" style="background:rgba(45,106,79,.15);color:#2d6a4f;">+' + o.marge + '%</span></div><div class="opp-market">' + o.achat + ' → ' + o.vente + '</div><div class="opp-price">Achat: ' + o.pa + ' CFA/kg · Vente estimée: ' + o.pv + ' CFA/kg</div><div class="opp-reco">' + o.raison + '</div></div>';
+        return '<div class="opportunity-card severity-' + o.urgence + '"><div class="opp-header"><span class="opp-culture">' + o.culture + '</span><span class="opp-margin" style="background:rgba(45,106,79,.15);color:#2D6A4F;">+' + o.marge + '%</span></div><div class="opp-market">' + o.achat + ' → ' + o.vente + '</div><div class="opp-price">Achat: ' + o.pa + ' CFA/kg · Vente estimée: ' + o.pv + ' CFA/kg</div><div class="opp-reco">' + o.raison + '</div></div>';
       }).join('');
     }
   }
@@ -77,4 +77,53 @@
   AP.negoce = { init: init, addTransaction: addTransaction };
   window.addTransaction = addTransaction;
 
+  AP.negoce = { init: init };
 })(window.AgroPrix);
+
+// Calculateur Transport Inter-Marches (global function)
+function calculateTransport() {
+  var depart = document.querySelector('#viewNegoce select:nth-of-type(1)');
+  var arrivee = document.querySelector('#viewNegoce select:nth-of-type(2)');
+  var qtyEl = document.querySelector('#viewNegoce input[type="number"]:nth-of-type(1)');
+  var prixEl = document.querySelector('#viewNegoce input[type="number"]:nth-of-type(2)');
+
+  if (!depart || !arrivee || !qtyEl || !prixEl) return;
+
+  var qty = parseFloat(qtyEl.value) || 5;
+  var prixAchat = parseInt(prixEl.value) || 245;
+
+  // Transport costs (FCFA/tonne) between markets
+  var costs = {
+    'Dantokpa (Cotonou)-Bohicon': 8000, 'Dantokpa (Cotonou)-Parakou': 18000,
+    'Dantokpa (Cotonou)-Malanville': 25000, 'Dantokpa (Cotonou)-Glazoue': 12000,
+    'Bohicon-Parakou': 12000, 'Bohicon-Malanville': 20000, 'Bohicon-Glazoue': 6000,
+    'Parakou-Malanville': 10000, 'Parakou-Glazoue': 8000,
+    'Glazoue-Malanville': 15000
+  };
+
+  var key1 = depart.value + '-' + arrivee.value;
+  var key2 = arrivee.value + '-' + depart.value;
+  var transportPerTonne = costs[key1] || costs[key2] || 15000;
+
+  var totalTransport = transportPerTonne * qty;
+  var totalAchat = prixAchat * qty * 1000; // qty en tonnes, prix en FCFA/kg
+  var totalCout = totalAchat + totalTransport;
+  var prixRevientKg = Math.round(totalCout / (qty * 1000));
+  var margeMin = Math.round(prixRevientKg * 1.1); // 10% marge minimum
+
+  var resultsEl = document.getElementById('transportResults');
+  if (resultsEl) {
+    resultsEl.innerHTML = '<div class="card" style="margin-top:16px;background:#D8F3DC;">'
+      + '<div style="font-size:16px;font-weight:800;color:#1B4332;margin-bottom:12px;">📊 Resultat</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
+      + '<div><div style="font-size:11px;color:#666;">Cout achat</div><div style="font-size:16px;font-weight:800;">' + totalAchat.toLocaleString('fr') + ' FCFA</div></div>'
+      + '<div><div style="font-size:11px;color:#666;">Cout transport</div><div style="font-size:16px;font-weight:800;">' + totalTransport.toLocaleString('fr') + ' FCFA</div></div>'
+      + '<div><div style="font-size:11px;color:#666;">Cout total</div><div style="font-size:16px;font-weight:800;color:#E8862A;">' + totalCout.toLocaleString('fr') + ' FCFA</div></div>'
+      + '<div><div style="font-size:11px;color:#666;">Prix de revient</div><div style="font-size:16px;font-weight:800;color:#E8862A;">' + prixRevientKg + ' FCFA/kg</div></div>'
+      + '</div>'
+      + '<div style="margin-top:12px;padding:10px;background:#fff;border-radius:12px;font-size:13px;color:#1B4332;">'
+      + '💡 Pour une marge de 10% minimum, vendez a <strong>' + margeMin + ' FCFA/kg</strong> ou plus a ' + arrivee.value + '.'
+      + '</div>'
+      + '</div>';
+  }
+}

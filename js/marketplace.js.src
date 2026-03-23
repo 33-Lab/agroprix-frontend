@@ -133,27 +133,17 @@
     var offers = getOffers().filter(function(o) { return o.status === 'active'; });
     var demands = getDemands().filter(function(d) { return d.status === 'active'; });
     var matches = findMatches();
+    var totalMatchRate = (offers.length + demands.length) > 0 ? Math.round(matches.length / Math.max(offers.length, demands.length) * 100) : 0;
     var html = '';
+    var cropEmojis = { mais: '🌽', cajou: '🥜', soja: '🫘', riz: '🌾', tomate: '🍅', oignon: '🧅', manioc: '🥔', arachide: '🥜', niebe: '🫘', igname: '🍠', coton: '🌿', cafe: '☕', cacao: '🍫', mil: '🌾', sorgho: '🌾' };
 
-    // Stats
-    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-bottom:16px;">';
-    html += '<div class="card" style="padding:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--green);">' + offers.length + '</div><div style="font-size:10px;color:var(--text-light);">Offres</div></div>';
-    html += '<div class="card" style="padding:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--blue,#3b82f6);">' + demands.length + '</div><div style="font-size:10px;color:var(--text-light);">Demandes</div></div>';
-    html += '<div class="card" style="padding:10px;text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--gold);">' + matches.length + '</div><div style="font-size:10px;color:var(--text-light);">Matchs</div></div>';
+    // Header Place de Marche
+    html += '<div style="background:linear-gradient(135deg,#1B4332,#2D6A4F);border-radius:20px;padding:20px;color:#fff;margin-bottom:16px;text-align:center;">';
+    html += '<div style="font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:2px;">PLACE DE MARCHE</div>';
+    html += '<div style="font-size:20px;font-weight:800;margin-top:4px;">🏪 Offres & Demandes</div>';
     html += '</div>';
 
-    // Matches alert
-    if (matches.length > 0) {
-      html += '<div class="card" style="padding:12px;margin-bottom:16px;background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:1px solid var(--green);">'
-        + '<div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;">🎯 CORRESPONDANCES TROUVEES</div>';
-      matches.slice(0, 3).forEach(function(m) {
-        html += '<div style="font-size:12px;color:#065f46;margin-bottom:4px;">'
-          + '🤝 <strong>' + m.offer.seller + '</strong> vend du ' + m.offer.cropName + ' → <strong>' + m.demand.buyer + '</strong> en cherche!</div>';
-      });
-      html += '</div>';
-    }
-
-    // All announcements combined and sorted by date
+    // Annonces style guide
     var all = [];
     offers.forEach(function(o) { all.push(Object.assign({ _type: 'sell' }, o)); });
     demands.forEach(function(d) { all.push(Object.assign({ _type: 'buy' }, d)); });
@@ -162,50 +152,51 @@
     if (all.length === 0) {
       html += '<div class="card" style="padding:32px;text-align:center;">'
         + '<div style="font-size:48px;margin-bottom:12px;">🏪</div>'
-        + '<h3 style="color:var(--text-light);">Aucune annonce</h3>'
-        + '<p style="font-size:13px;color:var(--text-muted);">Soyez le premier a publier une offre ou une demande!</p>'
+        + '<h3 style="color:#666;">Aucune annonce</h3>'
+        + '<p style="font-size:13px;color:#999;">Soyez le premier a publier une offre ou une demande!</p>'
         + '</div>';
       return html;
     }
 
-    html += '<div class="card" style="padding:16px;">'
-      + '<div class="card-title"><span class="icon">📢</span> Annonces en cours</div>';
-
     all.forEach(function(item) {
       var isSell = item._type === 'sell';
-      var borderColor = isSell ? 'var(--green)' : 'var(--blue,#3b82f6)';
-      var tag = isSell
-        ? '<span style="background:var(--green);color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">VENTE</span>'
-        : '<span style="background:var(--blue,#3b82f6);color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">ACHAT</span>';
+      var emoji = cropEmojis[item.crop] || '🌿';
+      var phone = item.phone || '+229 XX XX XX XX';
 
-      var title = isSell
-        ? item.quantity + item.unit + ' ' + item.cropName + ' — ' + item.market
-        : item.quantity + item.unit + ' ' + item.cropName + ' — ' + item.market;
+      html += '<div class="card" style="margin-bottom:14px;padding:20px;">';
 
-      var priceLabel = isSell
-        ? '<b>Prix:</b> ' + formatFCFA(item.price) + '/kg'
-        : '<b>Prix max:</b> ' + item.maxPrice + ' ' + item.priceUnit;
-
-      var contactLabel = isSell
-        ? '<b>Vendeur:</b> ' + item.seller
-        : '<b>Acheteur:</b> ' + item.buyer;
-
-      html += '<div style="border-left:4px solid ' + borderColor + ';padding:10px 12px;margin-bottom:12px;border-radius:0 8px 8px 0;background:var(--bg);">'
-        + '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;">'
-        + '<div>' + tag + ' <strong style="font-size:13px;margin-left:6px;">' + title + '</strong></div>'
-        + '<span style="font-size:11px;color:var(--text-light);">' + timeAgo(item.date) + '</span>'
-        + '</div>'
-        + '<div style="margin-top:6px;font-size:12px;color:var(--text);">' + (item.description || '') + '</div>'
-        + '<div style="margin-top:6px;font-size:11px;color:var(--text-light);">' + priceLabel + ' — ' + contactLabel;
-      if (item.verified) html += ' <span style="background:var(--green);color:#fff;padding:1px 6px;border-radius:8px;font-size:9px;font-weight:700;">Verifie</span>';
-      html += '</div>'
-        + '<div style="margin-top:6px;display:flex;gap:8px;">'
-        + '<button onclick="event.stopPropagation();AgroPrix.marketplace.showQR(\'' + item.id + '\')" style="padding:4px 10px;font-size:10px;font-weight:600;border:1px solid var(--primary);color:var(--primary);background:white;border-radius:6px;cursor:pointer;">📱 QR Tracabilite</button>'
-        + '</div>'
+      // Product info (style guide: emoji + nom + quantite + lieu + prix)
+      html += '<div style="font-size:18px;font-weight:800;color:#333;">'
+        + emoji + ' <strong>' + item.cropName + '</strong> — ' + item.quantity + ' ' + (item.unit || 'tonnes')
         + '</div>';
+      html += '<div style="font-size:15px;color:#333;margin-top:4px;">— ' + (item.market || 'Non precise') + '</div>';
+      html += '<div style="font-size:15px;color:#333;margin-top:2px;">— ' + (isSell ? formatFCFA(item.price) + '/kg' : item.maxPrice + ' ' + item.priceUnit) + '</div>';
+
+      if (item.description) {
+        html += '<div style="font-size:13px;color:#666;margin-top:8px;font-style:italic;">' + item.description + '</div>';
+      }
+
+      // Contact info
+      html += '<div style="font-size:12px;color:#999;margin-top:8px;">'
+        + (isSell ? item.seller : item.buyer) + ' · ' + timeAgo(item.date);
+      if (item.verified) html += ' · <span style="background:#D8F3DC;color:#2D6A4F;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">Verifie</span>';
+      html += '</div>';
+
+      // WhatsApp button (style guide)
+      html += '<a href="https://wa.me/' + phone.replace(/[^0-9+]/g, '') + '?text=Bonjour%2C%20je%20suis%20interesse%20par%20votre%20offre%20' + encodeURIComponent(item.cropName) + '%20sur%20AgroPrix" target="_blank" style="display:block;margin-top:12px;padding:12px;background:#25D366;color:#fff;border-radius:12px;text-align:center;font-size:14px;font-weight:700;text-decoration:none;">'
+        + '💬 CONTACTER VIA WHATSAPP</a>';
+
+      // QR button
+      html += '<button onclick="event.stopPropagation();AgroPrix.marketplace.showQR(\'' + item.id + '\')" style="display:block;width:100%;margin-top:8px;padding:10px;font-size:12px;font-weight:600;border:1.5px solid #2D6A4F;color:#2D6A4F;background:#fff;border-radius:12px;cursor:pointer;">📱 QR Tracabilite</button>';
+
+      html += '</div>';
     });
 
-    html += '</div>';
+    // Stats bar (style guide: X OFFRES · X DEMANDES · X% MISE EN RELATION)
+    html += '<div style="text-align:center;padding:16px;font-size:13px;font-weight:700;color:#666;letter-spacing:0.5px;">'
+      + offers.length + ' OFFRES · ' + demands.length + ' DEMANDES · ' + totalMatchRate + '% MISE EN RELATION'
+      + '</div>';
+
     return html;
   }
 
@@ -270,7 +261,7 @@
     html += '<button class="btn-analyse" style="width:100%;font-size:14px;padding:12px;" onclick="AgroPrix.marketplace.publish(\'' + type + '\')">'
       + '📢 Publier ' + (isSell ? 'l\'offre' : 'la demande') + '</button>';
 
-    html += '<div id="mpSuccess" style="display:none;margin-top:12px;padding:10px;background:#d1fae5;border-radius:8px;text-align:center;font-size:13px;color:#065f46;font-weight:600;"></div>';
+    html += '<div id="mpSuccess" style="display:none;margin-top:12px;padding:10px;background:#d1fae5;border-radius:8px;text-align:center;font-size:13px;color:#1B4332;font-weight:600;"></div>';
 
     html += '</div>';
     return html;
@@ -496,9 +487,9 @@
     html += '</div></div>';
 
     // Conformity info
-    html += '<div class="card" style="padding:14px;margin-bottom:16px;background:linear-gradient(135deg,#D8F3DC,#B7E4C7);border:1px solid #2d6a4f33;">'
+    html += '<div class="card" style="padding:14px;margin-bottom:16px;background:linear-gradient(135deg,#D8F3DC,#B7E4C7);border:1px solid #2D6A4F33;">'
       + '<div style="font-size:12px;font-weight:700;color:#1B4332;margin-bottom:6px;">🌍 Conformite reglementation UE</div>'
-      + '<div style="font-size:11px;color:#2d6a4f;">Ce QR code repond aux exigences du reglement europeen anti-deforestation '
+      + '<div style="font-size:11px;color:#2D6A4F;">Ce QR code repond aux exigences du reglement europeen anti-deforestation '
       + '(EUDR, applicable juin 2026) qui impose la tracabilite des produits agricoles importes dans l\'UE, '
       + 'notamment le cacao, le cafe, le soja et le cajou.</div>'
       + '</div>';
@@ -511,7 +502,7 @@
       if (isPaid) {
         html += '<div class="card" style="padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#d1fae5,#a7f3d0);border:2px solid var(--green);text-align:center;">'
           + '<div style="font-size:32px;margin-bottom:6px;">✅</div>'
-          + '<div style="font-size:14px;font-weight:700;color:#065f46;">Paiement confirme</div>'
+          + '<div style="font-size:14px;font-weight:700;color:#1B4332;">Paiement confirme</div>'
           + '<div style="font-size:12px;color:#047857;margin-top:4px;">' + formatFCFA(totalAmount) + ' via Mobile Money</div>'
           + '<div style="font-size:10px;color:#059669;margin-top:4px;">Ref: FDP-' + item.id.toUpperCase().substr(0,8) + ' | ' + new Date().toLocaleDateString('fr') + '</div>'
           + '</div>';
@@ -533,7 +524,7 @@
           + '<div style="text-align:center;padding:10px;border:2px solid var(--border);border-radius:10px;cursor:pointer;" onclick="this.style.borderColor=\'var(--green)\'">'
           + '<div style="font-size:20px;">💳</div><div style="font-size:10px;font-weight:600;">Carte</div></div>'
           + '</div>'
-          + '<button onclick="AgroPrix.marketplace.processPayment(\'' + item.id + '\')" style="width:100%;padding:14px;background:linear-gradient(135deg,#D97706,#F59E0B);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">'
+          + '<button onclick="AgroPrix.marketplace.processPayment(\'' + item.id + '\')" style="width:100%;padding:14px;background:linear-gradient(135deg,#E8862A,#E8862A);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">'
           + '💳 Payer ' + formatFCFA(totalAmount) + '</button>'
           + '<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;">'
           + '<span style="font-size:9px;color:#999;">🔒 Paiement securise par</span>'
@@ -546,7 +537,7 @@
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">'
       + '<button style="padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;" '
       + 'onclick="AgroPrix.marketplace.shareQR(\'' + item.id + '\')">📤 Partager</button>'
-      + '<button style="padding:12px;background:white;color:var(--primary);border:2px solid var(--primary);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;" '
+      + '<button style="padding:12px;background:linear-gradient(180deg,#fff,#FAFCFB);color:var(--primary);border:2px solid var(--primary);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;" '
       + 'onclick="AgroPrix.marketplace.init()">🏪 Retour</button>'
       + '</div>';
 

@@ -17,11 +17,11 @@ window.AgroPrix = window.AgroPrix || {};
   // AgroPrix color palette
   // =========================================================================
   var COLORS = {
-    primary:   '#2d6a4f',
-    accent:    '#d4a017',
+    primary:   '#2D6A4F',
+    accent:    '#E8862A',
     alert:     '#e76f51',
     info:      '#1a3a5c',
-    forecast:  '#3d8b6a',
+    forecast:  '#40916C',
     green:     '#10b981',
     red:       '#ef4444',
     gold:      '#f59e0b',

@@ -117,7 +117,8 @@ window.AgroPrix = window.AgroPrix || {};
     financing:'GPS Financement',
     scoring:'Mon Score Credit',
     ndvi:'Sante Parcelle',
-    market:'Offres & Demandes', rapports:'Rapports', params:'Param\u00e8tres'
+    market:'Offres & Demandes', rapports:'Rapports', params:'Param\u00e8tres',
+    offres:'Nos Offres', plus:'Plus', proprietaire:'Proprietaire'
   };
 
   // View ID mapping (view name -> HTML element ID)
@@ -130,7 +131,8 @@ window.AgroPrix = window.AgroPrix || {};
     financing:'viewFinancing',
     scoring:'viewScoring',
     ndvi:'viewNdvi',
-    market:'viewMarket', rapports:'viewAnalyse', params:'viewParams'
+    market:'viewMarket', rapports:'viewAnalyse', params:'viewParams',
+    offres:'viewOffres', plus:'viewPlus', proprietaire:'viewProprietaire'
   };
 
 })(window.AgroPrix);

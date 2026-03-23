@@ -146,8 +146,8 @@
     var tickerContent = tickerItems.join('') + tickerItems.join(''); // Double for seamless loop
 
     html += '<div style="background:#1B4332;border-radius:10px;margin-bottom:12px;overflow:hidden;position:relative;height:36px;">';
-    html += '<div style="position:absolute;left:0;top:0;bottom:0;width:6px;background:linear-gradient(180deg,#F59E0B,#D97706);z-index:2;"></div>';
-    html += '<div style="position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:3;background:#F59E0B;color:#1B4332;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:800;letter-spacing:0.5px;">LIVE</div>';
+    html += '<div style="position:absolute;left:0;top:0;bottom:0;width:6px;background:linear-gradient(180deg,#E8862A,#E8862A);z-index:2;"></div>';
+    html += '<div style="position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:3;background:#E8862A;color:#1B4332;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:800;letter-spacing:0.5px;">LIVE</div>';
     html += '<div style="overflow:hidden;margin-left:58px;height:100%;display:flex;align-items:center;">';
     html += '<div class="ticker-scroll" style="white-space:nowrap;color:white;font-size:12px;animation:tickerScroll 25s linear infinite;">';
     html += tickerContent;
@@ -206,10 +206,10 @@
     html += '</div>'; // hero card
 
     // ─── 2. PRICE ALERTS TICKER ───
-    html += '<div style="background:linear-gradient(90deg, #FEF3C7, #FDE68A);border-radius:14px;padding:14px 16px;margin-bottom:16px;border:1px solid #F59E0B33;">';
+    html += '<div style="background:linear-gradient(90deg, #FEF3C7, #FDE68A);border-radius:14px;padding:14px 16px;margin-bottom:16px;border:1px solid #E8862A33;">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
     html += '<div style="font-size:13px;font-weight:700;color:#92400E;">📡 ALERTES MARCHE</div>';
-    html += '<div style="font-size:10px;color:#B45309;background:white;padding:2px 8px;border-radius:8px;">En direct</div>';
+    html += '<div style="font-size:10px;color:#B45309;background:linear-gradient(180deg,#fff,#FAFCFB);padding:2px 8px;border-radius:8px;">En direct</div>';
     html += '</div>';
 
     alerts.forEach(function(a) {
@@ -226,11 +226,11 @@
       html += '</div>';
     });
 
-    html += '<button onclick="showView(\'analyse\')" style="width:100%;margin-top:10px;padding:8px;background:linear-gradient(135deg,#F59E0B,#D97706);color:white;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;">🔍 Analyser ces tendances</button>';
+    html += '<button onclick="showView(\'analyse\')" style="width:100%;margin-top:10px;padding:8px;background:linear-gradient(135deg,#E8862A,#E8862A);color:white;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;">🔍 Analyser ces tendances</button>';
     html += '</div>';
 
     // ─── 3. GAMIFICATION CARD ───
-    html += '<div style="background:white;border-radius:14px;padding:16px;margin-bottom:16px;border:1px solid #E5E7EB;box-shadow:0 2px 8px rgba(0,0,0,0.04);">';
+    html += '<div style="background:linear-gradient(180deg,#fff,#FAFCFB);border-radius:14px;padding:16px;margin-bottom:16px;border:1px solid rgba(45,106,79,0.1);box-shadow:0 2px 8px rgba(0,0,0,0.04);">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">';
     html += '<div style="font-size:13px;font-weight:700;color:#1B4332;">🏆 Votre progression</div>';
     html += '<div style="font-size:11px;color:#6B7280;">Niveau ' + level.name + '</div>';
@@ -238,7 +238,7 @@
 
     // Progress bar
     if (level.next) {
-      html += '<div style="background:#F3F4F6;border-radius:10px;height:10px;overflow:hidden;margin-bottom:8px;">';
+      html += '<div style="background:#D8F3DC;border-radius:10px;height:10px;overflow:hidden;margin-bottom:8px;">';
       html += '<div style="width:' + Math.min(level.progress, 100) + '%;height:100%;background:linear-gradient(90deg,#2D6A4F,#40916C);border-radius:10px;transition:width 1s ease;"></div>';
       html += '</div>';
       html += '<div style="font-size:10px;color:#9CA3AF;text-align:right;margin-bottom:12px;">' + points + ' / ' + level.next + ' pts pour le prochain niveau</div>';
@@ -255,7 +255,7 @@
 
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
     actions.forEach(function(a) {
-      html += '<button onclick="showView(\'' + a.view + '\')" style="display:flex;align-items:center;gap:6px;padding:10px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;font-size:11px;font-weight:500;color:#374151;cursor:pointer;text-align:left;">';
+      html += '<button onclick="showView(\'' + a.view + '\')" style="display:flex;align-items:center;gap:6px;padding:10px;background:#D8F3DC;border:1px solid rgba(45,106,79,0.1);border-radius:10px;font-size:11px;font-weight:500;color:#374151;cursor:pointer;text-align:left;">';
       html += '<span style="font-size:16px;">' + a.icon + '</span>';
       html += '<div><div>' + a.label + '</div><div style="font-size:9px;color:#2D6A4F;font-weight:700;">+' + a.pts + ' pts</div></div>';
       html += '</button>';
@@ -268,7 +268,7 @@
       html += '<div style="font-size:11px;font-weight:600;color:#374151;margin-bottom:6px;">Mes badges (' + badges.length + ')</div>';
       html += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
       badges.forEach(function(b) {
-        html += '<span style="background:#ECFDF5;padding:3px 8px;border-radius:8px;font-size:10px;font-weight:600;color:#065F46;">' + b.label + '</span>';
+        html += '<span style="background:#D8F3DC;padding:3px 8px;border-radius:8px;font-size:10px;font-weight:600;color:#1B4332;">' + b.label + '</span>';
       });
       html += '</div></div>';
     }

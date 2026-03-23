@@ -22,9 +22,9 @@
       niveaux: { faible:0.7, moyen:1.0, intensif:1.4 },
       scenarios: [
         { label:'Faible', rendement:12, prix:280, couleur:'#e76f51' },
-        { label:'Moyen', rendement:22, prix:350, couleur:'#d4a017' },
+        { label:'Moyen', rendement:22, prix:350, couleur:'#E8862A' },
         { label:'Bon', rendement:32, prix:420, couleur:'#52b788' },
-        { label:'Excellent', rendement:45, prix:520, couleur:'#2d6a4f' }
+        { label:'Excellent', rendement:45, prix:520, couleur:'#2D6A4F' }
       ],
       calendrier: [
         { mois:'Mois 1', activite:'Pépinière & préparation sol', detail:'Semis en pépinière, labour, fumure de fond' },
@@ -61,9 +61,9 @@
       niveaux: { faible:0.6, moyen:1.0, intensif:1.5 },
       scenarios: [
         { label:'Faible', rendement:1.8, prix:220, couleur:'#e76f51' },
-        { label:'Moyen', rendement:3.2, prix:250, couleur:'#d4a017' },
+        { label:'Moyen', rendement:3.2, prix:250, couleur:'#E8862A' },
         { label:'Bon', rendement:4.8, prix:280, couleur:'#52b788' },
-        { label:'Excellent', rendement:6.5, prix:310, couleur:'#2d6a4f' }
+        { label:'Excellent', rendement:6.5, prix:310, couleur:'#2D6A4F' }
       ],
       calendrier: [
         { mois:'Mois 1', activite:'Préparation & semis', detail:'Labour, hersage, semis en ligne, fumure de fond NPK' },
@@ -98,9 +98,9 @@
       niveaux: { faible:0.65, moyen:1.0, intensif:1.4 },
       scenarios: [
         { label:'Faible', rendement:12, prix:250, couleur:'#e76f51' },
-        { label:'Moyen', rendement:22, prix:320, couleur:'#d4a017' },
+        { label:'Moyen', rendement:22, prix:320, couleur:'#E8862A' },
         { label:'Bon', rendement:28, prix:400, couleur:'#52b788' },
-        { label:'Excellent', rendement:35, prix:500, couleur:'#2d6a4f' }
+        { label:'Excellent', rendement:35, prix:500, couleur:'#2D6A4F' }
       ],
       calendrier: [
         { mois:'Mois 1-2', activite:'Pépinière', detail:'Semis en pépinière, arrosage quotidien' },
@@ -135,9 +135,9 @@
       niveaux: { faible:0.7, moyen:1.0, intensif:1.35 },
       scenarios: [
         { label:'Faible', rendement:2.5, prix:400, couleur:'#e76f51' },
-        { label:'Moyen', rendement:5, prix:550, couleur:'#d4a017' },
+        { label:'Moyen', rendement:5, prix:550, couleur:'#E8862A' },
         { label:'Bon', rendement:7.5, prix:700, couleur:'#52b788' },
-        { label:'Excellent', rendement:10, prix:900, couleur:'#2d6a4f' }
+        { label:'Excellent', rendement:10, prix:900, couleur:'#2D6A4F' }
       ],
       calendrier: [
         { mois:'Mois 1', activite:'Pépinière', detail:'Semis en pépinière ombragée, arrosage fin' },
@@ -172,9 +172,9 @@
       niveaux: { faible:0.6, moyen:1.0, intensif:1.4 },
       scenarios: [
         { label:'Faible', rendement:0.6, prix:380, couleur:'#e76f51' },
-        { label:'Moyen', rendement:1.2, prix:430, couleur:'#d4a017' },
+        { label:'Moyen', rendement:1.2, prix:430, couleur:'#E8862A' },
         { label:'Bon', rendement:1.8, prix:480, couleur:'#52b788' },
-        { label:'Excellent', rendement:2.5, prix:550, couleur:'#2d6a4f' }
+        { label:'Excellent', rendement:2.5, prix:550, couleur:'#2D6A4F' }
       ],
       calendrier: [
         { mois:'Mois 1', activite:'Préparation & semis', detail:'Préparation minimale, semis direct, inoculation rhizobium' },
@@ -208,9 +208,9 @@
       niveaux: { faible:0.6, moyen:1.0, intensif:1.3 },
       scenarios: [
         { label:'Faible', rendement:10, prix:65, couleur:'#e76f51' },
-        { label:'Moyen', rendement:20, prix:80, couleur:'#d4a017' },
+        { label:'Moyen', rendement:20, prix:80, couleur:'#E8862A' },
         { label:'Bon', rendement:30, prix:95, couleur:'#52b788' },
-        { label:'Excellent', rendement:40, prix:120, couleur:'#2d6a4f' }
+        { label:'Excellent', rendement:40, prix:120, couleur:'#2D6A4F' }
       ],
       calendrier: [
         { mois:'Mois 1-2', activite:'Préparation & plantation', detail:'Labour profond, buttage, plantation boutures 25 cm' },
@@ -245,9 +245,9 @@
       niveaux: { faible:0.6, moyen:1.0, intensif:1.3 },
       scenarios: [
         { label:'Faible', rendement:8, prix:200, couleur:'#e76f51' },
-        { label:'Moyen', rendement:15, prix:280, couleur:'#d4a017' },
+        { label:'Moyen', rendement:15, prix:280, couleur:'#E8862A' },
         { label:'Bon', rendement:22, prix:350, couleur:'#52b788' },
-        { label:'Excellent', rendement:30, prix:450, couleur:'#2d6a4f' }
+        { label:'Excellent', rendement:30, prix:450, couleur:'#2D6A4F' }
       ],
       calendrier: [
         { mois:'Mois 1-2', activite:'Préparation buttes & plantation', detail:'Confection buttes 40-50cm, plantation semenceaux' },
@@ -282,9 +282,9 @@
       niveaux: { faible:0.6, moyen:1.0, intensif:1.4 },
       scenarios: [
         { label:'Faible', rendement:1, prix:180, couleur:'#e76f51' },
-        { label:'Moyen', rendement:2.2, prix:210, couleur:'#d4a017' },
+        { label:'Moyen', rendement:2.2, prix:210, couleur:'#E8862A' },
         { label:'Bon', rendement:3.5, prix:240, couleur:'#52b788' },
-        { label:'Excellent', rendement:5, prix:280, couleur:'#2d6a4f' }
+        { label:'Excellent', rendement:5, prix:280, couleur:'#2D6A4F' }
       ],
       calendrier: [
         { mois:'Mois 1', activite:'Préparation & semis', detail:'Labour léger, semis en poquet après 1ère pluie utile' },
@@ -319,9 +319,9 @@
       niveaux: { faible:0.6, moyen:1.0, intensif:1.35 },
       scenarios: [
         { label:'Faible', rendement:0.6, prix:200, couleur:'#e76f51' },
-        { label:'Moyen', rendement:1.5, prix:240, couleur:'#d4a017' },
+        { label:'Moyen', rendement:1.5, prix:240, couleur:'#E8862A' },
         { label:'Bon', rendement:2.2, prix:280, couleur:'#52b788' },
-        { label:'Excellent', rendement:3, prix:330, couleur:'#2d6a4f' }
+        { label:'Excellent', rendement:3, prix:330, couleur:'#2D6A4F' }
       ],
       calendrier: [
         { mois:'Mois 1', activite:'Préparation & semis', detail:'Semis direct après pluie, zaï ou poquet, micro-dose engrais' },
@@ -398,10 +398,10 @@
       var revenu = Math.round(production * sc.prix);
       var benefice = revenu - coutTotal;
       var roi = coutTotal > 0 ? ((benefice / coutTotal) * 100).toFixed(0) : '0';
-      var benefColor = benefice >= 0 ? '#2d6a4f' : '#e76f51';
+      var benefColor = benefice >= 0 ? '#2D6A4F' : '#e76f51';
       var benefSign = benefice >= 0 ? '+' : '';
 
-      scenarioCards += '<div style="background:#fff;border-radius:12px;padding:1.2rem;border-left:4px solid ' + sc.couleur + ';box-shadow:0 2px 8px rgba(0,0,0,.06);">';
+      scenarioCards += '<div style="background:linear-gradient(180deg,#fff,#FAFCFB);border-radius:12px;padding:1.2rem;border-left:4px solid ' + sc.couleur + ';box-shadow:0 2px 8px rgba(0,0,0,.06);">';
       scenarioCards += '<div style="font-weight:700;color:' + sc.couleur + ';margin-bottom:.5rem;font-size:1.1rem;">' + sc.label + '</div>';
       scenarioCards += '<div style="font-size:.85rem;color:#666;margin-bottom:.3rem;">Rendement: <b>' + rendAjuste + ' t/ha</b> → <b>' + parseFloat(production).toLocaleString('fr-FR') + ' kg</b></div>';
       scenarioCards += '<div style="font-size:.85rem;color:#666;margin-bottom:.3rem;">Prix estimé: <b>' + sc.prix.toLocaleString('fr-FR') + ' FCFA/kg</b></div>';
@@ -428,7 +428,7 @@
     var riskRows = '';
     for (var r = 0; r < data.risques.length; r++) {
       var rk = data.risques[r];
-      var probColor = rk.probabilite === 'Élevée' ? '#e76f51' : rk.probabilite === 'Moyenne' ? '#d4a017' : '#52b788';
+      var probColor = rk.probabilite === 'Élevée' ? '#e76f51' : rk.probabilite === 'Moyenne' ? '#E8862A' : '#52b788';
       riskRows += '<tr><td><span style="display:inline-block;padding:2px 8px;border-radius:4px;background:rgba(0,0,0,.06);font-size:.8rem;">' + rk.type + '</span></td>';
       riskRows += '<td style="font-weight:600;">' + rk.nom + '</td>';
       riskRows += '<td style="color:' + probColor + ';font-weight:600;">' + rk.probabilite + '</td>';
@@ -440,7 +440,7 @@
     var html = '';
 
     // Header
-    html += '<div style="background:linear-gradient(135deg,#2d6a4f,#52b788);color:#fff;padding:1.5rem;border-radius:12px;margin-bottom:1.5rem;">';
+    html += '<div style="background:linear-gradient(135deg,#2D6A4F,#52b788);color:#fff;padding:1.5rem;border-radius:12px;margin-bottom:1.5rem;">';
     html += '<h3 style="margin:0 0 .5rem 0;">Simulation : ' + data.name + '</h3>';
     html += '<div style="display:flex;gap:2rem;flex-wrap:wrap;font-size:.95rem;">';
     html += '<span>Surface : <b>' + surface + ' ha</b></span>';

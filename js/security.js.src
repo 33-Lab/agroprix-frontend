@@ -38,7 +38,7 @@
     warningTimer = setTimeout(function() {
       var banner = document.createElement('div');
       banner.id = 'sessionWarning';
-      banner.innerHTML = '⏰ Votre session expire dans 5 minutes. <button onclick="this.parentElement.remove()" style="margin-left:8px;padding:2px 8px;background:white;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:11px;">OK</button>';
+      banner.innerHTML = '⏰ Votre session expire dans 5 minutes. <button onclick="this.parentElement.remove()" style="margin-left:8px;padding:2px 8px;background:linear-gradient(180deg,#fff,#FAFCFB);border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:11px;">OK</button>';
       banner.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:10px;background:#FEF3C7;color:#92400E;text-align:center;font-size:12px;font-weight:600;z-index:10000;';
       var existing = document.getElementById('sessionWarning');
       if (existing) existing.remove();

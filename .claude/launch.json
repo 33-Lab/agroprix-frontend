@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "agroprix-frontend",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "8093"],
+      "port": 8093
+    }
+  ]
+}

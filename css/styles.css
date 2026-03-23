@@ -1,6 +1,6 @@
 /* ==========================================================================
-   AgroPrix V3 - Design System Stylesheet
-   Palette: Vert AgroPrix, Bleu profond, Orange alerte, Or export
+   AgroPrix V6.4 — Design System (Style Guides Savanna)
+   Palette: Vert AgroPrix + Orange Prix
    Typography: Inter (Google Fonts)
    Mobile-first: 375px base, responsive at 768px / 1024px
    ========================================================================== */
@@ -9,44 +9,50 @@
    1. CSS Custom Properties
    -------------------------------------------------------------------------- */
 :root {
-  /* Primary palette */
-  --primary: #2d6a4f;
-  --primary-light: #3d8b6a;
-  --primary-lighter: #d8f3dc;
-  --primary-dark: #1e4d38;
+  /* Primary palette — Vert AgroPrix (guides Savanna) */
+  --primary: #2D6A4F;
+  --primary-light: #40916C;
+  --primary-lighter: #D8F3DC;
+  --primary-dark: #1B4332;
 
-  /* Secondary / Sidebar */
-  --navy: #1a3a5c;
-  --navy-light: #234b73;
-  --navy-mid: #2c5a8a;
+  /* Secondary / Sidebar + Header */
+  --navy: #1B4332;
+  --navy-light: #234b3f;
+  --navy-mid: #2D6A4F;
 
-  /* Accent colors */
-  --gold: #d4a017;
-  --gold-light: #e8b830;
-  --alert: #e76f51;
-  --alert-light: #f4a58f;
+  /* Accent colors — Orange AgroPrix + alertes */
+  --gold: #E8862A;
+  --gold-light: #F0A050;
+  --alert: #E53935;
+  --alert-light: #FF6B6B;
+  --success: #43A047;
+  --blue: #1976D2;
+  --orange: #E8862A;
 
   /* Neutrals */
-  --bg: #f5f5f5;
+  --bg: #F5F5F5;
   --card: #ffffff;
   --text: #333333;
   --text-light: #666666;
   --text-muted: #999999;
-  --border: #e0e0e0;
-  --border-light: #f0f0f0;
+  --border: #E0E0E0;
+  --border-light: #F0F0F0;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  /* Shadows — neutres et douces */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-gold: 0 4px 14px rgba(232, 134, 42, 0.2);
 
   /* Layout */
   --sidebar-width: 260px;
-  --topbar-height: 60px;
+  --topbar-height: 66px;
   --bottom-nav-height: 64px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-card: 20px;
 
   /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -260,25 +266,46 @@ h4 { font-size: var(--font-size-md); }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
   color: var(--text-muted);
-  font-size: var(--font-size-xs);
+  font-size: 11px;
   font-weight: 500;
-  transition: color var(--transition-fast);
+  transition: all 0.2s ease;
   -webkit-tap-highlight-color: transparent;
+  min-height: 48px;
+  position: relative;
 }
 
 .bottom-nav-item .icon {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
+  transition: transform 0.2s ease;
 }
 
 .bottom-nav-item.active {
   color: var(--primary);
+  font-weight: 700;
+}
+
+.bottom-nav-item.active .icon {
+  transform: scale(1.1);
+}
+
+.bottom-nav-item.active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 0 0 3px 3px;
 }
 
 .bottom-nav-item:active {
   color: var(--primary-light);
+  transform: scale(0.95);
 }
 
 /* --------------------------------------------------------------------------
@@ -338,13 +365,89 @@ h4 { font-size: var(--font-size-md); }
   position: sticky;
   top: 0;
   height: var(--topbar-height);
-  background: #ffffff;
-  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 16px;
   z-index: 90;
+  color: #fff;
+}
+
+.topbar h2 {
+  color: #fff !important;
+  font-size: 0;
+}
+
+.topbar .breadcrumb {
+  display: none;
+}
+
+/* Logo in topbar */
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.topbar-logo .logo-agro {
+  color: #fff;
+}
+
+.topbar-logo .logo-prix {
+  color: #E8862A;
+}
+
+/* Language pills */
+.lang-pills {
+  display: flex;
+  gap: 4px;
+}
+
+.lang-pill {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  min-height: 28px;
+}
+
+.lang-pill.active {
+  background: rgba(255,255,255,0.25);
+  color: #fff;
+}
+
+.lang-pill:not(.active) {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.6);
+}
+
+/* Status dot */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background: #43A047;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(67, 160, 71, 0.5);
+}
+
+/* User avatar */
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #E8862A;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .topbar-left {
@@ -431,11 +534,13 @@ h4 { font-size: var(--font-size-md); }
    7. Cards
    -------------------------------------------------------------------------- */
 .card {
-  background: var(--card);
-  border-radius: var(--radius-md);
+  background: #FFFFFF;
+  border-radius: var(--radius-card);
   box-shadow: var(--shadow-sm);
-  padding: 20px;
-  transition: box-shadow var(--transition-base);
+  padding: 24px;
+  transition: all 0.25s ease;
+  border: none;
+  opacity: 1;
 }
 
 .card:hover {
@@ -996,9 +1101,16 @@ h4 { font-size: var(--font-size-md); }
 
 .stat-card {
   background: var(--card);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   padding: 20px;
+  border: 1px solid var(--border-light);
+  opacity: 1;
+  transition: all 0.25s ease;
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .stat-value {
@@ -1539,6 +1651,46 @@ button, .btn-analyse {
   cursor: pointer;
 }
 
+.btn-analyse {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-xl);
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: var(--shadow-md);
+  transition: all 0.25s ease;
+  min-height: 48px;
+}
+
+.btn-analyse:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.btn-analyse:active {
+  transform: scale(0.97);
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-xl);
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: var(--shadow-gold);
+  transition: all 0.25s ease;
+  min-height: 48px;
+}
+
+.btn-gold:hover {
+  box-shadow: 0 6px 20px rgba(245, 166, 35, 0.35);
+  transform: translateY(-2px);
+}
+
 /* Section titles in views */
 .view-container h3,
 .view-container h2 {
@@ -1835,7 +1987,751 @@ button, .btn-analyse {
   right: 0;
   height: 3px;
   background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--gold));
-  opacity: 0.6;
+  opacity: 0.8;
+}
+
+/* --------------------------------------------------------------------------
+   V6-6. Premium Design System — Sections & Utilities
+   -------------------------------------------------------------------------- */
+
+/* Section backgrounds for visual rhythm */
+.section-teal {
+  background: linear-gradient(135deg, #D8F3DC 0%, #F0F7F2 100%);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.section-gold {
+  background: linear-gradient(135deg, #FFF8E7 0%, #FFFDF5 100%);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.section-white {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+}
+
+/* Hero gradient card */
+.hero-card {
+  background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(27, 67, 50, 0.3);
+  margin-bottom: 16px;
+}
+
+.hero-card h2, .hero-card h3 {
+  color: #fff;
+}
+
+.hero-card p {
+  color: rgba(255,255,255,0.85);
+}
+
+/* Alert banner */
+.alert-banner {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-gold);
+}
+
+.alert-banner-red {
+  background: linear-gradient(135deg, #E53935 0%, #FF6B6B 100%);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+
+/* KPI mini cards */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.kpi-card {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+
+.kpi-card .kpi-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+.kpi-card .kpi-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* Form groups premium */
+.form-section {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-light);
+}
+
+.form-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Price tags */
+.price-up {
+  color: #E53935;
+  font-weight: 700;
+}
+
+.price-down {
+  color: #43A047;
+  font-weight: 700;
+}
+
+.price-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.price-tag-up {
+  background: #FDEAEA;
+  color: #E53935;
+}
+
+.price-tag-down {
+  background: #E8F5E9;
+  color: #43A047;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-muted);
+}
+
+.empty-state .empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  color: var(--text-light);
+  margin-bottom: 8px;
+}
+
+/* Icon circles */
+.icon-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.icon-circle-teal {
+  background: var(--primary-lighter);
+  color: var(--primary);
+}
+
+.icon-circle-gold {
+  background: #FFF3D6;
+  color: var(--gold);
+}
+
+.icon-circle-red {
+  background: #FDEAEA;
+  color: var(--alert);
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: var(--border-light);
+  margin: 16px 0;
+}
+
+/* Page background */
+.page-content {
+  background: var(--bg);
+}
+
+/* View container background */
+.view-container {
+  background: var(--bg);
+  min-height: calc(100vh - var(--topbar-height) - var(--bottom-nav-height));
+}
+
+/* --------------------------------------------------------------------------
+   V6-7. Premium Page Backgrounds & Auto-styling
+   -------------------------------------------------------------------------- */
+
+/* Every view gets uniform light background */
+.view-container {
+  padding: 16px;
+  background: var(--bg);
+  min-height: calc(100vh - var(--topbar-height) - var(--bottom-nav-height));
+}
+
+/* Page content inside views */
+.view-container .page-content,
+.view-container > .card,
+.view-container > .stats-row,
+.view-container > .section-teal,
+.view-container > .section-gold,
+.view-container > .section-white {
+  margin: 0 16px;
+}
+
+/* Auto-style form groups within views */
+.view-container .form-group label,
+.view-container .form-label {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* Auto-style selects everywhere */
+.view-container select,
+.form-grid select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-family: var(--font-family);
+  background: #fff;
+  color: var(--text);
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230A6E5C' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.view-container select:focus,
+.form-grid select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(10, 110, 92, 0.12);
+}
+
+/* Auto-style inputs everywhere */
+.view-container input[type="text"],
+.view-container input[type="number"],
+.view-container input[type="email"],
+.view-container input[type="tel"],
+.view-container input[type="date"],
+.view-container input[type="password"],
+.view-container textarea,
+.form-grid input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-family: var(--font-family);
+  background: #fff;
+  color: var(--text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.view-container input:focus,
+.view-container textarea:focus,
+.form-grid input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(10, 110, 92, 0.12);
+}
+
+/* Auto-style checkboxes */
+.view-container input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Auto-style buttons inside views */
+.view-container button:not(.bottom-nav-item):not(.btn-analyse):not(.btn-gold) {
+  min-height: 44px;
+  font-family: var(--font-family);
+}
+
+/* Card titles styling */
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-title .icon {
+  font-size: 18px;
+}
+
+/* Score/value labels in stat cards */
+.sc-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.sc-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  margin-top: 4px;
+}
+
+.sc-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.sc-sub.up { color: var(--alert); }
+.sc-sub.down { color: var(--success); }
+
+/* Data tables premium */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.data-table thead {
+  background: var(--primary-lighter);
+}
+
+.data-table th {
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 700;
+  color: var(--primary-dark);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.data-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text);
+}
+
+.data-table tr:hover td {
+  background: rgba(10, 110, 92, 0.03);
+}
+
+.positive { color: var(--success); font-weight: 700; }
+.negative { color: var(--alert); font-weight: 700; }
+
+/* Trend badges */
+.trend-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.trend-badge.hausse { background: #FDEAEA; color: #E53935; }
+.trend-badge.baisse { background: #E8F5E9; color: #43A047; }
+.trend-badge.stable { background: #FFF3E0; color: #F5A623; }
+
+/* Currency grid */
+.currency-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.currency-card {
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  text-align: center;
+  border: 1px solid var(--border-light);
+}
+
+.cc-pair { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+.cc-rate { font-size: 22px; font-weight: 800; color: var(--text); margin: 4px 0; }
+.cc-trend { font-size: 12px; font-weight: 700; }
+.cc-trend.up { color: var(--alert); }
+.cc-trend.down { color: var(--success); }
+
+/* Photo banner premium */
+.product-photo-banner {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.product-photo-banner::-webkit-scrollbar { display: none; }
+
+.photo-banner-scroll {
+  display: flex;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.photo-banner-item {
+  flex-shrink: 0;
+  width: 72px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.photo-banner-item:hover {
+  transform: translateY(-2px);
+}
+
+.photo-banner-emoji {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 4px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+}
+
+.photo-banner-item span {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Toggle switch premium */
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.toggle-row label {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.toggle-switch {
+  width: 44px;
+  height: 24px;
+  background: #D1D5DB;
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.toggle-switch.active {
+  background: var(--primary);
+}
+
+.toggle-switch.active::after {
+  transform: translateX(20px);
+}
+
+/* Lock overlay (premium) */
+.lock-overlay {
+  text-align: center;
+  padding: 40px 24px;
+}
+
+.lock-icon-big {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.btn-upgrade {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-xl);
+  padding: 14px 32px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-gold);
+  margin-top: 16px;
+}
+
+/* Markets grid */
+.markets-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.markets-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.markets-controls button {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  font-size: 12px;
+  color: var(--text-light);
+  cursor: pointer;
+}
+
+/* Form grid */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-grid .form-group.full {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 480px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Date custom */
+.date-custom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Features list (premium) */
+.features-list {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+  margin: 16px 0;
+}
+
+.features-list li {
+  padding: 8px 0;
+  font-size: 14px;
+  color: var(--text);
+}
+
+/* --------------------------------------------------------------------------
+   V6-8. Force Premium Styling on JS-Generated Content
+   -------------------------------------------------------------------------- */
+
+/* All divs inside dynamic content containers get subtle background */
+#financingContent > div,
+#scoringContent > div,
+#ndviContent > div,
+#inputsContent > div,
+#marketplaceContent > div {
+  padding: 0 16px;
+}
+
+/* Override inline white backgrounds on cards inside dynamic modules */
+#financingContent [style*="background:white"],
+#financingContent [style*="background:#fff"],
+#scoringContent [style*="background:white"],
+#scoringContent [style*="background:#fff"],
+#ndviContent [style*="background:white"],
+#ndviContent [style*="background:#fff"],
+#inputsContent [style*="background:white"],
+#inputsContent [style*="background:#fff"],
+#marketplaceContent [style*="background:white"],
+#marketplaceContent [style*="background:#fff"] {
+  background: linear-gradient(180deg, #fff, #FAFCFB) !important;
+  border: 1px solid rgba(10, 110, 92, 0.08) !important;
+  border-radius: 12px !important;
+}
+
+/* Style all card-like divs inside dynamic modules */
+#financingContent .card,
+#scoringContent .card,
+#ndviContent .card,
+#inputsContent .card,
+#marketplaceContent .card {
+  border: 1px solid rgba(10, 110, 92, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(10, 110, 92, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Force rounded borders on buttons in dynamic modules */
+#financingContent button,
+#scoringContent button,
+#ndviContent button,
+#inputsContent button,
+#marketplaceContent button {
+  border-radius: 10px !important;
+  min-height: 44px;
+  font-weight: 600 !important;
+}
+
+/* Force select styling in dynamic modules */
+#financingContent select,
+#scoringContent select,
+#ndviContent select,
+#inputsContent select,
+#marketplaceContent select {
+  border-radius: 12px !important;
+  border: 1.5px solid rgba(10, 110, 92, 0.15) !important;
+  padding: 12px 16px !important;
+}
+
+/* Force input styling in dynamic modules */
+#financingContent input,
+#scoringContent input,
+#ndviContent input,
+#inputsContent input,
+#marketplaceContent input,
+#financingContent textarea,
+#marketplaceContent textarea {
+  border-radius: 12px !important;
+  border: 1.5px solid rgba(10, 110, 92, 0.15) !important;
+  padding: 12px 16px !important;
+}
+
+/* Add teal tint to gray backgrounds in JS-generated content */
+[style*="background:#E8F5F0"],
+[style*="background:#e8f5f0"],
+[style*="background:var(--bg)"] {
+  border-radius: 10px;
+}
+
+/* Bottom margin for all direct children in dynamic modules */
+#financingContent > div > div,
+#scoringContent > div > div,
+#ndviContent > div > div,
+#inputsContent > div > div {
+  margin-bottom: 12px;
+}
+
+/* Loading overlay — hidden by default */
+.loading-overlay {
+  display: none;
+  padding: 24px;
+}
+
+.loading-overlay.show {
+  display: block;
+}
+
+.loading-bar-wrap {
+  background: var(--border-light);
+  border-radius: 8px;
+  height: 8px;
+  overflow: hidden;
+  margin: 12px 0;
+}
+
+.loading-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--gold));
+  border-radius: 8px;
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+.loading-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+.loading-step .step-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-step.done .step-icon {
+  color: var(--primary);
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top: 2px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* --------------------------------------------------------------------------

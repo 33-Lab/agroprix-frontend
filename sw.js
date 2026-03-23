@@ -1,5 +1,5 @@
 // AgroPrix Service Worker — Cache offline + performance
-const CACHE_NAME = 'agroprix-v6.3';
+const CACHE_NAME = 'agroprix-v6.4-premium';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

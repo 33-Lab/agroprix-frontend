@@ -151,15 +151,15 @@
   }
 
   function getScoreColor(score) {
-    if (score >= 90) return '#2d6a4f';
-    if (score >= 70) return '#d4a017';
+    if (score >= 90) return '#2D6A4F';
+    if (score >= 70) return '#E8862A';
     if (score >= 50) return '#e76f51';
     return '#999';
   }
 
   function getScoreBadge(score) {
-    if (score >= 90) return '<span style="background:#2d6a4f;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;">Eligible</span>';
-    if (score >= 70) return '<span style="background:#d4a017;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;">Presque eligible</span>';
+    if (score >= 90) return '<span style="background:#2D6A4F;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;">Eligible</span>';
+    if (score >= 70) return '<span style="background:#E8862A;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;">Presque eligible</span>';
     return '<span style="background:#e76f51;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;">Conditions manquantes</span>';
   }
 
