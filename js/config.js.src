@@ -4,12 +4,10 @@ window.AgroPrix = window.AgroPrix || {};
 (function(AP) {
   // API Configuration
   // V6 Fix: Added fallback to agroprix-backend.onrender.com
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    AP.API_BASE = 'http://localhost:8000';
-  } else {
-    // Production: Railway backend (Laurent)
-    AP.API_BASE = 'https://web-production-717dd0.up.railway.app';
-  }
+  // Always use Railway backend (production)
+  // To use local backend for dev, uncomment the next line:
+  // AP.API_BASE = 'http://localhost:8000';
+  AP.API_BASE = 'https://web-production-717dd0.up.railway.app';
   AP.API_AVAILABLE = false;
 
   // Month names in French

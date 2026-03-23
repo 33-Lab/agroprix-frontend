@@ -1,1 +1,73 @@
-(a=>{function o(t){var n=new Date,e=n.getFullYear(),a=n.getMonth()+1;switch(t){case"12m":return e-1+"-"+String(a).padStart(2,"0")+"-01";case"3y":return e-3+"-"+String(a).padStart(2,"0")+"-01";case"5y":return e-5+"-"+String(a).padStart(2,"0")+"-01";case"10y":return e-10+"-"+String(a).padStart(2,"0")+"-01";default:return e-1+"-01-01"}}a.api={checkAPI:function(){fetch(a.API_BASE+"/",{method:"GET",signal:AbortSignal.timeout(3e3)}).then(function(t){t.ok&&(a.API_AVAILABLE=!0,console.log("[AgroPrix] Backend API connecté ✓"))}).catch(function(){a.API_AVAILABLE=!1,console.log("[AgroPrix] Backend non disponible — mode données simulées")})},periodToStartDate:o,fetchPrices:async function(t,n,e){return n=a.cultureToWFP[n]||n,e=o(e),t=a.API_BASE+"/api/prices/monthly?country="+t+"&commodity="+encodeURIComponent(n)+"&start_date="+e,(await(await fetch(t)).json()).data||[]},fetchMarkets:async function(t){return(await(await fetch(a.API_BASE+"/api/prices/markets?country="+t)).json()).data||[]},fetchCompare:async function(t){return t=a.cultureToWFP[t]||t,(await(await fetch(a.API_BASE+"/api/prices/compare?commodity="+encodeURIComponent(t))).json()).data||[]},fetchForecast:async function(t){return(await fetch(a.API_BASE+"/api/weather/forecast?country="+t)).json()},fetchRecommendations:async function(t,n){return n=a.cultureToWFP[n]||n,(await fetch(a.API_BASE+"/api/recommendations/?country="+t+"&commodity="+encodeURIComponent(n))).json()}}})(window.AgroPrix);
+// AgroPrix API Module
+(function(AP) {
+
+  // Check backend availability on load
+  function checkAPI() {
+    fetch(AP.API_BASE + '/', { method: 'GET', signal: AbortSignal.timeout(3000) })
+      .then(function(r) { if (r.ok) { AP.API_AVAILABLE = true; console.log('[AgroPrix] Backend API connecté ✓'); } })
+      .catch(function() { AP.API_AVAILABLE = false; console.log('[AgroPrix] Backend non disponible — mode données simulées'); });
+  }
+
+  // Convert period key to start date string
+  function periodToStartDate(periodKey) {
+    var now = new Date();
+    var y = now.getFullYear(), m = now.getMonth() + 1;
+    switch (periodKey) {
+      case '12m': return (y - 1) + '-' + String(m).padStart(2, '0') + '-01';
+      case '3y':  return (y - 3) + '-' + String(m).padStart(2, '0') + '-01';
+      case '5y':  return (y - 5) + '-' + String(m).padStart(2, '0') + '-01';
+      case '10y': return (y - 10) + '-' + String(m).padStart(2, '0') + '-01';
+      default:    return (y - 1) + '-01-01';
+    }
+  }
+
+  // Fetch monthly prices
+  async function fetchPrices(country, commodity, periodKey) {
+    var wfpName = AP.cultureToWFP[commodity] || commodity;
+    var startDate = periodToStartDate(periodKey);
+    var url = AP.API_BASE + '/api/prices/monthly?country=' + country + '&commodity=' + encodeURIComponent(wfpName) + '&start_date=' + startDate;
+    var resp = await fetch(url);
+    var json = await resp.json();
+    return json.data || [];
+  }
+
+  // Fetch markets for map
+  async function fetchMarkets(country) {
+    var resp = await fetch(AP.API_BASE + '/api/prices/markets?country=' + country);
+    var json = await resp.json();
+    return json.data || [];
+  }
+
+  // Fetch regional comparison
+  async function fetchCompare(commodity) {
+    var wfpName = AP.cultureToWFP[commodity] || commodity;
+    var resp = await fetch(AP.API_BASE + '/api/prices/compare?commodity=' + encodeURIComponent(wfpName));
+    var json = await resp.json();
+    return json.data || [];
+  }
+
+  // Fetch weather forecast
+  async function fetchForecast(country) {
+    var resp = await fetch(AP.API_BASE + '/api/weather/forecast?country=' + country);
+    return resp.json();
+  }
+
+  // Fetch recommendations
+  async function fetchRecommendations(country, commodity) {
+    var wfpName = AP.cultureToWFP[commodity] || commodity;
+    var resp = await fetch(AP.API_BASE + '/api/recommendations/?country=' + country + '&commodity=' + encodeURIComponent(wfpName));
+    return resp.json();
+  }
+
+  // Expose
+  AP.api = {
+    checkAPI: checkAPI,
+    periodToStartDate: periodToStartDate,
+    fetchPrices: fetchPrices,
+    fetchMarkets: fetchMarkets,
+    fetchCompare: fetchCompare,
+    fetchForecast: fetchForecast,
+    fetchRecommendations: fetchRecommendations
+  };
+
+})(window.AgroPrix);

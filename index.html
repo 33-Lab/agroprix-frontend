@@ -1067,10 +1067,46 @@
 <nav class="bottom-nav" id="bottomNav">
   <a class="active" onclick="showView('analyse', this)"><span>📊</span><span>Analyse</span></a>
   <a onclick="showView('negoce', this)"><span>📒</span><span>Negoce</span></a>
-  <a onclick="showView('production', this)"><span>🌱</span><span>Production</span></a>
-  <a onclick="showView('export', this)"><span>🚢</span><span>Export</span></a>
-  <a onclick="showView('plus', this)"><span>⊕</span><span>Plus</span></a>
+  <a onclick="showView('market', this)"><span>🤝</span><span>Marche</span></a>
+  <a onclick="showView('production', this)"><span>🌱</span><span>Produc.</span></a>
+  <a onclick="toggleMoreMenu()" id="moreBtn"><span>⊕</span><span>Plus</span></a>
 </nav>
+
+<!-- More Menu Popup -->
+<div id="moreMenu" style="display:none;position:fixed;bottom:70px;right:8px;left:8px;background:#fff;border-radius:20px;box-shadow:0 -4px 20px rgba(0,0,0,0.15);padding:16px;z-index:200;">
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+    <div style="text-align:center;cursor:pointer;" onclick="showView('financing');closeMoreMenu()">
+      <div style="width:50px;height:50px;border-radius:14px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;">💰</div>
+      <div style="font-size:11px;font-weight:600;">Finance</div>
+    </div>
+    <div style="text-align:center;cursor:pointer;" onclick="showView('scoring');closeMoreMenu()">
+      <div style="width:50px;height:50px;border-radius:14px;background:#FFF3E0;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;">📊</div>
+      <div style="font-size:11px;font-weight:600;">Score Credit</div>
+    </div>
+    <div style="text-align:center;cursor:pointer;" onclick="showView('ndvi');closeMoreMenu()">
+      <div style="width:50px;height:50px;border-radius:14px;background:#E0F2F1;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;">🛰</div>
+      <div style="font-size:11px;font-weight:600;">NDVI</div>
+    </div>
+    <div style="text-align:center;cursor:pointer;" onclick="showView('inputs');closeMoreMenu()">
+      <div style="width:50px;height:50px;border-radius:14px;background:#F3E5F5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;">🧪</div>
+      <div style="font-size:11px;font-weight:600;">Intrants</div>
+    </div>
+    <div style="text-align:center;cursor:pointer;" onclick="showView('export');closeMoreMenu()">
+      <div style="width:50px;height:50px;border-radius:14px;background:#E3F2FD;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;">🚢</div>
+      <div style="font-size:11px;font-weight:600;">Export</div>
+    </div>
+    <div style="text-align:center;cursor:pointer;" onclick="showView('params');closeMoreMenu()">
+      <div style="width:50px;height:50px;border-radius:14px;background:#F5F5F5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;">⚙️</div>
+      <div style="font-size:11px;font-weight:600;">Parametres</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleMoreMenu(){var m=document.getElementById('moreMenu');m.style.display=m.style.display==='none'?'block':'none';}
+function closeMoreMenu(){document.getElementById('moreMenu').style.display='none';}
+document.addEventListener('click',function(e){var m=document.getElementById('moreMenu');var b=document.getElementById('moreBtn');if(m&&m.style.display!=='none'&&!m.contains(e.target)&&!b.contains(e.target))m.style.display='none';});
+</script>
 
 </div><!-- /#appContainer -->
 

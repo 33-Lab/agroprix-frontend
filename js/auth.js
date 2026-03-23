@@ -1,1 +1,278 @@
-(o=>{var n="agroprix_token",r="agroprix_user";function i(){return localStorage.getItem(n)}function a(){try{var e=localStorage.getItem(r);return e?JSON.parse(e):null}catch(e){return null}}function l(e,t){localStorage.setItem(n,e),localStorage.setItem(r,JSON.stringify(t)),m(t)}function t(){localStorage.removeItem(n),localStorage.removeItem(r),m(null)}function u(e,t){(t=t||{}).headers=t.headers||{},t.headers["Content-Type"]="application/json";var n=i();return n&&(t.headers.Authorization="Bearer "+n),fetch(o.API_BASE+e,t)}function d(e,t,n,o,r){e={email:e,password:t,name:n};return o&&(e.phone=o),r&&(e.country=r),u("/api/auth/register",{method:"POST",body:JSON.stringify(e)}).then(function(e){return e.ok?e.json():e.json().then(function(e){throw e})}).then(function(e){return l(e.token,e.utilisateur),e})}function s(e,t){return u("/api/auth/login",{method:"POST",body:JSON.stringify({email:e,password:t})}).then(function(e){return e.ok?e.json():e.json().then(function(e){throw e})}).then(function(e){return l(e.token,e.utilisateur),e})}function c(){return u("/api/auth/me").then(function(e){if(e.ok)return e.json();throw t(),new Error("Session expirée")}).then(function(e){e=e.utilisateur;return localStorage.setItem(r,JSON.stringify(e)),m(e),e})}function e(){t(),g("login")}function m(e){var t,n=document.querySelector(".user-name"),o=document.querySelector(".user-role"),r=document.querySelector(".sidebar-footer .avatar");e&&(n&&(n.textContent=e.nom||e.name||"Utilisateur"),o&&(o.textContent={free:"Plan Gratuit",pro:"Plan Pro",expert:"Plan Expert",admin:"Administrateur"}[e.role]||"Plan Gratuit"),r&&(n=(e.nom||e.name||"U").split(" ").map(function(e){return e[0]}).join("").toUpperCase().substring(0,2),r.textContent=n),o=document.getElementById("profileName"),r=document.getElementById("profileEmail"),n=document.getElementById("profileCountry"),t=document.getElementById("profilePlan"),o&&(o.textContent=e.nom||e.name||"—"),r&&(r.textContent=e.email||"—"),n&&(n.textContent=e.pays||e.country||"—"),t&&(t.textContent={free:"Gratuit",pro:"Pro · 2 900 FCFA/mois",expert:"Expert · 14 900 FCFA/mois",admin:"Administrateur"}[e.role]||"Gratuit"),o=document.getElementById("authScreen"),r=document.getElementById("appContainer"),o&&(o.style.display="none"),r)&&(r.style.display="")}function g(e){e=e||"login";var t=document.getElementById("authScreen"),n=document.getElementById("appContainer"),t=(t&&(t.style.display="flex"),n&&(n.style.display="none"),document.getElementById("loginForm")),n=document.getElementById("registerForm"),o=document.getElementById("authTabLogin"),r=document.getElementById("authTabRegister");"login"===e?(t&&(t.style.display="block"),n&&(n.style.display="none"),o&&o.classList.add("active"),r&&r.classList.remove("active")):(t&&(t.style.display="none"),n&&(n.style.display="block"),o&&o.classList.remove("active"),r&&r.classList.add("active"))}function y(e){e&&e.preventDefault();var e=document.getElementById("loginEmail").value.trim(),t=document.getElementById("loginPassword").value,n=document.getElementById("loginError"),o=document.getElementById("loginBtn");e&&t?(o&&(o.disabled=!0,o.textContent="Connexion..."),n&&(n.textContent=""),s(e,t).then(function(){o&&(o.disabled=!1,o.textContent="Se connecter")}).catch(function(e){o&&(o.disabled=!1,o.textContent="Se connecter");e=e&&e.detail?e.detail:"Erreur de connexion";n&&(n.textContent=e)})):n&&(n.textContent="Veuillez remplir tous les champs.")}function p(e){e&&e.preventDefault();var e=document.getElementById("regName").value.trim(),t=document.getElementById("regEmail").value.trim(),n=document.getElementById("regPhone").value.trim(),o=document.getElementById("regCountry").value,r=document.getElementById("regPassword").value,i=document.getElementById("regConfirm").value,a=document.getElementById("registerError"),l=document.getElementById("registerBtn");e&&t&&r?r.length<6?a&&(a.textContent="Le mot de passe doit contenir au moins 6 caractères."):r!==i?a&&(a.textContent="Les mots de passe ne correspondent pas."):(l&&(l.disabled=!0,l.textContent="Création..."),a&&(a.textContent=""),d(t,r,e,n,o).then(function(){l&&(l.disabled=!1,l.textContent="Créer mon compte")}).catch(function(e){l&&(l.disabled=!1,l.textContent="Créer mon compte");e=e&&e.detail?e.detail:"Erreur lors de la création";a&&(a.textContent=e)})):a&&(a.textContent="Veuillez remplir les champs obligatoires.")}o.auth={getToken:i,getUser:a,isLoggedIn:function(){return!!i()},login:s,register:d,logout:e,fetchProfile:c,initAuth:function(){var e=i(),t=a();e&&t?(m(t),c().catch(function(){g("login")})):g("login")},showAuthScreen:g,handleLogin:y,handleRegister:p},window.handleLogin=y,window.handleRegister=p,window.showAuthScreen=g,window.logout=e})(window.AgroPrix);
+// AgroPrix — Authentication Module (Frontend)
+// Handles login, register, session management, UI updates
+(function(AP) {
+  'use strict';
+
+  var TOKEN_KEY = 'agroprix_token';
+  var USER_KEY = 'agroprix_user';
+
+  // =========================================================================
+  // Token / Session management
+  // =========================================================================
+
+  function getToken() {
+    return localStorage.getItem(TOKEN_KEY);
+  }
+
+  function getUser() {
+    try {
+      var raw = localStorage.getItem(USER_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function saveSession(token, user) {
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    updateAuthUI(user);
+  }
+
+  function clearSession() {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    updateAuthUI(null);
+  }
+
+  function isLoggedIn() {
+    return !!getToken();
+  }
+
+  // =========================================================================
+  // API calls
+  // =========================================================================
+
+  function authFetch(url, options) {
+    options = options || {};
+    options.headers = options.headers || {};
+    options.headers['Content-Type'] = 'application/json';
+    var token = getToken();
+    if (token) {
+      options.headers['Authorization'] = 'Bearer ' + token;
+    }
+    return fetch(AP.API_BASE + url, options);
+  }
+
+  function register(email, password, name, phone, country) {
+    var body = { email: email, password: password, name: name };
+    if (phone) body.phone = phone;
+    if (country) body.country = country;
+
+    return authFetch('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(body)
+    }).then(function(r) {
+      if (!r.ok) return r.json().then(function(e) { throw e; });
+      return r.json();
+    }).then(function(data) {
+      saveSession(data.token, data.utilisateur);
+      return data;
+    });
+  }
+
+  function login(email, password) {
+    return authFetch('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: email, password: password })
+    }).then(function(r) {
+      if (!r.ok) return r.json().then(function(e) { throw e; });
+      return r.json();
+    }).then(function(data) {
+      saveSession(data.token, data.utilisateur);
+      return data;
+    });
+  }
+
+  function fetchProfile() {
+    return authFetch('/api/auth/me').then(function(r) {
+      if (!r.ok) { clearSession(); throw new Error('Session expirée'); }
+      return r.json();
+    }).then(function(data) {
+      var user = data.utilisateur;
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+      updateAuthUI(user);
+      return user;
+    });
+  }
+
+  function logout() {
+    clearSession();
+    showAuthScreen('login');
+  }
+
+  // =========================================================================
+  // UI Updates
+  // =========================================================================
+
+  function updateAuthUI(user) {
+    // Update sidebar user info
+    var nameEl = document.querySelector('.user-name');
+    var roleEl = document.querySelector('.user-role');
+    var avatarEl = document.querySelector('.sidebar-footer .avatar');
+
+    if (user) {
+      if (nameEl) nameEl.textContent = user.nom || user.name || 'Utilisateur';
+      if (roleEl) {
+        var roleLabels = { free: 'Plan Gratuit', pro: 'Plan Pro', expert: 'Plan Expert', admin: 'Administrateur' };
+        roleEl.textContent = roleLabels[user.role] || 'Plan Gratuit';
+      }
+      if (avatarEl) {
+        var initials = (user.nom || user.name || 'U').split(' ').map(function(w) { return w[0]; }).join('').toUpperCase().substring(0, 2);
+        avatarEl.textContent = initials;
+      }
+      // Update params profile
+      var profileName = document.getElementById('profileName');
+      var profileEmail = document.getElementById('profileEmail');
+      var profileCountry = document.getElementById('profileCountry');
+      var profilePlan = document.getElementById('profilePlan');
+      if (profileName) profileName.textContent = user.nom || user.name || '—';
+      if (profileEmail) profileEmail.textContent = user.email || '—';
+      if (profileCountry) profileCountry.textContent = user.pays || user.country || '—';
+      if (profilePlan) {
+        var planLabels = { free: 'Gratuit', pro: 'Pro · 2 900 FCFA/mois', expert: 'Expert · 14 900 FCFA/mois', admin: 'Administrateur' };
+        profilePlan.textContent = planLabels[user.role] || 'Gratuit';
+      }
+      // Hide auth screen, show app
+      var authScreen = document.getElementById('authScreen');
+      var appContainer = document.getElementById('appContainer');
+      if (authScreen) authScreen.style.display = 'none';
+      if (appContainer) appContainer.style.display = '';
+    }
+  }
+
+  // =========================================================================
+  // Auth Screen
+  // =========================================================================
+
+  function showAuthScreen(mode) {
+    mode = mode || 'login';
+    var authScreen = document.getElementById('authScreen');
+    var appContainer = document.getElementById('appContainer');
+
+    if (authScreen) authScreen.style.display = 'flex';
+    if (appContainer) appContainer.style.display = 'none';
+
+    var loginForm = document.getElementById('loginForm');
+    var registerForm = document.getElementById('registerForm');
+    var loginTab = document.getElementById('authTabLogin');
+    var registerTab = document.getElementById('authTabRegister');
+
+    if (mode === 'login') {
+      if (loginForm) loginForm.style.display = 'block';
+      if (registerForm) registerForm.style.display = 'none';
+      if (loginTab) loginTab.classList.add('active');
+      if (registerTab) registerTab.classList.remove('active');
+    } else {
+      if (loginForm) loginForm.style.display = 'none';
+      if (registerForm) registerForm.style.display = 'block';
+      if (loginTab) loginTab.classList.remove('active');
+      if (registerTab) registerTab.classList.add('active');
+    }
+  }
+
+  function handleLogin(e) {
+    if (e) e.preventDefault();
+    var email = document.getElementById('loginEmail').value.trim();
+    var password = document.getElementById('loginPassword').value;
+    var errorEl = document.getElementById('loginError');
+    var btn = document.getElementById('loginBtn');
+
+    if (!email || !password) {
+      if (errorEl) errorEl.textContent = 'Veuillez remplir tous les champs.';
+      return;
+    }
+
+    if (btn) { btn.disabled = true; btn.textContent = 'Connexion...'; }
+    if (errorEl) errorEl.textContent = '';
+
+    login(email, password).then(function() {
+      if (btn) { btn.disabled = false; btn.textContent = 'Se connecter'; }
+    }).catch(function(err) {
+      if (btn) { btn.disabled = false; btn.textContent = 'Se connecter'; }
+      var msg = (err && err.detail) ? err.detail : 'Erreur de connexion';
+      if (errorEl) errorEl.textContent = msg;
+    });
+  }
+
+  function handleRegister(e) {
+    if (e) e.preventDefault();
+    var name = document.getElementById('regName').value.trim();
+    var email = document.getElementById('regEmail').value.trim();
+    var phone = document.getElementById('regPhone').value.trim();
+    var country = document.getElementById('regCountry').value;
+    var password = document.getElementById('regPassword').value;
+    var confirm = document.getElementById('regConfirm').value;
+    var errorEl = document.getElementById('registerError');
+    var btn = document.getElementById('registerBtn');
+
+    if (!name || !email || !password) {
+      if (errorEl) errorEl.textContent = 'Veuillez remplir les champs obligatoires.';
+      return;
+    }
+    if (password.length < 6) {
+      if (errorEl) errorEl.textContent = 'Le mot de passe doit contenir au moins 6 caractères.';
+      return;
+    }
+    if (password !== confirm) {
+      if (errorEl) errorEl.textContent = 'Les mots de passe ne correspondent pas.';
+      return;
+    }
+
+    if (btn) { btn.disabled = true; btn.textContent = 'Création...'; }
+    if (errorEl) errorEl.textContent = '';
+
+    register(email, password, name, phone, country).then(function() {
+      if (btn) { btn.disabled = false; btn.textContent = 'Créer mon compte'; }
+    }).catch(function(err) {
+      if (btn) { btn.disabled = false; btn.textContent = 'Créer mon compte'; }
+      var msg = (err && err.detail) ? err.detail : 'Erreur lors de la création';
+      if (errorEl) errorEl.textContent = msg;
+    });
+  }
+
+  // =========================================================================
+  // Init — check existing session
+  // =========================================================================
+
+  function initAuth() {
+    var token = getToken();
+    var user = getUser();
+
+    if (token && user) {
+      // Session exists, update UI and optionally verify
+      updateAuthUI(user);
+      // Verify token is still valid in background
+      fetchProfile().catch(function() {
+        // Token expired, show login
+        showAuthScreen('login');
+      });
+    } else {
+      // No session, show login screen
+      showAuthScreen('login');
+    }
+  }
+
+  // =========================================================================
+  // Expose
+  // =========================================================================
+
+  AP.auth = {
+    getToken: getToken,
+    getUser: getUser,
+    isLoggedIn: isLoggedIn,
+    login: login,
+    register: register,
+    logout: logout,
+    fetchProfile: fetchProfile,
+    initAuth: initAuth,
+    showAuthScreen: showAuthScreen,
+    handleLogin: handleLogin,
+    handleRegister: handleRegister
+  };
+
+  // Global functions for onclick handlers
+  window.handleLogin = handleLogin;
+  window.handleRegister = handleRegister;
+  window.showAuthScreen = showAuthScreen;
+  window.logout = logout;
+
+})(window.AgroPrix);

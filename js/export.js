@@ -1,1 +1,15 @@
-(()=>{function i(){alert("Inscription requise pour publier une demande.\nFonctionnalité disponible en version complète.")}window.AgroPrix.exportModule={init:function(){console.log("[AgroPrix] Module Export initialisé")},publishDemand:i},window.publishDemand=i})();
+(function(AP) {
+  function init() {
+    console.log('[AgroPrix] Module Export initialisé');
+    // Future: fetch real exchange rates from API
+    // Future: fetch real FOB prices
+  }
+
+  function publishDemand() {
+    alert('Inscription requise pour publier une demande.\nFonctionnalité disponible en version complète.');
+  }
+
+  AP.exportModule = { init: init, publishDemand: publishDemand };
+  window.publishDemand = publishDemand;
+
+})(window.AgroPrix);

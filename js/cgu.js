@@ -1,1 +1,277 @@
-(a=>{var i="agroprix_cgu_accepted",r="agroprix_farmer_profile",n="agroprix_profile_history",s=90,c="1.0.0";function t(){var e,t=p();return!t||!t.acceptedAt||(e=Math.floor((Date.now()-new Date(t.acceptedAt).getTime())/864e5),s<=e)||t.version!==c}function p(){try{return JSON.parse(localStorage.getItem(i))}catch(e){return null}}function u(){try{return JSON.parse(localStorage.getItem(r))||{}}catch(e){return{}}}function o(){var o,e,i,r,t,n,l,d;document.getElementById("cguModal")||(o=u(),e=!p(),i=a.cultureNames||{},r=a.countryMeta||{},(t=document.createElement("div")).id="cguModal",t.style.cssText="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;",n='<div style="background:linear-gradient(180deg,#fff,#FAFCFB);border-radius:16px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);"><div style="padding:20px 20px 12px;background:linear-gradient(135deg,#2D6A4F,#40916c);border-radius:16px 16px 0 0;"><h2 style="margin:0;color:#fff;font-size:18px;">'+(e?"Bienvenue sur AgroPrix!":"Mise a jour de vos informations")+'</h2><p style="margin:6px 0 0;color:rgba(255,255,255,0.8);font-size:13px;">'+(e?"Completez votre profil pour acceder a toutes les fonctionnalites.":"Pour vous offrir un meilleur service, merci de verifier vos informations (tous les "+s+" jours).")+'</p></div><div style="padding:20px;">',n+='<div style="margin-bottom:12px;"><label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Pays</label><select id="cguCountry" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit;">',Object.keys(r).forEach(function(e){var t=o.country===e?" selected":"";n+='<option value="'+e+'"'+t+">"+r[e].flag+" "+r[e].name+"</option>"}),n+='</select></div><div style="margin-bottom:12px;"><label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Cultures pratiquees</label><div id="cguCrops" style="display:flex;flex-wrap:wrap;gap:4px;">',Object.keys(i).forEach(function(e){var t=o.crops&&0<=o.crops.indexOf(e);n+='<button type="button" data-crop="'+e+'" onclick="AgroPrix.cgu.toggleCrop(this,\''+e+'\')" style="padding:4px 10px;border-radius:14px;font-size:11px;font-weight:600;border:1px solid '+(t?"#2D6A4F":"#ddd")+";background:"+(t?"#2D6A4F":"#fff")+";color:"+(t?"#fff":"#666")+';cursor:pointer;">'+i[e]+"</button>"}),n=(n=(n=(n=(n+="</div></div>")+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;"><div><label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Superficie (ha)</label><input type="number" id="cguFarmSize" value="'+(o.farmSize||"")+'" placeholder="Ex: 2.5" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit;" step="0.1" min="0"></div><div><label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Genre</label><select id="cguGender" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit;"><option value="">—</option><option value="M"'+("M"===o.gender?" selected":"")+'>Homme</option><option value="F"'+("F"===o.gender?" selected":"")+">Femme</option></select></div></div>")+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;"><div><label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Age</label><input type="number" id="cguAge" value="'+(o.age||"")+'" placeholder="30" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit;" min="15" max="99"></div><div><label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Experience (ans)</label><input type="number" id="cguExperience" value="'+(o.experience||"")+'" placeholder="5" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit;" min="0"></div></div>')+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;"><div><label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Type exploitation</label><select id="cguFarmerType" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit;"><option value="individual"'+("individual"===o.farmerType?" selected":"")+'>Individuel</option><option value="cooperative"'+("cooperative"===o.farmerType?" selected":"")+'>Cooperative</option><option value="sme"'+("sme"===o.farmerType?" selected":"")+'>PME</option></select></div><div style="display:flex;align-items:end;padding-bottom:4px;"><label style="font-size:12px;font-weight:600;color:#333;display:flex;align-items:center;gap:6px;"><input type="checkbox" id="cguCoop"'+(o.isCoop?" checked":"")+' style="width:16px;height:16px;"> Membre cooperative</label></div></div>')+'<div style="margin:16px 0;padding:12px;background:#f8f9fa;border-radius:8px;max-height:120px;overflow-y:auto;font-size:11px;color:#666;line-height:1.5;"><strong>Conditions Generales d\'Utilisation — v'+c+'</strong><br><br>En utilisant AgroPrix, vous acceptez que vos donnees soient collectees, archivees et traitees pour :<br>• Vous fournir des analyses de prix et conseils personnalises<br>• Ameliorer nos services et algorithmes de recommandation<br>• Generer des statistiques anonymisees sur les marches agricoles<br>• Faciliter votre acces aux financements et services adaptes<br><br>Vos donnees personnelles ne sont jamais vendues a des tiers individuellement. Seules des donnees agregees et anonymisees peuvent etre partagees avec nos partenaires (institutions financieres, organismes de developpement) pour ameliorer l\'acces aux services agricoles.<br><br>Vous pouvez demander la suppression de vos donnees a tout moment via les parametres.</div><label style="display:flex;align-items:start;gap:8px;margin-bottom:16px;cursor:pointer;"><input type="checkbox" id="cguAccept" style="width:18px;height:18px;margin-top:2px;"><span style="font-size:12px;color:#333;">J\'accepte les Conditions Generales d\'Utilisation et la collecte de mes donnees telles que decrites ci-dessus.</span></label><button id="cguSubmitBtn" onclick="AgroPrix.cgu.accept()" style="width:100%;padding:14px;background:linear-gradient(135deg,#2D6A4F,#40916c);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;opacity:0.5;" disabled>Valider et continuer</button></div></div>',t.innerHTML=n,document.body.appendChild(t),l=document.getElementById("cguAccept"),d=document.getElementById("cguSubmitBtn"),l&&d&&l.addEventListener("change",function(){d.disabled=!l.checked,d.style.opacity=l.checked?"1":"0.5"}),t._selectedCrops=(o.crops||[]).slice())}a.cgu={checkOnStartup:function(){setTimeout(function(){var e=a.auth?a.auth.getUser():null;e&&!e.demo&&t()&&o()},2e3)},forceShow:function(){o()},toggleCrop:function(e,t){var o,i,r=document.getElementById("cguModal");r&&(0<=(i=(o=r._selectedCrops||[]).indexOf(t))?o.splice(i,1):o.push(t),i=0<=(r._selectedCrops=o).indexOf(t),e.style.background=i?"#2D6A4F":"#fff",e.style.color=i?"#fff":"#666",e.style.borderColor=i?"#2D6A4F":"#ddd")},accept:function(){if((e=document.getElementById("cguAccept"))&&e.checked){var e=document.getElementById("cguModal"),t={country:document.getElementById("cguCountry")?document.getElementById("cguCountry").value:"",crops:e&&e._selectedCrops||[],farmSize:document.getElementById("cguFarmSize")&&parseFloat(document.getElementById("cguFarmSize").value)||null,gender:document.getElementById("cguGender")?document.getElementById("cguGender").value:"",age:document.getElementById("cguAge")&&parseInt(document.getElementById("cguAge").value)||null,experience:document.getElementById("cguExperience")&&parseInt(document.getElementById("cguExperience").value)||null,farmerType:document.getElementById("cguFarmerType")?document.getElementById("cguFarmerType").value:"individual",isCoop:!!document.getElementById("cguCoop")&&document.getElementById("cguCoop").checked},o=(localStorage.setItem(r,JSON.stringify(t)),[]);try{o=JSON.parse(localStorage.getItem(n)||"[]")}catch(e){}o.push({timestamp:(new Date).toISOString(),profile:t,cguVersion:c,source:"cgu_revalidation"}),localStorage.setItem(n,JSON.stringify(o));t={acceptedAt:(new Date).toISOString(),version:c,profileSnapshot:t};localStorage.setItem(i,JSON.stringify(t)),e&&e.remove(),console.log("[AgroPrix] CGU v"+c+" acceptees. Profil mis a jour. Historique: "+o.length+" versions.")}},needsRevalidation:t,getProfileStats:function(){var e=[];try{e=JSON.parse(localStorage.getItem(n)||"[]")}catch(e){}var t=u(),o=p();return{profileComplete:!!(t.country&&t.crops&&0<t.crops.length&&t.farmSize),profileVersions:e.length,lastUpdate:0<e.length?e[e.length-1].timestamp:null,cguVersion:o?o.version:null,cguAcceptedAt:o?o.acceptedAt:null,daysSinceAcceptance:o?Math.floor((Date.now()-new Date(o.acceptedAt).getTime())/864e5):null}}}})(window.AgroPrix);
+// AgroPrix — Module CGU Periodique + Data Archivage
+// Validation periodique des conditions d'utilisation + mise a jour profil enrichi
+// Modele inspire de Google/Meta : chaque revalidation = mise a jour des donnees
+(function(AP) {
+  'use strict';
+
+  var CGU_KEY = 'agroprix_cgu_accepted';
+  var PROFILE_KEY = 'agroprix_farmer_profile';
+  var PROFILE_HISTORY_KEY = 'agroprix_profile_history';
+  var CGU_INTERVAL_DAYS = 90; // Revalidation tous les 90 jours
+  var CGU_VERSION = '1.0.0';
+
+  // =========================================================================
+  // Check if CGU revalidation is needed
+  // =========================================================================
+  function needsRevalidation() {
+    var cguData = getCguData();
+    if (!cguData || !cguData.acceptedAt) return true;
+
+    var daysSince = Math.floor((Date.now() - new Date(cguData.acceptedAt).getTime()) / 86400000);
+    return daysSince >= CGU_INTERVAL_DAYS || cguData.version !== CGU_VERSION;
+  }
+
+  function getCguData() {
+    try { return JSON.parse(localStorage.getItem(CGU_KEY)); } catch(e) { return null; }
+  }
+
+  function getProfile() {
+    try { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; } catch(e) { return {}; }
+  }
+
+  // =========================================================================
+  // Show CGU Modal
+  // =========================================================================
+  function showCguModal() {
+    // Don't show if already visible
+    if (document.getElementById('cguModal')) return;
+
+    var profile = getProfile();
+    var cguData = getCguData();
+    var isFirstTime = !cguData;
+    var cultures = AP.cultureNames || {};
+    var countries = AP.countryMeta || {};
+
+    var modal = document.createElement('div');
+    modal.id = 'cguModal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
+
+    var title = isFirstTime
+      ? 'Bienvenue sur AgroPrix!'
+      : 'Mise a jour de vos informations';
+    var subtitle = isFirstTime
+      ? 'Completez votre profil pour acceder a toutes les fonctionnalites.'
+      : 'Pour vous offrir un meilleur service, merci de verifier vos informations (tous les ' + CGU_INTERVAL_DAYS + ' jours).';
+
+    var html = '<div style="background:linear-gradient(180deg,#fff,#FAFCFB);border-radius:16px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">'
+      + '<div style="padding:20px 20px 12px;background:linear-gradient(135deg,#2D6A4F,#40916c);border-radius:16px 16px 0 0;">'
+      + '<h2 style="margin:0;color:#fff;font-size:18px;">' + title + '</h2>'
+      + '<p style="margin:6px 0 0;color:rgba(255,255,255,0.8);font-size:13px;">' + subtitle + '</p>'
+      + '</div>'
+      + '<div style="padding:20px;">';
+
+    // Country
+    html += '<div style="margin-bottom:12px;">'
+      + '<label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Pays</label>'
+      + '<select id="cguCountry" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit;">';
+    Object.keys(countries).forEach(function(k) {
+      var sel = (profile.country === k) ? ' selected' : '';
+      html += '<option value="' + k + '"' + sel + '>' + countries[k].flag + ' ' + countries[k].name + '</option>';
+    });
+    html += '</select></div>';
+
+    // Crops
+    html += '<div style="margin-bottom:12px;">'
+      + '<label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Cultures pratiquees</label>'
+      + '<div id="cguCrops" style="display:flex;flex-wrap:wrap;gap:4px;">';
+    Object.keys(cultures).forEach(function(c) {
+      var active = profile.crops && profile.crops.indexOf(c) >= 0;
+      html += '<button type="button" data-crop="' + c + '" onclick="AgroPrix.cgu.toggleCrop(this,\'' + c + '\')" '
+        + 'style="padding:4px 10px;border-radius:14px;font-size:11px;font-weight:600;border:1px solid ' + (active ? '#2D6A4F' : '#ddd') + ';background:' + (active ? '#2D6A4F' : '#fff') + ';color:' + (active ? '#fff' : '#666') + ';cursor:pointer;">'
+        + cultures[c] + '</button>';
+    });
+    html += '</div></div>';
+
+    // Farm size + Gender row
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">'
+      + '<div><label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Superficie (ha)</label>'
+      + '<input type="number" id="cguFarmSize" value="' + (profile.farmSize || '') + '" placeholder="Ex: 2.5" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit;" step="0.1" min="0"></div>'
+      + '<div><label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Genre</label>'
+      + '<select id="cguGender" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit;">'
+      + '<option value="">—</option><option value="M"' + (profile.gender === 'M' ? ' selected' : '') + '>Homme</option><option value="F"' + (profile.gender === 'F' ? ' selected' : '') + '>Femme</option>'
+      + '</select></div></div>';
+
+    // Age + Experience row
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">'
+      + '<div><label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Age</label>'
+      + '<input type="number" id="cguAge" value="' + (profile.age || '') + '" placeholder="30" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit;" min="15" max="99"></div>'
+      + '<div><label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Experience (ans)</label>'
+      + '<input type="number" id="cguExperience" value="' + (profile.experience || '') + '" placeholder="5" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit;" min="0"></div></div>';
+
+    // Cooperative + Farmer type
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">'
+      + '<div><label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Type exploitation</label>'
+      + '<select id="cguFarmerType" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit;">'
+      + '<option value="individual"' + (profile.farmerType === 'individual' ? ' selected' : '') + '>Individuel</option>'
+      + '<option value="cooperative"' + (profile.farmerType === 'cooperative' ? ' selected' : '') + '>Cooperative</option>'
+      + '<option value="sme"' + (profile.farmerType === 'sme' ? ' selected' : '') + '>PME</option>'
+      + '</select></div>'
+      + '<div style="display:flex;align-items:end;padding-bottom:4px;">'
+      + '<label style="font-size:12px;font-weight:600;color:#333;display:flex;align-items:center;gap:6px;">'
+      + '<input type="checkbox" id="cguCoop"' + (profile.isCoop ? ' checked' : '') + ' style="width:16px;height:16px;"> Membre cooperative</label>'
+      + '</div></div>';
+
+    // CGU text
+    html += '<div style="margin:16px 0;padding:12px;background:#f8f9fa;border-radius:8px;max-height:120px;overflow-y:auto;font-size:11px;color:#666;line-height:1.5;">'
+      + '<strong>Conditions Generales d\'Utilisation — v' + CGU_VERSION + '</strong><br><br>'
+      + 'En utilisant AgroPrix, vous acceptez que vos donnees soient collectees, archivees et traitees pour :<br>'
+      + '• Vous fournir des analyses de prix et conseils personnalises<br>'
+      + '• Ameliorer nos services et algorithmes de recommandation<br>'
+      + '• Generer des statistiques anonymisees sur les marches agricoles<br>'
+      + '• Faciliter votre acces aux financements et services adaptes<br><br>'
+      + 'Vos donnees personnelles ne sont jamais vendues a des tiers individuellement. '
+      + 'Seules des donnees agregees et anonymisees peuvent etre partagees avec nos partenaires '
+      + '(institutions financieres, organismes de developpement) pour ameliorer l\'acces aux services agricoles.<br><br>'
+      + 'Vous pouvez demander la suppression de vos donnees a tout moment via les parametres.'
+      + '</div>';
+
+    // Accept checkbox
+    html += '<label style="display:flex;align-items:start;gap:8px;margin-bottom:16px;cursor:pointer;">'
+      + '<input type="checkbox" id="cguAccept" style="width:18px;height:18px;margin-top:2px;">'
+      + '<span style="font-size:12px;color:#333;">J\'accepte les Conditions Generales d\'Utilisation et la collecte de mes donnees telles que decrites ci-dessus.</span>'
+      + '</label>';
+
+    // Submit
+    html += '<button id="cguSubmitBtn" onclick="AgroPrix.cgu.accept()" style="width:100%;padding:14px;background:linear-gradient(135deg,#2D6A4F,#40916c);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;opacity:0.5;" disabled>'
+      + 'Valider et continuer</button>';
+
+    html += '</div></div>';
+
+    modal.innerHTML = html;
+    document.body.appendChild(modal);
+
+    // Enable button when checkbox is checked
+    var acceptBox = document.getElementById('cguAccept');
+    var submitBtn = document.getElementById('cguSubmitBtn');
+    if (acceptBox && submitBtn) {
+      acceptBox.addEventListener('change', function() {
+        submitBtn.disabled = !acceptBox.checked;
+        submitBtn.style.opacity = acceptBox.checked ? '1' : '0.5';
+      });
+    }
+
+    // Track selected crops
+    modal._selectedCrops = (profile.crops || []).slice();
+  }
+
+  // =========================================================================
+  // Toggle crop in CGU modal
+  // =========================================================================
+  function toggleCrop(btn, crop) {
+    var modal = document.getElementById('cguModal');
+    if (!modal) return;
+    var crops = modal._selectedCrops || [];
+    var idx = crops.indexOf(crop);
+    if (idx >= 0) { crops.splice(idx, 1); } else { crops.push(crop); }
+    modal._selectedCrops = crops;
+
+    var active = crops.indexOf(crop) >= 0;
+    btn.style.background = active ? '#2D6A4F' : '#fff';
+    btn.style.color = active ? '#fff' : '#666';
+    btn.style.borderColor = active ? '#2D6A4F' : '#ddd';
+  }
+
+  // =========================================================================
+  // Accept CGU + save profile
+  // =========================================================================
+  function accept() {
+    var acceptBox = document.getElementById('cguAccept');
+    if (!acceptBox || !acceptBox.checked) return;
+
+    var modal = document.getElementById('cguModal');
+
+    // Collect profile data
+    var newProfile = {
+      country: document.getElementById('cguCountry') ? document.getElementById('cguCountry').value : '',
+      crops: modal ? (modal._selectedCrops || []) : [],
+      farmSize: document.getElementById('cguFarmSize') ? parseFloat(document.getElementById('cguFarmSize').value) || null : null,
+      gender: document.getElementById('cguGender') ? document.getElementById('cguGender').value : '',
+      age: document.getElementById('cguAge') ? parseInt(document.getElementById('cguAge').value) || null : null,
+      experience: document.getElementById('cguExperience') ? parseInt(document.getElementById('cguExperience').value) || null : null,
+      farmerType: document.getElementById('cguFarmerType') ? document.getElementById('cguFarmerType').value : 'individual',
+      isCoop: document.getElementById('cguCoop') ? document.getElementById('cguCoop').checked : false
+    };
+
+    // Save profile
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(newProfile));
+
+    // Archive profile version (DATA ARCHIVAGE - never delete, always version)
+    var history = [];
+    try { history = JSON.parse(localStorage.getItem(PROFILE_HISTORY_KEY) || '[]'); } catch(e) {}
+    history.push({
+      timestamp: new Date().toISOString(),
+      profile: newProfile,
+      cguVersion: CGU_VERSION,
+      source: 'cgu_revalidation'
+    });
+    localStorage.setItem(PROFILE_HISTORY_KEY, JSON.stringify(history));
+
+    // Save CGU acceptance
+    var cguData = {
+      acceptedAt: new Date().toISOString(),
+      version: CGU_VERSION,
+      profileSnapshot: newProfile
+    };
+    localStorage.setItem(CGU_KEY, JSON.stringify(cguData));
+
+    // Close modal
+    if (modal) modal.remove();
+
+    console.log('[AgroPrix] CGU v' + CGU_VERSION + ' acceptees. Profil mis a jour. Historique: ' + history.length + ' versions.');
+  }
+
+  // =========================================================================
+  // Init — check on app startup
+  // =========================================================================
+  function checkOnStartup() {
+    // Wait a bit after login to not block the UX
+    setTimeout(function() {
+      var user = AP.auth ? AP.auth.getUser() : null;
+      if (!user) return; // Not logged in
+      if (user.demo) return; // Demo mode, skip CGU
+
+      if (needsRevalidation()) {
+        showCguModal();
+      }
+    }, 2000);
+  }
+
+  // =========================================================================
+  // Force show (for testing or from settings)
+  // =========================================================================
+  function forceShow() {
+    showCguModal();
+  }
+
+  // =========================================================================
+  // Get profile stats (for B2B data layer)
+  // =========================================================================
+  function getProfileStats() {
+    var history = [];
+    try { history = JSON.parse(localStorage.getItem(PROFILE_HISTORY_KEY) || '[]'); } catch(e) {}
+    var profile = getProfile();
+    var cguData = getCguData();
+
+    return {
+      profileComplete: !!(profile.country && profile.crops && profile.crops.length > 0 && profile.farmSize),
+      profileVersions: history.length,
+      lastUpdate: history.length > 0 ? history[history.length - 1].timestamp : null,
+      cguVersion: cguData ? cguData.version : null,
+      cguAcceptedAt: cguData ? cguData.acceptedAt : null,
+      daysSinceAcceptance: cguData ? Math.floor((Date.now() - new Date(cguData.acceptedAt).getTime()) / 86400000) : null
+    };
+  }
+
+  // =========================================================================
+  // Expose
+  // =========================================================================
+  AP.cgu = {
+    checkOnStartup: checkOnStartup,
+    forceShow: forceShow,
+    toggleCrop: toggleCrop,
+    accept: accept,
+    needsRevalidation: needsRevalidation,
+    getProfileStats: getProfileStats
+  };
+
+})(window.AgroPrix);
