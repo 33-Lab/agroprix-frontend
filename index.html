@@ -4,10 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="AgroPrix — Intelligence des prix agricoles UEMOA. Analysez, négociez, exportez.">
-  <meta name="theme-color" content="#2d6a4f">
+  <meta name="theme-color" content="#1B4332">
+
+  <!-- Analytics: Plausible (RGPD-friendly, no cookies) -->
+  <script defer data-domain="agroprix.app" src="https://plausible.io/js/script.js"
+    onerror="console.log('[AgroPrix] Plausible not loaded (OK in dev)')"></script>
 
   <!-- Security: CSP -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.qrserver.com https://api.open-meteo.com https://agromonitoring.com https://*.railway.app https://*.vercel.app;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://plausible.io https://js.sentry-cdn.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.qrserver.com https://api.open-meteo.com https://agromonitoring.com https://*.railway.app https://*.vercel.app https://plausible.io https://*.sentry.io;">
   <meta name="referrer" content="strict-origin-when-cross-origin">
 
   <!-- PWA Meta -->
@@ -1129,6 +1133,76 @@ document.addEventListener('click',function(e){var m=document.getElementById('mor
 <script src="/js/dashboard.js"></script>
 <script src="/js/auth.js"></script>
 <script src="/js/app.js"></script>
+
+<!-- ═══ ERROR BOUNDARY + OFFLINE + MONITORING (Prompt Master) ═══ -->
+
+<!-- Offline Banner -->
+<div id="offlineBanner" style="display:none;position:fixed;top:0;left:0;right:0;padding:10px;background:#F59E0B;color:#fff;text-align:center;font-size:13px;font-weight:600;z-index:9999;">
+  📡 Vous etes hors-ligne. Vos donnees sont sauvegardees localement.
+</div>
+
+<!-- Error Boundary UI -->
+<div id="errorBoundary" style="display:none;position:fixed;inset:0;background:#fff;z-index:10000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;">
+  <div style="font-size:64px;margin-bottom:16px;">🔧</div>
+  <h1 style="font-size:22px;font-weight:800;color:#1B4332;margin-bottom:8px;">Oups ! Un petit grain de sable...</h1>
+  <p style="font-size:14px;color:#666;max-width:400px;margin-bottom:24px;">L'application a rencontre une erreur inattendue. Nos ingenieurs (33 Lab) ont ete prevenus automatiquement.</p>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+    <button onclick="window.location.reload()" style="padding:12px 24px;background:#1B4332;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">🔄 Recharger l'application</button>
+    <a href="https://wa.me/22996816868" target="_blank" style="padding:12px 24px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;">💬 Contacter le support</a>
+  </div>
+  <div style="margin-top:24px;font-size:11px;color:#999;" id="errorDebugInfo"></div>
+</div>
+
+<script>
+// === ERROR BOUNDARY ===
+window.onerror = function(msg, src, line, col, err) {
+  var errorId = 'ERR-' + Date.now().toString(36).toUpperCase();
+  console.error('[AgroPrix Error Boundary]', errorId, msg, src, line);
+
+  // Show error UI only for critical errors (not API timeouts)
+  if (msg && (msg.indexOf('Script error') > -1 || msg.indexOf('ChunkLoadError') > -1)) {
+    var el = document.getElementById('errorBoundary');
+    var info = document.getElementById('errorDebugInfo');
+    if (el) { el.style.display = 'flex'; }
+    if (info) { info.textContent = 'ID erreur : #' + errorId + ' (utile pour le support)'; }
+  }
+
+  // Send to Sentry if available
+  if (window.Sentry && err) {
+    Sentry.captureException(err, { tags: { errorId: errorId } });
+  }
+
+  return false;
+};
+
+// === UNHANDLED PROMISE REJECTIONS ===
+window.addEventListener('unhandledrejection', function(e) {
+  console.warn('[AgroPrix] Unhandled promise:', e.reason);
+  if (window.Sentry && e.reason) {
+    Sentry.captureException(e.reason);
+  }
+});
+
+// === OFFLINE DETECTION ===
+function updateOnlineStatus() {
+  var banner = document.getElementById('offlineBanner');
+  if (banner) {
+    banner.style.display = navigator.onLine ? 'none' : 'block';
+  }
+  // Adjust main content padding when offline banner shows
+  var main = document.querySelector('.main');
+  if (main) {
+    main.style.paddingTop = navigator.onLine ? '' : '40px';
+  }
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+</script>
+
+<!-- Sentry SDK (lightweight, async) -->
+<script src="https://js.sentry-cdn.com/examplePublicKey.min.js" crossorigin="anonymous" async defer
+  onerror="console.log('[AgroPrix] Sentry not loaded (OK in dev)')"></script>
 
 </body>
 </html>
