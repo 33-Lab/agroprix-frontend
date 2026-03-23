@@ -387,10 +387,11 @@ h4 { font-size: var(--font-size-md); }
 .topbar-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 30px;
+  gap: 6px;
+  font-size: 20px;
   font-weight: 800;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
 }
 
 .topbar-logo .logo-agro {
@@ -401,10 +402,30 @@ h4 { font-size: var(--font-size-md); }
   color: #E8862A;
 }
 
-/* Language pills */
+@media (min-width: 400px) {
+  .topbar-logo {
+    font-size: 24px;
+    gap: 8px;
+  }
+}
+
+@media (min-width: 500px) {
+  .topbar-logo {
+    font-size: 30px;
+    gap: 10px;
+  }
+}
+
+/* Language pills — hidden on small mobile */
 .lang-pills {
-  display: flex;
+  display: none;
   gap: 4px;
+}
+
+@media (min-width: 420px) {
+  .lang-pills {
+    display: flex;
+  }
 }
 
 .lang-pill {
@@ -2944,14 +2965,7 @@ body { background: #f0f2f5; }
   font-weight: 700 !important; font-size: 13px !important;
 }
 
-/* ── Topbar: clean border ── */
-.topbar {
-  border-bottom: 1px solid #e8ecf1 !important;
-  background: #fff !important;
-  padding: 12px 28px !important;
-}
-.topbar h2, #viewTitle { font-size: 18px !important; font-weight: 700 !important; }
-.breadcrumb { font-size: 12px !important; color: var(--text-light) !important; }
+/* ── Topbar: kept green gradient from V6.4 ── */
 
 /* Live dot animation */
 .live-dot, .status-dot {

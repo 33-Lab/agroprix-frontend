@@ -7,8 +7,8 @@ window.AgroPrix = window.AgroPrix || {};
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     AP.API_BASE = 'http://localhost:8000';
   } else {
-    // Try api.agroprix.app first, fallback to Render deployment
-    AP.API_BASE = 'https://agroprix-backend.onrender.com';
+    // Production: Railway backend (Laurent)
+    AP.API_BASE = 'https://web-production-717dd0.up.railway.app';
   }
   AP.API_AVAILABLE = false;
 

@@ -62,52 +62,110 @@
   }
 
   // =========================================================================
-  // Price alerts (simulated real-time)
+  // Price alerts (from real data file)
   // =========================================================================
+  var realPriceData = null;
+
+  function loadRealPrices(callback) {
+    if (realPriceData) { callback(realPriceData); return; }
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/data/prix_reels_uemoa.json?v=' + Date.now(), true);
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        try { realPriceData = JSON.parse(xhr.responseText); } catch(e) { realPriceData = null; }
+      }
+      callback(realPriceData);
+    };
+    xhr.onerror = function() { callback(null); };
+    xhr.send();
+  }
+
   function generateAlerts() {
-    var cultures = AP.cultureNames || { mais: 'Mais', cajou: 'Cajou', soja: 'Soja', riz: 'Riz', coton: 'Coton', arachide: 'Arachide', tomate: 'Tomate', oignon: 'Oignon' };
-    var markets = ['Dantokpa', 'Bohicon', 'Parakou', 'Malanville', 'Ouagadougou', 'Abidjan', 'Dakar', 'Lome'];
+    var cultureNames = AP.cultureNames || {};
     var alerts = [];
-    var keys = Object.keys(cultures);
 
-    for (var i = 0; i < 5; i++) {
-      var crop = keys[Math.floor(Math.random() * keys.length)];
-      var market = markets[Math.floor(Math.random() * markets.length)];
-      var change = Math.floor(Math.random() * 25) - 8; // -8 to +17 (bias up)
-      var price = Math.floor(Math.random() * 800) + 150;
-      var hoursAgo = Math.floor(Math.random() * 48);
-      var timeLabel = hoursAgo < 1 ? 'A l\'instant' : hoursAgo < 24 ? 'Il y a ' + hoursAgo + 'h' : 'Hier';
-
-      alerts.push({
-        crop: cultures[crop] || crop,
-        market: market,
-        change: change,
-        price: price,
-        time: timeLabel,
-        isUp: change > 0
+    if (realPriceData && realPriceData.data) {
+      // Use real data, pick entries with significant trends
+      var entries = realPriceData.data.slice();
+      // Sort by absolute trend value
+      entries.sort(function(a, b) {
+        return Math.abs(parseFloat(b.trend)) - Math.abs(parseFloat(a.trend));
       });
+      // Take top 8 most volatile
+      entries.slice(0, 8).forEach(function(e) {
+        var change = parseInt(e.trend) || 0;
+        var daysAgo = Math.floor((Date.now() - new Date(e.date).getTime()) / 86400000);
+        var timeLabel = daysAgo === 0 ? 'Aujourd\'hui' : daysAgo === 1 ? 'Hier' : 'Il y a ' + daysAgo + 'j';
+        alerts.push({
+          crop: cultureNames[e.commodity] || e.commodity.charAt(0).toUpperCase() + e.commodity.slice(1).replace('_', ' '),
+          market: e.market.split(' (')[0],
+          change: change,
+          price: e.price,
+          time: timeLabel,
+          isUp: change > 0
+        });
+      });
+    } else {
+      // Fallback: hardcoded recent prices (not random)
+      alerts = [
+        { crop: 'Cajou', market: 'Dantokpa', change: 14, price: 850, time: 'Aujourd\'hui', isUp: true },
+        { crop: 'Tomate', market: 'Abidjan', change: 18, price: 550, time: 'Aujourd\'hui', isUp: true },
+        { crop: 'Oignon', market: 'Dakar', change: -10, price: 350, time: 'Hier', isUp: false },
+        { crop: 'Niebe', market: 'Ouagadougou', change: 8, price: 620, time: 'Hier', isUp: true },
+        { crop: 'Mais', market: 'Bamako', change: -7, price: 225, time: 'Il y a 2j', isUp: false }
+      ];
     }
-    // Sort: biggest moves first
-    alerts.sort(function(a, b) { return Math.abs(b.change) - Math.abs(a.change); });
     return alerts;
   }
 
   // =========================================================================
-  // Weather (simulated for demo)
+  // Weather (real API from backend, fallback to estimate)
   // =========================================================================
-  function getWeather() {
+  var cachedWeather = null;
+
+  function fetchRealWeather(callback) {
+    if (cachedWeather) { callback(cachedWeather); return; }
+    var country = getUserCountry();
+    var meta = AP.countryMeta && AP.countryMeta[country];
+    var lat = meta ? meta.lat : 6.36;
+    var lon = meta ? meta.lng : 2.43;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', AP.API_BASE + '/api/weather/forecast?country=' + country + '&lat=' + lat + '&lon=' + lon, true);
+    xhr.timeout = 5000;
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        try {
+          var data = JSON.parse(xhr.responseText);
+          if (data.forecast && data.forecast[0]) {
+            var today = data.forecast[0];
+            var temp = Math.round(today.temp_max);
+            var rain = today.rain || today.precipitation || 0;
+            var month = new Date().getMonth();
+            var desc, icon, tip;
+            if (rain > 5) { desc = 'Pluie prevue'; icon = '🌧️'; tip = 'Verifiez le sechage de vos recoltes'; }
+            else if (month >= 5 && month <= 9) { desc = 'Saison des pluies'; icon = '🌦️'; tip = 'Surveillez l\'humidite de vos stocks'; }
+            else if (month >= 10 || month <= 1) { desc = 'Harmattan'; icon = '🌫️'; tip = 'Protegez vos stocks de l\'humidite'; }
+            else { desc = 'Saison seche'; icon = '☀️'; tip = 'Bon moment pour negocier les prix'; }
+            cachedWeather = { temp: temp, desc: desc, icon: icon, tip: tip, real: true };
+          }
+        } catch(e) {}
+      }
+      callback(cachedWeather || getWeatherFallback());
+    };
+    xhr.onerror = xhr.ontimeout = function() { callback(getWeatherFallback()); };
+    xhr.send();
+  }
+
+  function getWeatherFallback() {
     var month = new Date().getMonth();
-    // West Africa seasons
-    if (month >= 5 && month <= 9) {
-      var temps = [28, 29, 30, 27, 26];
-      return { temp: temps[Math.floor(Math.random() * temps.length)], desc: 'Saison des pluies', icon: '🌧️', tip: 'Verifiez le sechage de vos recoltes' };
-    } else if (month >= 10 || month <= 1) {
-      var temps2 = [33, 34, 35, 32, 31];
-      return { temp: temps2[Math.floor(Math.random() * temps2.length)], desc: 'Harmattan', icon: '🌫️', tip: 'Protegez vos stocks de l\'humidite' };
-    } else {
-      var temps3 = [30, 31, 32, 33, 34];
-      return { temp: temps3[Math.floor(Math.random() * temps3.length)], desc: 'Saison seche', icon: '☀️', tip: 'Bon moment pour negocier les prix' };
-    }
+    if (month >= 5 && month <= 9) return { temp: 28, desc: 'Saison des pluies', icon: '🌧️', tip: 'Verifiez le sechage de vos recoltes', real: false };
+    if (month >= 10 || month <= 1) return { temp: 33, desc: 'Harmattan', icon: '🌫️', tip: 'Protegez vos stocks', real: false };
+    return { temp: 32, desc: 'Saison seche', icon: '☀️', tip: 'Bon moment pour negocier les prix', real: false };
+  }
+
+  function getWeather() {
+    return cachedWeather || getWeatherFallback();
   }
 
   // =========================================================================
@@ -117,6 +175,15 @@
     var container = document.getElementById('dashboardHero');
     if (!container) return;
 
+    // Load real data, then render
+    loadRealPrices(function() {
+      fetchRealWeather(function() {
+        doRender(container);
+      });
+    });
+  }
+
+  function doRender(container) {
     var name = getUserName();
     var greeting = getGreeting();
     var streak = getStreak();
