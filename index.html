@@ -917,8 +917,51 @@
       <div class="card">
         <div class="card-title"><span class="icon">📜</span> Legal</div>
         <div style="padding:8px 0;">
-          <p style="margin-bottom:8px;"><a href="#" onclick="AgroPrix.cgu.forceShow();return false;" style="font-size:13px;color:var(--primary);font-weight:600;">Conditions Generales d'Utilisation (CGU)</a></p>
-          <p><a href="#" style="font-size:13px;color:var(--primary);font-weight:600;">Politique de confidentialite</a></p>
+          <p style="margin-bottom:8px;"><a href="#" onclick="AgroPrix.cgu.forceShow();return false;" style="font-size:13px;color:var(--primary);font-weight:600;">📋 Conditions Generales d'Utilisation (CGU)</a></p>
+          <p style="margin-bottom:8px;"><a href="#" onclick="var m=document.getElementById('cgvModal');m.style.display='flex';m.style.alignItems='center';m.style.justifyContent='center';return false;" style="font-size:13px;color:var(--primary);font-weight:600;">📄 Conditions Generales de Vente (CGV)</a></p>
+          <p><a href="#" onclick="var m=document.getElementById('privacyModal');m.style.display='flex';m.style.alignItems='center';m.style.justifyContent='center';return false;" style="font-size:13px;color:var(--primary);font-weight:600;">🔒 Politique de confidentialite</a></p>
+        </div>
+      </div>
+
+      <!-- CGV Modal -->
+      <div id="cgvModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;align-items:center;justify-content:center;padding:16px;">
+        <div style="background:#fff;border-radius:20px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;padding:24px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h2 style="font-size:18px;font-weight:800;color:#1B4332;">📄 Conditions Generales de Vente</h2>
+            <button onclick="document.getElementById('cgvModal').style.display='none'" style="background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
+          </div>
+          <div style="font-size:13px;color:#333;line-height:1.8;">
+            <p><strong>Article 1 — Objet</strong><br>Les presentes Conditions Generales de Vente (CGV) regissent les relations contractuelles entre 33 Lab SARL ("AgroPrix") et ses clients ("Utilisateurs") pour l'acces aux services payants de la plateforme AgroPrix.</p>
+            <p><strong>Article 2 — Services</strong><br>AgroPrix propose des abonnements mensuels donnant acces a des fonctionnalites avancees : analyse de prix multi-pays, conseil IA, GPS Financement, Credit Scoring, NDVI satellite, traçabilite QR et marketplace P2P.</p>
+            <p><strong>Article 3 — Tarifs</strong><br>• Gratuit : 0 FCFA/mois — fonctionnalites de base<br>• Starter : 990 FCFA/mois — tous les marches, 5 produits<br>• Pro : 2 900 FCFA/mois — conseil IA, GPS Financement, Score Credit<br>• Expert : 14 900 FCFA/mois — export, conformite, marketplace prioritaire<br>• Plantain Pro : 1 490 FCFA/mois<br>• Hevea Pro : 1 490 FCFA/mois<br>• Institution : sur devis</p>
+            <p><strong>Article 4 — Paiement</strong><br>Les paiements sont effectues via FedaPay (MTN Mobile Money, Moov Money, carte bancaire). Le paiement est du au debut de chaque periode mensuelle. En cas de non-paiement, l'acces aux fonctionnalites premium est suspendu.</p>
+            <p><strong>Article 5 — Resiliation</strong><br>L'utilisateur peut resilier son abonnement a tout moment depuis les parametres de l'application. La resiliation prend effet a la fin de la periode en cours. Aucun remboursement au prorata.</p>
+            <p><strong>Article 6 — Responsabilite</strong><br>AgroPrix fournit des analyses et conseils a titre informatif. Les decisions d'achat, de vente ou d'investissement restent de la responsabilite exclusive de l'utilisateur. AgroPrix ne garantit pas l'exactitude absolue des prix affiches.</p>
+            <p><strong>Article 7 — Propriete intellectuelle</strong><br>Tous les contenus, algorithmes, bases de donnees et interfaces de la plateforme AgroPrix sont la propriete exclusive de 33 Lab SARL. Toute reproduction ou utilisation non autorisee est interdite.</p>
+            <p><strong>Article 8 — Donnees personnelles</strong><br>Les donnees collectees sont traitees conformement a notre Politique de Confidentialite et a la loi beninoise n°2017-20 du 20 avril 2018 portant code du numerique en Republique du Benin.</p>
+            <p><strong>Article 9 — Droit applicable</strong><br>Les presentes CGV sont soumises au droit beninois. Tout litige sera soumis aux juridictions competentes de Cotonou, Benin.</p>
+            <p style="margin-top:16px;font-size:11px;color:#999;">33 Lab SARL — Cotonou, Benin — Mars 2026 — Version 1.0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Privacy Modal -->
+      <div id="privacyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;align-items:center;justify-content:center;padding:16px;">
+        <div style="background:#fff;border-radius:20px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;padding:24px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h2 style="font-size:18px;font-weight:800;color:#1B4332;">🔒 Politique de Confidentialite</h2>
+            <button onclick="document.getElementById('privacyModal').style.display='none'" style="background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
+          </div>
+          <div style="font-size:13px;color:#333;line-height:1.8;">
+            <p><strong>1. Donnees collectees</strong><br>Nous collectons : nom, email, telephone, pays, cultures pratiquees, superficie, donnees de prix saisies, donnees de transactions marketplace, localisation GPS des parcelles (avec consentement).</p>
+            <p><strong>2. Finalites</strong><br>Ces donnees servent a : personnaliser les analyses de prix, calculer le credit scoring, fournir des recommandations de production, ameliorer le service via des donnees agregees et anonymisees.</p>
+            <p><strong>3. Partage</strong><br>Vos donnees individuelles ne sont JAMAIS vendues. Les donnees agregees et anonymisees peuvent etre partagees avec des institutions financieres partenaires (banques, MFIs, assureurs) dans le cadre du credit scoring, avec votre consentement explicite.</p>
+            <p><strong>4. Stockage</strong><br>Les donnees sont stockees sur des serveurs securises (Railway, PostgreSQL) avec chiffrement en transit (HTTPS/TLS). Les donnees hors-ligne sont stockees localement dans le navigateur (localStorage).</p>
+            <p><strong>5. Duree de conservation</strong><br>Vos donnees sont conservees tant que votre compte est actif. Apres 24 mois d'inactivite, votre compte et vos donnees sont supprimes. Vous pouvez demander la suppression a tout moment.</p>
+            <p><strong>6. Vos droits</strong><br>Conformement a la loi beninoise sur le numerique, vous avez le droit d'acces, de rectification, de suppression et de portabilite de vos donnees. Contactez-nous a : contact@agroprix.app</p>
+            <p><strong>7. Cookies</strong><br>AgroPrix n'utilise PAS de cookies tiers. Nous utilisons uniquement le localStorage du navigateur pour le fonctionnement hors-ligne. Notre analytics (Plausible) ne collecte aucune donnee personnelle.</p>
+            <p style="margin-top:16px;font-size:11px;color:#999;">33 Lab SARL — Cotonou, Benin — Mars 2026 — Version 1.0</p>
+          </div>
         </div>
       </div>
 
