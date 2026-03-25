@@ -217,7 +217,6 @@
     // Close modal
     if (modal) modal.remove();
 
-    console.log('[AgroPrix] CGU v' + CGU_VERSION + ' acceptees. Profil mis a jour. Historique: ' + history.length + ' versions.');
   }
 
   // =========================================================================

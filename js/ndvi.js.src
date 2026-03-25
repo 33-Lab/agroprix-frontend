@@ -103,7 +103,7 @@
 
   function renderEmptyState() {
     return '<div class="card" style="padding:32px;text-align:center;">'
-      + '<div style="font-size:48px;margin-bottom:12px;">🛰️</div>'
+      + '<div style="font-size:48px;margin-bottom:12px;"><i data-lucide="satellite" class="lc"></i></div>'
       + '<h3 style="color:var(--text-light);margin-bottom:8px;">Aucune parcelle enregistree</h3>'
       + '<p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">'
       + 'Enregistrez vos parcelles pour recevoir l\'indice de vegetation par satellite '
@@ -176,7 +176,7 @@
 
   function renderParcelsList(parcels) {
     var html = '<div class="card" style="padding:16px;margin-bottom:12px;">'
-      + '<div class="card-title"><span class="icon">🗺️</span> Mes parcelles</div>';
+      + '<div class="card-title"><span class="icon"><i data-lucide="map" class="lc"></i>️</span> Mes parcelles</div>';
 
     parcels.forEach(function(p, idx) {
       var latest = p.ndviHistory && p.ndviHistory.length > 0 ? p.ndviHistory[p.ndviHistory.length - 1] : { ndvi: 0, date: '' };
@@ -189,7 +189,7 @@
         + 'onclick="AgroPrix.ndvi.showDetail(' + idx + ')">'
         + '<div style="display:flex;justify-content:space-between;align-items:start;">'
         + '<div>'
-        + '<div style="font-size:13px;font-weight:700;color:var(--text);">🌾 ' + (p.name || 'Parcelle ' + (idx + 1)) + '</div>'
+        + '<div style="font-size:13px;font-weight:700;color:var(--text);"><i data-lucide="wheat" class="lc"></i> ' + (p.name || 'Parcelle ' + (idx + 1)) + '</div>'
         + '<div style="font-size:11px;color:#666;">' + (p.culture || '—') + ' · ' + (p.surface || '—') + ' ha · ' + (p.location || '—') + '</div>'
         + '</div>'
         + '<div style="text-align:right;">'
@@ -200,7 +200,7 @@
         + sparkline
         + '<div style="font-size:10px;color:#999;">Derniere mesure : ' + latest.date + '</div>'
         + '</div>'
-        + '<div style="font-size:11px;color:' + status.color + ';margin-top:6px;font-style:italic;">💡 ' + status.advice + '</div>'
+        + '<div style="font-size:11px;color:' + status.color + ';margin-top:6px;font-style:italic;"><i data-lucide="lightbulb" class="lc"></i> ' + status.advice + '</div>'
         + '</div>';
     });
 
@@ -246,7 +246,7 @@
 
     // Header
     html += '<div class="card" style="padding:16px;margin-bottom:16px;border-top:4px solid ' + status.color + ';">'
-      + '<h3 style="margin:0 0 8px;">🌾 ' + (p.name || 'Parcelle') + '</h3>'
+      + '<h3 style="margin:0 0 8px;"><i data-lucide="wheat" class="lc"></i> ' + (p.name || 'Parcelle') + '</h3>'
       + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">'
       + '<div style="background:var(--bg);padding:8px;border-radius:8px;"><div style="font-size:10px;color:#999;">Culture</div><div style="font-weight:700;">' + (p.culture || '—') + '</div></div>'
       + '<div style="background:var(--bg);padding:8px;border-radius:8px;"><div style="font-size:10px;color:#999;">Surface</div><div style="font-weight:700;">' + (p.surface || '—') + ' ha</div></div>'
@@ -264,7 +264,7 @@
 
     // NDVI timeline (bar chart)
     html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
-      + '<div class="card-title"><span class="icon">📈</span> Evolution NDVI (6 mois)</div>'
+      + '<div class="card-title"><span class="icon"><i data-lucide="trending-up" class="lc"></i></span> Evolution NDVI (6 mois)</div>'
       + '<div style="display:flex;align-items:end;gap:3px;height:120px;margin-top:8px;">';
 
     (p.ndviHistory || []).forEach(function(h) {
@@ -282,7 +282,7 @@
 
     // NDVI scale legend
     html += '<div class="card" style="padding:12px;margin-bottom:16px;">'
-      + '<div class="card-title"><span class="icon">📊</span> Echelle NDVI</div>'
+      + '<div class="card-title"><span class="icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Echelle NDVI</div>'
       + '<div style="display:flex;height:12px;border-radius:6px;overflow:hidden;margin:8px 0;">'
       + '<div style="flex:1;background:#c0392b;" title="Critique"></div>'
       + '<div style="flex:1;background:#e76f51;" title="Stress"></div>'
@@ -370,7 +370,7 @@
 
     // Submit
     html += '<button class="btn-analyse" style="width:100%;font-size:14px;padding:14px;" '
-      + 'onclick="AgroPrix.ndvi.saveParcel()">🛰️ Enregistrer et obtenir le NDVI</button>';
+      + 'onclick="AgroPrix.ndvi.saveParcel()"><i data-lucide="satellite" class="lc"></i> Enregistrer et obtenir le NDVI</button>';
 
     html += '</div>';
     container.innerHTML = html;

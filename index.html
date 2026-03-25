@@ -30,6 +30,9 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+  <!-- Lucide Icons (SVG professionnelles) -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
   <!-- App Styles -->
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
@@ -138,42 +141,42 @@
   <nav class="sidebar-nav">
     <!-- ANALYSE -->
     <div class="nav-section-label">ANALYSE</div>
-    <a class="active" id="navAnalyse" onclick="showView('analyse', this)"><span class="nav-icon">📊</span> Nouvelle analyse</a>
-    <a id="navHistorique" onclick="showView('historique', this)"><span class="nav-icon">📈</span> Historique</a>
-    <a id="navCarte" onclick="showView('carte', this)"><span class="nav-icon">🗺</span> Carte</a>
+    <a class="active" id="navAnalyse" onclick="showView('analyse', this)"><span class="nav-icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Nouvelle analyse</a>
+    <a id="navHistorique" onclick="showView('historique', this)"><span class="nav-icon"><i data-lucide="trending-up" class="lc"></i></span> Historique</a>
+    <a id="navCarte" onclick="showView('carte', this)"><span class="nav-icon"><i data-lucide="map" class="lc"></i></span> Carte</a>
 
     <!-- NEGOCE -->
     <div class="nav-section-label">NEGOCE <span class="pro-badge">PRO</span></div>
-    <a id="navNegoce" onclick="showView('negoce', this)"><span class="nav-icon">📒</span> Carnet de negoce</a>
-    <a id="navOpportunites" onclick="showView('opportunites', this)"><span class="nav-icon">🎯</span> Opportunites</a>
+    <a id="navNegoce" onclick="showView('negoce', this)"><span class="nav-icon"><i data-lucide="book-open" class="lc"></i></span> Carnet de negoce</a>
+    <a id="navOpportunites" onclick="showView('opportunites', this)"><span class="nav-icon"><i data-lucide="target" class="lc"></i></span> Opportunites</a>
 
     <!-- PRODUCTION -->
     <div class="nav-section-label">PRODUCTION <span class="pro-badge">PRO</span></div>
-    <a id="navProduction" onclick="showView('production', this)"><span class="nav-icon">🌱</span> Assistant Production</a>
-    <a id="navConseils" onclick="showView('conseilsProducteur', this)"><span class="nav-icon">📋</span> Conseils <span class="lock-icon">🔒</span></a>
+    <a id="navProduction" onclick="showView('production', this)"><span class="nav-icon"><i data-lucide="sprout" class="lc"></i></span> Assistant Production</a>
+    <a id="navConseils" onclick="showView('conseilsProducteur', this)"><span class="nav-icon"><i data-lucide="clipboard-list" class="lc"></i></span> Conseils <span class="lock-icon"><i data-lucide="lock" class="lc"></i></span></a>
 
     <!-- EXPORT -->
     <div class="nav-section-label">EXPORT <span class="premium-badge">PREMIUM</span></div>
-    <a id="navExport" onclick="showView('export', this)"><span class="nav-icon">🚢</span> Tableau Export</a>
-    <a id="navConformite" onclick="showView('conformite', this)"><span class="nav-icon">✅</span> Conformite <span class="lock-icon">🔒</span></a>
+    <a id="navExport" onclick="showView('export', this)"><span class="nav-icon"><i data-lucide="ship" class="lc"></i></span> Tableau Export</a>
+    <a id="navConformite" onclick="showView('conformite', this)"><span class="nav-icon"><i data-lucide="check-circle" class="lc"></i></span> Conformite <span class="lock-icon"><i data-lucide="lock" class="lc"></i></span></a>
 
     <!-- INTRANTS -->
     <div class="nav-section-label">INTRANTS <span class="new-badge">NOUVEAU</span></div>
-    <a id="navInputs" onclick="showView('inputs', this)"><span class="nav-icon">🧪</span> Prix Intrants</a>
+    <a id="navInputs" onclick="showView('inputs', this)"><span class="nav-icon"><i data-lucide="flask-conical" class="lc"></i></span> Prix Intrants</a>
 
     <!-- FINANCEMENT -->
     <div class="nav-section-label">FINANCEMENT <span class="new-badge">NOUVEAU</span></div>
-    <a id="navFinancing" onclick="showView('financing', this)"><span class="nav-icon">💰</span> GPS Financement</a>
-    <a id="navNdvi" onclick="showView('ndvi', this)"><span class="nav-icon">🛰️</span> Sante Parcelle</a>
-    <a id="navScoring" onclick="showView('scoring', this)"><span class="nav-icon">📊</span> Mon Score Credit</a>
+    <a id="navFinancing" onclick="showView('financing', this)"><span class="nav-icon"><i data-lucide="coins" class="lc"></i></span> GPS Financement</a>
+    <a id="navNdvi" onclick="showView('ndvi', this)"><span class="nav-icon"><i data-lucide="satellite" class="lc"></i></span> Sante Parcelle</a>
+    <a id="navScoring" onclick="showView('scoring', this)"><span class="nav-icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Mon Score Credit</a>
 
     <!-- MARKET -->
     <div class="nav-section-label">MARKET</div>
-    <a id="navMarket" onclick="showView('market', this)"><span class="nav-icon">🤝</span> Offres & Demandes</a>
+    <a id="navMarket" onclick="showView('market', this)"><span class="nav-icon"><i data-lucide="handshake" class="lc"></i></span> Offres & Demandes</a>
 
     <div class="nav-separator"></div>
-    <a id="navParams" onclick="showView('params', this)"><span class="nav-icon">⚙</span> Parametres</a>
-    <a onclick="logout()" style="color:#e76f51;"><span class="nav-icon">🚪</span> Deconnexion</a>
+    <a id="navParams" onclick="showView('params', this)"><span class="nav-icon"><i data-lucide="settings" class="lc"></i></span> Parametres</a>
+    <a onclick="logout()" style="color:#e76f51;"><span class="nav-icon"><i data-lucide="log-out" class="lc"></i></span> Deconnexion</a>
   </nav>
   <div class="sidebar-footer">
     <div class="user-info">
@@ -203,7 +206,7 @@
       </div>
       <div class="status-dot"></div>
       <div class="user-avatar" id="topbarAvatar">UD</div>
-      <button class="topbar-btn" id="installBtn" style="display:none;">📲</button>
+      <button class="topbar-btn" id="installBtn" style="display:none;"><i data-lucide="download" class="lc"></i></button>
     </div>
   </div>
 
@@ -217,7 +220,7 @@
 
       <!-- Form -->
       <div class="section-teal" id="formCard">
-        <div class="card-title" style="color:#064E41;font-size:16px;font-weight:800;margin-bottom:4px;"><span class="icon">⚙</span> Configuration de l'analyse</div>
+        <div class="card-title" style="color:#064E41;font-size:16px;font-weight:800;margin-bottom:4px;"><span class="icon"><i data-lucide="settings" class="lc"></i></span> Configuration de l'analyse</div>
         <p style="font-size:12px;color:#45B7A0;margin-bottom:16px;">Selectionnez vos parametres pour obtenir une analyse detaillee</p>
         <div class="form-grid">
           <div class="form-group">
@@ -288,11 +291,11 @@
           <div class="form-group full">
             <label class="form-label" style="margin-bottom:8px;">Options</label>
             <div class="toggle-row">
-              <label>📈 Comparer avec annee precedente</label>
+              <label><i data-lucide="trending-up" class="lc"></i> Comparer avec annee precedente</label>
               <div class="toggle-switch active" id="togCompare" onclick="toggleSwitch(this)"></div>
             </div>
             <div class="toggle-row">
-              <label>🤖 Previsions IA (J+30, J+90)</label>
+              <label><i data-lucide="bot" class="lc"></i> Previsions IA (J+30, J+90)</label>
               <div class="toggle-switch active" id="togForecast" onclick="toggleSwitch(this)"></div>
             </div>
             <div class="toggle-row">
@@ -301,7 +304,7 @@
             </div>
           </div>
           <div class="form-group full">
-            <button class="btn-analyse" onclick="launchAnalysis()" style="width:100%;font-size:15px;padding:14px;">🔍 Lancer l'analyse</button>
+            <button class="btn-analyse" onclick="launchAnalysis()" style="width:100%;font-size:15px;padding:14px;"><i data-lucide="search" class="lc"></i> Lancer l'analyse</button>
           </div>
         </div>
       </div><!-- end section-teal -->
@@ -309,7 +312,7 @@
       <!-- Loading -->
       <div class="loading-overlay" id="loadingOverlay">
         <div class="card">
-          <div class="card-title"><span class="icon">⚙</span> Analyse en cours...</div>
+          <div class="card-title"><span class="icon"><i data-lucide="settings" class="lc"></i></span> Analyse en cours...</div>
           <div class="loading-bar-wrap"><div class="loading-bar" id="loadingBar"></div></div>
           <div class="loading-steps" id="loadingSteps"></div>
         </div>
@@ -317,7 +320,7 @@
 
       <!-- Results -->
       <div id="results" style="display:none;">
-        <div class="section-sep"><h3>📊 Resume Executif</h3></div>
+        <div class="section-sep"><h3><i data-lucide="bar-chart-3" class="lc"></i> Resume Executif</h3></div>
         <div class="exec-hero glass-card" id="execHero">
           <div class="hero-left">
             <h3 id="heroSubtitle">Analyse de prix</h3>
@@ -335,7 +338,7 @@
           </div>
         </div>
 
-        <div class="section-sep"><h3>📈 Evolution des Prix</h3></div>
+        <div class="section-sep"><h3><i data-lucide="trending-up" class="lc"></i> Evolution des Prix</h3></div>
         <div class="card glass-card">
           <div class="chart-container"><canvas id="priceChart"></canvas></div>
           <div class="stat-row">
@@ -346,25 +349,25 @@
           </div>
         </div>
 
-        <div class="section-sep"><h3>🗺 Carte des Prix</h3></div>
+        <div class="section-sep"><h3><i data-lucide="map" class="lc"></i> Carte des Prix</h3></div>
         <div class="card"><div id="priceMap"></div></div>
 
-        <div class="section-sep"><h3>⚠ Facteurs d'Influence</h3></div>
+        <div class="section-sep"><h3><i data-lucide="alert-triangle" class="lc"></i> Facteurs d'Influence</h3></div>
         <div class="factors-grid" id="factorsGrid"></div>
 
-        <div class="section-sep" style="margin-top:28px;"><h3>🌐 Comparaison Regionale UEMOA</h3></div>
+        <div class="section-sep" style="margin-top:28px;"><h3><i data-lucide="globe" class="lc"></i> Comparaison Regionale UEMOA</h3></div>
         <div class="card"><div class="bar-chart-container"><canvas id="regionChart"></canvas></div></div>
 
-        <div class="section-sep"><h3>📰 Actualites & Alertes</h3></div>
+        <div class="section-sep"><h3><i data-lucide="newspaper" class="lc"></i> Actualites & Alertes</h3></div>
         <div class="card"><div class="news-feed" id="newsFeed"></div></div>
 
-        <div class="section-sep"><h3>🤖 Recommandations IA</h3></div>
+        <div class="section-sep"><h3><i data-lucide="bot" class="lc"></i> Recommandations IA</h3></div>
         <div class="reco-card" id="recoCard"><div id="recoContainer"></div></div>
 
         <div class="action-bar">
-          <button class="action-btn primary">📄 Telecharger PDF</button>
-          <button class="action-btn secondary">📊 Exporter Excel</button>
-          <button class="action-btn outline" onclick="document.getElementById('formCard').scrollIntoView({behavior:'smooth'})">🔄 Nouvelle analyse</button>
+          <button class="action-btn primary"><i data-lucide="file" class="lc"></i> Telecharger PDF</button>
+          <button class="action-btn secondary"><i data-lucide="bar-chart-3" class="lc"></i> Exporter Excel</button>
+          <button class="action-btn outline" onclick="document.getElementById('formCard').scrollIntoView({behavior:'smooth'})"><i data-lucide="refresh-cw" class="lc"></i> Nouvelle analyse</button>
         </div>
       </div>
     </div>
@@ -374,7 +377,7 @@
 
       <!-- Opportunites (style guide: bordure orange + badge %) -->
       <div class="card" style="margin-bottom:16px;">
-        <div style="font-size:18px;font-weight:800;color:#333;margin-bottom:16px;">⊙ Opportunites</div>
+        <div style="font-size:18px;font-weight:800;color:#333;margin-bottom:16px;"><i data-lucide="target" class="lc"></i> Opportunites</div>
 
         <!-- Opportunite 1 -->
         <div style="border-left:4px solid #E8862A;padding:14px 16px;margin-bottom:14px;border-radius:0 16px 16px 0;background:#fff;">
@@ -414,7 +417,7 @@
 
       <!-- Dernieres Transactions (style guide: table propre) -->
       <div class="card" style="margin-bottom:16px;">
-        <div style="font-size:18px;font-weight:800;color:#333;margin-bottom:16px;">📋 Dernieres Transactions</div>
+        <div style="font-size:18px;font-weight:800;color:#333;margin-bottom:16px;"><i data-lucide="clipboard-list" class="lc"></i> Dernieres Transactions</div>
         <div style="overflow-x:auto;">
           <table class="data-table">
             <thead><tr><th>Date</th><th>Culture</th><th>Marche</th><th>Qte</th><th>Prix achat</th></tr></thead>
@@ -430,7 +433,7 @@
 
       <!-- Calculateur Transport (style guide) -->
       <div class="card" style="margin-bottom:16px;">
-        <div style="font-size:18px;font-weight:800;color:#333;margin-bottom:16px;">🚚 Calculateur Transport Inter-Marches</div>
+        <div style="font-size:18px;font-weight:800;color:#333;margin-bottom:16px;"><i data-lucide="truck" class="lc"></i> Calculateur Transport Inter-Marches</div>
         <div class="form-grid">
           <div class="form-group">
             <label class="form-label">Marche de depart</label>
@@ -449,13 +452,13 @@
             <input type="number" value="245" min="1">
           </div>
           <div class="form-group full">
-            <button class="btn-analyse" style="width:100%;" onclick="calculateTransport()">🧮 Calculer la marge nette</button>
+            <button class="btn-analyse" style="width:100%;" onclick="calculateTransport()"><i data-lucide="calculator" class="lc"></i> Calculer la marge nette</button>
           </div>
         </div>
         <div id="transportResults"></div>
       </div>
 
-      <button class="btn-analyse" style="width:100%;" onclick="addTransaction()">📒 Ajouter une transaction</button>
+      <button class="btn-analyse" style="width:100%;" onclick="addTransaction()"><i data-lucide="book-open" class="lc"></i> Ajouter une transaction</button>
     </div>
 
     <!-- ═══ VIEW: PRODUCTION ═══ -->
@@ -463,7 +466,7 @@
       <!-- Hero section -->
       <div class="hero-card" style="margin:16px;margin-bottom:0;">
         <div style="font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:1px;">Assistant production</div>
-        <div style="font-size:20px;font-weight:800;margin-top:4px;">🌱 Simulez vos rendements</div>
+        <div style="font-size:20px;font-weight:800;margin-top:4px;"><i data-lucide="sprout" class="lc"></i> Simulez vos rendements</div>
         <div style="font-size:12px;opacity:0.8;margin-top:4px;">Estimez vos couts, rendements et benefices par culture</div>
       </div>
       <div style="padding:0 16px;">
@@ -506,7 +509,7 @@
       </div>
 
       <div class="section-white">
-        <div class="form-section-title">🌱 Simulateur de Production</div>
+        <div class="form-section-title"><i data-lucide="sprout" class="lc"></i> Simulateur de Production</div>
         <div class="form-grid">
           <div class="form-group">
             <label class="form-label">Culture</label>
@@ -554,7 +557,7 @@
             </select>
           </div>
           <div class="form-group">
-            <button class="btn-analyse" onclick="calculateProduction()">🧮 Calculer</button>
+            <button class="btn-analyse" onclick="calculateProduction()"><i data-lucide="calculator" class="lc"></i> Calculer</button>
           </div>
         </div>
       </div>
@@ -566,7 +569,7 @@
     <div class="view-container" id="viewExport">
       <div class="hero-card" style="margin:16px;margin-bottom:0;">
         <div style="font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:1px;">Tableau export</div>
-        <div style="font-size:20px;font-weight:800;margin-top:4px;">🚢 Commerce international</div>
+        <div style="font-size:20px;font-weight:800;margin-top:4px;"><i data-lucide="ship" class="lc"></i> Commerce international</div>
         <div style="font-size:12px;opacity:0.8;margin-top:4px;">Prix FOB, taux de change, fret et fenetres d'export</div>
       </div>
       <div style="padding:0 16px;">
@@ -577,7 +580,7 @@
         <div class="kpi-card"><div class="kpi-value" style="color:var(--gold);">Avr-Mai</div><div class="kpi-label">Prochaine fenetre (Cajou, Sesame)</div></div>
       </div>
       <div class="card">
-        <div class="card-title"><span class="icon">🌍</span> Prix Internationaux vs Locaux</div>
+        <div class="card-title"><span class="icon"><i data-lucide="globe-2" class="lc"></i></span> Prix Internationaux vs Locaux</div>
         <div style="overflow-x:auto;">
           <table class="data-table">
             <thead><tr><th>Produit</th><th>Prix local</th><th>Prix FOB</th><th>Cours mondial</th><th>Ecart</th><th>Tendance</th></tr></thead>
@@ -592,7 +595,7 @@
         </div>
       </div>
       <div class="card">
-        <div class="card-title"><span class="icon">💱</span> Taux de Change</div>
+        <div class="card-title"><span class="icon"><i data-lucide="arrow-left-right" class="lc"></i></span> Taux de Change</div>
         <div class="currency-grid">
           <div class="currency-card"><div class="cc-pair">USD / XOF</div><div class="cc-rate">598.5</div><div class="cc-trend up">+0.3%</div></div>
           <div class="currency-card"><div class="cc-pair">EUR / XOF</div><div class="cc-rate">655.957</div><div class="cc-trend">Fixe</div></div>
@@ -607,18 +610,18 @@
       <div style="padding:16px;">
         <div class="hero-card">
           <div style="text-align:center;">
-            <div style="font-size:48px;margin-bottom:12px;">🔒</div>
+            <div style="font-size:48px;margin-bottom:12px;"><i data-lucide="lock" class="lc"></i></div>
             <div style="font-size:20px;font-weight:800;">Extension Conseils Producteur</div>
             <div style="font-size:13px;opacity:0.8;margin-top:8px;">Accompagnez vos producteurs avec des rapports personnalises</div>
           </div>
         </div>
         <div class="section-white" style="text-align:center;">
           <ul style="list-style:none;padding:0;text-align:left;">
-            <li style="padding:10px 0;border-bottom:1px solid var(--border-light);font-size:14px;">✅ Planification de campagne par producteur</li>
-            <li style="padding:10px 0;border-bottom:1px solid var(--border-light);font-size:14px;">✅ Rapport PDF personnalise par parcelle</li>
-            <li style="padding:10px 0;font-size:14px;">✅ Suivi parcelles et historique rendements</li>
+            <li style="padding:10px 0;border-bottom:1px solid var(--border-light);font-size:14px;"><i data-lucide="check-circle" class="lc"></i> Planification de campagne par producteur</li>
+            <li style="padding:10px 0;border-bottom:1px solid var(--border-light);font-size:14px;"><i data-lucide="check-circle" class="lc"></i> Rapport PDF personnalise par parcelle</li>
+            <li style="padding:10px 0;font-size:14px;"><i data-lucide="check-circle" class="lc"></i> Suivi parcelles et historique rendements</li>
           </ul>
-          <button class="btn-gold" style="width:100%;margin-top:16px;">⭐ Passer a Pro — 2 900 FCFA/mois</button>
+          <button class="btn-gold" style="width:100%;margin-top:16px;"><i data-lucide="star" class="lc"></i> Passer a Pro — 2 900 FCFA/mois</button>
         </div>
       </div>
     </div>
@@ -628,18 +631,18 @@
       <div style="padding:16px;">
         <div class="hero-card" style="background:linear-gradient(135deg, #064E41 0%, #0A6E5C 100%);">
           <div style="text-align:center;">
-            <div style="font-size:48px;margin-bottom:12px;">🔒</div>
+            <div style="font-size:48px;margin-bottom:12px;"><i data-lucide="lock" class="lc"></i></div>
             <div style="font-size:20px;font-weight:800;">Module Conformite Export</div>
             <div style="font-size:13px;opacity:0.8;margin-top:8px;">Normes phytosanitaires par destination, check-lists automatisees</div>
           </div>
         </div>
         <div class="section-white" style="text-align:center;">
           <ul style="list-style:none;padding:0;text-align:left;">
-            <li style="padding:10px 0;border-bottom:1px solid var(--border-light);font-size:14px;">✅ Normes par pays de destination</li>
-            <li style="padding:10px 0;border-bottom:1px solid var(--border-light);font-size:14px;">✅ Check-list automatisee par produit</li>
-            <li style="padding:10px 0;font-size:14px;">✅ Alertes reglementaires</li>
+            <li style="padding:10px 0;border-bottom:1px solid var(--border-light);font-size:14px;"><i data-lucide="check-circle" class="lc"></i> Normes par pays de destination</li>
+            <li style="padding:10px 0;border-bottom:1px solid var(--border-light);font-size:14px;"><i data-lucide="check-circle" class="lc"></i> Check-list automatisee par produit</li>
+            <li style="padding:10px 0;font-size:14px;"><i data-lucide="check-circle" class="lc"></i> Alertes reglementaires</li>
           </ul>
-          <button class="btn-gold" style="width:100%;margin-top:16px;">⭐ Passer a Expert — 14 900 FCFA/mois</button>
+          <button class="btn-gold" style="width:100%;margin-top:16px;"><i data-lucide="star" class="lc"></i> Passer a Expert — 14 900 FCFA/mois</button>
         </div>
       </div>
     </div>
@@ -649,7 +652,7 @@
     <div class="view-container" id="viewInputs">
       <div id="inputsContent">
         <div style="text-align:center;padding:40px;">
-          <div style="font-size:48px;margin-bottom:12px;">🧪</div>
+          <div style="font-size:48px;margin-bottom:12px;"><i data-lucide="flask-conical" class="lc"></i></div>
           <p style="color:var(--text-light);">Chargement du module Prix Intrants...</p>
         </div>
       </div>
@@ -659,7 +662,7 @@
     <div class="view-container" id="viewFinancing">
       <div id="financingContent">
         <div style="text-align:center;padding:40px;">
-          <div style="font-size:48px;margin-bottom:12px;">💰</div>
+          <div style="font-size:48px;margin-bottom:12px;"><i data-lucide="coins" class="lc"></i></div>
           <p style="color:var(--text-light);">Chargement du GPS Financement...</p>
         </div>
       </div>
@@ -669,7 +672,7 @@
     <div class="view-container" id="viewNdvi">
       <div id="ndviContent">
         <div style="text-align:center;padding:40px;">
-          <div style="font-size:48px;margin-bottom:12px;">🛰️</div>
+          <div style="font-size:48px;margin-bottom:12px;"><i data-lucide="satellite" class="lc"></i></div>
           <p style="color:var(--text-light);">Chargement Sante Parcelle...</p>
         </div>
       </div>
@@ -679,7 +682,7 @@
     <div class="view-container" id="viewScoring">
       <div id="scoringContent">
         <div style="text-align:center;padding:40px;">
-          <div style="font-size:48px;margin-bottom:12px;">📊</div>
+          <div style="font-size:48px;margin-bottom:12px;"><i data-lucide="bar-chart-3" class="lc"></i></div>
           <p style="color:var(--text-light);">Calcul de votre score...</p>
         </div>
       </div>
@@ -689,7 +692,7 @@
     <div class="view-container" id="viewMarket">
       <div id="marketplaceContent">
         <div style="text-align:center;padding:40px;">
-          <div style="font-size:48px;margin-bottom:12px;">🏪</div>
+          <div style="font-size:48px;margin-bottom:12px;"><i data-lucide="store" class="lc"></i></div>
           <p style="color:var(--text-light);">Chargement de la Marketplace...</p>
         </div>
       </div>
@@ -700,13 +703,13 @@
       <div style="padding:16px;">
         <div class="hero-card">
           <div style="font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:1px;">Historique</div>
-          <div style="font-size:20px;font-weight:800;margin-top:4px;">📈 Vos analyses</div>
+          <div style="font-size:20px;font-weight:800;margin-top:4px;"><i data-lucide="trending-up" class="lc"></i> Vos analyses</div>
         </div>
         <div class="empty-state">
-          <div class="empty-icon">📊</div>
+          <div class="empty-icon"><i data-lucide="bar-chart-3" class="lc"></i></div>
           <h3>Aucune analyse precedente</h3>
           <p style="font-size:13px;">Lancez une premiere analyse pour voir vos resultats ici.</p>
-          <button class="btn-analyse" style="margin-top:16px;" onclick="showView('analyse')">🔍 Lancer une analyse</button>
+          <button class="btn-analyse" style="margin-top:16px;" onclick="showView('analyse')"><i data-lucide="search" class="lc"></i> Lancer une analyse</button>
         </div>
       </div>
     </div>
@@ -714,7 +717,7 @@
     <!-- ═══ VIEW: CARTE ═══ -->
     <div class="view-container" id="viewCarte">
       <div class="card">
-        <div class="card-title"><span class="icon">🗺</span> Carte des marches UEMOA</div>
+        <div class="card-title"><span class="icon"><i data-lucide="map" class="lc"></i></span> Carte des marches UEMOA</div>
         <div id="fullMap" style="height:500px;border-radius:8px;"></div>
       </div>
     </div>
@@ -736,10 +739,10 @@
           </div>
         </div>
         <div style="margin-top:12px;font-size:13px;color:#666;">
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ 3 marches</div>
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ 1 produit</div>
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Prix de base</div>
-          <div style="padding:6px 0;color:#ccc;">❌ Conseil IA</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> 3 marches</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> 1 produit</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Prix de base</div>
+          <div style="padding:6px 0;color:#ccc;"><i data-lucide="x-circle" class="lc"></i> Conseil IA</div>
         </div>
         <button style="width:100%;margin-top:12px;padding:12px;background:#F5F5F5;color:#666;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Plan actuel</button>
       </div>
@@ -753,10 +756,10 @@
           </div>
         </div>
         <div style="margin-top:12px;font-size:13px;color:#666;">
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Tous les marches</div>
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ 5 produits</div>
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Conseil basique</div>
-          <div style="padding:6px 0;">✅ Meteo</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Tous les marches</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> 5 produits</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Conseil basique</div>
+          <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Meteo</div>
         </div>
         <button onclick="souscrirePlan('Starter', 990)" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#E8862A,#F0A050);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Choisir Starter</button>
       </div>
@@ -771,10 +774,10 @@
           </div>
         </div>
         <div style="margin-top:12px;font-size:13px;color:#666;">
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Tous les produits</div>
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Conseil IA complet</div>
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ GPS Financement</div>
-          <div style="padding:6px 0;">✅ Score Credit</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Tous les produits</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Conseil IA complet</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> GPS Financement</div>
+          <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Score Credit</div>
         </div>
         <button onclick="souscrirePlan('Pro', 2900)" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Choisir Pro</button>
       </div>
@@ -788,11 +791,11 @@
           </div>
         </div>
         <div style="margin-top:12px;font-size:13px;color:#666;">
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Tout le plan Pro</div>
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Export + Forex</div>
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Tracabilite QR</div>
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Marketplace prioritaire</div>
-          <div style="padding:6px 0;">✅ Alertes temps reel</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Tout le plan Pro</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Export + Forex</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Tracabilite QR</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Marketplace prioritaire</div>
+          <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Alertes temps reel</div>
         </div>
         <button onclick="souscrirePlan('Expert', 14900)" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#D4A017,#E8C030);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Choisir Expert</button>
       </div>
@@ -809,10 +812,10 @@
           </div>
         </div>
         <div style="margin-top:12px;font-size:13px;color:#666;">
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Simulateur rentabilite plantain</div>
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Calendrier cultural</div>
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Guide maladies (Cercosporiose)</div>
-          <div style="padding:6px 0;">✅ Prix saisonniers plantain</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Simulateur rentabilite plantain</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Calendrier cultural</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Guide maladies (Cercosporiose)</div>
+          <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Prix saisonniers plantain</div>
         </div>
         <button onclick="souscrirePlan('Plantain Pro', 1490)" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Choisir Plantain Pro</button>
       </div>
@@ -826,10 +829,10 @@
           </div>
         </div>
         <div style="margin-top:12px;font-size:13px;color:#666;">
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Suivi prix SICOM/APROMAC</div>
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Calendrier saignee</div>
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Guide maladies (Fomes, TPD)</div>
-          <div style="padding:6px 0;">✅ Calculateur rendement par clone</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Suivi prix SICOM/APROMAC</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Calendrier saignee</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Guide maladies (Fomes, TPD)</div>
+          <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Calculateur rendement par clone</div>
         </div>
         <button onclick="souscrirePlan('Hevea Pro', 1490)" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Choisir Hevea Pro</button>
       </div>
@@ -843,10 +846,10 @@
           </div>
         </div>
         <div style="margin-top:12px;font-size:13px;color:#666;">
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Guides illustres par culture</div>
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Diagnostic maladies en BD</div>
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">✅ Techniques post-recolte</div>
-          <div style="padding:6px 0;">✅ Telechargeables hors ligne</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Guides illustres par culture</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Diagnostic maladies en BD</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Techniques post-recolte</div>
+          <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Telechargeables hors ligne</div>
         </div>
         <button style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#E8862A,#F0A050);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Voir les guides disponibles</button>
       </div>
@@ -855,16 +858,16 @@
       <div class="card" style="margin-bottom:14px;border-left:4px solid #1B4332;background:linear-gradient(135deg,#f8faf9,#eef5f0);">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div>
-            <span style="background:#1B4332;color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;">🏛️ INSTITUTION</span>
+            <span style="background:#1B4332;color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;"><i data-lucide="building-2" class="lc"></i> INSTITUTION</span>
             <div style="font-size:24px;font-weight:800;color:#1B4332;margin-top:8px;">Sur devis</div>
           </div>
         </div>
         <div style="margin-top:12px;font-size:13px;color:#666;">
-          <div style="padding:6px 0;border-bottom:1px solid #e0e8e3;">✅ Deploiement dans vos programmes</div>
-          <div style="padding:6px 0;border-bottom:1px solid #e0e8e3;">✅ Dashboard d'impact personnalise</div>
-          <div style="padding:6px 0;border-bottom:1px solid #e0e8e3;">✅ API Credit Scoring</div>
-          <div style="padding:6px 0;border-bottom:1px solid #e0e8e3;">✅ Donnees aggregees par region</div>
-          <div style="padding:6px 0;">✅ Support dedie + SLA</div>
+          <div style="padding:6px 0;border-bottom:1px solid #e0e8e3;"><i data-lucide="check-circle" class="lc"></i> Deploiement dans vos programmes</div>
+          <div style="padding:6px 0;border-bottom:1px solid #e0e8e3;"><i data-lucide="check-circle" class="lc"></i> Dashboard d'impact personnalise</div>
+          <div style="padding:6px 0;border-bottom:1px solid #e0e8e3;"><i data-lucide="check-circle" class="lc"></i> API Credit Scoring</div>
+          <div style="padding:6px 0;border-bottom:1px solid #e0e8e3;"><i data-lucide="check-circle" class="lc"></i> Donnees aggregees par region</div>
+          <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Support dedie + SLA</div>
         </div>
         <button style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">📧 Demander un devis</button>
       </div>
@@ -873,7 +876,7 @@
     <!-- ═══ VIEW: PARAMS ═══ -->
     <div class="view-container" id="viewParams">
       <div class="card">
-        <div class="card-title"><span class="icon">👤</span> Mon Profil</div>
+        <div class="card-title"><span class="icon"><i data-lucide="user" class="lc"></i></span> Mon Profil</div>
         <div id="profileInfo" style="padding:8px 0;">
           <p><strong>Nom :</strong> <span id="profileName">—</span></p>
           <p><strong>Email :</strong> <span id="profileEmail">—</span></p>
@@ -882,7 +885,7 @@
         </div>
       </div>
       <div class="card">
-        <div class="card-title"><span class="icon">💰</span> Plans & Tarifs</div>
+        <div class="card-title"><span class="icon"><i data-lucide="coins" class="lc"></i></span> Plans & Tarifs</div>
         <div class="stats-row" style="margin-top:12px;">
           <div class="stat-card" style="border-top:3px solid var(--green);">
             <div class="sc-value" style="color:var(--green);">Gratuit</div>
@@ -917,9 +920,9 @@
       <div class="card">
         <div class="card-title"><span class="icon">📜</span> Legal</div>
         <div style="padding:8px 0;">
-          <p style="margin-bottom:8px;"><a href="#" onclick="AgroPrix.cgu.forceShow();return false;" style="font-size:13px;color:var(--primary);font-weight:600;">📋 Conditions Generales d'Utilisation (CGU)</a></p>
-          <p style="margin-bottom:8px;"><a href="#" onclick="var m=document.getElementById('cgvModal');m.style.display='flex';m.style.alignItems='center';m.style.justifyContent='center';return false;" style="font-size:13px;color:var(--primary);font-weight:600;">📄 Conditions Generales de Vente (CGV)</a></p>
-          <p><a href="#" onclick="var m=document.getElementById('privacyModal');m.style.display='flex';m.style.alignItems='center';m.style.justifyContent='center';return false;" style="font-size:13px;color:var(--primary);font-weight:600;">🔒 Politique de confidentialite</a></p>
+          <p style="margin-bottom:8px;"><a href="#" onclick="AgroPrix.cgu.forceShow();return false;" style="font-size:13px;color:var(--primary);font-weight:600;"><i data-lucide="clipboard-list" class="lc"></i> Conditions Generales d'Utilisation (CGU)</a></p>
+          <p style="margin-bottom:8px;"><a href="#" onclick="var m=document.getElementById('cgvModal');m.style.display='flex';m.style.alignItems='center';m.style.justifyContent='center';return false;" style="font-size:13px;color:var(--primary);font-weight:600;"><i data-lucide="file" class="lc"></i> Conditions Generales de Vente (CGV)</a></p>
+          <p><a href="#" onclick="var m=document.getElementById('privacyModal');m.style.display='flex';m.style.alignItems='center';m.style.justifyContent='center';return false;" style="font-size:13px;color:var(--primary);font-weight:600;"><i data-lucide="lock" class="lc"></i> Politique de confidentialite</a></p>
         </div>
       </div>
 
@@ -927,7 +930,7 @@
       <div id="cgvModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;align-items:center;justify-content:center;padding:16px;">
         <div style="background:#fff;border-radius:20px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;padding:24px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-            <h2 style="font-size:18px;font-weight:800;color:#1B4332;">📄 Conditions Generales de Vente</h2>
+            <h2 style="font-size:18px;font-weight:800;color:#1B4332;"><i data-lucide="file" class="lc"></i> Conditions Generales de Vente</h2>
             <button onclick="document.getElementById('cgvModal').style.display='none'" style="background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
           </div>
           <div style="font-size:13px;color:#333;line-height:1.8;">
@@ -949,7 +952,7 @@
       <div id="privacyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;align-items:center;justify-content:center;padding:16px;">
         <div style="background:#fff;border-radius:20px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;padding:24px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-            <h2 style="font-size:18px;font-weight:800;color:#1B4332;">🔒 Politique de Confidentialite</h2>
+            <h2 style="font-size:18px;font-weight:800;color:#1B4332;"><i data-lucide="lock" class="lc"></i> Politique de Confidentialite</h2>
             <button onclick="document.getElementById('privacyModal').style.display='none'" style="background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
           </div>
           <div style="font-size:13px;color:#333;line-height:1.8;">
@@ -967,7 +970,7 @@
 
       <!-- V6: Partenaire officiel -->
       <div class="card">
-        <div class="card-title"><span class="icon">🤝</span> Partenaire officiel</div>
+        <div class="card-title"><span class="icon"><i data-lucide="handshake" class="lc"></i></span> Partenaire officiel</div>
         <div style="padding:8px 0;">
           <p style="font-size:13px;color:var(--text-light);line-height:1.6;">
             <strong>Les Domaines du Terroir (LDT)</strong><br>
@@ -985,7 +988,7 @@
           Version 6.0.0 - Mars 2026
         </p>
       </div>
-      <button class="btn-analyse" style="max-width:320px;background:var(--alert);" onclick="logout()">🚪 Se deconnecter</button>
+      <button class="btn-analyse" style="max-width:320px;background:var(--alert);" onclick="logout()"><i data-lucide="log-out" class="lc"></i> Se deconnecter</button>
     </div>
 
   <!-- ═══ VIEW: PROPRIETAIRE ═══ -->
@@ -1038,7 +1041,7 @@
           </div>
 
           <button onclick="simulerPotentiel()" style="width:100%;padding:14px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;">
-            🔍 Analyser le potentiel de ma parcelle
+            <i data-lucide="search" class="lc"></i> Analyser le potentiel de ma parcelle
           </button>
 
           <div id="propResultat" style="display:none;margin-top:16px;"></div>
@@ -1064,22 +1067,22 @@
         </div>
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
           <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('financing')">
-            <div style="font-size:32px;margin-bottom:8px;">💰</div>
+            <div style="font-size:32px;margin-bottom:8px;"><i data-lucide="coins" class="lc"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">GPS Financement</div>
             <div style="font-size:11px;color:var(--text-light);">90+ institutions</div>
           </div>
           <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('scoring')">
-            <div style="font-size:32px;margin-bottom:8px;">📊</div>
+            <div style="font-size:32px;margin-bottom:8px;"><i data-lucide="bar-chart-3" class="lc"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Mon Score Credit</div>
             <div style="font-size:11px;color:var(--text-light);">Score 0-1000</div>
           </div>
           <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('ndvi')">
-            <div style="font-size:32px;margin-bottom:8px;">🛰️</div>
+            <div style="font-size:32px;margin-bottom:8px;"><i data-lucide="satellite" class="lc"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Sante Parcelle</div>
             <div style="font-size:11px;color:var(--text-light);">NDVI Satellite</div>
           </div>
           <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('market')">
-            <div style="font-size:32px;margin-bottom:8px;">🏪</div>
+            <div style="font-size:32px;margin-bottom:8px;"><i data-lucide="store" class="lc"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Place de Marche</div>
             <div style="font-size:11px;color:var(--text-light);">Offres & Demandes</div>
           </div>
@@ -1099,7 +1102,7 @@
             <div style="font-size:11px;color:var(--text-light);">Valoriser ma terre</div>
           </div>
           <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('params')">
-            <div style="font-size:32px;margin-bottom:8px;">⚙️</div>
+            <div style="font-size:32px;margin-bottom:8px;"><i data-lucide="settings" class="lc"></i>️</div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Parametres</div>
             <div style="font-size:11px;color:var(--text-light);">Profil & compte</div>
           </div>
@@ -1112,10 +1115,10 @@
 
 <!-- ═══ BOTTOM NAV (Mobile - V6: 5 tabs) ═══ -->
 <nav class="bottom-nav" id="bottomNav">
-  <a class="active" onclick="showView('analyse', this)"><span>📊</span><span>Analyse</span></a>
-  <a onclick="showView('negoce', this)"><span>📒</span><span>Negoce</span></a>
-  <a onclick="showView('market', this)"><span>🤝</span><span>Marche</span></a>
-  <a onclick="showView('production', this)"><span>🌱</span><span>Produc.</span></a>
+  <a class="active" onclick="showView('analyse', this)"><span><i data-lucide="bar-chart-3" class="lc"></i></span><span>Analyse</span></a>
+  <a onclick="showView('negoce', this)"><span><i data-lucide="book-open" class="lc"></i></span><span>Negoce</span></a>
+  <a onclick="showView('market', this)"><span><i data-lucide="handshake" class="lc"></i></span><span>Marche</span></a>
+  <a onclick="showView('production', this)"><span><i data-lucide="sprout" class="lc"></i></span><span>Produc.</span></a>
   <a onclick="toggleMoreMenu()" id="moreBtn"><span>⊕</span><span>Plus</span></a>
 </nav>
 
@@ -1123,27 +1126,27 @@
 <div id="moreMenu" style="display:none;position:fixed;bottom:70px;right:8px;left:8px;background:#fff;border-radius:20px;box-shadow:0 -4px 20px rgba(0,0,0,0.15);padding:16px;z-index:200;">
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
     <div style="text-align:center;cursor:pointer;" onclick="showView('financing');closeMoreMenu()">
-      <div style="width:50px;height:50px;border-radius:14px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;">💰</div>
+      <div style="width:50px;height:50px;border-radius:14px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="coins" class="lc"></i></div>
       <div style="font-size:11px;font-weight:600;">Finance</div>
     </div>
     <div style="text-align:center;cursor:pointer;" onclick="showView('scoring');closeMoreMenu()">
-      <div style="width:50px;height:50px;border-radius:14px;background:#FFF3E0;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;">📊</div>
+      <div style="width:50px;height:50px;border-radius:14px;background:#FFF3E0;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="bar-chart-3" class="lc"></i></div>
       <div style="font-size:11px;font-weight:600;">Score Credit</div>
     </div>
     <div style="text-align:center;cursor:pointer;" onclick="showView('ndvi');closeMoreMenu()">
-      <div style="width:50px;height:50px;border-radius:14px;background:#E0F2F1;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;">🛰</div>
+      <div style="width:50px;height:50px;border-radius:14px;background:#E0F2F1;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="satellite" class="lc"></i></div>
       <div style="font-size:11px;font-weight:600;">NDVI</div>
     </div>
     <div style="text-align:center;cursor:pointer;" onclick="showView('inputs');closeMoreMenu()">
-      <div style="width:50px;height:50px;border-radius:14px;background:#F3E5F5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;">🧪</div>
+      <div style="width:50px;height:50px;border-radius:14px;background:#F3E5F5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="flask-conical" class="lc"></i></div>
       <div style="font-size:11px;font-weight:600;">Intrants</div>
     </div>
     <div style="text-align:center;cursor:pointer;" onclick="showView('export');closeMoreMenu()">
-      <div style="width:50px;height:50px;border-radius:14px;background:#E3F2FD;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;">🚢</div>
+      <div style="width:50px;height:50px;border-radius:14px;background:#E3F2FD;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="ship" class="lc"></i></div>
       <div style="font-size:11px;font-weight:600;">Export</div>
     </div>
     <div style="text-align:center;cursor:pointer;" onclick="showView('params');closeMoreMenu()">
-      <div style="width:50px;height:50px;border-radius:14px;background:#F5F5F5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;">⚙️</div>
+      <div style="width:50px;height:50px;border-radius:14px;background:#F5F5F5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="settings" class="lc"></i>️</div>
       <div style="font-size:11px;font-weight:600;">Parametres</div>
     </div>
   </div>
@@ -1190,7 +1193,7 @@ document.addEventListener('click',function(e){var m=document.getElementById('mor
   <h1 style="font-size:22px;font-weight:800;color:#1B4332;margin-bottom:8px;">Oups ! Un petit grain de sable...</h1>
   <p style="font-size:14px;color:#666;max-width:400px;margin-bottom:24px;">L'application a rencontre une erreur inattendue. Nos ingenieurs (33 Lab) ont ete prevenus automatiquement.</p>
   <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
-    <button onclick="window.location.reload()" style="padding:12px 24px;background:#1B4332;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">🔄 Recharger l'application</button>
+    <button onclick="window.location.reload()" style="padding:12px 24px;background:#1B4332;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;"><i data-lucide="refresh-cw" class="lc"></i> Recharger l'application</button>
     <a href="https://wa.me/22996816868" target="_blank" style="padding:12px 24px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;">💬 Contacter le support</a>
   </div>
   <div style="margin-top:24px;font-size:11px;color:#999;" id="errorDebugInfo"></div>

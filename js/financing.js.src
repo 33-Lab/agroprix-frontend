@@ -178,20 +178,20 @@
         inst.products.forEach(function(p) { if (p.eligibility.requiresCoop) coopCount++; });
       });
       if (coopCount > 0) {
-        advices.push({ icon: '🤝', text: 'Rejoignez une cooperative pour debloquer ' + coopCount + ' financement(s) supplementaire(s).', priority: 1 });
+        advices.push({ icon: '<i data-lucide="handshake" class="lc"></i>', text: 'Rejoignez une cooperative pour debloquer ' + coopCount + ' financement(s) supplementaire(s).', priority: 1 });
       }
     }
 
     // Check business plan advice
     if (!fProfile.hasBusinessPlan) {
-      advices.push({ icon: '📝', text: 'Preparez un business plan pour acceder aux financements bancaires (jusqu\'a 500M FCFA).', priority: 2 });
+      advices.push({ icon: '<i data-lucide="file-text" class="lc"></i>', text: 'Preparez un business plan pour acceder aux financements bancaires (jusqu\'a 500M FCFA).', priority: 2 });
     }
 
     // Check farm size advice
     matchResults.forEach(function(r) {
       r.checks.forEach(function(c) {
         if (!c.match && c.advice && advices.length < 4) {
-          advices.push({ icon: '💡', text: c.advice, priority: 3 });
+          advices.push({ icon: '<i data-lucide="lightbulb" class="lc"></i>', text: c.advice, priority: 3 });
         }
       });
     });
@@ -227,7 +227,7 @@
       + '</div>';
 
     html += '<div class="card" style="padding:16px;">'
-      + '<div class="card-title"><span class="icon">🎯</span> Votre profil producteur</div>';
+      + '<div class="card-title"><span class="icon"><i data-lucide="target" class="lc"></i></span> Votre profil producteur</div>';
 
     // Crops multi-select
     html += '<div class="form-group" style="margin-bottom:12px;">'
@@ -299,7 +299,7 @@
 
     // Submit
     html += '<button class="btn-analyse" style="width:100%;font-size:15px;padding:14px;" onclick="AgroPrix.financing.search()">'
-      + '🔍 Trouver mes financements</button>';
+      + '<i data-lucide="search" class="lc"></i> Trouver mes financements</button>';
 
     html += '</div>'; // card
 
@@ -322,7 +322,7 @@
     // Advices
     if (advices.length > 0) {
       html += '<div class="card" style="padding:12px;margin-bottom:16px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #f59e0b;">'
-        + '<div style="font-size:12px;font-weight:700;color:#b45309;margin-bottom:8px;">💡 CONSEILS POUR AMELIORER VOTRE ELIGIBILITE</div>';
+        + '<div style="font-size:12px;font-weight:700;color:#b45309;margin-bottom:8px;"><i data-lucide="lightbulb" class="lc"></i> CONSEILS POUR AMELIORER VOTRE ELIGIBILITE</div>';
       advices.forEach(function(a) {
         html += '<div style="font-size:12px;color:#92400e;margin-bottom:4px;">' + a.icon + ' ' + a.text + '</div>';
       });
@@ -332,7 +332,7 @@
     // Results cards
     if (matchResults.length === 0) {
       html += '<div class="card" style="padding:32px;text-align:center;">'
-        + '<div style="font-size:48px;margin-bottom:12px;">🔍</div>'
+        + '<div style="font-size:48px;margin-bottom:12px;"><i data-lucide="search" class="lc"></i></div>'
         + '<h3 style="color:var(--text-light);">Aucun financement trouve</h3>'
         + '<p style="font-size:13px;color:var(--text-muted);">Modifiez vos criteres ou verifiez vos informations.</p>'
         + '</div>';
@@ -390,19 +390,19 @@
 
     // Eligibility checklist
     html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
-      + '<div class="card-title"><span class="icon">✅</span> Conditions d\'eligibilite</div>';
+      + '<div class="card-title"><span class="icon"><i data-lucide="check-circle" class="lc"></i></span> Conditions d\'eligibilite</div>';
     r.checks.forEach(function(c) {
-      var icon = c.match ? '✅' : '❌';
+      var icon = c.match ? '<i data-lucide="check-circle" class="lc"></i>' : '<i data-lucide="x-circle" class="lc"></i>';
       var color = c.match ? 'var(--green)' : 'var(--alert)';
       html += '<div style="display:flex;align-items:start;gap:8px;margin-bottom:8px;">'
         + '<span style="font-size:14px;">' + icon + '</span>'
         + '<div>'
         + '<div style="font-size:13px;color:' + color + ';font-weight:600;">' + c.label + '</div>';
       if (!c.match && c.advice) {
-        html += '<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">💡 ' + c.advice + '</div>';
+        html += '<div style="font-size:11px;color:var(--text-muted);margin-top:2px;"><i data-lucide="lightbulb" class="lc"></i> ' + c.advice + '</div>';
       }
       if (c.note) {
-        html += '<div style="font-size:11px;color:var(--gold);margin-top:2px;">⭐ ' + c.note + '</div>';
+        html += '<div style="font-size:11px;color:var(--gold);margin-top:2px;"><i data-lucide="star" class="lc"></i> ' + c.note + '</div>';
       }
       html += '</div></div>';
     });
@@ -412,19 +412,19 @@
     var docs = r.product.eligibility.documents || [];
     if (docs.length > 0) {
       var docLabels = {
-        business_plan: '📋 Business plan / plan d\'affaires',
+        business_plan: '<i data-lucide="clipboard-list" class="lc"></i> Business plan / plan d\'affaires',
         id: '🪪 Piece d\'identite',
-        bank_account: '🏦 Compte bancaire',
-        tax_compliance: '📄 Attestation fiscale',
-        proof_of_activity: '🌾 Justificatif d\'activite agricole',
-        membership_card: '🤝 Carte de membre cooperative',
-        financial_statements: '📊 Etats financiers certifies (2 ans)',
-        project_proposal: '📝 Proposition de projet',
-        training_certificate: '🎓 Certificat de formation entrepreneuriat',
-        feasibility_study: '📈 Etude de faisabilite'
+        bank_account: '<i data-lucide="landmark" class="lc"></i> Compte bancaire',
+        tax_compliance: '<i data-lucide="file" class="lc"></i> Attestation fiscale',
+        proof_of_activity: '<i data-lucide="wheat" class="lc"></i> Justificatif d\'activite agricole',
+        membership_card: '<i data-lucide="handshake" class="lc"></i> Carte de membre cooperative',
+        financial_statements: '<i data-lucide="bar-chart-3" class="lc"></i> Etats financiers certifies (2 ans)',
+        project_proposal: '<i data-lucide="file-text" class="lc"></i> Proposition de projet',
+        training_certificate: '<i data-lucide="graduation-cap" class="lc"></i> Certificat de formation entrepreneuriat',
+        feasibility_study: '<i data-lucide="trending-up" class="lc"></i> Etude de faisabilite'
       };
       html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
-        + '<div class="card-title"><span class="icon">📂</span> Documents requis</div>';
+        + '<div class="card-title"><span class="icon"><i data-lucide="folder-open" class="lc"></i></span> Documents requis</div>';
       docs.forEach(function(d) {
         html += '<div style="font-size:13px;margin-bottom:6px;">' + (docLabels[d] || d) + '</div>';
       });
@@ -433,13 +433,13 @@
 
     // How to apply
     html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
-      + '<div class="card-title"><span class="icon">🚀</span> Comment postuler</div>'
+      + '<div class="card-title"><span class="icon"><i data-lucide="rocket" class="lc"></i></span> Comment postuler</div>'
       + '<p style="font-size:13px;line-height:1.6;">' + (r.product.howToApply || 'Contactez l\'institution directement.') + '</p>';
     if (r.institution.website) {
-      html += '<a href="' + r.institution.website + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-size:13px;color:var(--primary);font-weight:600;">🌐 Visiter le site web →</a>';
+      html += '<a href="' + r.institution.website + '" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-size:13px;color:var(--primary);font-weight:600;"><i data-lucide="globe" class="lc"></i> Visiter le site web →</a>';
     }
     if (r.institution.phone) {
-      html += '<div style="margin-top:6px;font-size:13px;">📞 ' + r.institution.phone + '</div>';
+      html += '<div style="margin-top:6px;font-size:13px;"><i data-lucide="phone" class="lc"></i> ' + r.institution.phone + '</div>';
     }
     html += '</div>';
 

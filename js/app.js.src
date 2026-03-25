@@ -5,7 +5,6 @@
   'use strict';
 
   function init() {
-    console.log('[AgroPrix] Initialisation V6...');
 
     // Check API availability
     if (AP.api && AP.api.checkAPI) {
@@ -33,7 +32,6 @@
       AP.cgu.checkOnStartup();
     }
 
-    console.log('[AgroPrix] Application V6 prete');
   }
 
   // Register PWA Service Worker
@@ -41,10 +39,8 @@
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
         .then(function(reg) {
-          console.log('[AgroPrix] Service Worker enregistre', reg.scope);
         })
         .catch(function(err) {
-          console.log('[AgroPrix] Service Worker non disponible:', err.message);
         });
     }
   }
@@ -64,7 +60,6 @@
           if (deferredPrompt) {
             deferredPrompt.prompt();
             deferredPrompt.userChoice.then(function(result) {
-              console.log('[AgroPrix] Installation:', result.outcome);
               deferredPrompt = null;
               installBtn.style.display = 'none';
             });
@@ -76,7 +71,6 @@
 
   // V6: Demo Mode — skip auth, set fake demo user
   function demoMode() {
-    console.log('[AgroPrix] Mode Demo active');
 
     var demoUser = {
       nom: 'Utilisateur Demo',
@@ -160,7 +154,7 @@ window.simulerPotentiel = function() {
   cultures.sort(function(a, b) { return b.score - a.score; });
 
   var html = '<div style="margin-top:16px;">';
-  html += '<h3 style="font-size:16px;font-weight:700;color:#1B4332;margin-bottom:12px;">📊 Resultats pour ' + surface + ' ha</h3>';
+  html += '<h3 style="font-size:16px;font-weight:700;color:#1B4332;margin-bottom:12px;"><i data-lucide="bar-chart-3" class="lc"></i> Resultats pour ' + surface + ' ha</h3>';
 
   cultures.slice(0, 3).forEach(function(c, i) {
     var revenu = Math.round(surface * c.rendement * 1000 * c.prixKg);
@@ -237,7 +231,7 @@ window.chercherTechniciens = function() {
       + '<div style="font-size:11px;color:#E8862A;font-weight:600;">📍 ' + t.zone + '</div>'
       + '</div></div>'
       + '<div style="display:flex;gap:8px;margin-top:10px;">'
-      + '<a href="tel:' + t.tel.replace(/\s/g, '') + '" style="flex:1;padding:10px;background:#2D6A4F;color:#fff;border-radius:10px;text-align:center;text-decoration:none;font-size:13px;font-weight:600;">📞 Appeler</a>'
+      + '<a href="tel:' + t.tel.replace(/\s/g, '') + '" style="flex:1;padding:10px;background:#2D6A4F;color:#fff;border-radius:10px;text-align:center;text-decoration:none;font-size:13px;font-weight:600;"><i data-lucide="phone" class="lc"></i> Appeler</a>'
       + '<a href="https://wa.me/' + t.tel.replace(/[^0-9]/g, '') + '" target="_blank" style="flex:1;padding:10px;background:#25D366;color:#fff;border-radius:10px;text-align:center;text-decoration:none;font-size:13px;font-weight:600;">💬 WhatsApp</a>'
       + '</div></div>';
   });
@@ -267,15 +261,15 @@ window.souscrirePlan = function(plan, montant) {
     + '<div style="margin-bottom:16px;">'
     + '<label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px;">Methode de paiement</label>'
     + '<div style="display:flex;gap:10px;margin-top:8px;">'
-    + '<button onclick="selectPayMethod(\'mtn\')" id="payMtn" style="flex:1;padding:14px;border:2px solid #E8862A;border-radius:12px;background:#FFF8F0;cursor:pointer;font-weight:700;font-size:13px;">📱 MTN MoMo</button>'
-    + '<button onclick="selectPayMethod(\'moov\')" id="payMoov" style="flex:1;padding:14px;border:2px solid #ddd;border-radius:12px;background:#fff;cursor:pointer;font-weight:700;font-size:13px;">📱 Moov Money</button>'
+    + '<button onclick="selectPayMethod(\'mtn\')" id="payMtn" style="flex:1;padding:14px;border:2px solid #E8862A;border-radius:12px;background:#FFF8F0;cursor:pointer;font-weight:700;font-size:13px;"><i data-lucide="smartphone" class="lc"></i> MTN MoMo</button>'
+    + '<button onclick="selectPayMethod(\'moov\')" id="payMoov" style="flex:1;padding:14px;border:2px solid #ddd;border-radius:12px;background:#fff;cursor:pointer;font-weight:700;font-size:13px;"><i data-lucide="smartphone" class="lc"></i> Moov Money</button>'
     + '</div>'
     + '</div>'
     + '<div style="margin-bottom:16px;">'
     + '<label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px;">Numero de telephone</label>'
     + '<input type="tel" id="payPhone" placeholder="+229 XX XX XX XX" style="width:100%;padding:14px;border:1px solid #ddd;border-radius:12px;font-size:15px;font-family:inherit;">'
     + '</div>'
-    + '<button onclick="confirmerPaiement(\'' + plan + '\',' + montant + ')" style="width:100%;padding:16px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;">💳 Payer ' + fmt + ' FCFA</button>'
+    + '<button onclick="confirmerPaiement(\'' + plan + '\',' + montant + ')" style="width:100%;padding:16px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;"><i data-lucide="credit-card" class="lc"></i> Payer ' + fmt + ' FCFA</button>'
     + '<button onclick="document.getElementById(\'paymentOverlay\').remove()" style="width:100%;margin-top:10px;padding:12px;background:none;border:1px solid #ddd;border-radius:12px;font-size:14px;color:#999;cursor:pointer;">Annuler</button>'
     + '</div>';
 
@@ -305,12 +299,12 @@ window.confirmerPaiement = function(plan, montant) {
   var overlay = document.getElementById('paymentOverlay');
   if (overlay) {
     overlay.innerHTML = '<div style="background:#fff;border-radius:20px;padding:40px;max-width:400px;width:100%;text-align:center;">'
-      + '<div style="font-size:64px;margin-bottom:16px;">✅</div>'
+      + '<div style="font-size:64px;margin-bottom:16px;"><i data-lucide="check-circle" class="lc"></i></div>'
       + '<div style="font-size:20px;font-weight:800;color:#1B4332;">Paiement initie !</div>'
       + '<div style="font-size:14px;color:#666;margin-top:8px;">Un SMS de confirmation FedaPay va etre envoye au <strong>' + phone.value + '</strong>.</div>'
       + '<div style="font-size:13px;color:#999;margin-top:8px;">Plan ' + plan + ' — ' + montant.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA/mois</div>'
       + '<div style="margin-top:16px;padding:12px;background:#D8F3DC;border-radius:12px;font-size:12px;color:#1B4332;">'
-      + '💡 En production, ce paiement sera traite par FedaPay (MTN MoMo / Moov Money). Pour l\'instant c\'est une simulation.'
+      + '<i data-lucide="lightbulb" class="lc"></i> En production, ce paiement sera traite par FedaPay (MTN MoMo / Moov Money). Pour l\'instant c\'est une simulation.'
       + '</div>'
       + '<button onclick="document.getElementById(\'paymentOverlay\').remove()" style="width:100%;margin-top:16px;padding:14px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;">Fermer</button>'
       + '</div>';

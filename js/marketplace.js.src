@@ -107,10 +107,10 @@
     // Tabs
     html += '<div style="display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border);">';
     [
-      { id: 'marche', label: '🏪 Marche' },
-      { id: 'vendre', label: '📦 Vendre' },
-      { id: 'acheter', label: '🛒 Acheter' },
-      { id: 'mes-transactions', label: '📋 Mes annonces' }
+      { id: 'marche', label: '<i data-lucide="store" class="lc"></i> Marche' },
+      { id: 'vendre', label: '<i data-lucide="package" class="lc"></i> Vendre' },
+      { id: 'acheter', label: '<i data-lucide="shopping-cart" class="lc"></i> Acheter' },
+      { id: 'mes-transactions', label: '<i data-lucide="clipboard-list" class="lc"></i> Mes annonces' }
     ].forEach(function(t) {
       var active = currentTab === t.id;
       html += '<button onclick="AgroPrix.marketplace.setTab(\'' + t.id + '\')" style="flex:1;padding:10px;font-size:12px;font-weight:' + (active ? '700' : '500') + ';color:' + (active ? 'var(--green)' : 'var(--text-light)') + ';background:none;border:none;border-bottom:' + (active ? '3px solid var(--green)' : '3px solid transparent') + ';cursor:pointer;font-family:inherit;">' + t.label + '</button>';
@@ -135,12 +135,12 @@
     var matches = findMatches();
     var totalMatchRate = (offers.length + demands.length) > 0 ? Math.round(matches.length / Math.max(offers.length, demands.length) * 100) : 0;
     var html = '';
-    var cropEmojis = { mais: '🌽', cajou: '🥜', soja: '🫘', riz: '🌾', tomate: '🍅', oignon: '🧅', manioc: '🥔', arachide: '🥜', niebe: '🫘', igname: '🍠', coton: '🌿', cafe: '☕', cacao: '🍫', mil: '🌾', sorgho: '🌾' };
+    var cropEmojis = { mais: '🌽', cajou: '🥜', soja: '🫘', riz: '<i data-lucide="wheat" class="lc"></i>', tomate: '🍅', oignon: '🧅', manioc: '🥔', arachide: '🥜', niebe: '🫘', igname: '🍠', coton: '🌿', cafe: '☕', cacao: '🍫', mil: '<i data-lucide="wheat" class="lc"></i>', sorgho: '<i data-lucide="wheat" class="lc"></i>' };
 
     // Header Place de Marche
     html += '<div style="background:linear-gradient(135deg,#1B4332,#2D6A4F);border-radius:20px;padding:20px;color:#fff;margin-bottom:16px;text-align:center;">';
     html += '<div style="font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:2px;">PLACE DE MARCHE</div>';
-    html += '<div style="font-size:20px;font-weight:800;margin-top:4px;">🏪 Offres & Demandes</div>';
+    html += '<div style="font-size:20px;font-weight:800;margin-top:4px;"><i data-lucide="store" class="lc"></i> Offres & Demandes</div>';
     html += '</div>';
 
     // Annonces style guide
@@ -151,7 +151,7 @@
 
     if (all.length === 0) {
       html += '<div class="card" style="padding:32px;text-align:center;">'
-        + '<div style="font-size:48px;margin-bottom:12px;">🏪</div>'
+        + '<div style="font-size:48px;margin-bottom:12px;"><i data-lucide="store" class="lc"></i></div>'
         + '<h3 style="color:#666;">Aucune annonce</h3>'
         + '<p style="font-size:13px;color:#999;">Soyez le premier a publier une offre ou une demande!</p>'
         + '</div>';
@@ -187,7 +187,7 @@
         + '💬 CONTACTER VIA WHATSAPP</a>';
 
       // QR button
-      html += '<button onclick="event.stopPropagation();AgroPrix.marketplace.showQR(\'' + item.id + '\')" style="display:block;width:100%;margin-top:8px;padding:10px;font-size:12px;font-weight:600;border:1.5px solid #2D6A4F;color:#2D6A4F;background:#fff;border-radius:12px;cursor:pointer;">📱 QR Tracabilite</button>';
+      html += '<button onclick="event.stopPropagation();AgroPrix.marketplace.showQR(\'' + item.id + '\')" style="display:block;width:100%;margin-top:8px;padding:10px;font-size:12px;font-weight:600;border:1.5px solid #2D6A4F;color:#2D6A4F;background:#fff;border-radius:12px;cursor:pointer;"><i data-lucide="smartphone" class="lc"></i> QR Tracabilite</button>';
 
       html += '</div>';
     });
@@ -210,7 +210,7 @@
     var html = '';
 
     html += '<div class="card" style="padding:16px;">'
-      + '<div class="card-title"><span class="icon">' + (isSell ? '📦' : '🛒') + '</span> ' + (isSell ? 'Publier une offre de vente' : 'Publier une demande d\'achat') + '</div>'
+      + '<div class="card-title"><span class="icon">' + (isSell ? '<i data-lucide="package" class="lc"></i>' : '<i data-lucide="shopping-cart" class="lc"></i>') + '</span> ' + (isSell ? 'Publier une offre de vente' : 'Publier une demande d\'achat') + '</div>'
       + '<p style="font-size:12px;color:var(--text-light);margin-bottom:12px;">' + (isSell ? 'Proposez vos produits aux acheteurs.' : 'Decrivez ce que vous recherchez.') + '</p>';
 
     // Culture
@@ -281,7 +281,7 @@
 
     if (myOffers.length === 0 && myDemands.length === 0) {
       html += '<div class="card" style="padding:32px;text-align:center;">'
-        + '<div style="font-size:48px;margin-bottom:12px;">📋</div>'
+        + '<div style="font-size:48px;margin-bottom:12px;"><i data-lucide="clipboard-list" class="lc"></i></div>'
         + '<h3 style="color:var(--text-light);">Aucune annonce</h3>'
         + '<p style="font-size:13px;color:var(--text-muted);">Publiez une offre ou une demande pour la retrouver ici.</p>'
         + '</div>';
@@ -290,7 +290,7 @@
 
     if (myOffers.length > 0) {
       html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
-        + '<div class="card-title"><span class="icon">📦</span> Mes offres de vente (' + myOffers.length + ')</div>';
+        + '<div class="card-title"><span class="icon"><i data-lucide="package" class="lc"></i></span> Mes offres de vente (' + myOffers.length + ')</div>';
       myOffers.forEach(function(o) {
         html += '<div style="padding:8px 0;border-bottom:1px solid var(--border);">'
           + '<div style="display:flex;justify-content:space-between;align-items:center;">'
@@ -305,7 +305,7 @@
 
     if (myDemands.length > 0) {
       html += '<div class="card" style="padding:16px;">'
-        + '<div class="card-title"><span class="icon">🛒</span> Mes demandes d\'achat (' + myDemands.length + ')</div>';
+        + '<div class="card-title"><span class="icon"><i data-lucide="shopping-cart" class="lc"></i></span> Mes demandes d\'achat (' + myDemands.length + ')</div>';
       myDemands.forEach(function(d) {
         html += '<div style="padding:8px 0;border-bottom:1px solid var(--border);">'
           + '<div style="display:flex;justify-content:space-between;align-items:center;">'
@@ -384,7 +384,7 @@
     // Show success
     var successEl = document.getElementById('mpSuccess');
     if (successEl) {
-      successEl.textContent = '✅ Annonce publiee ! ' + cropName + ' — ' + (type === 'sell' ? 'offre de vente' : 'demande d\'achat');
+      successEl.textContent = '<i data-lucide="check-circle" class="lc"></i> Annonce publiee ! ' + cropName + ' — ' + (type === 'sell' ? 'offre de vente' : 'demande d\'achat');
       successEl.style.display = 'block';
       setTimeout(function() { successEl.style.display = 'none'; }, 3000);
     }
@@ -461,12 +461,12 @@
 
     // Traceability details
     html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
-      + '<div class="card-title"><span class="icon">📋</span> Fiche de tracabilite</div>'
+      + '<div class="card-title"><span class="icon"><i data-lucide="clipboard-list" class="lc"></i></span> Fiche de tracabilite</div>'
       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
 
     var fields = [
       { label: 'ID Lot', value: item.id },
-      { label: 'Type', value: isSell ? '📦 Vente' : '🛒 Achat' },
+      { label: 'Type', value: isSell ? '<i data-lucide="package" class="lc"></i> Vente' : '<i data-lucide="shopping-cart" class="lc"></i> Achat' },
       { label: 'Produit', value: item.cropName || item.crop },
       { label: 'Quantite', value: item.quantity + ' ' + (item.unit || 'kg') },
       { label: 'Prix', value: isSell ? formatFCFA(item.price) + '/kg' : item.maxPrice + ' ' + item.priceUnit },
@@ -474,7 +474,7 @@
       { label: isSell ? 'Vendeur' : 'Acheteur', value: isSell ? item.seller : item.buyer },
       { label: 'Date', value: item.date ? item.date.split('T')[0] : '—' },
       { label: 'Pays', value: getUserCountry() },
-      { label: 'Verifie', value: item.verified ? '✅ Oui' : '⏳ En attente' }
+      { label: 'Verifie', value: item.verified ? '<i data-lucide="check-circle" class="lc"></i> Oui' : '<i data-lucide="hourglass" class="lc"></i> En attente' }
     ];
 
     fields.forEach(function(f) {
@@ -488,7 +488,7 @@
 
     // Conformity info
     html += '<div class="card" style="padding:14px;margin-bottom:16px;background:linear-gradient(135deg,#D8F3DC,#B7E4C7);border:1px solid #2D6A4F33;">'
-      + '<div style="font-size:12px;font-weight:700;color:#1B4332;margin-bottom:6px;">🌍 Conformite reglementation UE</div>'
+      + '<div style="font-size:12px;font-weight:700;color:#1B4332;margin-bottom:6px;"><i data-lucide="globe-2" class="lc"></i> Conformite reglementation UE</div>'
       + '<div style="font-size:11px;color:#2D6A4F;">Ce QR code repond aux exigences du reglement europeen anti-deforestation '
       + '(EUDR, applicable juin 2026) qui impose la tracabilite des produits agricoles importes dans l\'UE, '
       + 'notamment le cacao, le cafe, le soja et le cajou.</div>'
@@ -501,14 +501,14 @@
 
       if (isPaid) {
         html += '<div class="card" style="padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#d1fae5,#a7f3d0);border:2px solid var(--green);text-align:center;">'
-          + '<div style="font-size:32px;margin-bottom:6px;">✅</div>'
+          + '<div style="font-size:32px;margin-bottom:6px;"><i data-lucide="check-circle" class="lc"></i></div>'
           + '<div style="font-size:14px;font-weight:700;color:#1B4332;">Paiement confirme</div>'
           + '<div style="font-size:12px;color:#047857;margin-top:4px;">' + formatFCFA(totalAmount) + ' via Mobile Money</div>'
           + '<div style="font-size:10px;color:#059669;margin-top:4px;">Ref: FDP-' + item.id.toUpperCase().substr(0,8) + ' | ' + new Date().toLocaleDateString('fr') + '</div>'
           + '</div>';
       } else {
         html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
-          + '<div class="card-title"><span class="icon">💳</span> Paiement securise</div>'
+          + '<div class="card-title"><span class="icon"><i data-lucide="credit-card" class="lc"></i></span> Paiement securise</div>'
           + '<div style="font-size:12px;color:var(--text-light);margin-bottom:12px;">Payez directement le producteur via Mobile Money. Transaction securisee par FedaPay.</div>'
           + '<div style="background:var(--bg);padding:12px;border-radius:10px;margin-bottom:12px;">'
           + '<div style="display:flex;justify-content:space-between;font-size:13px;"><span>Produit</span><strong>' + (item.cropName || item.crop) + '</strong></div>'
@@ -518,16 +518,16 @@
           + '</div>'
           + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">'
           + '<div style="text-align:center;padding:10px;border:2px solid var(--border);border-radius:10px;cursor:pointer;" onclick="this.style.borderColor=\'var(--green)\'">'
-          + '<div style="font-size:20px;">📱</div><div style="font-size:10px;font-weight:600;">MTN MoMo</div></div>'
+          + '<div style="font-size:20px;"><i data-lucide="smartphone" class="lc"></i></div><div style="font-size:10px;font-weight:600;">MTN MoMo</div></div>'
           + '<div style="text-align:center;padding:10px;border:2px solid var(--border);border-radius:10px;cursor:pointer;" onclick="this.style.borderColor=\'var(--green)\'">'
-          + '<div style="font-size:20px;">📱</div><div style="font-size:10px;font-weight:600;">Moov Money</div></div>'
+          + '<div style="font-size:20px;"><i data-lucide="smartphone" class="lc"></i></div><div style="font-size:10px;font-weight:600;">Moov Money</div></div>'
           + '<div style="text-align:center;padding:10px;border:2px solid var(--border);border-radius:10px;cursor:pointer;" onclick="this.style.borderColor=\'var(--green)\'">'
-          + '<div style="font-size:20px;">💳</div><div style="font-size:10px;font-weight:600;">Carte</div></div>'
+          + '<div style="font-size:20px;"><i data-lucide="credit-card" class="lc"></i></div><div style="font-size:10px;font-weight:600;">Carte</div></div>'
           + '</div>'
           + '<button onclick="AgroPrix.marketplace.processPayment(\'' + item.id + '\')" style="width:100%;padding:14px;background:linear-gradient(135deg,#E8862A,#E8862A);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">'
-          + '💳 Payer ' + formatFCFA(totalAmount) + '</button>'
+          + '<i data-lucide="credit-card" class="lc"></i> Payer ' + formatFCFA(totalAmount) + '</button>'
           + '<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;">'
-          + '<span style="font-size:9px;color:#999;">🔒 Paiement securise par</span>'
+          + '<span style="font-size:9px;color:#999;"><i data-lucide="lock" class="lc"></i> Paiement securise par</span>'
           + '<span style="font-size:11px;font-weight:700;color:#1B4332;">FedaPay</span>'
           + '</div></div>';
       }
@@ -536,9 +536,9 @@
     // Share button
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">'
       + '<button style="padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;" '
-      + 'onclick="AgroPrix.marketplace.shareQR(\'' + item.id + '\')">📤 Partager</button>'
+      + 'onclick="AgroPrix.marketplace.shareQR(\'' + item.id + '\')"><i data-lucide="share-2" class="lc"></i> Partager</button>'
       + '<button style="padding:12px;background:linear-gradient(180deg,#fff,#FAFCFB);color:var(--primary);border:2px solid var(--primary);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;" '
-      + 'onclick="AgroPrix.marketplace.init()">🏪 Retour</button>'
+      + 'onclick="AgroPrix.marketplace.init()"><i data-lucide="store" class="lc"></i> Retour</button>'
       + '</div>';
 
     container.innerHTML = html;
@@ -556,7 +556,7 @@
     // Show processing animation
     var btn = event.target;
     btn.disabled = true;
-    btn.innerHTML = '⏳ Traitement en cours...';
+    btn.innerHTML = '<i data-lucide="hourglass" class="lc"></i> Traitement en cours...';
     btn.style.background = '#6b7280';
 
     setTimeout(function() {

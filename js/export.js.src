@@ -1,6 +1,5 @@
 (function(AP) {
   function init() {
-    console.log('[AgroPrix] Module Export initialisé');
     // Future: fetch real exchange rates from API
     // Future: fetch real FOB prices
   }

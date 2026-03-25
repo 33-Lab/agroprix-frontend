@@ -114,7 +114,7 @@ function calculateTransport() {
   var resultsEl = document.getElementById('transportResults');
   if (resultsEl) {
     resultsEl.innerHTML = '<div class="card" style="margin-top:16px;background:#D8F3DC;">'
-      + '<div style="font-size:16px;font-weight:800;color:#1B4332;margin-bottom:12px;">📊 Resultat</div>'
+      + '<div style="font-size:16px;font-weight:800;color:#1B4332;margin-bottom:12px;"><i data-lucide="bar-chart-3" class="lc"></i> Resultat</div>'
       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
       + '<div><div style="font-size:11px;color:#666;">Cout achat</div><div style="font-size:16px;font-weight:800;">' + totalAchat.toLocaleString('fr') + ' FCFA</div></div>'
       + '<div><div style="font-size:11px;color:#666;">Cout transport</div><div style="font-size:16px;font-weight:800;">' + totalTransport.toLocaleString('fr') + ' FCFA</div></div>'
@@ -122,7 +122,7 @@ function calculateTransport() {
       + '<div><div style="font-size:11px;color:#666;">Prix de revient</div><div style="font-size:16px;font-weight:800;color:#E8862A;">' + prixRevientKg + ' FCFA/kg</div></div>'
       + '</div>'
       + '<div style="margin-top:12px;padding:10px;background:#fff;border-radius:12px;font-size:13px;color:#1B4332;">'
-      + '💡 Pour une marge de 10% minimum, vendez a <strong>' + margeMin + ' FCFA/kg</strong> ou plus a ' + arrivee.value + '.'
+      + '<i data-lucide="lightbulb" class="lc"></i> Pour une marge de 10% minimum, vendez a <strong>' + margeMin + ' FCFA/kg</strong> ou plus a ' + arrivee.value + '.'
       + '</div>'
       + '</div>';
   }

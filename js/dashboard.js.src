@@ -44,10 +44,10 @@
   }
   function getLevel(pts) {
     if (pts >= 2000) return { name: 'Expert Marche', emoji: '👑', next: null, progress: 100 };
-    if (pts >= 1000) return { name: 'Negociant Pro', emoji: '💎', next: 2000, progress: Math.round((pts-1000)/10) };
+    if (pts >= 1000) return { name: 'Negociant Pro', emoji: '<i data-lucide="gem" class="lc"></i>', next: 2000, progress: Math.round((pts-1000)/10) };
     if (pts >= 500) return { name: 'Analyste Confirme', emoji: '🏅', next: 1000, progress: Math.round((pts-500)/5) };
-    if (pts >= 200) return { name: 'Producteur Actif', emoji: '🌟', next: 500, progress: Math.round((pts-200)/3) };
-    if (pts >= 50) return { name: 'Debutant Motive', emoji: '🌱', next: 200, progress: Math.round((pts-50)/1.5) };
+    if (pts >= 200) return { name: 'Producteur Actif', emoji: '<i data-lucide="sparkles" class="lc"></i>', next: 500, progress: Math.round((pts-200)/3) };
+    if (pts >= 50) return { name: 'Debutant Motive', emoji: '<i data-lucide="sprout" class="lc"></i>', next: 200, progress: Math.round((pts-50)/1.5) };
     return { name: 'Nouveau', emoji: '🆕', next: 50, progress: Math.round(pts/0.5) };
   }
   function getBadges() {
@@ -243,7 +243,7 @@
 
     // Weather tip
     html += '<div style="margin-top:12px;padding:8px 12px;background:rgba(255,255,255,0.12);border-radius:10px;font-size:12px;position:relative;z-index:1;">';
-    html += '💡 ' + weather.tip;
+    html += '<i data-lucide="lightbulb" class="lc"></i> ' + weather.tip;
     html += '</div>';
 
     // Quick stats row
@@ -251,14 +251,14 @@
 
     // Streak
     html += '<div style="text-align:center;background:rgba(255,255,255,0.1);border-radius:12px;padding:10px 6px;">';
-    html += '<div style="font-size:22px;">🔥</div>';
+    html += '<div style="font-size:22px;"><i data-lucide="flame" class="lc"></i></div>';
     html += '<div style="font-size:18px;font-weight:800;">' + streak + '</div>';
     html += '<div style="font-size:9px;opacity:0.7;">jours</div>';
     html += '</div>';
 
     // Points
     html += '<div style="text-align:center;background:rgba(255,255,255,0.1);border-radius:12px;padding:10px 6px;">';
-    html += '<div style="font-size:22px;">⭐</div>';
+    html += '<div style="font-size:22px;"><i data-lucide="star" class="lc"></i></div>';
     html += '<div style="font-size:18px;font-weight:800;">' + points + '</div>';
     html += '<div style="font-size:9px;opacity:0.7;">points</div>';
     html += '</div>';
@@ -293,13 +293,13 @@
       html += '</div>';
     });
 
-    html += '<button onclick="showView(\'analyse\')" style="width:100%;margin-top:10px;padding:8px;background:linear-gradient(135deg,#E8862A,#E8862A);color:white;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;">🔍 Analyser ces tendances</button>';
+    html += '<button onclick="showView(\'analyse\')" style="width:100%;margin-top:10px;padding:8px;background:linear-gradient(135deg,#E8862A,#E8862A);color:white;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;"><i data-lucide="search" class="lc"></i> Analyser ces tendances</button>';
     html += '</div>';
 
     // ─── 3. GAMIFICATION CARD ───
     html += '<div style="background:linear-gradient(180deg,#fff,#FAFCFB);border-radius:14px;padding:16px;margin-bottom:16px;border:1px solid rgba(45,106,79,0.1);box-shadow:0 2px 8px rgba(0,0,0,0.04);">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">';
-    html += '<div style="font-size:13px;font-weight:700;color:#1B4332;">🏆 Votre progression</div>';
+    html += '<div style="font-size:13px;font-weight:700;color:#1B4332;"><i data-lucide="trophy" class="lc"></i> Votre progression</div>';
     html += '<div style="font-size:11px;color:#6B7280;">Niveau ' + level.name + '</div>';
     html += '</div>';
 
@@ -314,10 +314,10 @@
     // Action buttons to earn points
     html += '<div style="font-size:11px;font-weight:600;color:#374151;margin-bottom:8px;">Gagner des points :</div>';
     var actions = [
-      { label: 'Analyser un prix', pts: 50, icon: '📊', view: 'analyse' },
-      { label: 'Publier une offre', pts: 100, icon: '📦', view: 'market' },
+      { label: 'Analyser un prix', pts: 50, icon: '<i data-lucide="bar-chart-3" class="lc"></i>', view: 'analyse' },
+      { label: 'Publier une offre', pts: 100, icon: '<i data-lucide="package" class="lc"></i>', view: 'market' },
       { label: 'Signaler un prix intrant', pts: 30, icon: '🌿', view: 'inputs' },
-      { label: 'Completer mon profil', pts: 80, icon: '👤', view: 'scoring' }
+      { label: 'Completer mon profil', pts: 80, icon: '<i data-lucide="user" class="lc"></i>', view: 'scoring' }
     ];
 
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';

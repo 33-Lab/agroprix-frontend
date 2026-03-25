@@ -1101,10 +1101,8 @@ window.AgroPrix = window.AgroPrix || {};
         + forecastHTML
         + '</div>';
 
-      console.log('[AgroPrix] Recommandations API charg\u00e9es \u2713 \u2014 ' + reco.action + ' (' + reco.confidence + ')');
 
     } catch (e) {
-      console.log('[AgroPrix] Recommandations API indisponibles, fallback simul\u00e9');
       buildRecommendations(cultureName, cName, currentPrice, momChange, yoyChange, vol, forecast, bestSell, data);
     }
   }

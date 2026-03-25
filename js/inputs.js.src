@@ -89,9 +89,9 @@
     // Tabs
     html += '<div style="display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border);">';
     [
-      { id: 'saisie', label: '📝 Saisir un prix', icon: '' },
-      { id: 'historique', label: '📊 Historique', icon: '' },
-      { id: 'compare', label: '⚡ Comparer', icon: '' }
+      { id: 'saisie', label: '<i data-lucide="file-text" class="lc"></i> Saisir un prix', icon: '' },
+      { id: 'historique', label: '<i data-lucide="bar-chart-3" class="lc"></i> Historique', icon: '' },
+      { id: 'compare', label: '<i data-lucide="zap" class="lc"></i> Comparer', icon: '' }
     ].forEach(function(t) {
       var active = currentTab === t.id;
       html += '<button onclick="AgroPrix.inputs.setTab(\'' + t.id + '\')" style="flex:1;padding:10px;font-size:13px;font-weight:' + (active ? '700' : '500') + ';color:' + (active ? 'var(--green)' : 'var(--text-light)') + ';background:none;border:none;border-bottom:' + (active ? '3px solid var(--green)' : '3px solid transparent') + ';cursor:pointer;font-family:inherit;">' + t.label + '</button>';
@@ -169,7 +169,7 @@
 
     // Submit
     html += '<button class="btn-analyse" style="width:100%;font-size:14px;padding:12px;" onclick="AgroPrix.inputs.submitPrice()">'
-      + '💾 Enregistrer ce prix</button>';
+      + '<i data-lucide="save" class="lc"></i> Enregistrer ce prix</button>';
 
     // Success message placeholder
     html += '<div id="inputSuccess" style="display:none;margin-top:12px;padding:10px;background:#d1fae5;border-radius:8px;text-align:center;font-size:13px;color:#1B4332;font-weight:600;"></div>';
@@ -207,7 +207,7 @@
 
     if (history.length === 0) {
       html += '<div class="card" style="padding:32px;text-align:center;">'
-        + '<div style="font-size:48px;margin-bottom:12px;">📊</div>'
+        + '<div style="font-size:48px;margin-bottom:12px;"><i data-lucide="bar-chart-3" class="lc"></i></div>'
         + '<h3 style="color:var(--text-light);">Aucune donnee</h3>'
         + '<p style="font-size:13px;color:var(--text-muted);">Saisissez des prix d\'intrants pour voir l\'historique.</p>'
         + '</div>';
@@ -231,7 +231,7 @@
 
     // Full history list
     html += '<div class="card" style="padding:16px;">'
-      + '<div class="card-title"><span class="icon">📋</span> Tous les prix saisis</div>';
+      + '<div class="card-title"><span class="icon"><i data-lucide="clipboard-list" class="lc"></i></span> Tous les prix saisis</div>';
     history.slice(0, 30).forEach(function(e) {
       var cat = catalog.categories.find(function(c) { return c.id === e.category; });
       html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">'
@@ -259,7 +259,7 @@
 
     if (history.length < 2) {
       html += '<div class="card" style="padding:32px;text-align:center;">'
-        + '<div style="font-size:48px;margin-bottom:12px;">⚡</div>'
+        + '<div style="font-size:48px;margin-bottom:12px;"><i data-lucide="zap" class="lc"></i></div>'
         + '<h3 style="color:var(--text-light);">Pas assez de donnees</h3>'
         + '<p style="font-size:13px;color:var(--text-muted);">Saisissez au moins 2 prix du meme intrant pour comparer.</p>'
         + '</div>';
@@ -278,7 +278,7 @@
 
     if (comparables.length === 0) {
       html += '<div class="card" style="padding:32px;text-align:center;">'
-        + '<div style="font-size:48px;margin-bottom:12px;">⚡</div>'
+        + '<div style="font-size:48px;margin-bottom:12px;"><i data-lucide="zap" class="lc"></i></div>'
         + '<h3 style="color:var(--text-light);">Pas de comparaison possible</h3>'
         + '<p style="font-size:13px;color:var(--text-muted);">Saisissez le meme intrant dans differents marches pour comparer.</p>'
         + '</div>';
@@ -322,7 +322,7 @@
       // Insight
       if (diffPct > 10) {
         html += '<div style="margin-top:8px;padding:8px;background:#D8F3DC;border-radius:8px;font-size:12px;color:#1B4332;">'
-          + '💡 <strong>' + prod.name + '</strong> est <strong>' + diffPct + '% moins cher</strong> a ' + entries[0].market + ' qu\'a ' + entries[entries.length - 1].market + '.</div>';
+          + '<i data-lucide="lightbulb" class="lc"></i> <strong>' + prod.name + '</strong> est <strong>' + diffPct + '% moins cher</strong> a ' + entries[0].market + ' qu\'a ' + entries[entries.length - 1].market + '.</div>';
       }
 
       html += '</div>';
@@ -375,7 +375,7 @@
     // Show success
     var successEl = document.getElementById('inputSuccess');
     if (successEl) {
-      successEl.textContent = '✅ Prix enregistre ! ' + entry.productName + ' a ' + formatFCFA(price) + ' (' + entry.market + ')';
+      successEl.textContent = '<i data-lucide="check-circle" class="lc"></i> Prix enregistre ! ' + entry.productName + ' a ' + formatFCFA(price) + ' (' + entry.market + ')';
       successEl.style.display = 'block';
       setTimeout(function() { successEl.style.display = 'none'; }, 3000);
     }

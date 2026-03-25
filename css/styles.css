@@ -1779,7 +1779,7 @@ button, .btn-analyse {
   }
 
   .data-table {
-    min-width: 600px;
+    min-width: 100%;
   }
 
   .reco-actions {
@@ -3195,3 +3195,51 @@ input[type="checkbox"] {
   .sidebar, .bottom-nav, .topbar, .ticker-bar { display: none !important; }
   .main { margin-left: 0 !important; }
 }
+
+/* ═══ Lucide Icons ═══ */
+.lc {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+.sidebar-nav .lc { width: 16px; height: 16px; }
+.bottom-nav .lc { width: 20px; height: 20px; margin-right: 2px; }
+h1 .lc, h2 .lc, .card-title .lc { width: 22px; height: 22px; }
+
+/* ═══ Fix: Hamburger Button ═══ */
+.hamburger-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  display: none;
+  line-height: 1;
+}
+.hamburger-btn span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: white;
+  margin: 5px 0;
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+@media (max-width: 1024px) {
+  .hamburger-btn { display: flex; flex-direction: column; justify-content: center; }
+}
+
+/* ═══ Fix: Sidebar Overlay ═══ */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 99;
+  transition: opacity 0.3s;
+}
+.sidebar-overlay.active { display: block; }

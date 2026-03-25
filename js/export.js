@@ -1,1 +1,1 @@
-(()=>{function i(){alert("Inscription requise pour publier une demande.\nFonctionnalité disponible en version complète.")}window.AgroPrix.exportModule={init:function(){console.log("[AgroPrix] Module Export initialisé")},publishDemand:i},window.publishDemand=i})();
+(()=>{function n(){alert("Inscription requise pour publier une demande.\nFonctionnalité disponible en version complète.")}window.AgroPrix.exportModule={init:function(){},publishDemand:n},window.publishDemand=n})();

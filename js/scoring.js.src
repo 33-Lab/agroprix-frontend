@@ -12,18 +12,18 @@
 
   // Score dimensions (total = 1000)
   var DIMENSIONS = [
-    { id: 'profile',      label: 'Profil complet',       icon: '👤', max: 150, color: '#2D6A4F' },
-    { id: 'production',   label: 'Activite production',  icon: '🌾', max: 200, color: '#40916C' },
-    { id: 'transactions', label: 'Historique transactions', icon: '💰', max: 250, color: '#52B788' },
-    { id: 'stability',    label: 'Stabilite financiere', icon: '🏛️', max: 150, color: '#E8862A' },
-    { id: 'usage',        label: 'Utilisation app',      icon: '📱', max: 100, color: '#264653' },
-    { id: 'seniority',    label: 'Anciennete',           icon: '📅', max: 150, color: '#6C757D' }
+    { id: 'profile',      label: 'Profil complet',       icon: '<i data-lucide="user" class="lc"></i>', max: 150, color: '#2D6A4F' },
+    { id: 'production',   label: 'Activite production',  icon: '<i data-lucide="wheat" class="lc"></i>', max: 200, color: '#40916C' },
+    { id: 'transactions', label: 'Historique transactions', icon: '<i data-lucide="coins" class="lc"></i>', max: 250, color: '#52B788' },
+    { id: 'stability',    label: 'Stabilite financiere', icon: '<i data-lucide="building-2" class="lc"></i>', max: 150, color: '#E8862A' },
+    { id: 'usage',        label: 'Utilisation app',      icon: '<i data-lucide="smartphone" class="lc"></i>', max: 100, color: '#264653' },
+    { id: 'seniority',    label: 'Anciennete',           icon: '<i data-lucide="calendar" class="lc"></i>', max: 150, color: '#6C757D' }
   ];
 
   // Badge thresholds
   var BADGES = [
-    { min: 800, label: 'Excellent',       emoji: '⭐', color: '#2D6A4F', bg: '#D8F3DC' },
-    { min: 600, label: 'Bon',             emoji: '✅', color: '#40916C', bg: '#E8F5E9' },
+    { min: 800, label: 'Excellent',       emoji: '<i data-lucide="star" class="lc"></i>', color: '#2D6A4F', bg: '#D8F3DC' },
+    { min: 600, label: 'Bon',             emoji: '<i data-lucide="check-circle" class="lc"></i>', color: '#40916C', bg: '#E8F5E9' },
     { min: 400, label: 'Moyen',           emoji: '🔶', color: '#E8862A', bg: '#FFF8E1' },
     { min: 200, label: 'En construction', emoji: '🔸', color: '#e76f51', bg: '#FFF3E0' },
     { min: 0,   label: 'Nouveau',         emoji: '⬜', color: '#999',    bg: '#F5F5F5' }
@@ -235,22 +235,22 @@
       if (!p.gender) missing.push('genre');
       if (!p.experience && p.experience !== 0) missing.push('experience');
       if (missing.length > 0) {
-        tips.push({ icon: '👤', text: 'Completez votre profil (' + missing.join(', ') + ') pour gagner jusqu\'a ' + (150 - dims.profile) + ' points.', pts: 150 - dims.profile });
+        tips.push({ icon: '<i data-lucide="user" class="lc"></i>', text: 'Completez votre profil (' + missing.join(', ') + ') pour gagner jusqu\'a ' + (150 - dims.profile) + ' points.', pts: 150 - dims.profile });
       }
     }
 
     if (dims.transactions < 50) {
-      tips.push({ icon: '💰', text: 'Publiez des offres sur le Marche et confirmez des ventes pour gagner jusqu\'a 250 points.', pts: 250 - dims.transactions });
+      tips.push({ icon: '<i data-lucide="coins" class="lc"></i>', text: 'Publiez des offres sur le Marche et confirmez des ventes pour gagner jusqu\'a 250 points.', pts: 250 - dims.transactions });
     }
 
     if (dims.stability < 80) {
       var p2 = getProfile();
-      if (!p2.isCoop) tips.push({ icon: '🤝', text: 'Rejoignez une cooperative pour +40 points de stabilite.', pts: 40 });
-      if (!p2.hasBusinessPlan) tips.push({ icon: '📝', text: 'Preparez un business plan pour +40 points.', pts: 40 });
+      if (!p2.isCoop) tips.push({ icon: '<i data-lucide="handshake" class="lc"></i>', text: 'Rejoignez une cooperative pour +40 points de stabilite.', pts: 40 });
+      if (!p2.hasBusinessPlan) tips.push({ icon: '<i data-lucide="file-text" class="lc"></i>', text: 'Preparez un business plan pour +40 points.', pts: 40 });
     }
 
     if (dims.usage < 50) {
-      tips.push({ icon: '📱', text: 'Utilisez l\'app regulierement (analyses, recherches financement) pour ameliorer votre score.', pts: 100 - dims.usage });
+      tips.push({ icon: '<i data-lucide="smartphone" class="lc"></i>', text: 'Utilisez l\'app regulierement (analyses, recherches financement) pour ameliorer votre score.', pts: 100 - dims.usage });
     }
 
     // Sort by potential points gain
@@ -321,7 +321,7 @@
 
     // Dimensions detail
     html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
-      + '<div class="card-title"><span class="icon">📊</span> Detail par dimension</div>';
+      + '<div class="card-title"><span class="icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Detail par dimension</div>';
 
     DIMENSIONS.forEach(function(d) {
       var pts = result.dimensions[d.id] || 0;
@@ -340,7 +340,7 @@
     // Tips
     if (tips.length > 0) {
       html += '<div class="card" style="padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #f59e0b;">'
-        + '<div class="card-title" style="color:#b45309;"><span class="icon">💡</span> Comment ameliorer votre score</div>';
+        + '<div class="card-title" style="color:#b45309;"><span class="icon"><i data-lucide="lightbulb" class="lc"></i></span> Comment ameliorer votre score</div>';
       tips.forEach(function(t) {
         html += '<div style="display:flex;align-items:start;gap:8px;margin-bottom:8px;">'
           + '<span style="font-size:14px;">' + t.icon + '</span>'
@@ -354,7 +354,7 @@
     // Score history chart (mini sparkline)
     if (history.length >= 2) {
       html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
-        + '<div class="card-title"><span class="icon">📈</span> Evolution du score</div>';
+        + '<div class="card-title"><span class="icon"><i data-lucide="trending-up" class="lc"></i></span> Evolution du score</div>';
       var maxH = 60;
       var barW = Math.max(4, Math.min(16, Math.floor(280 / history.length)));
       var maxScore = 1000;
@@ -374,7 +374,7 @@
 
     // What institutions see (B2B preview)
     html += '<div class="card" style="padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#D8F3DC,#B7E4C7);border:1px solid #2D6A4F33;">'
-      + '<div class="card-title" style="color:#1B4332;"><span class="icon">🏦</span> Ce que voient les institutions</div>'
+      + '<div class="card-title" style="color:#1B4332;"><span class="icon"><i data-lucide="landmark" class="lc"></i></span> Ce que voient les institutions</div>'
       + '<p style="font-size:12px;color:#2D6A4F;margin-bottom:8px;">Quand une banque ou un fonds consulte votre profil via l\'API AgroPrix, elle voit :</p>'
       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
 
