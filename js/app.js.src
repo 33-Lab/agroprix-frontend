@@ -32,6 +32,24 @@
       AP.cgu.checkOnStartup();
     }
 
+    // Handle PWA shortcuts — ?view=xxx ouvre la bonne vue au démarrage
+    handleStartupView();
+
+  }
+
+  // Gère le paramètre ?view= des shortcuts manifest
+  function handleStartupView() {
+    var params = new URLSearchParams(window.location.search);
+    var view = params.get('view');
+    if (view && window.showView) {
+      // Attendre que l'auth soit prête avant de naviguer
+      setTimeout(function() {
+        var user = AP.auth ? AP.auth.getUser() : null;
+        if (user && window.showView) {
+          window.showView(view);
+        }
+      }, 800);
+    }
   }
 
   // Register PWA Service Worker
@@ -241,72 +259,89 @@ window.chercherTechniciens = function() {
 // NOTE: calculateTransport() est dans negoce.js.src — ne pas dupliquer ici
 
 // ============================================================
-// Souscription Plan — Paiement Mobile Money via FedaPay
+// Souscription Plan — Paiement KKiaPay (MTN MoMo, Moov, Carte)
 // ============================================================
 window.souscrirePlan = function(plan, montant) {
-  var fmt = montant.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  var AP = window.AgroPrix;
   var user = JSON.parse(localStorage.getItem('agroprix_user') || '{}');
+  var kkiapayKey = AP && AP.KKIAPAY_KEY;
+  var keyReady = kkiapayKey && kkiapayKey !== 'VOTRE_CLE_PUBLIQUE_KKIAPAY_ICI';
 
-  // Build payment modal
+  // Si KKiaPay est configuré → paiement réel
+  if (keyReady && window.openKkiapayWidget) {
+    // Écouter le succès (une seule fois)
+    if (window.addSuccessListener) {
+      window.addSuccessListener(function(response) {
+        onKkiapaySuccess(plan, montant, response);
+      });
+    }
+    // Ouvrir le widget KKiaPay
+    window.openKkiapayWidget({
+      amount: montant,
+      api_key: kkiapayKey,
+      sandbox: AP.KKIAPAY_SANDBOX || false,
+      email: user.email || '',
+      phone: user.phone || '',
+      name: user.nom || user.name || 'Client AgroPrix',
+      callback: window.location.origin,
+      theme: '#1B4332'
+    });
+    return;
+  }
+
+  // Fallback simulation (tant que la clé n'est pas configurée)
+  var fmt = montant.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   var overlay = document.createElement('div');
   overlay.id = 'paymentOverlay';
   overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
-
-  var modal = '<div style="background:#fff;border-radius:20px;padding:24px;max-width:400px;width:100%;">'
+  overlay.innerHTML = '<div style="background:#fff;border-radius:20px;padding:24px;max-width:400px;width:100%;">'
     + '<div style="text-align:center;margin-bottom:20px;">'
     + '<div style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#999;">ABONNEMENT</div>'
     + '<div style="font-size:24px;font-weight:800;color:#1B4332;margin-top:4px;">Plan ' + plan + '</div>'
     + '<div style="font-size:28px;font-weight:800;color:#E8862A;margin-top:8px;">' + fmt + ' FCFA<span style="font-size:14px;color:#999;font-weight:500;">/mois</span></div>'
     + '</div>'
-    + '<div style="margin-bottom:16px;">'
-    + '<label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px;">Methode de paiement</label>'
-    + '<div style="display:flex;gap:10px;margin-top:8px;">'
-    + '<button onclick="selectPayMethod(\'mtn\')" id="payMtn" style="flex:1;padding:14px;border:2px solid #E8862A;border-radius:12px;background:#FFF8F0;cursor:pointer;font-weight:700;font-size:13px;"><i data-lucide="smartphone" class="lc"></i> MTN MoMo</button>'
-    + '<button onclick="selectPayMethod(\'moov\')" id="payMoov" style="flex:1;padding:14px;border:2px solid #ddd;border-radius:12px;background:#fff;cursor:pointer;font-weight:700;font-size:13px;"><i data-lucide="smartphone" class="lc"></i> Moov Money</button>'
+    + '<div style="padding:14px;background:#FEF3C7;border-radius:12px;font-size:13px;color:#92400E;margin-bottom:16px;">'
+    + '<strong>Paiement bientôt disponible</strong><br>KKiaPay sera activé dans les prochaines heures. Revenez ou contactez-nous via WhatsApp.'
     + '</div>'
-    + '</div>'
-    + '<div style="margin-bottom:16px;">'
-    + '<label style="font-weight:600;font-size:13px;display:block;margin-bottom:4px;">Numero de telephone</label>'
-    + '<input type="tel" id="payPhone" placeholder="+229 XX XX XX XX" style="width:100%;padding:14px;border:1px solid #ddd;border-radius:12px;font-size:15px;font-family:inherit;">'
-    + '</div>'
-    + '<button onclick="confirmerPaiement(\'' + plan + '\',' + montant + ')" style="width:100%;padding:16px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;"><i data-lucide="credit-card" class="lc"></i> Payer ' + fmt + ' FCFA</button>'
-    + '<button onclick="document.getElementById(\'paymentOverlay\').remove()" style="width:100%;margin-top:10px;padding:12px;background:none;border:1px solid #ddd;border-radius:12px;font-size:14px;color:#999;cursor:pointer;">Annuler</button>'
+    + '<a href="https://wa.me/22960000000?text=Je veux souscrire au Plan ' + plan + ' (' + fmt + ' FCFA/mois)" target="_blank" style="display:block;width:100%;padding:14px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:10px;">💬 Payer via WhatsApp</a>'
+    + '<button onclick="document.getElementById(\'paymentOverlay\').remove()" style="width:100%;padding:12px;background:none;border:1px solid #ddd;border-radius:12px;font-size:14px;color:#999;cursor:pointer;">Fermer</button>'
     + '</div>';
-
-  overlay.innerHTML = modal;
   document.body.appendChild(overlay);
 };
 
-window.selectPayMethod = function(method) {
-  var mtn = document.getElementById('payMtn');
-  var moov = document.getElementById('payMoov');
-  if (method === 'mtn') {
-    mtn.style.borderColor = '#E8862A'; mtn.style.background = '#FFF8F0';
-    moov.style.borderColor = '#ddd'; moov.style.background = '#fff';
-  } else {
-    moov.style.borderColor = '#E8862A'; moov.style.background = '#FFF8F0';
-    mtn.style.borderColor = '#ddd'; mtn.style.background = '#fff';
-  }
-};
+// Callback succès paiement KKiaPay
+function onKkiapaySuccess(plan, montant, response) {
+  var transactionId = response && response.transactionId ? response.transactionId : 'N/A';
+  var user = JSON.parse(localStorage.getItem('agroprix_user') || '{}');
 
-window.confirmerPaiement = function(plan, montant) {
-  var phone = document.getElementById('payPhone');
-  if (!phone || !phone.value.trim()) {
-    alert('Veuillez entrer votre numero de telephone.');
-    return;
+  // Mettre à jour le plan de l'utilisateur en localStorage
+  user.plan = plan;
+  user.planActivatedAt = new Date().toISOString();
+  user.lastTransactionId = transactionId;
+  localStorage.setItem('agroprix_user', JSON.stringify(user));
+
+  // Notifier le backend (non bloquant)
+  var AP = window.AgroPrix;
+  if (AP && AP.API_BASE) {
+    var token = localStorage.getItem('agroprix_token');
+    fetch(AP.API_BASE + '/api/subscriptions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ plan: plan, montant: montant, transactionId: transactionId })
+    }).catch(function() {}); // Silencieux si hors ligne
   }
 
-  var overlay = document.getElementById('paymentOverlay');
-  if (overlay) {
-    overlay.innerHTML = '<div style="background:#fff;border-radius:20px;padding:40px;max-width:400px;width:100%;text-align:center;">'
-      + '<div style="font-size:64px;margin-bottom:16px;"><i data-lucide="check-circle" class="lc"></i></div>'
-      + '<div style="font-size:20px;font-weight:800;color:#1B4332;">Paiement initie !</div>'
-      + '<div style="font-size:14px;color:#666;margin-top:8px;">Un SMS de confirmation FedaPay va etre envoye au <strong>' + phone.value + '</strong>.</div>'
-      + '<div style="font-size:13px;color:#999;margin-top:8px;">Plan ' + plan + ' — ' + montant.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA/mois</div>'
-      + '<div style="margin-top:16px;padding:12px;background:#D8F3DC;border-radius:12px;font-size:12px;color:#1B4332;">'
-      + '<i data-lucide="lightbulb" class="lc"></i> En production, ce paiement sera traite par FedaPay (MTN MoMo / Moov Money). Pour l\'instant c\'est une simulation.'
-      + '</div>'
-      + '<button onclick="document.getElementById(\'paymentOverlay\').remove()" style="width:100%;margin-top:16px;padding:14px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;">Fermer</button>'
-      + '</div>';
-  }
-};
+  // Afficher la confirmation
+  var fmt = montant.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
+  overlay.innerHTML = '<div style="background:#fff;border-radius:20px;padding:40px;max-width:400px;width:100%;text-align:center;">'
+    + '<div style="font-size:64px;margin-bottom:16px;">✅</div>'
+    + '<div style="font-size:22px;font-weight:800;color:#1B4332;">Paiement confirmé !</div>'
+    + '<div style="font-size:15px;color:#666;margin-top:8px;">Plan <strong>' + plan + '</strong> activé — ' + fmt + ' FCFA/mois</div>'
+    + '<div style="font-size:12px;color:#999;margin-top:6px;">Transaction : ' + transactionId + '</div>'
+    + '<div style="margin-top:16px;padding:12px;background:#D8F3DC;border-radius:12px;font-size:13px;color:#1B4332;">Merci ! Toutes les fonctionnalités sont maintenant disponibles.</div>'
+    + '<button onclick="this.closest(\'[style*=fixed]\').remove()" style="width:100%;margin-top:16px;padding:14px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;">Accéder à mon compte</button>'
+    + '</div>';
+  document.body.appendChild(overlay);
+}

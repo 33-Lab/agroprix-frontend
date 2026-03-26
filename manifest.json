@@ -1,4 +1,5 @@
 {
+  "id": "/",
   "name": "AgroPrix — Intelligence des Prix Agricoles",
   "short_name": "AgroPrix",
   "description": "Plateforme d'intelligence des prix agricoles en Afrique de l'Ouest (UEMOA). Analysez les prix, négociez au bon moment, exportez en confiance.",
@@ -9,33 +10,71 @@
   "theme_color": "#1B4332",
   "background_color": "#ffffff",
   "lang": "fr",
+  "dir": "ltr",
   "categories": ["business", "finance", "productivity"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/img/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/img/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "screenshots": [],
+  "screenshots": [
+    {
+      "src": "/img/screenshot-analyse.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Analyse des prix en temps réel"
+    },
+    {
+      "src": "/img/screenshot-negoce.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Carnet de négoce"
+    }
+  ],
   "shortcuts": [
     {
       "name": "Nouvelle Analyse",
       "short_name": "Analyse",
+      "description": "Analyser les prix du marché",
       "url": "/index.html?view=analyse",
       "icons": [{ "src": "/img/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Carnet de Négoce",
       "short_name": "Négoce",
+      "description": "Accéder au carnet de négoce",
       "url": "/index.html?view=negoce",
+      "icons": [{ "src": "/img/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "GPS Financement",
+      "short_name": "Finance",
+      "description": "Trouver un financement agricole",
+      "url": "/index.html?view=financing",
       "icons": [{ "src": "/img/icon-192.png", "sizes": "192x192" }]
     }
   ]

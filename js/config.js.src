@@ -119,6 +119,14 @@ window.AgroPrix = window.AgroPrix || {};
     offres:'Nos Offres', plus:'Plus', proprietaire:'Proprietaire'
   };
 
+  // ============================================================
+  // KKiaPay — Paiement Mobile Money (MTN MoMo, Moov, Carte)
+  // ⚠️ REMPLACER par la vraie clé publique KKiaPay (dashboard.kkiapay.me)
+  // Clé publique LIVE (commence par "live_") — NE PAS mettre la clé secrète ici
+  AP.KKIAPAY_KEY = '3401f3768803a2a9cddb289b07b82109e74ae88a';
+  AP.KKIAPAY_SANDBOX = false; // false = production live
+  // ============================================================
+
   // View ID mapping (view name -> HTML element ID)
   AP.viewIdMap = {
     analyse:'viewAnalyse', historique:'viewHistorique', carte:'viewCarte',

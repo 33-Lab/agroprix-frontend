@@ -1,1 +1,419 @@
-(d=>{var p=null,c="engrais",u="saisie",l="agroprix_input_prices";function g(){try{return JSON.parse(localStorage.getItem(l)||"[]")}catch(t){return[]}}function v(){var t=d.auth?d.auth.getUser():null;return t&&(t.pays||t.country)||"benin"}function f(t){return t?t.toString().replace(/\B(?=(\d{3})+(?!\d))/g," ")+" FCFA":"—"}function x(t){return t?(t=new Date(t)).getDate()+" "+["Jan","Fev","Mar","Avr","Mai","Jun","Jul","Aou","Sep","Oct","Nov","Dec"][t.getMonth()]+" "+t.getFullYear():"—"}function m(){var i,a,o,r,n,t,s,e,l;p&&(i="",i+='<div style="display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border);">',[{id:"saisie",label:'<i data-lucide="file-text" class="lc"></i> Saisir un prix',icon:""},{id:"historique",label:'<i data-lucide="bar-chart-3" class="lc"></i> Historique',icon:""},{id:"compare",label:'<i data-lucide="zap" class="lc"></i> Comparer',icon:""}].forEach(function(t){var e=u===t.id;i+="<button onclick=\"AgroPrix.inputs.setTab('"+t.id+'\')" style="flex:1;padding:10px;font-size:13px;font-weight:'+(e?"700":"500")+";color:"+(e?"var(--green)":"var(--text-light)")+";background:none;border:none;border-bottom:"+(e?"3px solid var(--green)":"3px solid transparent")+';cursor:pointer;font-family:inherit;">'+t.label+"</button>"}),i+="</div>","saisie"===u?i+=(t=(()=>{var t=v();return d.marketsByCountry&&d.marketsByCountry[t]||[]})(),s="",s+='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">',p.categories.forEach(function(t){var e=c===t.id;s+="<button onclick=\"AgroPrix.inputs.setCategory('"+t.id+'\')" style="padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid '+(e?"var(--green)":"var(--border)")+";background:"+(e?"var(--green)":"#fff")+";color:"+(e?"#fff":"var(--text)")+';cursor:pointer;font-family:inherit;">'+t.emoji+" "+t.name+"</button>"}),s+="</div>",(e=p.categories.find(function(t){return t.id===c}))&&(s=s+('<div class="card" style="padding:16px;"><div class="card-title"><span class="icon">'+e.emoji)+"</span> Saisir un prix — "+e.name+'</div><p style="font-size:12px;color:var(--text-light);margin-bottom:12px;">Renseignez le prix que vous avez paye. Vos donnees aident tous les producteurs!</p><div class="form-group" style="margin-bottom:12px;"><label class="form-label" style="font-weight:600;">Produit</label><select id="inputProduct" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;">',e.items.forEach(function(t){s+='<option value="'+t.id+'">'+t.name+" ("+t.unit+")</option>"}),s=(s+='</select></div><div class="form-group" style="margin-bottom:12px;"><label class="form-label" style="font-weight:600;">Prix paye (FCFA)</label><input type="number" id="inputPrice" placeholder="Ex: 18500" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;" min="0"></div>')+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;"><div class="form-group"><label class="form-label" style="font-weight:600;">Lieu d\'achat</label><select id="inputMarket" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;">',t.forEach(function(t){s+='<option value="'+t.name+'">'+t.name+"</option>"}),s=(s=(s=(s+='<option value="autre">Autre</option></select></div>')+'<div class="form-group"><label class="form-label" style="font-weight:600;">Date</label><input type="date" id="inputDate" value="'+(new Date).toISOString().split("T")[0]+'" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;"></div></div>')+'<div class="form-group" style="margin-bottom:16px;"><label class="form-label" style="font-weight:600;">Fournisseur <span style="color:var(--text-muted);font-weight:400;">(optionnel)</span></label><input type="text" id="inputSupplier" placeholder="Nom du fournisseur" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;"></div><button class="btn-analyse" style="width:100%;font-size:14px;padding:12px;" onclick="AgroPrix.inputs.submitPrice()"><i data-lucide="save" class="lc"></i> Enregistrer ce prix</button>')+'<div id="inputSuccess" style="display:none;margin-top:12px;padding:10px;background:#d1fae5;border-radius:8px;text-align:center;font-size:13px;color:#1B4332;font-weight:600;"></div></div>',0<(t=g().filter(function(t){return t.category===c}).slice(0,5)).length)&&(s+='<div class="card" style="padding:16px;margin-top:16px;"><div class="card-title"><span class="icon">🕐</span> Derniers prix saisis — '+e.name+"</div>",t.forEach(function(t){var e,i;s+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);"><div><div style="font-size:13px;font-weight:600;">'+t.productName+'</div><div style="font-size:11px;color:var(--text-light);">'+t.market+" — "+(e=t.date,i=Date.now()-new Date(e).getTime(),(i=Math.floor(i/36e5))<1?"Il y a moins d'1h":i<24?"Il y a "+i+"h":(i=Math.floor(i/24))<7?"Il y a "+i+"j":x(e))+'</div></div><div style="font-size:14px;font-weight:700;color:var(--green);">'+f(t.price)+"</div></div>"}),s+="</div>"),s):"historique"===u?i+=(e=g(),n="",0===e.length?n+='<div class="card" style="padding:32px;text-align:center;"><div style="font-size:48px;margin-bottom:12px;"><i data-lucide="bar-chart-3" class="lc"></i></div><h3 style="color:var(--text-light);">Aucune donnee</h3><p style="font-size:13px;color:var(--text-muted);">Saisissez des prix d\'intrants pour voir l\'historique.</p></div>':(t=e.length,r={},e.forEach(function(t){r[t.category]=(r[t.category]||0)+1}),n=n+'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:16px;"><div class="card" style="padding:12px;text-align:center;"><div style="font-size:24px;font-weight:800;color:var(--green);">'+t+'</div><div style="font-size:11px;color:var(--text-light);">Prix saisis</div></div>',Object.keys(r).forEach(function(e){var t=p.categories.find(function(t){return t.id===e});n+='<div class="card" style="padding:12px;text-align:center;"><div style="font-size:24px;font-weight:800;">'+r[e]+'</div><div style="font-size:11px;color:var(--text-light);">'+(t?t.emoji+" "+t.name:e)+"</div></div>"}),n+='</div><div class="card" style="padding:16px;"><div class="card-title"><span class="icon"><i data-lucide="clipboard-list" class="lc"></i></span> Tous les prix saisis</div>',e.slice(0,30).forEach(function(e){var t=p.categories.find(function(t){return t.id===e.category});n+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);"><div><div style="font-size:13px;font-weight:600;">'+(t?t.emoji:"")+" "+e.productName+'</div><div style="font-size:11px;color:var(--text-light);">'+e.market+" — "+x(e.date)+(e.supplier?" — "+e.supplier:"")+'</div></div><div style="font-size:14px;font-weight:700;color:var(--green);">'+f(e.price)+"</div></div>"}),30<e.length&&(n+='<p style="text-align:center;font-size:12px;color:var(--text-muted);margin-top:8px;">... et '+(e.length-30)+" autres</p>"),n+="</div>"),n):"compare"===u&&(i+=(l=g(),o="",l.length<2?o+='<div class="card" style="padding:32px;text-align:center;"><div style="font-size:48px;margin-bottom:12px;"><i data-lucide="zap" class="lc"></i></div><h3 style="color:var(--text-light);">Pas assez de donnees</h3><p style="font-size:13px;color:var(--text-muted);">Saisissez au moins 2 prix du meme intrant pour comparer.</p></div>':(a={},l.forEach(function(t){a[t.productId]||(a[t.productId]={name:t.productName,category:t.category,entries:[]}),a[t.productId].entries.push(t)}),0===(l=Object.keys(a).filter(function(t){return 2<=a[t].entries.length})).length?o+='<div class="card" style="padding:32px;text-align:center;"><div style="font-size:48px;margin-bottom:12px;"><i data-lucide="zap" class="lc"></i></div><h3 style="color:var(--text-light);">Pas de comparaison possible</h3><p style="font-size:13px;color:var(--text-muted);">Saisissez le meme intrant dans differents marches pour comparer.</p></div>':l.forEach(function(t){var e=a[t],r=e.entries.sort(function(t,e){return t.price-e.price}),t=r[0].price,n=r[r.length-1].price,t=(Math.round(r.reduce(function(t,e){return t+e.price},0)/r.length),Math.round((n-t)/t*100)),i=p.categories.find(function(t){return t.id===e.category});o+='<div class="card" style="padding:16px;margin-bottom:12px;"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;"><div><div style="font-size:15px;font-weight:700;">'+(i?i.emoji:"")+" "+e.name+'</div><div style="font-size:12px;color:var(--text-light);">'+r.length+" prix saisis</div></div>",10<t&&(o+='<div style="background:#fef3c7;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;color:#b45309;">-'+t+"% possible</div>"),o+="</div>",r.forEach(function(t,e){var i=0<n?Math.max(20,Math.round(t.price/n*100)):50,e=0===e?"var(--green)":e===r.length-1?"var(--alert)":"var(--gold)";o+='<div style="margin-bottom:6px;"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px;"><span style="color:var(--text-light);">'+t.market+'</span><span style="font-weight:700;">'+f(t.price)+'</span></div><div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;"><div style="height:100%;width:'+i+"%;background:"+e+';border-radius:4px;"></div></div></div>'}),10<t&&(o+='<div style="margin-top:8px;padding:8px;background:#D8F3DC;border-radius:8px;font-size:12px;color:#1B4332;"><i data-lucide="lightbulb" class="lc"></i> <strong>'+e.name+"</strong> est <strong>"+t+"% moins cher</strong> a "+r[0].market+" qu'a "+r[r.length-1].market+".</div>"),o+="</div>"})),o)),l=document.getElementById("inputsContent"))&&(l.innerHTML=i)}d.inputs={init:function(){(p?Promise.resolve(p):fetch("/data/inputs_catalog.json").then(function(t){return t.json()}).then(function(t){return p=t}).catch(function(){return console.warn("Could not load inputs_catalog.json"),null})).then(function(){u="saisie",c="engrais",m()})},setCategory:function(t){c=t,m()},setTab:function(t){u=t,m()},submitPrice:function(){var t,e,i,r=document.getElementById("inputProduct"),n=document.getElementById("inputPrice"),a=document.getElementById("inputMarket"),o=document.getElementById("inputDate"),s=document.getElementById("inputSupplier");r&&n&&n.value?(t=parseInt(n.value),isNaN(t)||t<=0?alert("Le prix doit etre un nombre positif."):(e=(e=p.categories.find(function(t){return t.id===c}))?e.items.find(function(t){return t.id===r.value}):null,e={id:Date.now().toString(36)+Math.random().toString(36).substr(2,5),timestamp:(new Date).toISOString(),country:v(),category:c,productId:r.value,productName:e?e.name:r.value,unit:e?e.unit:"",price:t,market:a?a.value:"",date:o?o.value:(new Date).toISOString().split("T")[0],supplier:s?s.value.trim():""},a=e,(o=g()).unshift(a),500<o.length&&(o=o.slice(0,500)),localStorage.setItem(l,JSON.stringify(o)),(i=document.getElementById("inputSuccess"))&&(i.textContent='<i data-lucide="check-circle" class="lc"></i> Prix enregistre ! '+e.productName+" a "+f(t)+" ("+e.market+")",i.style.display="block",setTimeout(function(){i.style.display="none"},3e3)),n&&(n.value=""),s&&(s.value=""),setTimeout(function(){m()},100))):alert("Veuillez renseigner le produit et le prix.")}}})(window.AgroPrix);
+// AgroPrix — Module Prix Intrants (crowdsourced)
+// Saisie, historique et comparaison des prix des intrants agricoles
+(function(AP) {
+  'use strict';
+
+  var STORAGE_KEY = 'agroprix_input_prices';
+  var currentCategory = 'engrais';
+  var currentTab = 'saisie'; // saisie, historique, compare
+
+  // Catalog embarqué en inline — chargement instantané, pas de fetch
+  var catalog = {"categories":[{"id":"engrais","name":"Engrais","emoji":"🧪","items":[{"id":"npk_15_15_15","name":"NPK 15-15-15","unit":"sac 50kg","crops":["mais","riz_local","sorgho","mil","oignon","tomate"]},{"id":"uree_46","name":"Urée 46%","unit":"sac 50kg","crops":["mais","riz_local","sorgho","mil","oignon"]},{"id":"dap","name":"DAP 18-46-0","unit":"sac 50kg","crops":["mais","riz_local","arachide","niebe"]},{"id":"kcl","name":"KCl (Chlorure de potassium)","unit":"sac 50kg","crops":["cacao","cafe","manioc","igname"]},{"id":"npk_10_18_18","name":"NPK 10-18-18","unit":"sac 50kg","crops":["cacao","cafe","cajou"]},{"id":"npk_0_23_19","name":"NPK 0-23-19","unit":"sac 50kg","crops":["cacao"]},{"id":"fumure_organique","name":"Fumure organique / Compost","unit":"sac 50kg","crops":[]},{"id":"sulfate_ammonium","name":"Sulfate d'ammonium","unit":"sac 50kg","crops":["riz_local","mais"]}]},{"id":"semences","name":"Semences","emoji":"🌱","items":[{"id":"sem_mais_hybride","name":"Maïs hybride (certifié)","unit":"kg","crops":["mais"]},{"id":"sem_mais_local","name":"Maïs local","unit":"kg","crops":["mais"]},{"id":"sem_riz_nerica","name":"Riz NERICA","unit":"kg","crops":["riz_local"]},{"id":"sem_riz_sahel","name":"Riz Sahel (irrigué)","unit":"kg","crops":["riz_local"]},{"id":"sem_niebe","name":"Niébé amélioré","unit":"kg","crops":["niebe"]},{"id":"sem_arachide","name":"Arachide (certifié)","unit":"kg","crops":["arachide"]},{"id":"sem_sorgho","name":"Sorgho amélioré","unit":"kg","crops":["sorgho"]},{"id":"sem_tomate","name":"Tomate (sachet)","unit":"sachet","crops":["tomate"]},{"id":"sem_oignon","name":"Oignon (sachet)","unit":"sachet","crops":["oignon"]},{"id":"sem_piment","name":"Piment (sachet)","unit":"sachet","crops":["piment"]},{"id":"sem_manioc","name":"Boutures manioc","unit":"botte","crops":["manioc"]},{"id":"plants_cacao","name":"Plants cacao (pépinière)","unit":"plant","crops":["cacao"]},{"id":"plants_cafe","name":"Plants café","unit":"plant","crops":["cafe"]},{"id":"plants_cajou","name":"Plants anacardier","unit":"plant","crops":["cajou"]}]},{"id":"phyto","name":"Phytosanitaires","emoji":"🛡️","items":[{"id":"herbicide_glypho","name":"Glyphosate (herbicide total)","unit":"litre","crops":[]},{"id":"herbicide_selectif","name":"Herbicide sélectif maïs/riz","unit":"litre","crops":["mais","riz_local"]},{"id":"insecticide_lambda","name":"Lambda-cyhalothrine (insecticide)","unit":"litre","crops":[]},{"id":"fongicide_mancozeb","name":"Mancozèbe (fongicide)","unit":"sachet","crops":["tomate","cacao","cafe"]},{"id":"insecticide_bio","name":"Insecticide biologique (neem)","unit":"litre","crops":[]},{"id":"fongicide_cuivre","name":"Bouillie bordelaise (cuivre)","unit":"kg","crops":["cacao","cafe","tomate"]},{"id":"raticide","name":"Raticide","unit":"sachet","crops":[]}]},{"id":"equipement","name":"Équipement & Services","emoji":"🚜","items":[{"id":"location_tracteur","name":"Location tracteur + labour","unit":"hectare","crops":[]},{"id":"location_motopompe","name":"Location motopompe","unit":"jour","crops":[]},{"id":"pulverisateur","name":"Pulvérisateur à dos","unit":"pièce","crops":[]},{"id":"sac_jute","name":"Sacs jute/polypropylène","unit":"lot de 100","crops":[]},{"id":"bache","name":"Bâche de séchage","unit":"pièce","crops":[]},{"id":"filet_ombrage","name":"Filet d'ombrage (pépinière)","unit":"rouleau","crops":["tomate","piment","cacao"]},{"id":"tuyau_irrigation","name":"Tuyau irrigation goutte-à-goutte","unit":"rouleau 100m","crops":["tomate","oignon","piment"]}]}]};
+
+  // =========================================================================
+  // Load catalog (returns resolved promise — catalog already in memory)
+  // =========================================================================
+  function loadCatalog() {
+    return Promise.resolve(catalog);
+  }
+
+  // =========================================================================
+  // Storage helpers
+  // =========================================================================
+  function getPriceHistory() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; }
+  }
+
+  function savePriceEntry(entry) {
+    var history = getPriceHistory();
+    history.unshift(entry);
+    // Keep last 500 entries
+    if (history.length > 500) history = history.slice(0, 500);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  }
+
+  // =========================================================================
+  // Get user country & markets
+  // =========================================================================
+  function getUserCountry() {
+    var user = AP.auth ? AP.auth.getUser() : null;
+    return (user && (user.pays || user.country)) || 'benin';
+  }
+
+  function getMarkets() {
+    var country = getUserCountry();
+    return (AP.marketsByCountry && AP.marketsByCountry[country]) || [];
+  }
+
+  function getCountryName() {
+    var country = getUserCountry();
+    return AP.countryMeta && AP.countryMeta[country] ? AP.countryMeta[country].name : country;
+  }
+
+  // =========================================================================
+  // Format helpers
+  // =========================================================================
+  function formatFCFA(n) {
+    if (!n) return '—';
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA';
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '—';
+    var d = new Date(iso);
+    var months = ['Jan','Fev','Mar','Avr','Mai','Jun','Jul','Aou','Sep','Oct','Nov','Dec'];
+    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  function timeAgo(iso) {
+    var diff = Date.now() - new Date(iso).getTime();
+    var hours = Math.floor(diff / 3600000);
+    if (hours < 1) return 'Il y a moins d\'1h';
+    if (hours < 24) return 'Il y a ' + hours + 'h';
+    var days = Math.floor(hours / 24);
+    if (days < 7) return 'Il y a ' + days + 'j';
+    return formatDate(iso);
+  }
+
+  // =========================================================================
+  // Render main view
+  // =========================================================================
+  function render() {
+    if (!catalog) return;
+
+    var html = '';
+
+    // Tabs
+    html += '<div style="display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border);">';
+    [
+      { id: 'saisie', label: '<i data-lucide="file-text" class="lc"></i> Saisir un prix', icon: '' },
+      { id: 'historique', label: '<i data-lucide="bar-chart-3" class="lc"></i> Historique', icon: '' },
+      { id: 'compare', label: '<i data-lucide="zap" class="lc"></i> Comparer', icon: '' }
+    ].forEach(function(t) {
+      var active = currentTab === t.id;
+      html += '<button onclick="AgroPrix.inputs.setTab(\'' + t.id + '\')" style="flex:1;padding:10px;font-size:13px;font-weight:' + (active ? '700' : '500') + ';color:' + (active ? 'var(--green)' : 'var(--text-light)') + ';background:none;border:none;border-bottom:' + (active ? '3px solid var(--green)' : '3px solid transparent') + ';cursor:pointer;font-family:inherit;">' + t.label + '</button>';
+    });
+    html += '</div>';
+
+    if (currentTab === 'saisie') html += renderSaisie();
+    else if (currentTab === 'historique') html += renderHistorique();
+    else if (currentTab === 'compare') html += renderCompare();
+
+    var container = document.getElementById('inputsContent');
+    if (container) container.innerHTML = html;
+  }
+
+  // =========================================================================
+  // Tab: Saisie
+  // =========================================================================
+  function renderSaisie() {
+    var markets = getMarkets();
+    var html = '';
+
+    // Category selector
+    html += '<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">';
+    catalog.categories.forEach(function(cat) {
+      var active = currentCategory === cat.id;
+      html += '<button onclick="AgroPrix.inputs.setCategory(\'' + cat.id + '\')" style="padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid ' + (active ? 'var(--green)' : 'var(--border)') + ';background:' + (active ? 'var(--green)' : '#fff') + ';color:' + (active ? '#fff' : 'var(--text)') + ';cursor:pointer;font-family:inherit;">' + cat.emoji + ' ' + cat.name + '</button>';
+    });
+    html += '</div>';
+
+    // Input items for selected category
+    var cat = catalog.categories.find(function(c) { return c.id === currentCategory; });
+    if (!cat) return html;
+
+    html += '<div class="card" style="padding:16px;">'
+      + '<div class="card-title"><span class="icon">' + cat.emoji + '</span> Saisir un prix — ' + cat.name + '</div>'
+      + '<p style="font-size:12px;color:var(--text-light);margin-bottom:12px;">Renseignez le prix que vous avez paye. Vos donnees aident tous les producteurs!</p>';
+
+    // Product select
+    html += '<div class="form-group" style="margin-bottom:12px;">'
+      + '<label class="form-label" style="font-weight:600;">Produit</label>'
+      + '<select id="inputProduct" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;">';
+    cat.items.forEach(function(item) {
+      html += '<option value="' + item.id + '">' + item.name + ' (' + item.unit + ')</option>';
+    });
+    html += '</select></div>';
+
+    // Price
+    html += '<div class="form-group" style="margin-bottom:12px;">'
+      + '<label class="form-label" style="font-weight:600;">Prix paye (FCFA)</label>'
+      + '<input type="number" id="inputPrice" placeholder="Ex: 18500" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;" min="0">'
+      + '</div>';
+
+    // Market + Date row
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">';
+    // Market
+    html += '<div class="form-group">'
+      + '<label class="form-label" style="font-weight:600;">Lieu d\'achat</label>'
+      + '<select id="inputMarket" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;">';
+    markets.forEach(function(m) {
+      html += '<option value="' + m.name + '">' + m.name + '</option>';
+    });
+    html += '<option value="autre">Autre</option>';
+    html += '</select></div>';
+    // Date
+    html += '<div class="form-group">'
+      + '<label class="form-label" style="font-weight:600;">Date</label>'
+      + '<input type="date" id="inputDate" value="' + new Date().toISOString().split('T')[0] + '" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;">'
+      + '</div></div>';
+
+    // Supplier (optional)
+    html += '<div class="form-group" style="margin-bottom:16px;">'
+      + '<label class="form-label" style="font-weight:600;">Fournisseur <span style="color:var(--text-muted);font-weight:400;">(optionnel)</span></label>'
+      + '<input type="text" id="inputSupplier" placeholder="Nom du fournisseur" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;">'
+      + '</div>';
+
+    // Submit
+    html += '<button class="btn-analyse" style="width:100%;font-size:14px;padding:12px;" onclick="AgroPrix.inputs.submitPrice()">'
+      + '<i data-lucide="save" class="lc"></i> Enregistrer ce prix</button>';
+
+    // Success message placeholder
+    html += '<div id="inputSuccess" style="display:none;margin-top:12px;padding:10px;background:#d1fae5;border-radius:8px;text-align:center;font-size:13px;color:#1B4332;font-weight:600;"></div>';
+
+    html += '</div>';
+
+    // Recent entries (last 5)
+    var history = getPriceHistory();
+    var recentForCat = history.filter(function(e) { return e.category === currentCategory; }).slice(0, 5);
+
+    if (recentForCat.length > 0) {
+      html += '<div class="card" style="padding:16px;margin-top:16px;">'
+        + '<div class="card-title"><span class="icon">🕐</span> Derniers prix saisis — ' + cat.name + '</div>';
+      recentForCat.forEach(function(e) {
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">'
+          + '<div>'
+          + '<div style="font-size:13px;font-weight:600;">' + e.productName + '</div>'
+          + '<div style="font-size:11px;color:var(--text-light);">' + e.market + ' — ' + timeAgo(e.date) + '</div>'
+          + '</div>'
+          + '<div style="font-size:14px;font-weight:700;color:var(--green);">' + formatFCFA(e.price) + '</div>'
+          + '</div>';
+      });
+      html += '</div>';
+    }
+
+    return html;
+  }
+
+  // =========================================================================
+  // Tab: Historique
+  // =========================================================================
+  function renderHistorique() {
+    var history = getPriceHistory();
+    var html = '';
+
+    if (history.length === 0) {
+      html += '<div class="card" style="padding:32px;text-align:center;">'
+        + '<div style="font-size:48px;margin-bottom:12px;"><i data-lucide="bar-chart-3" class="lc"></i></div>'
+        + '<h3 style="color:var(--text-light);">Aucune donnee</h3>'
+        + '<p style="font-size:13px;color:var(--text-muted);">Saisissez des prix d\'intrants pour voir l\'historique.</p>'
+        + '</div>';
+      return html;
+    }
+
+    // Stats
+    var totalEntries = history.length;
+    var categories = {};
+    history.forEach(function(e) {
+      categories[e.category] = (categories[e.category] || 0) + 1;
+    });
+
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:16px;">';
+    html += '<div class="card" style="padding:12px;text-align:center;"><div style="font-size:24px;font-weight:800;color:var(--green);">' + totalEntries + '</div><div style="font-size:11px;color:var(--text-light);">Prix saisis</div></div>';
+    Object.keys(categories).forEach(function(catId) {
+      var cat = catalog.categories.find(function(c) { return c.id === catId; });
+      html += '<div class="card" style="padding:12px;text-align:center;"><div style="font-size:24px;font-weight:800;">' + categories[catId] + '</div><div style="font-size:11px;color:var(--text-light);">' + (cat ? cat.emoji + ' ' + cat.name : catId) + '</div></div>';
+    });
+    html += '</div>';
+
+    // Full history list
+    html += '<div class="card" style="padding:16px;">'
+      + '<div class="card-title"><span class="icon"><i data-lucide="clipboard-list" class="lc"></i></span> Tous les prix saisis</div>';
+    history.slice(0, 30).forEach(function(e) {
+      var cat = catalog.categories.find(function(c) { return c.id === e.category; });
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">'
+        + '<div>'
+        + '<div style="font-size:13px;font-weight:600;">' + (cat ? cat.emoji : '') + ' ' + e.productName + '</div>'
+        + '<div style="font-size:11px;color:var(--text-light);">' + e.market + ' — ' + formatDate(e.date) + (e.supplier ? ' — ' + e.supplier : '') + '</div>'
+        + '</div>'
+        + '<div style="font-size:14px;font-weight:700;color:var(--green);">' + formatFCFA(e.price) + '</div>'
+        + '</div>';
+    });
+    if (history.length > 30) {
+      html += '<p style="text-align:center;font-size:12px;color:var(--text-muted);margin-top:8px;">... et ' + (history.length - 30) + ' autres</p>';
+    }
+    html += '</div>';
+
+    return html;
+  }
+
+  // =========================================================================
+  // Tab: Compare
+  // =========================================================================
+  function renderCompare() {
+    var history = getPriceHistory();
+    var html = '';
+
+    if (history.length < 2) {
+      html += '<div class="card" style="padding:32px;text-align:center;">'
+        + '<div style="font-size:48px;margin-bottom:12px;"><i data-lucide="zap" class="lc"></i></div>'
+        + '<h3 style="color:var(--text-light);">Pas assez de donnees</h3>'
+        + '<p style="font-size:13px;color:var(--text-muted);">Saisissez au moins 2 prix du meme intrant pour comparer.</p>'
+        + '</div>';
+      return html;
+    }
+
+    // Group by product
+    var byProduct = {};
+    history.forEach(function(e) {
+      if (!byProduct[e.productId]) byProduct[e.productId] = { name: e.productName, category: e.category, entries: [] };
+      byProduct[e.productId].entries.push(e);
+    });
+
+    // Show products with multiple entries
+    var comparables = Object.keys(byProduct).filter(function(k) { return byProduct[k].entries.length >= 2; });
+
+    if (comparables.length === 0) {
+      html += '<div class="card" style="padding:32px;text-align:center;">'
+        + '<div style="font-size:48px;margin-bottom:12px;"><i data-lucide="zap" class="lc"></i></div>'
+        + '<h3 style="color:var(--text-light);">Pas de comparaison possible</h3>'
+        + '<p style="font-size:13px;color:var(--text-muted);">Saisissez le meme intrant dans differents marches pour comparer.</p>'
+        + '</div>';
+      return html;
+    }
+
+    comparables.forEach(function(productId) {
+      var prod = byProduct[productId];
+      var entries = prod.entries.sort(function(a, b) { return a.price - b.price; });
+      var minPrice = entries[0].price;
+      var maxPrice = entries[entries.length - 1].price;
+      var avgPrice = Math.round(entries.reduce(function(s, e) { return s + e.price; }, 0) / entries.length);
+      var diff = maxPrice - minPrice;
+      var diffPct = Math.round((diff / minPrice) * 100);
+
+      var cat = catalog.categories.find(function(c) { return c.id === prod.category; });
+
+      html += '<div class="card" style="padding:16px;margin-bottom:12px;">'
+        + '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;">'
+        + '<div><div style="font-size:15px;font-weight:700;">' + (cat ? cat.emoji : '') + ' ' + prod.name + '</div>'
+        + '<div style="font-size:12px;color:var(--text-light);">' + entries.length + ' prix saisis</div></div>';
+
+      if (diffPct > 10) {
+        html += '<div style="background:#fef3c7;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;color:#b45309;">-' + diffPct + '% possible</div>';
+      }
+      html += '</div>';
+
+      // Price bars
+      entries.forEach(function(e, idx) {
+        var barWidth = maxPrice > 0 ? Math.max(20, Math.round((e.price / maxPrice) * 100)) : 50;
+        var barColor = idx === 0 ? 'var(--green)' : (idx === entries.length - 1 ? 'var(--alert)' : 'var(--gold)');
+        html += '<div style="margin-bottom:6px;">'
+          + '<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px;">'
+          + '<span style="color:var(--text-light);">' + e.market + '</span>'
+          + '<span style="font-weight:700;">' + formatFCFA(e.price) + '</span></div>'
+          + '<div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;">'
+          + '<div style="height:100%;width:' + barWidth + '%;background:' + barColor + ';border-radius:4px;"></div></div>'
+          + '</div>';
+      });
+
+      // Insight
+      if (diffPct > 10) {
+        html += '<div style="margin-top:8px;padding:8px;background:#D8F3DC;border-radius:8px;font-size:12px;color:#1B4332;">'
+          + '<i data-lucide="lightbulb" class="lc"></i> <strong>' + prod.name + '</strong> est <strong>' + diffPct + '% moins cher</strong> a ' + entries[0].market + ' qu\'a ' + entries[entries.length - 1].market + '.</div>';
+      }
+
+      html += '</div>';
+    });
+
+    return html;
+  }
+
+  // =========================================================================
+  // Actions
+  // =========================================================================
+  function submitPrice() {
+    var productEl = document.getElementById('inputProduct');
+    var priceEl = document.getElementById('inputPrice');
+    var marketEl = document.getElementById('inputMarket');
+    var dateEl = document.getElementById('inputDate');
+    var supplierEl = document.getElementById('inputSupplier');
+
+    if (!productEl || !priceEl || !priceEl.value) {
+      alert('Veuillez renseigner le produit et le prix.');
+      return;
+    }
+
+    var price = parseInt(priceEl.value);
+    if (isNaN(price) || price <= 0) {
+      alert('Le prix doit etre un nombre positif.');
+      return;
+    }
+
+    // Find product name from catalog
+    var cat = catalog.categories.find(function(c) { return c.id === currentCategory; });
+    var item = cat ? cat.items.find(function(i) { return i.id === productEl.value; }) : null;
+
+    var entry = {
+      id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+      timestamp: new Date().toISOString(),
+      country: getUserCountry(),
+      category: currentCategory,
+      productId: productEl.value,
+      productName: item ? item.name : productEl.value,
+      unit: item ? item.unit : '',
+      price: price,
+      market: marketEl ? marketEl.value : '',
+      date: dateEl ? dateEl.value : new Date().toISOString().split('T')[0],
+      supplier: supplierEl ? supplierEl.value.trim() : ''
+    };
+
+    savePriceEntry(entry);
+
+    // Show success
+    var successEl = document.getElementById('inputSuccess');
+    if (successEl) {
+      successEl.textContent = '<i data-lucide="check-circle" class="lc"></i> Prix enregistre ! ' + entry.productName + ' a ' + formatFCFA(price) + ' (' + entry.market + ')';
+      successEl.style.display = 'block';
+      setTimeout(function() { successEl.style.display = 'none'; }, 3000);
+    }
+
+    // Reset price field
+    if (priceEl) priceEl.value = '';
+    if (supplierEl) supplierEl.value = '';
+
+    // Re-render to show recent entries
+    setTimeout(function() { render(); }, 100);
+  }
+
+  function setCategory(catId) {
+    currentCategory = catId;
+    render();
+  }
+
+  function setTab(tabId) {
+    currentTab = tabId;
+    render();
+  }
+
+  // =========================================================================
+  // Init
+  // =========================================================================
+  function init() {
+    loadCatalog().then(function() {
+      currentTab = 'saisie';
+      currentCategory = 'engrais';
+      render();
+    });
+  }
+
+  // =========================================================================
+  // Expose
+  // =========================================================================
+  AP.inputs = {
+    init: init,
+    setCategory: setCategory,
+    setTab: setTab,
+    submitPrice: submitPrice
+  };
+
+})(window.AgroPrix);
