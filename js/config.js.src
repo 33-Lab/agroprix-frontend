@@ -7,7 +7,7 @@ window.AgroPrix = window.AgroPrix || {};
   // Always use Railway backend (production)
   // To use local backend for dev, uncomment the next line:
   // AP.API_BASE = 'http://localhost:8000';
-  AP.API_BASE = 'https://web-production-717dd0.up.railway.app';
+  AP.API_BASE = 'https://web-production-46fb2.up.railway.app';
   AP.API_AVAILABLE = false;
 
   // Month names in French
