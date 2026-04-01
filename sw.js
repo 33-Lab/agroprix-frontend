@@ -2,7 +2,7 @@
 // Stratégie : Cache-first pour assets statiques, Network-first pour API
 // Version bumped à chaque déploiement pour forcer le refresh
 
-const CACHE_VERSION = 'v6.5.1';
+const CACHE_VERSION = 'v6.11.0';
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 
@@ -34,6 +34,8 @@ const STATIC_ASSETS = [
   '/js/financing.js',
   '/js/scoring.js',
   '/js/ndvi.js',
+  '/js/hevea.js',
+  '/js/plantain.js',
   // Data embarquée
   '/data/prix_reels_uemoa.json',
   '/data/institutions.json'
@@ -49,7 +51,7 @@ const CDN_ORIGINS = [
 
 // API backend Railway — Network-first, fallback JSON erreur
 const API_ORIGINS = [
-  'web-production-717dd0.up.railway.app'
+  'web-production-46fb2.up.railway.app'
 ];
 
 // ============================================================
@@ -119,7 +121,13 @@ self.addEventListener('fetch', function(event) {
     return;
   }
 
-  // 3. Assets locaux → Network-first avec fallback cache (toujours la dernière version)
+  // 3. Assets versionnés (?v=X) → Cache-first (immutables par version, chargement instantané)
+  if (url.search && url.search.match(/[?&]v=\d/)) {
+    event.respondWith(cacheFirstVersioned(request));
+    return;
+  }
+
+  // 4. Assets locaux → Network-first avec fallback cache (toujours la dernière version)
   event.respondWith(networkFirstLocal(request));
 });
 
@@ -155,10 +163,32 @@ function cacheFirstCDN(request) {
 }
 
 // ============================================================
-// Stratégie 3 : Network-first pour assets locaux
+// Stratégie 3 : Cache-first pour assets versionnés (?v=X)
+// ============================================================
+function cacheFirstVersioned(request) {
+  return caches.open(CACHE_NAME).then(function(cache) {
+    return cache.match(request).then(function(cached) {
+      if (cached) return cached;
+      return fetch(request).then(function(response) {
+        if (response.status === 200) {
+          cache.put(request, response.clone());
+        }
+        return response;
+      }).catch(function() {
+        return new Response('', { status: 503 });
+      });
+    });
+  });
+}
+
+// ============================================================
+// Stratégie 4 : Network-first pour assets locaux (timeout 2s)
 // ============================================================
 function networkFirstLocal(request) {
-  return fetch(request).then(function(response) {
+  var networkTimeout = new Promise(function(_, reject) {
+    setTimeout(function() { reject(new Error('timeout')); }, 2000);
+  });
+  return Promise.race([fetch(request), networkTimeout]).then(function(response) {
     if (response.status === 200) {
       caches.open(CACHE_NAME).then(function(cache) {
         cache.put(request, response.clone());
