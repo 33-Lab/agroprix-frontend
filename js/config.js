@@ -10,6 +10,11 @@ window.AgroPrix = window.AgroPrix || {};
   AP.API_BASE = 'https://web-production-46fb2.up.railway.app';
   AP.API_AVAILABLE = false;
 
+  // Clé API HDX (WFP food prices — data.humdata.org)
+  // Compte OFFICIEL : Kayode Gnonlonfoun (kayode1974) — token agroprix-prod-v2
+  // Expire : 2027-04-01
+  AP.HDX_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJOTktaOFo2cmtYOUd4Z3RteUpYOUR5TjlGMUpvaWhHeTJXdE9BNG5pMmNVIiwiaWF0IjoxNzc1MDMyNzMwLCJleHAiOjE4MDY1Njg3MzB9.8v2UiX0JM8lB7lOnkAJc6pax55s6TgwCZy-kkdEeUm0';
+
   // Month names in French
   AP.MONTHS = ['Jan', 'F\u00e9v', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Ao\u00fb', 'Sep', 'Oct', 'Nov', 'D\u00e9c'];
   AP.MONTHS_FULL = ['Janvier', 'F\u00e9vrier', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Ao\u00fbt', 'Septembre', 'Octobre', 'Novembre', 'D\u00e9cembre'];
