@@ -76,7 +76,12 @@
       + '<button onclick="document.getElementById(\'upgradeModal\').style.display=\'none\';" style="width:100%;padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:12px;font-size:14px;cursor:pointer;">Annuler</button>'
       + '</div>';
     modal.style.display = 'flex';
-    if (window.lucide) { try { window.lucide.createIcons(); } catch(e) {} }
+    if (window.lucide) {
+      try {
+        var mNodes = Array.prototype.slice.call(modal.querySelectorAll('[data-lucide]'));
+        if (mNodes.length) window.lucide.createIcons({ nodes: mNodes });
+      } catch(e) {}
+    }
   }
 
   // Show a specific view
@@ -177,10 +182,34 @@
     return '<i data-lucide="' + name + '" style="width:' + size + 'px;height:' + size + 'px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>';
   }
 
-  // Refresh Lucide icons after dynamic content render
-  function refreshIcons() {
-    if (window.lucide) {
-      try { window.lucide.createIcons(); } catch(e) {}
+  // Refresh Lucide icons — scoped à la vue active + UI persistante
+  // Evite de rescanner les 162+ icônes des vues cachées (cause du freeze renderer)
+  function refreshIcons(scopeEl) {
+    if (!window.lucide) return;
+    try {
+      var nodes = [];
+      if (scopeEl) {
+        // Scope explicite (ex: module init passe son container)
+        nodes = Array.prototype.slice.call(scopeEl.querySelectorAll('[data-lucide]'));
+      } else {
+        // UI persistante : sidebar + bottom-nav + moreMenu
+        var persistent = document.querySelectorAll('.sidebar [data-lucide], .bottom-nav [data-lucide], #moreMenu [data-lucide]');
+        Array.prototype.forEach.call(persistent, function(n) { nodes.push(n); });
+        // Vue visible uniquement
+        var visibleView = document.querySelector('.view-container.show');
+        if (visibleView) {
+          Array.prototype.forEach.call(visibleView.querySelectorAll('[data-lucide]'), function(n) { nodes.push(n); });
+        }
+        // Modals visibles
+        var modals = document.querySelectorAll('#upgradeModal [data-lucide], #errorBoundary [data-lucide], #offlineBanner [data-lucide]');
+        Array.prototype.forEach.call(modals, function(n) { nodes.push(n); });
+      }
+      if (nodes.length > 0) {
+        window.lucide.createIcons({ nodes: nodes });
+      }
+    } catch(e) {
+      // Fallback full-scan si nodes option non supportée
+      try { window.lucide.createIcons(); } catch(e2) {}
     }
   }
 
