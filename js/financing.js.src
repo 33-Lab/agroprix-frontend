@@ -413,7 +413,7 @@
     if (docs.length > 0) {
       var docLabels = {
         business_plan: '<i data-lucide="clipboard-list" class="lc"></i> Business plan / plan d\'affaires',
-        id: '🪪 Piece d\'identite',
+        id: '<i data-lucide="credit-card" class="lc"></i> Piece d\'identite',
         bank_account: '<i data-lucide="landmark" class="lc"></i> Compte bancaire',
         tax_compliance: '<i data-lucide="file" class="lc"></i> Attestation fiscale',
         proof_of_activity: '<i data-lucide="wheat" class="lc"></i> Justificatif d\'activite agricole',

@@ -96,7 +96,8 @@
       email: 'demo@agroprix.app',
       pays: 'benin',
       country: 'benin',
-      role: 'pro',
+      role: 'demo',  // Accès limité : Analyse + Dashboard uniquement
+      plan: 'demo',
       demo: true
     };
 
@@ -126,7 +127,7 @@
     if (profileName) profileName.textContent = 'Utilisateur Demo';
     if (profileEmail) profileEmail.textContent = 'demo@agroprix.app';
     if (profileCountry) profileCountry.textContent = 'Benin';
-    if (profilePlan) profilePlan.textContent = 'Demo (Pro)';
+    if (profilePlan) profilePlan.textContent = 'Démo — Gratuit';
   }
 
   // Expose
@@ -246,11 +247,11 @@ window.chercherTechniciens = function() {
       + '<div style="flex:1;">'
       + '<div style="font-weight:700;font-size:14px;">' + t.nom + '</div>'
       + '<div style="font-size:12px;color:var(--text-light);">' + t.specialite + '</div>'
-      + '<div style="font-size:11px;color:#E8862A;font-weight:600;">📍 ' + t.zone + '</div>'
+      + '<div style="font-size:11px;color:#E8862A;font-weight:600;"><i data-lucide="map-pin" class="lc"></i> ' + t.zone + '</div>'
       + '</div></div>'
       + '<div style="display:flex;gap:8px;margin-top:10px;">'
       + '<a href="tel:' + t.tel.replace(/\s/g, '') + '" style="flex:1;padding:10px;background:#2D6A4F;color:#fff;border-radius:10px;text-align:center;text-decoration:none;font-size:13px;font-weight:600;"><i data-lucide="phone" class="lc"></i> Appeler</a>'
-      + '<a href="https://wa.me/' + t.tel.replace(/[^0-9]/g, '') + '" target="_blank" style="flex:1;padding:10px;background:#25D366;color:#fff;border-radius:10px;text-align:center;text-decoration:none;font-size:13px;font-weight:600;">💬 WhatsApp</a>'
+      + '<a href="https://wa.me/' + t.tel.replace(/[^0-9]/g, '') + '" target="_blank" style="flex:1;padding:10px;background:#25D366;color:#fff;border-radius:10px;text-align:center;text-decoration:none;font-size:13px;font-weight:600;"><i data-lucide="message-circle" class="lc" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;"></i> WhatsApp</a>'
       + '</div></div>';
   });
   container.innerHTML = html;
@@ -303,7 +304,7 @@ window.souscrirePlan = function(plan, montant) {
     + '<div style="padding:14px;background:#FEF3C7;border-radius:12px;font-size:13px;color:#92400E;margin-bottom:16px;">'
     + '<strong>Paiement bientôt disponible</strong><br>KKiaPay sera activé dans les prochaines heures. Revenez ou contactez-nous via WhatsApp.'
     + '</div>'
-    + '<a href="https://wa.me/22960000000?text=Je veux souscrire au Plan ' + plan + ' (' + fmt + ' FCFA/mois)" target="_blank" style="display:block;width:100%;padding:14px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:10px;">💬 Payer via WhatsApp</a>'
+    + '<a href="https://wa.me/22960000000?text=Je veux souscrire au Plan ' + plan + ' (' + fmt + ' FCFA/mois)" target="_blank" style="display:block;width:100%;padding:14px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:10px;"><i data-lucide="message-circle" class="lc" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> Payer via WhatsApp</a>'
     + '<button onclick="document.getElementById(\'paymentOverlay\').remove()" style="width:100%;padding:12px;background:none;border:1px solid #ddd;border-radius:12px;font-size:14px;color:#999;cursor:pointer;">Fermer</button>'
     + '</div>';
   document.body.appendChild(overlay);
@@ -336,7 +337,7 @@ function onKkiapaySuccess(plan, montant, response) {
   var overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
   overlay.innerHTML = '<div style="background:#fff;border-radius:20px;padding:40px;max-width:400px;width:100%;text-align:center;">'
-    + '<div style="font-size:64px;margin-bottom:16px;">✅</div>'
+    + '<div style="margin-bottom:16px;"><i data-lucide="check-circle" style="width:64px;height:64px;color:#2D6A4F;" class="lc"></i></div>'
     + '<div style="font-size:22px;font-weight:800;color:#1B4332;">Paiement confirmé !</div>'
     + '<div style="font-size:15px;color:#666;margin-top:8px;">Plan <strong>' + plan + '</strong> activé — ' + fmt + ' FCFA/mois</div>'
     + '<div style="font-size:12px;color:#999;margin-top:6px;">Transaction : ' + transactionId + '</div>'

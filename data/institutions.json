@@ -19,14 +19,23 @@
         "guarantee": "50% couvert par FNDA",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative", "sme"],
+          "farmerTypes": [
+            "individual",
+            "cooperative",
+            "sme"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["business_plan", "id", "bank_account", "tax_compliance"]
+          "documents": [
+            "business_plan",
+            "id",
+            "bank_account",
+            "tax_compliance"
+          ]
         },
         "howToApply": "Contactez une banque partenaire agréée par le FNDA avec votre business plan."
       },
@@ -40,14 +49,20 @@
         "guarantee": "50% couvert par FNDA",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "proof_of_activity"]
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "Rendez-vous dans une institution de microfinance partenaire du FNDA."
       }
@@ -73,14 +88,18 @@
         "guarantee": "Groupe solidaire 5-15 personnes",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual"],
+          "farmerTypes": [
+            "individual"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id"]
+          "documents": [
+            "id"
+          ]
         },
         "howToApply": "Formez un groupe solidaire de 5-15 personnes et contactez une IMF partenaire du FNM."
       }
@@ -105,15 +124,28 @@
         "duration": "Variable",
         "guarantee": "Adhésion coopérative",
         "eligibility": {
-          "crops": ["mais", "coton", "anacarde", "soja", "niebe", "arachide"],
-          "farmerTypes": ["individual", "cooperative"],
+          "crops": [
+            "mais",
+            "coton",
+            "anacarde",
+            "soja",
+            "niebe",
+            "arachide"
+          ],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": true,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "membership_card"]
+          "documents": [
+            "id",
+            "membership_card"
+          ]
         },
         "howToApply": "Adhérez à la CLCAM (Caisse Locale) de votre commune. 33 CLCAMs dans 77 communes."
       }
@@ -139,14 +171,20 @@
         "guarantee": "Adhésion + épargne",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": true,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "membership_card"]
+          "documents": [
+            "id",
+            "membership_card"
+          ]
         },
         "howToApply": "Adhérez à une CREP locale. 159 000+ membres, 75 points de service dans 12 départements."
       }
@@ -172,14 +210,18 @@
         "guarantee": "Groupe villageois",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual"],
+          "farmerTypes": [
+            "individual"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id"]
+          "documents": [
+            "id"
+          ]
         },
         "howToApply": "Contactez la CAVECA de votre département. 238 000 membres dans 7 départements."
       }
@@ -205,14 +247,20 @@
         "guarantee": "Adhésion",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "proof_of_activity"]
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "Contactez un des 6 points de service AgriFinance."
       }
@@ -238,14 +286,21 @@
         "guarantee": "Aucune",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative", "sme"],
+          "farmerTypes": [
+            "individual",
+            "cooperative",
+            "sme"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["project_proposal", "id"]
+          "documents": [
+            "project_proposal",
+            "id"
+          ]
         },
         "howToApply": "Répondez aux appels à projets du FNEC (accrédité Fonds Vert pour le Climat)."
       }
@@ -271,14 +326,20 @@
         "guarantee": "Standard",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "sme"],
+          "farmerTypes": [
+            "individual",
+            "sme"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "proof_of_activity"]
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "Rendez-vous dans un des points de service PADME."
       }
@@ -304,14 +365,21 @@
         "guarantee": "10% apport personnel + 30% garantie progressive",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["sme"],
+          "farmerTypes": [
+            "sme"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": 2,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["business_plan", "financial_statements", "id", "tax_compliance"]
+          "documents": [
+            "business_plan",
+            "financial_statements",
+            "id",
+            "tax_compliance"
+          ]
         },
         "howToApply": "Appel à projets ouvert 5 mars - 20 avril 2026 via NSIA Banque. Revenus < 1 milliard FCFA."
       }
@@ -336,15 +404,26 @@
         "duration": "3-36 mois",
         "guarantee": "Simplifiée",
         "eligibility": {
-          "crops": ["cacao", "anacarde", "cafe"],
-          "farmerTypes": ["individual", "cooperative", "sme"],
+          "crops": [
+            "cacao",
+            "anacarde",
+            "cafe"
+          ],
+          "farmerTypes": [
+            "individual",
+            "cooperative",
+            "sme"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "proof_of_activity"]
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "Contactez Advans via WhatsApp +225 05 75 58 45 60 ou en agence."
       }
@@ -370,14 +449,20 @@
         "guarantee": "Pas d'épargne préalable requise",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": 2,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "proof_of_activity"]
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "Contactez une agence Baobab ou postulez en ligne sur baobab.com/ci."
       }
@@ -402,15 +487,22 @@
         "duration": "Programme 2026-2035",
         "guarantee": "Aucune",
         "eligibility": {
-          "crops": ["hevea"],
-          "farmerTypes": ["individual", "cooperative"],
+          "crops": [
+            "hevea"
+          ],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id"]
+          "documents": [
+            "id"
+          ]
         },
         "howToApply": "Contactez les bureaux régionaux APROMAC pour le programme d'urgence hévéa."
       }
@@ -436,14 +528,21 @@
         "guarantee": "Standard bancaire",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "sme"],
+          "farmerTypes": [
+            "individual",
+            "sme"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["business_plan", "id", "bank_account"]
+          "documents": [
+            "business_plan",
+            "id",
+            "bank_account"
+          ]
         },
         "howToApply": "Rendez-vous en agence BPCI avec votre dossier de crédit."
       }
@@ -469,14 +568,20 @@
         "guarantee": "Standard",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["sme"],
+          "farmerTypes": [
+            "sme"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": 2,
           "gender": "female_priority",
           "maxAge": null,
           "minAge": null,
-          "documents": ["business_plan", "financial_statements", "id"]
+          "documents": [
+            "business_plan",
+            "financial_statements",
+            "id"
+          ]
         },
         "howToApply": "Agences Bridge Bank à Abidjan. Priorité femmes entrepreneures."
       }
@@ -502,14 +607,19 @@
         "guarantee": "Aucune",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id"]
+          "documents": [
+            "id"
+          ]
         },
         "howToApply": "Inscrivez-vous aux programmes de formation FDFP dans votre région."
       }
@@ -535,14 +645,20 @@
         "guarantee": "Standard",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "proof_of_activity"]
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "Rendez-vous dans l'une des 38 agences. Réseau le plus décentralisé du Sénégal."
       },
@@ -556,14 +672,23 @@
         "guarantee": "Garantie requise",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative", "sme"],
+          "farmerTypes": [
+            "individual",
+            "cooperative",
+            "sme"
+          ],
           "requiresCoop": false,
           "minFarmSize": 1,
           "minExperience": 2,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["business_plan", "id", "bank_account", "proof_of_activity"]
+          "documents": [
+            "business_plan",
+            "id",
+            "bank_account",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "Demandez le programme Agreenfi (soutenu par l'AFD) dans votre agence."
       }
@@ -589,14 +714,19 @@
         "guarantee": "Projet viable",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual"],
+          "farmerTypes": [
+            "individual"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "female_priority",
           "maxAge": 40,
           "minAge": 18,
-          "documents": ["id", "business_plan"]
+          "documents": [
+            "id",
+            "business_plan"
+          ]
         },
         "howToApply": "Passez par les Pôles Emploi et Entrepreneuriat (PEEFJ) dans chaque région."
       }
@@ -622,14 +752,21 @@
         "guarantee": "FONGIP couvre le risque",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative", "sme"],
+          "farmerTypes": [
+            "individual",
+            "cooperative",
+            "sme"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["business_plan", "id"]
+          "documents": [
+            "business_plan",
+            "id"
+          ]
         },
         "howToApply": "Demandez la garantie FONGIP via votre banque ou IMF partenaire."
       }
@@ -655,14 +792,20 @@
         "guarantee": "Récépissé d'entrepôt (SRE) accepté",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "proof_of_activity"]
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "218+ agences dans toute la zone UEMOA. 44 départements couverts au Sénégal."
       }
@@ -688,14 +831,19 @@
         "guarantee": "Standard coopératif",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual"],
+          "farmerTypes": [
+            "individual"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "proof_of_activity"]
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "19 agences + 88 sous-bureaux. WhatsApp : +221 70 621 00. 30+ ans d'expérience agri."
       }
@@ -720,15 +868,23 @@
         "duration": "Adapté au cycle de production",
         "guarantee": "Standard",
         "eligibility": {
-          "crops": ["cereales", "horticulture"],
-          "farmerTypes": ["sme"],
+          "crops": [
+            "cereales",
+            "horticulture"
+          ],
+          "farmerTypes": [
+            "sme"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "female_priority",
           "maxAge": null,
           "minAge": null,
-          "documents": ["business_plan", "id"]
+          "documents": [
+            "business_plan",
+            "id"
+          ]
         },
         "howToApply": "Contactez COFINA Sénégal. Priorité céréales et horticulture."
       }
@@ -754,14 +910,18 @@
         "guarantee": "Groupe solidaire (tontine)",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual"],
+          "farmerTypes": [
+            "individual"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "female_priority",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id"]
+          "documents": [
+            "id"
+          ]
         },
         "howToApply": "95% des clients sont des femmes. 86% en milieu rural. Contactez une agence locale."
       }
@@ -787,14 +947,20 @@
         "guarantee": "Adhésion + épargne",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": true,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "membership_card"]
+          "documents": [
+            "id",
+            "membership_card"
+          ]
         },
         "howToApply": "1.1 million de membres. 106+ points de vente fixes. Adhérez à une coopérative locale."
       }
@@ -820,14 +986,20 @@
         "guarantee": "Standard",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "proof_of_activity"]
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "50+ agences au Mali. Partenariat IFC (40M$ en 2025)."
       }
@@ -852,15 +1024,23 @@
         "duration": "36 mois max",
         "guarantee": "10% dépôt sur montant emprunté",
         "eligibility": {
-          "crops": ["coton"],
-          "farmerTypes": ["individual", "cooperative"],
+          "crops": [
+            "coton"
+          ],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": true,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "membership_card"]
+          "documents": [
+            "id",
+            "membership_card"
+          ]
         },
         "howToApply": "500 000 membres. 158 points de vente (128 ruraux). 40%+ du marché microfinance Mali."
       },
@@ -874,14 +1054,20 @@
         "guarantee": "Coopérative",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": true,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "membership_card"]
+          "documents": [
+            "id",
+            "membership_card"
+          ]
         },
         "howToApply": "Adhérez à une caisse locale Kafo Jiginew."
       }
@@ -907,14 +1093,20 @@
         "guarantee": "Allégée pour OP",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "proof_of_activity"]
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "40+ agences au Mali. Taux réduit à 8% pour organisations paysannes."
       }
@@ -940,14 +1132,19 @@
         "guarantee": "Via institutions partenaires",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "female_priority",
           "maxAge": 40,
           "minAge": 18,
-          "documents": ["id"]
+          "documents": [
+            "id"
+          ]
         },
         "howToApply": "440 000 bénéficiaires ciblés (50% femmes, 50% jeunes). 5 régions : Koulikoro, Sikasso, Kayes, Ségou, Mopti."
       }
@@ -972,15 +1169,29 @@
         "duration": "Saisonnier à 3 ans",
         "guarantee": "Pas de condition sine qua non",
         "eligibility": {
-          "crops": ["mais", "sorgho", "mil", "niebe", "soja", "riz"],
-          "farmerTypes": ["individual", "cooperative", "sme"],
+          "crops": [
+            "mais",
+            "sorgho",
+            "mil",
+            "niebe",
+            "soja",
+            "riz"
+          ],
+          "farmerTypes": [
+            "individual",
+            "cooperative",
+            "sme"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "proof_of_activity"]
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "8 agences : Ouaga, Bobo, Dédougou, Banfora, Bagré, Diébougou, Houndé, Kaya."
       }
@@ -1006,14 +1217,20 @@
         "guarantee": "Adhésion coopérative",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": true,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "membership_card"]
+          "documents": [
+            "id",
+            "membership_card"
+          ]
         },
         "howToApply": "70%+ du marché MFI au Burkina. 212 points de vente. Fondé en 1972."
       }
@@ -1039,14 +1256,19 @@
         "guarantee": "Parrain/mentor de 40+ ans",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual"],
+          "farmerTypes": [
+            "individual"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "female_priority",
           "maxAge": 35,
           "minAge": 18,
-          "documents": ["id", "training_certificate"]
+          "documents": [
+            "id",
+            "training_certificate"
+          ]
         },
         "howToApply": "Formation entrepreneuriat obligatoire. 13 bureaux régionaux. Trouvez un parrain de 40+ ans."
       }
@@ -1072,14 +1294,19 @@
         "guarantee": "Standard",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual"],
+          "farmerTypes": [
+            "individual"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "proof_of_activity"]
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "84% du portefeuille dédié à l'agriculture. 20 000+ petits producteurs accompagnés."
       }
@@ -1104,15 +1331,25 @@
         "duration": "Variable",
         "guarantee": "Contrat tripartite (producteur, acheteur, FUCEC)",
         "eligibility": {
-          "crops": ["cacao", "soja", "ananas"],
-          "farmerTypes": ["individual", "cooperative"],
+          "crops": [
+            "cacao",
+            "soja",
+            "ananas"
+          ],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "proof_of_activity"]
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "46% des actifs MFI au Togo. 1.4M+ membres. 40+ institutions affiliées."
       }
@@ -1138,14 +1375,20 @@
         "guarantee": "Mécanisme de partage de risque État",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "proof_of_activity"]
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "200 000+ producteurs soutenus. 10 banques partenaires (Ecobank, Orabank, BOA, etc.)."
       }
@@ -1171,14 +1414,20 @@
         "guarantee": "MIFA",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "proof_of_activity"]
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "330M+ FCFA distribués à 392 producteurs en 2023-2024. Plateforme en ligne : credittogo.orabank.net."
       }
@@ -1204,14 +1453,20 @@
         "guarantee": "Allégée",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id", "proof_of_activity"]
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
         },
         "howToApply": "Seule banque agricole dédiée au Niger. 5 000+ petits producteurs soutenus. 1ère banque UEMOA hors BOAD à obtenir le Fonds Vert (10M$)."
       }
@@ -1237,14 +1492,19 @@
         "guarantee": "Aucune",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["individual", "cooperative"],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["id"]
+          "documents": [
+            "id"
+          ]
         },
         "howToApply": "200 000 ha restaurés. 67 000 agriculteurs formés. Contactez la Maison du Paysan de votre zone."
       }
@@ -1270,14 +1530,21 @@
         "guarantee": "Garantie souveraine",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["sme", "cooperative"],
+          "farmerTypes": [
+            "sme",
+            "cooperative"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": 5,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["business_plan", "financial_statements", "feasibility_study"]
+          "documents": [
+            "business_plan",
+            "financial_statements",
+            "feasibility_study"
+          ]
         },
         "howToApply": "Pour projets structurants uniquement. Contactez via les institutions nationales."
       }
@@ -1303,16 +1570,658 @@
         "guarantee": "FAGACE couvre le risque de défaut",
         "eligibility": {
           "crops": [],
-          "farmerTypes": ["sme"],
+          "farmerTypes": [
+            "sme"
+          ],
           "requiresCoop": false,
           "minFarmSize": null,
           "minExperience": null,
           "gender": "all",
           "maxAge": null,
           "minAge": null,
-          "documents": ["business_plan", "id"]
+          "documents": [
+            "business_plan",
+            "id"
+          ]
         },
         "howToApply": "3 000 milliards FCFA mobilisés depuis 1977. Demandez via votre banque. 14 pays membres."
+      }
+    ]
+  },
+  {
+    "id": "anpip-ne",
+    "name": "ANPIP",
+    "fullName": "Agence Nigerienne pour la Promotion de l'Irrigation Privee",
+    "country": "NE",
+    "type": "fund",
+    "emoji": "💧",
+    "website": "https://www.anpip.ne/",
+    "phone": "+227 20 35 29 54",
+    "products": [
+      {
+        "name": "Subvention equipements irrigation",
+        "minAmount": 0,
+        "maxAmount": 25000000,
+        "rate": "0% (subvention 60-80%)",
+        "rateValue": 0,
+        "duration": "Projet",
+        "guarantee": "Aucune",
+        "eligibility": {
+          "crops": [
+            "oignon",
+            "mais",
+            "riz_local",
+            "niebe"
+          ],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
+        },
+        "howToApply": "Contactez la Direction Regionale ANPIP. Subvention motopompes, tuyaux, forages pour petits irrigants."
+      }
+    ]
+  },
+  {
+    "id": "creusaid-ne",
+    "name": "CREUSAID",
+    "fullName": "Credit Rural et Services d'Appui Integres au Developpement",
+    "country": "NE",
+    "type": "mfi",
+    "emoji": "🌾",
+    "website": "",
+    "phone": "+227 20 73 46 67",
+    "products": [
+      {
+        "name": "Credit agricole rural",
+        "minAmount": 25000,
+        "maxAmount": 5000000,
+        "rate": "2-3%/mois",
+        "rateValue": 24,
+        "duration": "Saisonnier",
+        "guarantee": "Groupe solidaire ou caution",
+        "eligibility": {
+          "crops": [
+            "mil",
+            "sorgho",
+            "niebe",
+            "oignon",
+            "arachide"
+          ],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": [
+            "id"
+          ]
+        },
+        "howToApply": "Rejoignez un groupe d'entraide ou contactez la representation locale CREUSAID dans votre departement."
+      }
+    ]
+  },
+  {
+    "id": "reca-ne",
+    "name": "RECA Niger",
+    "fullName": "Reseau des Chambres d'Agriculture du Niger",
+    "country": "NE",
+    "type": "fund",
+    "emoji": "🏛️",
+    "website": "https://www.reca-niger.org/",
+    "phone": "+227 20 35 66 00",
+    "products": [
+      {
+        "name": "Programme FISAN — Financement agricole subventionne",
+        "minAmount": 100000,
+        "maxAmount": 50000000,
+        "rate": "5% (bonifie FISAN)",
+        "rateValue": 5,
+        "duration": "1-3 ans",
+        "guarantee": "30% garantie FISAN",
+        "eligibility": {
+          "crops": [
+            "mil",
+            "sorgho",
+            "niebe",
+            "oignon",
+            "arachide"
+          ],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": [
+            "id",
+            "proof_of_activity",
+            "bank_account"
+          ]
+        },
+        "howToApply": "Via Chambre Regionale d'Agriculture (CRA) de votre region. FISAN finance : intrants, equipements, transformation."
+      }
+    ]
+  },
+  {
+    "id": "bnea-ne",
+    "name": "BNEA",
+    "fullName": "Banque Nationale pour l'Epargne et le Credit Niger",
+    "country": "NE",
+    "type": "bank",
+    "emoji": "🏦",
+    "website": "",
+    "phone": "+227 20 73 63 65",
+    "products": [
+      {
+        "name": "Credit de campagne agricole",
+        "minAmount": 500000,
+        "maxAmount": 100000000,
+        "rate": "10-12%/an",
+        "rateValue": 11,
+        "duration": "Saisonnier a moyen terme",
+        "guarantee": "Standard bancaire",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": [
+            "individual",
+            "cooperative",
+            "sme"
+          ],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": [
+            "id",
+            "bank_account",
+            "proof_of_activity"
+          ]
+        },
+        "howToApply": "Rendez-vous en agence BNEA a Niamey, Maradi, Zinder ou Agadez avec votre dossier de credit."
+      }
+    ]
+  },
+  {
+    "id": "anca-gw",
+    "name": "ANCA",
+    "fullName": "Autoridade Nacional para a Cajucultura (Guinee-Bissau)",
+    "country": "GW",
+    "type": "fund",
+    "emoji": "🌳",
+    "website": "",
+    "phone": "+245 966 80 04 00",
+    "products": [
+      {
+        "name": "Fonds de stabilisation anacarde",
+        "minAmount": 0,
+        "maxAmount": 10000000,
+        "rate": "Subvention partielle intrants",
+        "rateValue": 0,
+        "duration": "Campagne annuelle",
+        "guarantee": "Aucune",
+        "eligibility": {
+          "crops": [
+            "cajou"
+          ],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": [
+            "id"
+          ]
+        },
+        "howToApply": "Contactez ANCA via les Associations de Producteurs d'Anacarde locales (APAs). Subvention intrants campagne mars-avril."
+      }
+    ]
+  },
+  {
+    "id": "bdu-gw",
+    "name": "BDU",
+    "fullName": "Banco de Desenvolvimento da Guine-Bissau",
+    "country": "GW",
+    "type": "bank",
+    "emoji": "🏦",
+    "website": "",
+    "phone": "+245 966 00 00 00",
+    "products": [
+      {
+        "name": "Credit agricole producteurs anacarde",
+        "minAmount": 100000,
+        "maxAmount": 20000000,
+        "rate": "8-10%/an",
+        "rateValue": 9,
+        "duration": "6 mois (campagne)",
+        "guarantee": "Recolte en garantie",
+        "eligibility": {
+          "crops": [
+            "cajou",
+            "riz_local",
+            "mil"
+          ],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
+        },
+        "howToApply": "Rendez-vous en agence BDU a Bissau. Credit pre-campagne pour financer la recolte anacarde (mars-mai)."
+      }
+    ]
+  },
+  {
+    "id": "pamf-tg",
+    "name": "PAMF Togo",
+    "fullName": "Premiere Agence de Microfinance Togo",
+    "country": "TG",
+    "type": "mfi",
+    "emoji": "💳",
+    "website": "https://pamf-togo.com/",
+    "phone": "+228 22 22 11 11",
+    "products": [
+      {
+        "name": "Credit agricole filieres cafe-cacao-coton",
+        "minAmount": 100000,
+        "maxAmount": 10000000,
+        "rate": "1.5-2%/mois",
+        "rateValue": 18,
+        "duration": "4-12 mois",
+        "guarantee": "Caution solidaire",
+        "eligibility": {
+          "crops": [
+            "cacao",
+            "cafe",
+            "coton",
+            "mais",
+            "manioc"
+          ],
+          "farmerTypes": [
+            "individual",
+            "cooperative"
+          ],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": [
+            "id",
+            "proof_of_activity"
+          ]
+        },
+        "howToApply": "Contactez une agence PAMF a Lome, Atakpame, Kpalime ou Sokode."
+      }
+    ]
+  },
+  {
+    "id": "fnfi-tg",
+    "name": "FNFI Togo",
+    "fullName": "Fonds National de la Finance Inclusive du Togo",
+    "country": "TG",
+    "type": "fund",
+    "emoji": "🌿",
+    "website": "https://www.fnfi.tg/",
+    "phone": "+228 22 23 37 37",
+    "products": [
+      {
+        "name": "Credit inclusif agricole (femmes & jeunes)",
+        "minAmount": 50000,
+        "maxAmount": 5000000,
+        "rate": "5-7%/an (bonifie)",
+        "rateValue": 6,
+        "duration": "Saisonnier",
+        "guarantee": "Caution solidaire groupe",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": [
+            "individual"
+          ],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "female_priority",
+          "maxAge": 45,
+          "minAge": 18,
+          "documents": [
+            "id"
+          ]
+        },
+        "howToApply": "Via les Cooperatives d'Epargne et de Credit (CEC) agreees FNFI dans les 5 regions du Togo."
+      }
+    ]
+  },
+  {
+    "id": "sofigib-bf",
+    "name": "SOFIGIB",
+    "fullName": "Societe de Financement des Intrants et Garants Agricoles du Burkina",
+    "country": "BF",
+    "type": "fund",
+    "emoji": "🌱",
+    "website": "",
+    "phone": "+226 25 31 22 00",
+    "products": [
+      {
+        "name": "Credit intrants (engrais + semences ameliorees)",
+        "minAmount": 50000,
+        "maxAmount": 10000000,
+        "rate": "5% (bonifie FONAB)",
+        "rateValue": 5,
+        "duration": "1 campagne",
+        "guarantee": "Recolte ou groupe solidaire",
+        "eligibility": {
+          "crops": ["mais","sorgho","mil","niebe","coton","sesame"],
+          "farmerTypes": ["individual","cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id","proof_of_activity"]
+        },
+        "howToApply": "Via les Unions Departementales de Producteurs (UDP). Financement intrants agricoles campagne hivernage."
+      }
+    ]
+  },
+  {
+    "id": "sofitex-unpcb-bf",
+    "name": "SOFITEX / UNPCB",
+    "fullName": "Societe Burkinabe des Fibres Textiles / Union Nationale des Producteurs de Coton du Burkina",
+    "country": "BF",
+    "type": "fund",
+    "emoji": "🌿",
+    "website": "https://www.sofitex.bf/",
+    "phone": "+226 20 97 00 60",
+    "products": [
+      {
+        "name": "Credit intrants coton (remboursement sur vente)",
+        "minAmount": 50000,
+        "maxAmount": 5000000,
+        "rate": "0% (intrants avances, remboursement livraison coton)",
+        "rateValue": 0,
+        "duration": "1 campagne",
+        "guarantee": "Garantie sur recolte de coton",
+        "eligibility": {
+          "crops": ["coton"],
+          "farmerTypes": ["individual","cooperative"],
+          "requiresCoop": true,
+          "minFarmSize": 0.5,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id","membership_card"]
+        },
+        "howToApply": "Adherer a l'UNPCB de votre zone cotonniere. Credit intrants semences, engrais et pesticides avances et remboursables a la livraison du coton."
+      }
+    ]
+  },
+  {
+    "id": "cofina-ci",
+    "name": "COFINA CI",
+    "fullName": "Compagnie Financiere de l'Afrique — Cote d'Ivoire",
+    "country": "CI",
+    "type": "mfi",
+    "emoji": "💳",
+    "website": "https://cofina.net/",
+    "phone": "+225 27 20 25 23 23",
+    "products": [
+      {
+        "name": "Mesocredit PME chaines de valeur agricoles",
+        "minAmount": 500000,
+        "maxAmount": 300000000,
+        "rate": "Taux bonifies via ligne BEI (16M EUR) — competitive",
+        "rateValue": 10,
+        "duration": "Adaptee aux cycles de production (3-36 mois)",
+        "guarantee": "Partielle selon montant",
+        "eligibility": {
+          "crops": ["cacao","anacarde","riz","mais","maraichage","horticulture"],
+          "farmerTypes": ["sme","cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": 1,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["business_plan","id","bank_account"]
+        },
+        "howToApply": "Contacter COFINA CI a Abidjan. Specialise sur les PME des filieres durables (cacao, anacarde). Eligible aux lignes BEI/Union Europeenne."
+      }
+    ]
+  },
+  {
+    "id": "fciad-ci",
+    "name": "FCIAD",
+    "fullName": "Fonds Competitif pour l'Innovation Agricole Durable",
+    "country": "CI",
+    "type": "fund",
+    "emoji": "💡",
+    "website": "https://firca.ci/",
+    "phone": "+225 27 22 52 81 81",
+    "products": [
+      {
+        "name": "Subvention innovation agricole durable (appel a projets)",
+        "minAmount": 1000000,
+        "maxAmount": 500000000,
+        "rate": "0% (subvention non remboursable via AFD/C2D)",
+        "rateValue": 0,
+        "duration": "Projet (1-3 ans)",
+        "guarantee": "Aucune",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["sme","cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["project_proposal","business_plan","id"]
+        },
+        "howToApply": "Repondre aux appels a projets FCIAD (gere par FIRCA). Equipes de recherche, vulgarisateurs, innovateurs nationaux ou internationaux etablis en CI. Enveloppe de 5 Mds FCFA sur 3 ans via AFD/C2D."
+      }
+    ]
+  },
+  {
+    "id": "uncas-sn",
+    "name": "UNCAS",
+    "fullName": "Union Nationale des Cooperatives Agricoles du Senegal",
+    "country": "SN",
+    "type": "cooperative",
+    "emoji": "🤝",
+    "website": "",
+    "phone": "",
+    "products": [
+      {
+        "name": "Credit cooperatif agricole (acces intrants, equipements, marches)",
+        "minAmount": 50000,
+        "maxAmount": 20000000,
+        "rate": "Taux mutualise avantageux",
+        "rateValue": 8,
+        "duration": "Saisonniere ou court terme",
+        "guarantee": "Adhesion cooperative + caution solidaire",
+        "eligibility": {
+          "crops": ["arachide","riz","mil","sorgho","mais","maraichage"],
+          "farmerTypes": ["individual","cooperative"],
+          "requiresCoop": true,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id","membership_card"]
+        },
+        "howToApply": "Adherer a une cooperative agricole membre de l'UNCAS dans votre region. Acces groupe aux intrants, equipements et marches collectifs."
+      }
+    ]
+  },
+  {
+    "id": "nyesigiso-ml",
+    "name": "Nyesigiso",
+    "fullName": "Reseau des Caisses d'Epargne et de Credit Nyesigiso",
+    "country": "ML",
+    "type": "cooperative",
+    "emoji": "🤝",
+    "website": "",
+    "phone": "+223 20 22 52 26",
+    "products": [
+      {
+        "name": "Microcredit agricole rural",
+        "minAmount": 25000,
+        "maxAmount": 5000000,
+        "rate": "Taux cooperatif (15-20%/an)",
+        "rateValue": 17,
+        "duration": "Court terme, cale sur cycles agricoles",
+        "guarantee": "Epargne prealable ou groupe solidaire",
+        "eligibility": {
+          "crops": ["riz","mais","mil","sorgho","arachide","maraichage"],
+          "farmerTypes": ["individual","cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id"]
+        },
+        "howToApply": "Rejoindre une caisse Nyesigiso dans votre localite. Reseau cooperatif couvrant plusieurs regions du Mali. Priorite aux petits producteurs, femmes et groupements ruraux."
+      }
+    ]
+  },
+  {
+    "id": "faiej-tg",
+    "name": "FAIEJ",
+    "fullName": "Fonds d'Appui aux Initiatives Economiques des Jeunes",
+    "country": "TG",
+    "type": "fund",
+    "emoji": "🚀",
+    "website": "https://faiej.tg/",
+    "phone": "+228 22 21 02 65",
+    "products": [
+      {
+        "name": "Pret jeunes entrepreneurs agricoles",
+        "minAmount": 500000,
+        "maxAmount": 50000000,
+        "rate": "Taux avantageux (bonifie Etat)",
+        "rateValue": 5,
+        "duration": "2-5 ans selon projet",
+        "guarantee": "Business plan + caution morale",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["individual","sme"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": 40,
+          "minAge": 18,
+          "documents": ["id","business_plan","proof_of_activity"]
+        },
+        "howToApply": "Deposer un dossier au FAIEJ a Lome ou dans les bureaux regionaux. Requis : plan d'affaires solide + potentiel economique avere. Cible jeunes 18-40 ans."
+      }
+    ]
+  },
+  {
+    "id": "asusu-ne",
+    "name": "ASUSU",
+    "fullName": "ASUSU SA — Institution de Microfinance du Niger",
+    "country": "NE",
+    "type": "mfi",
+    "emoji": "💳",
+    "website": "",
+    "phone": "+227 20 73 49 05",
+    "products": [
+      {
+        "name": "Microcredit agricole (campagne + equipements)",
+        "minAmount": 50000,
+        "maxAmount": 3000000,
+        "rate": "18-24%/an",
+        "rateValue": 21,
+        "duration": "Court terme (4-12 mois)",
+        "guarantee": "Caution solidaire ou garantie materielle",
+        "eligibility": {
+          "crops": ["mil","sorgho","niebe","arachide","oignon","mais"],
+          "farmerTypes": ["individual","cooperative"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": null,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["id"]
+        },
+        "howToApply": "Contactez une agence ASUSU dans votre region. Specialisee microcredit petits producteurs ruraux, femmes et groupements. Reseau etendu au Niger."
+      }
+    ]
+  },
+  {
+    "id": "fsa-regional",
+    "name": "FSA",
+    "fullName": "Fonds de Solidarite Africain",
+    "country": "ALL",
+    "type": "fund",
+    "emoji": "🌍",
+    "website": "https://fsa-africa.org/",
+    "phone": "",
+    "products": [
+      {
+        "name": "Contre-garantie et prise de participation (Senegal, CI, Mali)",
+        "minAmount": 50000000,
+        "maxAmount": 5000000000,
+        "rate": "Variable selon operation",
+        "rateValue": 8,
+        "duration": "Moyen a long terme",
+        "guarantee": "Contre-garantie aux banques partenaires",
+        "eligibility": {
+          "crops": [],
+          "farmerTypes": ["sme"],
+          "requiresCoop": false,
+          "minFarmSize": null,
+          "minExperience": 2,
+          "gender": "all",
+          "maxAge": null,
+          "minAge": null,
+          "documents": ["business_plan","financial_statements","legal_registration"]
+        },
+        "howToApply": "Contacter le FSA via les banques partenaires agreees (Senegal, Cote d'Ivoire, Mali principalement). Tickets 50M FCFA+. Participations minoritaires possibles pour entreprises africaines agro-industrielles."
       }
     ]
   }

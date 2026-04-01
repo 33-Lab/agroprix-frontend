@@ -1,14 +1,76 @@
 // AgroPrix API Module
+// Resilient fetch: timeout 8s, 1 retry, localStorage cache fallback (Edge/3G safe)
 (function(AP) {
 
-  // Check backend availability on load
-  function checkAPI() {
-    fetch(AP.API_BASE + '/', { method: 'GET', signal: AbortSignal.timeout(3000) })
-      .then(function(r) { if (r.ok) { AP.API_AVAILABLE = true; console.log('[AgroPrix] Backend API connecté ✓'); } })
-      .catch(function() { AP.API_AVAILABLE = false; console.log('[AgroPrix] Backend non disponible — mode données simulées'); });
+  var API_TIMEOUT_MS = 8000;   // 8s max par requête (confortable sur 3G)
+  var CACHE_PREFIX   = 'ap_cache_';
+  var CACHE_TTL_MS   = 6 * 60 * 60 * 1000; // 6h de fraîcheur
+
+  // ── Helpers cache localStorage ────────────────────────────────────────────
+
+  function cacheSet(key, data) {
+    try {
+      localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({ ts: Date.now(), data: data }));
+    } catch(e) {} // quota dépassé — silencieux
   }
 
-  // Convert period key to start date string
+  function cacheGet(key) {
+    try {
+      var raw = localStorage.getItem(CACHE_PREFIX + key);
+      if (!raw) return null;
+      var entry = JSON.parse(raw);
+      if (Date.now() - entry.ts > CACHE_TTL_MS) return null; // périmé
+      return entry.data;
+    } catch(e) { return null; }
+  }
+
+  // ── Fetch robuste : timeout + 1 retry + fallback cache ───────────────────
+
+  async function fetchRobust(url, cacheKey) {
+    // 1. Essai réseau avec timeout
+    for (var attempt = 0; attempt < 2; attempt++) {
+      try {
+        var resp = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT_MS) });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        var json = await resp.json();
+        if (cacheKey) cacheSet(cacheKey, json); // mettre en cache la bonne réponse
+        return json;
+      } catch(e) {
+        if (attempt === 0) {
+          // Petite pause avant retry (réseau instable)
+          await new Promise(function(r) { setTimeout(r, 1200); });
+        }
+      }
+    }
+    // 2. Réseau échoué → fallback cache localStorage
+    if (cacheKey) {
+      var cached = cacheGet(cacheKey);
+      if (cached) {
+        console.warn('[AgroPrix] Réseau indisponible — données cache utilisées pour', cacheKey);
+        cached._fromCache = true;
+        return cached;
+      }
+    }
+    // 3. Rien — retourne null (l'appelant gère le fallback simulé)
+    return null;
+  }
+
+  // ── Check API disponibilité ───────────────────────────────────────────────
+
+  function checkAPI() {
+    fetch(AP.API_BASE + '/', { method: 'GET', signal: AbortSignal.timeout(3000) })
+      .then(function(r) {
+        if (r.ok) {
+          AP.API_AVAILABLE = true;
+        }
+      })
+      .catch(function() {
+        AP.API_AVAILABLE = false;
+      });
+  }
+
+  // ── Conversion période → date ─────────────────────────────────────────────
+
   function periodToStartDate(periodKey) {
     var now = new Date();
     var y = now.getFullYear(), m = now.getMonth() + 1;
@@ -21,45 +83,48 @@
     }
   }
 
-  // Fetch monthly prices
+  // ── Endpoints ─────────────────────────────────────────────────────────────
+
   async function fetchPrices(country, commodity, periodKey) {
     var wfpName = AP.cultureToWFP[commodity] || commodity;
     var startDate = periodToStartDate(periodKey);
-    var url = AP.API_BASE + '/api/prices/monthly?country=' + country + '&commodity=' + encodeURIComponent(wfpName) + '&start_date=' + startDate;
-    var resp = await fetch(url);
-    var json = await resp.json();
-    return json.data || [];
+    var url = AP.API_BASE + '/api/prices/monthly?country=' + country
+            + '&commodity=' + encodeURIComponent(wfpName)
+            + '&start_date=' + startDate;
+    var cacheKey = 'prices_' + country + '_' + wfpName + '_' + periodKey;
+    var json = await fetchRobust(url, cacheKey);
+    return (json && json.data) ? json.data : [];
   }
 
-  // Fetch markets for map
   async function fetchMarkets(country) {
-    var resp = await fetch(AP.API_BASE + '/api/prices/markets?country=' + country);
-    var json = await resp.json();
-    return json.data || [];
+    var url = AP.API_BASE + '/api/prices/markets?country=' + country;
+    var json = await fetchRobust(url, 'markets_' + country);
+    return (json && json.data) ? json.data : [];
   }
 
-  // Fetch regional comparison
   async function fetchCompare(commodity) {
     var wfpName = AP.cultureToWFP[commodity] || commodity;
-    var resp = await fetch(AP.API_BASE + '/api/prices/compare?commodity=' + encodeURIComponent(wfpName));
-    var json = await resp.json();
-    return json.data || [];
+    var url = AP.API_BASE + '/api/prices/compare?commodity=' + encodeURIComponent(wfpName);
+    var json = await fetchRobust(url, 'compare_' + wfpName);
+    return (json && json.data) ? json.data : [];
   }
 
-  // Fetch weather forecast
   async function fetchForecast(country) {
-    var resp = await fetch(AP.API_BASE + '/api/weather/forecast?country=' + country);
-    return resp.json();
+    var url = AP.API_BASE + '/api/weather/forecast?country=' + country;
+    var json = await fetchRobust(url, 'forecast_' + country);
+    return json || {};
   }
 
-  // Fetch recommendations
   async function fetchRecommendations(country, commodity) {
     var wfpName = AP.cultureToWFP[commodity] || commodity;
-    var resp = await fetch(AP.API_BASE + '/api/recommendations/?country=' + country + '&commodity=' + encodeURIComponent(wfpName));
-    return resp.json();
+    var url = AP.API_BASE + '/api/recommendations/?country=' + country
+            + '&commodity=' + encodeURIComponent(wfpName);
+    var json = await fetchRobust(url, 'reco_' + country + '_' + wfpName);
+    return json || {};
   }
 
-  // Expose
+  // ── Expose ────────────────────────────────────────────────────────────────
+
   AP.api = {
     checkAPI: checkAPI,
     periodToStartDate: periodToStartDate,

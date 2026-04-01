@@ -33,11 +33,11 @@
 
   // NDVI interpretation
   function getNDVIStatus(ndvi) {
-    if (ndvi >= THRESHOLDS.excellent) return { label: 'Excellente', color: '#2D6A4F', bg: '#D8F3DC', emoji: '🟢', advice: 'Vegetation dense et saine. Conditions optimales.' };
-    if (ndvi >= THRESHOLDS.good) return { label: 'Bonne', color: '#40916C', bg: '#E8F5E9', emoji: '🟡', advice: 'Vegetation en bon etat. Surveillez l\'irrigation.' };
-    if (ndvi >= THRESHOLDS.moderate) return { label: 'Moderee', color: '#E8862A', bg: '#FFF8E1', emoji: '🟠', advice: 'Stress vegetal detecte. Verifiez l\'eau et les intrants.' };
-    if (ndvi >= THRESHOLDS.stress) return { label: 'Stress', color: '#e76f51', bg: '#FFF3E0', emoji: '🔴', advice: 'Stress severe ! Risque de perte de recolte. Action urgente.' };
-    return { label: 'Critique', color: '#c0392b', bg: '#FFEBEE', emoji: '⛔', advice: 'Parcelle en danger critique. Sol nu ou vegetation morte.' };
+    if (ndvi >= THRESHOLDS.excellent) return { label: 'Excellente', color: '#2D6A4F', bg: '#D8F3DC', emoji: '<span style="color:#2D6A4F;font-size:1em;">●</span>', advice: 'Vegetation dense et saine. Conditions optimales.' };
+    if (ndvi >= THRESHOLDS.good) return { label: 'Bonne', color: '#40916C', bg: '#E8F5E9', emoji: '<span style="color:#FBBF24;font-size:1em;">●</span>', advice: 'Vegetation en bon etat. Surveillez l\'irrigation.' };
+    if (ndvi >= THRESHOLDS.moderate) return { label: 'Moderee', color: '#E8862A', bg: '#FFF8E1', emoji: '<span style="color:#F97316;font-size:1em;">●</span>', advice: 'Stress vegetal detecte. Verifiez l\'eau et les intrants.' };
+    if (ndvi >= THRESHOLDS.stress) return { label: 'Stress', color: '#e76f51', bg: '#FFF3E0', emoji: '<span style="color:#EF4444;font-size:1em;">●</span>', advice: 'Stress severe ! Risque de perte de recolte. Action urgente.' };
+    return { label: 'Critique', color: '#c0392b', bg: '#FFEBEE', emoji: '<span style="color:#991B1B;font-size:1em;">●</span>', advice: 'Parcelle en danger critique. Sol nu ou vegetation morte.' };
   }
 
   // =========================================================================
@@ -96,7 +96,7 @@
 
     // Add parcel button
     html += '<button class="btn-analyse" style="width:100%;font-size:14px;padding:12px;margin-top:16px;" '
-      + 'onclick="AgroPrix.ndvi.showAddForm()">➕ Enregistrer une parcelle</button>';
+      + 'onclick="AgroPrix.ndvi.showAddForm()"><i data-lucide="plus-circle" class="lc"></i> Enregistrer une parcelle</button>';
 
     container.innerHTML = html;
   }
@@ -110,16 +110,16 @@
       + 'et des alertes en cas de stress vegetal.</p>'
       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:320px;margin:0 auto;">'
       + '<div style="background:#D8F3DC;padding:10px;border-radius:8px;text-align:center;">'
-      + '<div style="font-size:18px;">🟢</div><div style="font-size:10px;font-weight:600;color:#2D6A4F;">Saine</div>'
+      + '<div style="font-size:22px;color:#2D6A4F;">●</div><div style="font-size:10px;font-weight:600;color:#2D6A4F;">Saine</div>'
       + '<div style="font-size:9px;color:#666;">NDVI > 0.7</div></div>'
       + '<div style="background:#FFF8E1;padding:10px;border-radius:8px;text-align:center;">'
-      + '<div style="font-size:18px;">🟠</div><div style="font-size:10px;font-weight:600;color:#E8862A;">Moderee</div>'
+      + '<div style="font-size:22px;color:#F97316;">●</div><div style="font-size:10px;font-weight:600;color:#E8862A;">Moderee</div>'
       + '<div style="font-size:9px;color:#666;">NDVI 0.3-0.5</div></div>'
       + '<div style="background:#E8F5E9;padding:10px;border-radius:8px;text-align:center;">'
-      + '<div style="font-size:18px;">🟡</div><div style="font-size:10px;font-weight:600;color:#40916C;">Bonne</div>'
+      + '<div style="font-size:22px;color:#FBBF24;">●</div><div style="font-size:10px;font-weight:600;color:#40916C;">Bonne</div>'
       + '<div style="font-size:9px;color:#666;">NDVI 0.5-0.7</div></div>'
       + '<div style="background:#FFF3E0;padding:10px;border-radius:8px;text-align:center;">'
-      + '<div style="font-size:18px;">🔴</div><div style="font-size:10px;font-weight:600;color:#e76f51;">Stress</div>'
+      + '<div style="font-size:22px;color:#EF4444;">●</div><div style="font-size:10px;font-weight:600;color:#e76f51;">Stress</div>'
       + '<div style="font-size:9px;color:#666;">NDVI < 0.3</div></div>'
       + '</div></div>';
   }
@@ -165,7 +165,7 @@
     // Insurance banner
     html += '<div class="card" style="padding:12px;margin-bottom:16px;background:linear-gradient(135deg,#D8F3DC,#B7E4C7);border:1px solid #2D6A4F33;">'
       + '<div style="display:flex;align-items:center;gap:10px;">'
-      + '<span style="font-size:28px;">🛡️</span>'
+      + '<span style="font-size:28px;color:#1B4332;"><i data-lucide="shield" class="lc"></i></span>'
       + '<div>'
       + '<div style="font-size:12px;font-weight:700;color:#1B4332;">Assurance parametrique disponible</div>'
       + '<div style="font-size:11px;color:#2D6A4F;">Si votre NDVI chute sous 0.3, vous etes automatiquement indemnise. Sans expert terrain.</div>'
@@ -176,7 +176,7 @@
 
   function renderParcelsList(parcels) {
     var html = '<div class="card" style="padding:16px;margin-bottom:12px;">'
-      + '<div class="card-title"><span class="icon"><i data-lucide="map" class="lc"></i>️</span> Mes parcelles</div>';
+      + '<div class="card-title"><span class="icon"><i data-lucide="map" class="lc"></i></span> Mes parcelles</div>';
 
     parcels.forEach(function(p, idx) {
       var latest = p.ndviHistory && p.ndviHistory.length > 0 ? p.ndviHistory[p.ndviHistory.length - 1] : { ndvi: 0, date: '' };
@@ -296,7 +296,7 @@
 
     // Insurance card
     html += '<div class="card" style="padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#FFF8E1,#FFECB3);border:1px solid #E8862A33;">'
-      + '<div class="card-title" style="color:#b45309;"><span class="icon">🛡️</span> Assurance parametrique</div>'
+      + '<div class="card-title" style="color:#b45309;"><span class="icon"><i data-lucide="shield" class="lc"></i></span> Assurance parametrique</div>'
       + '<p style="font-size:12px;color:#92400e;margin-bottom:8px;">'
       + 'Si le NDVI de cette parcelle descend en dessous de <b>0.3</b> pendant 2 mesures consecutives, '
       + 'vous serez automatiquement eligible a une indemnisation.</p>'
@@ -307,7 +307,7 @@
 
     // Delete parcel
     html += '<button style="width:100%;padding:10px;border:1px solid #e76f51;color:#e76f51;background:linear-gradient(180deg,#fff,#FAFCFB);border-radius:8px;font-size:12px;cursor:pointer;" '
-      + 'onclick="if(confirm(\'Supprimer cette parcelle ?\')) { AgroPrix.ndvi.deleteParcel(' + idx + '); }">🗑️ Supprimer cette parcelle</button>';
+      + 'onclick="if(confirm(\'Supprimer cette parcelle ?\')) { AgroPrix.ndvi.deleteParcel(' + idx + '); }"><i data-lucide="trash-2" class="lc"></i> Supprimer cette parcelle</button>';
 
     container.innerHTML = html;
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -323,7 +323,7 @@
     var html = '<button class="action-btn" onclick="AgroPrix.ndvi.render()" style="font-size:12px;margin-bottom:16px;">← Retour</button>';
 
     html += '<div class="card" style="padding:16px;">'
-      + '<div class="card-title"><span class="icon">➕</span> Enregistrer une parcelle</div>'
+      + '<div class="card-title"><span class="icon"><i data-lucide="plus-circle" class="lc"></i></span> Enregistrer une parcelle</div>'
       + '<p style="font-size:12px;color:var(--text-light);margin-bottom:12px;">Enregistrez votre parcelle pour recevoir le suivi NDVI satellite automatique.</p>';
 
     // Name
@@ -365,7 +365,7 @@
       + 'style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;box-sizing:border-box;">'
       + '</div>'
       + '<button type="button" style="margin-top:6px;font-size:11px;padding:6px 12px;border:1px solid var(--primary);color:var(--primary);background:linear-gradient(180deg,#fff,#FAFCFB);border-radius:6px;cursor:pointer;" '
-      + 'onclick="AgroPrix.ndvi.getGPS()">📍 Utiliser ma position actuelle</button>'
+      + 'onclick="AgroPrix.ndvi.getGPS()"><i data-lucide="map-pin" class="lc"></i> Utiliser ma position actuelle</button>'
       + '</div>';
 
     // Submit

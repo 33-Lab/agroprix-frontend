@@ -24,9 +24,9 @@
   var BADGES = [
     { min: 800, label: 'Excellent',       emoji: '<i data-lucide="star" class="lc"></i>', color: '#2D6A4F', bg: '#D8F3DC' },
     { min: 600, label: 'Bon',             emoji: '<i data-lucide="check-circle" class="lc"></i>', color: '#40916C', bg: '#E8F5E9' },
-    { min: 400, label: 'Moyen',           emoji: '🔶', color: '#E8862A', bg: '#FFF8E1' },
-    { min: 200, label: 'En construction', emoji: '🔸', color: '#e76f51', bg: '#FFF3E0' },
-    { min: 0,   label: 'Nouveau',         emoji: '⬜', color: '#999',    bg: '#F5F5F5' }
+    { min: 400, label: 'Moyen',           emoji: '◆', color: '#E8862A', bg: '#FFF8E1' },
+    { min: 200, label: 'En construction', emoji: '◆', color: '#e76f51', bg: '#FFF3E0' },
+    { min: 0,   label: 'Nouveau',         emoji: '○', color: '#999',    bg: '#F5F5F5' }
   ];
 
   // =========================================================================

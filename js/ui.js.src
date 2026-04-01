@@ -1,8 +1,95 @@
 // AgroPrix UI Module
 (function(AP) {
 
+  // =========================================================================
+  // Plan Access Control
+  // =========================================================================
+
+  // Email de Kolawolé Ogounchi (Ambassadeur Commercial) — accès illimité
+  var KOLA_EMAIL = 'kolawoleogounchi@outlook.com';
+
+  // Niveaux de plan : 0=Gratuit/Démo | 1=Starter | 2=Pro | 3=Expert | 99=Admin
+  var PLAN_LEVELS = {
+    'free': 0, 'demo': 0, 'gratuit': 0,
+    'Starter': 1, 'starter': 1,
+    'Pro': 2, 'pro': 2,
+    'Expert': 3, 'expert': 3,
+    'admin': 99, 'unlimited': 99
+  };
+
+  // Niveau minimum requis par vue
+  var VIEW_MIN_PLAN = {
+    // Gratuit (0) — toujours accessible
+    'analyse': 0, 'dashboard': 0, 'params': 0, 'offres': 0,
+    // Starter (1)
+    'historique': 1, 'carte': 1,
+    'negoce': 1, 'opportunites': 1,
+    'production': 1, 'conseilsProducteur': 1,
+    'inputs': 1, 'market': 1,
+    // Pro (2)
+    'financing': 2, 'gpsFinancement': 2,
+    'scoring': 2, 'ndvi': 2,
+    'hevea': 2, 'plantain': 2,
+    // Expert (3)
+    'export': 3, 'conformite': 3
+  };
+
+  var PLAN_LABELS = {
+    0: 'Gratuit',
+    1: 'Starter — 990 FCFA/mois',
+    2: 'Pro — 2 900 FCFA/mois',
+    3: 'Expert — 14 900 FCFA/mois'
+  };
+
+  var PLAN_UPGRADE_TARGET = {
+    1: function() { souscrirePlan('Starter', 990); },
+    2: function() { souscrirePlan('Pro', 2900); },
+    3: function() { souscrirePlan('Expert', 14900); }
+  };
+
+  function getUserPlanLevel() {
+    var user = AP.auth ? AP.auth.getUser() : null;
+    if (!user) return 0;
+    // Kola : accès illimité
+    if (user.email && user.email.toLowerCase() === KOLA_EMAIL.toLowerCase()) return 99;
+    if (user.role === 'admin') return 99;
+    // Lire le plan depuis user.plan (abonnement) ou user.role (rôle)
+    var planKey = user.plan || user.role || 'free';
+    return PLAN_LEVELS[planKey] !== undefined ? PLAN_LEVELS[planKey] : 0;
+  }
+
+  function showUpgradeModal(requiredLevel) {
+    var planLabel = PLAN_LABELS[requiredLevel] || 'Plan supérieur';
+    var modal = document.getElementById('upgradeModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'upgradeModal';
+      modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+      document.body.appendChild(modal);
+    }
+    modal.innerHTML = '<div style="background:#fff;border-radius:20px;padding:28px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);">'
+      + '<div style="font-size:48px;margin-bottom:8px;"><i data-lucide="lock" style="width:48px;height:48px;color:#E8862A;display:inline-block;"></i></div>'
+      + '<h3 style="margin:0 0 8px;color:#1B4332;font-size:20px;">Module Réservé</h3>'
+      + '<p style="font-size:14px;color:#666;margin:0 0 20px;">Ce module nécessite le <strong style="color:#2D6A4F;">' + planLabel + '</strong>.</p>'
+      + '<button onclick="showView(\'offres\');document.getElementById(\'upgradeModal\').style.display=\'none\';" style="width:100%;padding:14px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;">'
+      + '<i data-lucide="trending-up" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> Voir nos offres</button>'
+      + '<button onclick="document.getElementById(\'upgradeModal\').style.display=\'none\';" style="width:100%;padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:12px;font-size:14px;cursor:pointer;">Annuler</button>'
+      + '</div>';
+    modal.style.display = 'flex';
+    if (window.lucide) { try { window.lucide.createIcons(); } catch(e) {} }
+  }
+
   // Show a specific view
   function showView(viewId, el) {
+    // --- Access control ---
+    var minLevel = VIEW_MIN_PLAN[viewId];
+    if (minLevel === undefined) minLevel = 0; // vue non listée = libre
+    var userLevel = getUserPlanLevel();
+    if (userLevel < minLevel) {
+      showUpgradeModal(minLevel);
+      return; // Bloquer la navigation
+    }
+
     document.querySelectorAll('.view-container').forEach(function(v) { v.classList.remove('show'); v.style.display = 'none'; });
     var targetId = AP.viewIdMap[viewId] || 'viewAnalyse';
     var target = document.getElementById(targetId);

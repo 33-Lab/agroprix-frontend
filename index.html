@@ -11,7 +11,7 @@
     onerror="console.log('[AgroPrix] Plausible not loaded (OK in dev)')"></script>
 
   <!-- Security: CSP -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://plausible.io https://js.sentry-cdn.com https://cdn.kkiapay.me; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdn.kkiapay.me; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.qrserver.com https://api.open-meteo.com https://agromonitoring.com https://*.railway.app https://*.vercel.app https://plausible.io https://*.sentry.io https://api.kkiapay.me https://sandbox.kkiapay.me; frame-src https://cdn.kkiapay.me https://api.kkiapay.me;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://plausible.io https://cdn.kkiapay.me; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdn.kkiapay.me; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.qrserver.com https://api.open-meteo.com https://agromonitoring.com https://*.railway.app https://*.vercel.app https://plausible.io https://api.kkiapay.me https://sandbox.kkiapay.me; frame-src https://cdn.kkiapay.me https://api.kkiapay.me;">
   <meta name="referrer" content="strict-origin-when-cross-origin">
 
   <!-- PWA Meta -->
@@ -31,7 +31,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <!-- Lucide Icons (SVG professionnelles) -->
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
 
   <!-- KKiaPay — Paiement Mobile Money (MTN MoMo, Moov, Carte) -->
   <script src="https://cdn.kkiapay.me/k.js"></script>
@@ -134,15 +134,15 @@
 <div id="appContainer">
 
 <!-- ═══ SIDEBAR (Desktop) ═══ -->
-<button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu()"><span></span></button>
+<button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Ouvrir le menu" aria-expanded="false"><span></span></button>
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileMenu()"></div>
 
-<aside class="sidebar" id="sidebarEl">
+<aside class="sidebar" id="sidebarEl" role="complementary" aria-label="Menu latéral">
   <div class="sidebar-logo">
     <h1>Agro<span>Prix</span></h1>
     <p>by 33 Lab</p>
   </div>
-  <nav class="sidebar-nav">
+  <nav class="sidebar-nav" role="navigation" aria-label="Navigation principale desktop">
     <!-- ANALYSE -->
     <div class="nav-section-label">ANALYSE</div>
     <a class="active" id="navAnalyse" onclick="showView('analyse', this)"><span class="nav-icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Nouvelle analyse</a>
@@ -173,6 +173,11 @@
     <a id="navFinancing" onclick="showView('financing', this)"><span class="nav-icon"><i data-lucide="coins" class="lc"></i></span> GPS Financement</a>
     <a id="navNdvi" onclick="showView('ndvi', this)"><span class="nav-icon"><i data-lucide="satellite" class="lc"></i></span> Sante Parcelle</a>
     <a id="navScoring" onclick="showView('scoring', this)"><span class="nav-icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Mon Score Credit</a>
+
+    <!-- FILIERES -->
+    <div class="nav-section-label">FILIERES <span class="pro-badge">PRO</span></div>
+    <a id="navHevea" onclick="showView('hevea', this)"><span class="nav-icon"><i data-lucide="tree-pine" class="lc"></i></span> Hevea Pro</a>
+    <a id="navPlantain" onclick="showView('plantain', this)"><span class="nav-icon"><i data-lucide="banana" class="lc"></i></span> Plantain Pro</a>
 
     <!-- MARKET -->
     <div class="nav-section-label">MARKET</div>
@@ -252,18 +257,29 @@
               </optgroup>
               <optgroup label="Legumineuses">
                 <option value="niebe">Niebe</option>
+                <option value="arachide">Arachide</option>
               </optgroup>
               <optgroup label="Maraichers">
                 <option value="tomate">Tomate</option>
                 <option value="oignon">Oignon</option>
-              </optgroup>
-              <optgroup label="Export">
-                <option value="cajou">Cajou</option>
-                <option value="arachide">Arachide</option>
+                <option value="piment">Piment</option>
+                <option value="gombo">Gombo</option>
               </optgroup>
               <optgroup label="Tubercules">
                 <option value="manioc">Manioc</option>
                 <option value="igname">Igname</option>
+                <option value="plantain">Plantain</option>
+              </optgroup>
+              <optgroup label="Cultures de rente">
+                <option value="cacao">Cacao</option>
+                <option value="cafe">Cafe</option>
+                <option value="cajou">Cajou (Anacarde)</option>
+                <option value="coton">Coton</option>
+                <option value="hevea">Hevea (Caoutchouc)</option>
+                <option value="sesame">Sesame</option>
+                <option value="karite">Karite</option>
+                <option value="mangue">Mangue</option>
+                <option value="ananas">Ananas</option>
               </optgroup>
             </select>
           </div>
@@ -303,7 +319,7 @@
               <div class="toggle-switch active" id="togForecast" onclick="toggleSwitch(this)"></div>
             </div>
             <div class="toggle-row">
-              <label>🌧 Donnees meteo</label>
+              <label><i data-lucide="cloud-rain" class="lc"></i> Donnees meteo</label>
               <div class="toggle-switch active" id="togMeteo" onclick="toggleSwitch(this)"></div>
             </div>
           </div>
@@ -383,40 +399,7 @@
       <div class="card" style="margin-bottom:16px;">
         <div style="font-size:18px;font-weight:800;color:#333;margin-bottom:16px;"><i data-lucide="target" class="lc"></i> Opportunites</div>
 
-        <!-- Opportunite 1 -->
-        <div style="border-left:4px solid #E8862A;padding:14px 16px;margin-bottom:14px;border-radius:0 16px 16px 0;background:#fff;">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-            <div style="font-size:18px;font-weight:800;color:#333;">Mais</div>
-            <span style="background:#D8F3DC;color:#2D6A4F;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:800;">+23.1%</span>
-          </div>
-          <div style="font-size:14px;color:#333;margin-top:4px;">Glazoue → Dantokpa (Cotonou)</div>
-          <div style="font-size:13px;color:#666;margin-top:4px;">Achat: 242 CFA/kg · Vente estimee: 298 CFA/kg</div>
-          <div style="font-size:12px;color:#2D6A4F;font-style:italic;margin-top:6px;">Deficit d'approvisionnement a Cotonou, stocks Glazoue abondants post-recolte</div>
-        </div>
-
-        <!-- Opportunite 2 -->
-        <div style="border-left:4px solid #E8862A;padding:14px 16px;margin-bottom:14px;border-radius:0 16px 16px 0;background:#fff;">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-            <div style="font-size:18px;font-weight:800;color:#333;">Niebe</div>
-            <span style="background:#D8F3DC;color:#2D6A4F;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:800;">+21%</span>
-          </div>
-          <div style="font-size:14px;color:#333;margin-top:4px;">Malanville → Bohicon</div>
-          <div style="font-size:13px;color:#666;margin-top:4px;">Achat: 395 CFA/kg · Vente estimee: 478 CFA/kg</div>
-          <div style="font-size:12px;color:#2D6A4F;font-style:italic;margin-top:6px;">Arrivage frontalier depuis le Niger, prix bas a Malanville. Demande forte au sud.</div>
-        </div>
-
-        <!-- Opportunite 3 -->
-        <div style="border-left:4px solid #E8862A;padding:14px 16px;border-radius:0 16px 16px 0;background:#fff;">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-            <div style="font-size:18px;font-weight:800;color:#333;">Soja</div>
-            <span style="background:#D8F3DC;color:#2D6A4F;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:800;">+15.3%</span>
-          </div>
-          <div style="font-size:14px;color:#333;margin-top:4px;">Parakou → Dantokpa (Cotonou)</div>
-          <div style="font-size:13px;color:#666;margin-top:4px;">Achat: 330 CFA/kg · Vente estimee: 380 CFA/kg</div>
-          <div style="font-size:12px;color:#2D6A4F;font-style:italic;margin-top:6px;">Forte demande des provenderies au sud, stocks disponibles au nord.</div>
-        </div>
-
-        <div id="opportunitiesGrid" style="display:none;"></div>
+        <div id="opportunitiesGrid"></div>
       </div>
 
       <!-- Dernieres Transactions (style guide: table propre) -->
@@ -425,12 +408,7 @@
         <div style="overflow-x:auto;">
           <table class="data-table">
             <thead><tr><th>Date</th><th>Culture</th><th>Marche</th><th>Qte</th><th>Prix achat</th></tr></thead>
-            <tbody id="transactionsBody">
-              <tr><td>14/03/2026</td><td>Mais</td><td>Dantokpa</td><td>2 500 kg</td><td>245 FCFA/kg</td></tr>
-              <tr><td>12/03/2026</td><td>Niebe</td><td>Bohicon</td><td>1 800 kg</td><td>410 FCFA/kg</td></tr>
-              <tr><td>10/03/2026</td><td>Sorgho</td><td>Parakou</td><td>3 200 kg</td><td>195 FCFA/kg</td></tr>
-              <tr><td>08/03/2026</td><td>Mais</td><td>Glazoue</td><td>1 500 kg</td><td>252 FCFA/kg</td></tr>
-            </tbody>
+            <tbody id="transactionsBody"></tbody>
           </table>
         </div>
       </div>
@@ -441,11 +419,11 @@
         <div class="form-grid">
           <div class="form-group">
             <label class="form-label">Marche de depart</label>
-            <select><option>-- Choisir --</option><option>Dantokpa (Cotonou)</option><option>Bohicon</option><option>Parakou</option><option>Malanville</option><option>Glazoue</option></select>
+            <select id="transportDepart"><option>-- Choisir --</option></select>
           </div>
           <div class="form-group">
             <label class="form-label">Marche d'arrivee</label>
-            <select><option>-- Choisir --</option><option>Dantokpa (Cotonou)</option><option>Bohicon</option><option>Parakou</option><option>Malanville</option><option>Glazoue</option></select>
+            <select id="transportArrivee"><option>-- Choisir --</option></select>
           </div>
           <div class="form-group">
             <label class="form-label">Quantite (tonnes)</label>
@@ -518,14 +496,30 @@
           <div class="form-group">
             <label class="form-label">Culture</label>
             <select id="prodCulture">
-              <option value="tomate">Tomate</option>
-              <option value="mais">Mais</option>
-              <option value="oignon">Oignon</option>
-              <option value="niebe">Niebe</option>
-              <option value="manioc">Manioc</option>
-              <option value="igname">Igname</option>
-              <option value="sorgho">Sorgho</option>
-              <option value="mil">Mil</option>
+              <optgroup label="Cereales">
+                <option value="mais">Mais</option>
+                <option value="mil">Mil</option>
+                <option value="sorgho">Sorgho</option>
+              </optgroup>
+              <optgroup label="Maraichers">
+                <option value="tomate">Tomate</option>
+                <option value="oignon">Oignon</option>
+                <option value="piment">Piment</option>
+              </optgroup>
+              <optgroup label="Vivriers">
+                <option value="manioc">Manioc</option>
+                <option value="igname">Igname</option>
+                <option value="niebe">Niebe</option>
+                <option value="arachide">Arachide</option>
+                <option value="plantain">Plantain</option>
+              </optgroup>
+              <optgroup label="Cultures de rente">
+                <option value="cacao">Cacao</option>
+                <option value="cajou">Anacarde (Cajou)</option>
+                <option value="coton">Coton</option>
+                <option value="hevea">Hevea</option>
+                <option value="ananas">Ananas</option>
+              </optgroup>
             </select>
           </div>
           <div class="form-group">
@@ -589,11 +583,12 @@
           <table class="data-table">
             <thead><tr><th>Produit</th><th>Prix local</th><th>Prix FOB</th><th>Cours mondial</th><th>Ecart</th><th>Tendance</th></tr></thead>
             <tbody>
-              <tr><td>Cajou (WW320)</td><td>750</td><td>1 250 USD/t</td><td>1 380 USD/t</td><td class="positive">+10.4%</td><td><span class="trend-badge hausse">hausse</span></td></tr>
-              <tr><td>Cacao</td><td>1 850</td><td>3 200 USD/t</td><td>8 450 USD/t</td><td class="positive">+164%</td><td><span class="trend-badge hausse">hausse</span></td></tr>
-              <tr><td>Coton fibre</td><td>320</td><td>1 680 USD/t</td><td>1 750 USD/t</td><td class="positive">+4.2%</td><td><span class="trend-badge stable">stable</span></td></tr>
-              <tr><td>Sesame</td><td>580</td><td>1 450 USD/t</td><td>1 620 USD/t</td><td class="positive">+11.7%</td><td><span class="trend-badge hausse">hausse</span></td></tr>
-              <tr><td>Arachide</td><td>450</td><td>980 USD/t</td><td>1 050 USD/t</td><td class="positive">+7.1%</td><td><span class="trend-badge stable">stable</span></td></tr>
+              <tr><td>Cajou (WW320)</td><td>425</td><td>1 350 USD/t</td><td>1 480 USD/t</td><td class="positive">+9.6%</td><td><span class="trend-badge hausse">hausse</span></td></tr>
+              <tr><td>Cacao</td><td>1 200</td><td>2 900 USD/t</td><td>3 100 USD/t</td><td class="positive">+6.9%</td><td><span class="trend-badge baisse">baisse</span></td></tr>
+              <tr><td>Cafe</td><td>1 700</td><td>4 200 USD/t</td><td>4 850 USD/t</td><td class="positive">+15.5%</td><td><span class="trend-badge hausse">hausse</span></td></tr>
+              <tr><td>Coton fibre</td><td>310</td><td>1 620 USD/t</td><td>1 680 USD/t</td><td class="positive">+3.7%</td><td><span class="trend-badge stable">stable</span></td></tr>
+              <tr><td>Sesame</td><td>535</td><td>1 520 USD/t</td><td>1 680 USD/t</td><td class="positive">+10.5%</td><td><span class="trend-badge hausse">hausse</span></td></tr>
+              <tr><td>Caoutchouc</td><td>478</td><td>1 970 USD/t</td><td>1 970 USD/t</td><td class="positive">SICOM</td><td><span class="trend-badge hausse">hausse</span></td></tr>
             </tbody>
           </table>
         </div>
@@ -811,7 +806,7 @@
       <div class="card" style="margin-bottom:14px;border-left:4px solid #2D6A4F;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div>
-            <span style="background:#D8F3DC;color:#2D6A4F;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;">🍌 PLANTAIN PRO</span>
+            <span style="background:#D8F3DC;color:#2D6A4F;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;"><i data-lucide="banana" class="lc"></i> PLANTAIN PRO</span>
             <div style="font-size:24px;font-weight:800;color:#333;margin-top:8px;">1 490 FCFA<span style="font-size:13px;color:#999;font-weight:500;">/mois</span></div>
           </div>
         </div>
@@ -821,14 +816,14 @@
           <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Guide maladies (Cercosporiose)</div>
           <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Prix saisonniers plantain</div>
         </div>
-        <button onclick="souscrirePlan('Plantain Pro', 1490)" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Choisir Plantain Pro</button>
+        <button onclick="showView('plantain')" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Acceder a Plantain Pro</button>
       </div>
 
       <!-- Plan Hevea Pro -->
       <div class="card" style="margin-bottom:14px;border-left:4px solid #2D6A4F;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div>
-            <span style="background:#D8F3DC;color:#2D6A4F;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;">🌳 HEVEA PRO</span>
+            <span style="background:#D8F3DC;color:#2D6A4F;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;"><i data-lucide="tree-pine" class="lc"></i> HEVEA PRO</span>
             <div style="font-size:24px;font-weight:800;color:#333;margin-top:8px;">1 490 FCFA<span style="font-size:13px;color:#999;font-weight:500;">/mois</span></div>
           </div>
         </div>
@@ -838,14 +833,14 @@
           <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Guide maladies (Fomes, TPD)</div>
           <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Calculateur rendement par clone</div>
         </div>
-        <button onclick="souscrirePlan('Hevea Pro', 1490)" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Choisir Hevea Pro</button>
+        <button onclick="showView('hevea')" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Acceder a Hevea Pro</button>
       </div>
 
       <!-- BD (guides) -->
       <div class="card" style="margin-bottom:14px;border-left:4px solid #E8862A;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div>
-            <span style="background:#FFF3E0;color:#E8862A;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;">📚 BD GUIDES</span>
+            <span style="background:#FFF3E0;color:#E8862A;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;"><i data-lucide="book-open" class="lc"></i> BD GUIDES</span>
             <div style="font-size:24px;font-weight:800;color:#333;margin-top:8px;">500 - 1 500 FCFA<span style="font-size:13px;color:#999;font-weight:500;">/guide</span></div>
           </div>
         </div>
@@ -873,7 +868,7 @@
           <div style="padding:6px 0;border-bottom:1px solid #e0e8e3;"><i data-lucide="check-circle" class="lc"></i> Donnees aggregees par region</div>
           <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Support dedie + SLA</div>
         </div>
-        <button style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">📧 Demander un devis</button>
+        <button style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;"><i data-lucide="mail" class="lc"></i> Demander un devis</button>
       </div>
     </div>
 
@@ -922,7 +917,7 @@
 
       <!-- V6: Legal Section -->
       <div class="card">
-        <div class="card-title"><span class="icon">📜</span> Legal</div>
+        <div class="card-title"><span class="icon"><i data-lucide="file-text" class="lc"></i></span> Legal</div>
         <div style="padding:8px 0;">
           <p style="margin-bottom:8px;"><a href="#" onclick="AgroPrix.cgu.forceShow();return false;" style="font-size:13px;color:var(--primary);font-weight:600;"><i data-lucide="clipboard-list" class="lc"></i> Conditions Generales d'Utilisation (CGU)</a></p>
           <p style="margin-bottom:8px;"><a href="#" onclick="var m=document.getElementById('cgvModal');m.style.display='flex';m.style.alignItems='center';m.style.justifyContent='center';return false;" style="font-size:13px;color:var(--primary);font-weight:600;"><i data-lucide="file" class="lc"></i> Conditions Generales de Vente (CGV)</a></p>
@@ -985,7 +980,7 @@
       </div>
 
       <div class="card">
-        <div class="card-title"><span class="icon">ℹ️</span> A propos</div>
+        <div class="card-title"><span class="icon"><i data-lucide="info" class="lc"></i></span> A propos</div>
         <p style="font-size:13px;color:var(--text-light);line-height:1.6;">
           AgroPrix est une plateforme d'intelligence des prix agricoles pour l'Afrique de l'Ouest (UEMOA).<br>
           Developpe par <strong>33 Lab</strong> — Cotonou, Benin.<br>
@@ -999,12 +994,12 @@
     <div class="view-container" id="viewProprietaire" style="display:none;">
       <div class="page-content">
         <div class="card" style="padding:20px;margin-bottom:20px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border-radius:16px;">
-          <h2 style="font-size:20px;font-weight:800;margin-bottom:4px;">🏡 Espace Proprietaire</h2>
+          <h2 style="font-size:20px;font-weight:800;margin-bottom:4px;"><i data-lucide="home" class="lc"></i> Espace Proprietaire</h2>
           <p style="font-size:13px;opacity:0.8;">Valorisez votre terrain — decouvrez son potentiel agricole</p>
         </div>
 
         <div class="card" style="padding:20px;border-radius:14px;margin-bottom:16px;">
-          <div class="card-title" style="font-size:16px;font-weight:700;">🌾 Simulateur de potentiel</div>
+          <div class="card-title" style="font-size:16px;font-weight:700;"><i data-lucide="wheat" class="lc"></i> Simulateur de potentiel</div>
           <p style="font-size:12px;color:var(--text-light);margin-bottom:16px;">Entrez les informations de votre parcelle pour decouvrir les cultures les plus rentables.</p>
 
           <div style="margin-bottom:12px;">
@@ -1052,12 +1047,107 @@
         </div>
 
         <div class="card" style="padding:20px;border-radius:14px;margin-bottom:16px;">
-          <div class="card-title" style="font-size:16px;font-weight:700;">👨‍🌾 Trouver un technicien dans ma zone</div>
+          <div class="card-title" style="font-size:16px;font-weight:700;"><i data-lucide="user-check" class="lc"></i> Trouver un technicien dans ma zone</div>
           <p style="font-size:12px;color:var(--text-light);margin-bottom:12px;">Des techniciens agricoles qualifies peuvent vous accompagner dans la mise en valeur de votre terrain.</p>
           <div id="techniciensList"></div>
           <button onclick="chercherTechniciens()" style="width:100%;padding:14px;background:linear-gradient(135deg,#E8862A,#F5A623);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;">
-            📞 Voir les techniciens disponibles
+            <i data-lucide="phone" class="lc"></i> Voir les techniciens disponibles
           </button>
+        </div>
+      </div>
+    </div>
+
+  <!-- ═══ VIEW: HEVEA PRO ═══ -->
+    <div class="view-container" id="viewHevea" style="display:none;">
+      <div class="page-content">
+        <!-- Header -->
+        <div class="card" style="padding:20px;margin-bottom:16px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border-radius:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <h2 style="font-size:20px;font-weight:800;margin-bottom:4px;">Hevea Pro</h2>
+              <p style="font-size:12px;opacity:0.8;">Votre exploitation heveicole intelligente</p>
+            </div>
+            <div style="background:rgba(255,255,255,0.15);padding:6px 12px;border-radius:20px;font-size:10px;font-weight:700;">EUDR 2026</div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div style="display:flex;gap:4px;margin-bottom:16px;background:#f0f0f0;border-radius:12px;padding:4px;">
+          <button class="hevea-tab active" data-tab="dashboard" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;background:#fff;color:#1B4332;">Dashboard</button>
+          <button class="hevea-tab" data-tab="journal" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#666;">Journal</button>
+          <button class="hevea-tab" data-tab="marche" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#666;">Marche</button>
+          <button class="hevea-tab" data-tab="dossier" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#666;">Mon Dossier</button>
+        </div>
+
+        <!-- Sections -->
+        <div id="hevea-dashboard" class="hevea-section" style="display:block;"></div>
+        <div id="hevea-journal" class="hevea-section" style="display:none;"></div>
+        <div id="hevea-marche" class="hevea-section" style="display:none;"></div>
+        <div id="hevea-dossier" class="hevea-section" style="display:none;"></div>
+      </div>
+
+      <!-- Assistant IA flottant -->
+      <button onclick="AgroPrix.heveaToggleIA()" style="position:fixed;bottom:80px;right:16px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;box-shadow:0 4px 16px rgba(45,106,79,0.4);font-size:22px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;"><i data-lucide="message-circle" class="lc"></i></button>
+
+      <!-- Panel IA -->
+      <div id="hevea-ia-panel" style="display:none;position:fixed;bottom:145px;right:16px;left:16px;max-width:400px;margin-left:auto;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);z-index:151;flex-direction:column;max-height:50vh;overflow:hidden;">
+        <div style="padding:14px 16px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border-radius:16px 16px 0 0;">
+          <div style="font-size:14px;font-weight:700;">Assistant Agronomique</div>
+          <div style="font-size:10px;opacity:0.8;">Forme sur les donnees CNRA, CIRAD, APROMAC</div>
+        </div>
+        <div id="hevea-ia-output" style="padding:12px 16px;overflow-y:auto;flex:1;max-height:200px;">
+          <div style="font-size:12px;color:#666;">Posez une question sur votre exploitation heveicole...</div>
+        </div>
+        <div style="padding:10px 12px;border-top:1px solid #f0f0f0;display:flex;gap:8px;">
+          <input type="text" id="hevea-ia-input" placeholder="Ex: Quel clone choisir ?" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:13px;font-family:inherit;" onkeypress="if(event.key==='Enter')AgroPrix.heveaAskIA()">
+          <button onclick="AgroPrix.heveaAskIA()" style="padding:10px 16px;background:#2D6A4F;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Envoyer</button>
+        </div>
+      </div>
+    </div>
+
+  <!-- ═══ VIEW: PLANTAIN PRO ═══ -->
+    <div class="view-container" id="viewPlantain" style="display:none;">
+      <div class="page-content">
+        <div class="card" style="padding:20px;margin-bottom:16px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border-radius:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <h2 style="font-size:20px;font-weight:800;margin-bottom:4px;">Plantain Pro</h2>
+              <p style="font-size:12px;opacity:0.8;">Votre exploitation de plantain intelligente</p>
+            </div>
+            <div style="background:rgba(255,255,255,0.15);padding:6px 12px;border-radius:20px;font-size:10px;font-weight:700;">CONTRE-SAISON</div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div style="display:flex;gap:4px;margin-bottom:16px;background:#f0f0f0;border-radius:12px;padding:4px;">
+          <button class="plantain-tab active" data-tab="dashboard" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;background:#fff;color:#5B3A1A;">Dashboard</button>
+          <button class="plantain-tab" data-tab="journal" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#666;">Journal</button>
+          <button class="plantain-tab" data-tab="marche" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#666;">Marche</button>
+          <button class="plantain-tab" data-tab="dossier" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#666;">Mon Dossier</button>
+        </div>
+
+        <!-- Sections -->
+        <div id="plantain-dashboard" class="plantain-section" style="display:block;"></div>
+        <div id="plantain-journal" class="plantain-section" style="display:none;"></div>
+        <div id="plantain-marche" class="plantain-section" style="display:none;"></div>
+        <div id="plantain-dossier" class="plantain-section" style="display:none;"></div>
+      </div>
+
+      <!-- Assistant IA flottant -->
+      <button onclick="AgroPrix.plantainToggleIA()" style="position:fixed;bottom:80px;right:16px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;box-shadow:0 4px 16px rgba(91,58,26,0.4);font-size:22px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;"><i data-lucide="message-circle" class="lc"></i></button>
+
+      <!-- Panel IA -->
+      <div id="plantain-ia-panel" style="display:none;position:fixed;bottom:145px;right:16px;left:16px;max-width:400px;margin-left:auto;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);z-index:151;flex-direction:column;max-height:50vh;overflow:hidden;">
+        <div style="padding:14px 16px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border-radius:16px 16px 0 0;">
+          <div style="font-size:14px;font-weight:700;">Assistant Agronomique</div>
+          <div style="font-size:10px;opacity:0.8;">Forme sur les donnees CNRA, CIRAD, FAO, RONGEAD</div>
+        </div>
+        <div id="plantain-ia-output" style="padding:12px 16px;overflow-y:auto;flex:1;max-height:200px;">
+          <div style="font-size:12px;color:#666;">Posez une question sur votre exploitation de plantain...</div>
+        </div>
+        <div style="padding:10px 12px;border-top:1px solid #f0f0f0;display:flex;gap:8px;">
+          <input type="text" id="plantain-ia-input" placeholder="Ex: Comment lutter contre la Sigatoka ?" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:13px;font-family:inherit;" onkeypress="if(event.key==='Enter')AgroPrix.plantainAskIA()">
+          <button onclick="AgroPrix.plantainAskIA()" style="padding:10px 16px;background:#5B3A1A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Envoyer</button>
         </div>
       </div>
     </div>
@@ -1091,22 +1181,32 @@
             <div style="font-size:11px;color:var(--text-light);">Offres & Demandes</div>
           </div>
           <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('inputs')">
-            <div style="font-size:32px;margin-bottom:8px;">🌿</div>
+            <div style="font-size:32px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;"><i data-lucide="leaf" class="lc" style="width:32px;height:32px;color:#2D6A4F;"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Prix Intrants</div>
             <div style="font-size:11px;color:var(--text-light);">Engrais, semences</div>
           </div>
           <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('offres')">
-            <div style="font-size:32px;margin-bottom:8px;">💎</div>
+            <div style="font-size:32px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;"><i data-lucide="gem" class="lc" style="width:32px;height:32px;color:#E8862A;"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Nos Offres</div>
             <div style="font-size:11px;color:var(--text-light);">Plans & Tarifs</div>
           </div>
+          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('hevea')">
+            <div style="font-size:32px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;"><i data-lucide="tree-pine" class="lc" style="width:32px;height:32px;color:#2D6A4F;"></i></div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);">Hevea Pro</div>
+            <div style="font-size:11px;color:var(--text-light);">EUDR + Saignee + Prix</div>
+          </div>
+          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('plantain')">
+            <div style="font-size:32px;margin-bottom:8px;">🍌</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);">Plantain Pro</div>
+            <div style="font-size:11px;color:var(--text-light);">Recolte + Marche + IA</div>
+          </div>
           <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('proprietaire')">
-            <div style="font-size:32px;margin-bottom:8px;">🏡</div>
+            <div style="font-size:32px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;"><i data-lucide="home" class="lc" style="width:32px;height:32px;color:#1B4332;"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Proprietaire</div>
             <div style="font-size:11px;color:var(--text-light);">Valoriser ma terre</div>
           </div>
           <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('params')">
-            <div style="font-size:32px;margin-bottom:8px;"><i data-lucide="settings" class="lc"></i>️</div>
+            <div style="font-size:32px;margin-bottom:8px;"><i data-lucide="settings" class="lc"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Parametres</div>
             <div style="font-size:11px;color:var(--text-light);">Profil & compte</div>
           </div>
@@ -1118,12 +1218,12 @@
 </div><!-- /.main -->
 
 <!-- ═══ BOTTOM NAV (Mobile - V6: 5 tabs) ═══ -->
-<nav class="bottom-nav" id="bottomNav">
-  <a class="active" onclick="showView('analyse', this)"><span><i data-lucide="bar-chart-3" class="lc"></i></span><span>Analyse</span></a>
-  <a onclick="showView('negoce', this)"><span><i data-lucide="book-open" class="lc"></i></span><span>Negoce</span></a>
-  <a onclick="showView('market', this)"><span><i data-lucide="handshake" class="lc"></i></span><span>Marche</span></a>
-  <a onclick="showView('production', this)"><span><i data-lucide="sprout" class="lc"></i></span><span>Produc.</span></a>
-  <a onclick="toggleMoreMenu()" id="moreBtn"><span>⊕</span><span>Plus</span></a>
+<nav class="bottom-nav" id="bottomNav" role="navigation" aria-label="Navigation principale">
+  <a class="active" onclick="showView('analyse', this)" aria-label="Analyse des prix"><span><i data-lucide="bar-chart-3" class="lc"></i></span><span>Analyse</span></a>
+  <a onclick="showView('negoce', this)" aria-label="Carnet de négoce"><span><i data-lucide="book-open" class="lc"></i></span><span>Negoce</span></a>
+  <a onclick="showView('market', this)" aria-label="Place de marché"><span><i data-lucide="handshake" class="lc"></i></span><span>Marche</span></a>
+  <a onclick="showView('production', this)" aria-label="Conseils production"><span><i data-lucide="sprout" class="lc"></i></span><span>Produc.</span></a>
+  <a onclick="toggleMoreMenu()" id="moreBtn" aria-label="Plus de modules" aria-haspopup="true"><span>⊕</span><span>Plus</span></a>
 </nav>
 
 <!-- More Menu Popup -->
@@ -1145,12 +1245,20 @@
       <div style="width:50px;height:50px;border-radius:14px;background:#F3E5F5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="flask-conical" class="lc"></i></div>
       <div style="font-size:11px;font-weight:600;">Intrants</div>
     </div>
+    <div style="text-align:center;cursor:pointer;" onclick="showView('hevea');closeMoreMenu()">
+      <div style="width:50px;height:50px;border-radius:14px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="tree-pine" class="lc" style="width:24px;height:24px;color:#2D6A4F;"></i></div>
+      <div style="font-size:11px;font-weight:600;">Hevea Pro</div>
+    </div>
+    <div style="text-align:center;cursor:pointer;" onclick="showView('plantain');closeMoreMenu()">
+      <div style="width:50px;height:50px;border-radius:14px;background:#FFF3E0;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;">🍌</div>
+      <div style="font-size:11px;font-weight:600;">Plantain Pro</div>
+    </div>
     <div style="text-align:center;cursor:pointer;" onclick="showView('export');closeMoreMenu()">
       <div style="width:50px;height:50px;border-radius:14px;background:#E3F2FD;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="ship" class="lc"></i></div>
       <div style="font-size:11px;font-weight:600;">Export</div>
     </div>
     <div style="text-align:center;cursor:pointer;" onclick="showView('params');closeMoreMenu()">
-      <div style="width:50px;height:50px;border-radius:14px;background:#F5F5F5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="settings" class="lc"></i>️</div>
+      <div style="width:50px;height:50px;border-radius:14px;background:#F5F5F5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="settings" class="lc"></i></div>
       <div style="font-size:11px;font-weight:600;">Parametres</div>
     </div>
   </div>
@@ -1166,39 +1274,42 @@ document.addEventListener('click',function(e){var m=document.getElementById('mor
 
 <!-- ═══ SCRIPTS ═══ -->
 <script src="/js/security.js"></script>
-<script src="/js/config.js"></script>
-<script src="/js/data.js"></script>
+<script src="/js/config.js?v=6.8"></script>
+<script src="/js/data.js?v=6.6"></script>
+<script src="/js/data-sources.js?v=1.0"></script>
 <script src="/js/api.js"></script>
-<script src="/js/ui.js?v=2"></script>
-<script src="/js/analysis.js"></script>
-<script src="/js/negoce.js"></script>
-<script src="/js/production.js"></script>
-<script src="/js/export.js"></script>
-<script src="/js/cgu.js"></script>
-<script src="/js/inputs.js"></script>
-<script src="/js/marketplace.js"></script>
-<script src="/js/financing.js"></script>
-<script src="/js/scoring.js"></script>
-<script src="/js/ndvi.js"></script>
-<script src="/js/dashboard.js"></script>
-<script src="/js/auth.js"></script>
-<script src="/js/app.js"></script>
+<script src="/js/ui.js?v=6.11"></script>
+<script src="/js/analysis.js?v=6.11"></script>
+<script src="/js/negoce.js?v=6.11"></script>
+<script src="/js/production.js?v=6.11"></script>
+<script src="/js/export.js?v=6.11"></script>
+<script src="/js/cgu.js?v=6.11"></script>
+<script src="/js/inputs.js?v=6.11"></script>
+<script src="/js/marketplace.js?v=6.11"></script>
+<script src="/js/financing.js?v=6.11"></script>
+<script src="/js/scoring.js?v=6.11"></script>
+<script src="/js/ndvi.js?v=6.11"></script>
+<script src="/js/hevea.js?v=6.11"></script>
+<script src="/js/plantain.js?v=6.11"></script>
+<script src="/js/dashboard.js?v=6.11"></script>
+<script src="/js/auth.js?v=6.11"></script>
+<script src="/js/app.js?v=6.11"></script>
 
 <!-- ═══ ERROR BOUNDARY + OFFLINE + MONITORING (Prompt Master) ═══ -->
 
 <!-- Offline Banner -->
 <div id="offlineBanner" style="display:none;position:fixed;top:0;left:0;right:0;padding:10px;background:#F59E0B;color:#fff;text-align:center;font-size:13px;font-weight:600;z-index:9999;">
-  📡 Vous etes hors-ligne. Vos donnees sont sauvegardees localement.
+  <i data-lucide="wifi-off" class="lc" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> Vous etes hors-ligne. Vos donnees sont sauvegardees localement.
 </div>
 
 <!-- Error Boundary UI -->
 <div id="errorBoundary" style="display:none;position:fixed;inset:0;background:#fff;z-index:10000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;">
-  <div style="font-size:64px;margin-bottom:16px;">🔧</div>
+  <div style="margin-bottom:16px;"><i data-lucide="wrench" class="lc" style="width:64px;height:64px;color:#2D6A4F;"></i></div>
   <h1 style="font-size:22px;font-weight:800;color:#1B4332;margin-bottom:8px;">Oups ! Un petit grain de sable...</h1>
   <p style="font-size:14px;color:#666;max-width:400px;margin-bottom:24px;">L'application a rencontre une erreur inattendue. Nos ingenieurs (33 Lab) ont ete prevenus automatiquement.</p>
   <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
     <button onclick="window.location.reload()" style="padding:12px 24px;background:#1B4332;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;"><i data-lucide="refresh-cw" class="lc"></i> Recharger l'application</button>
-    <a href="https://wa.me/22996816868" target="_blank" style="padding:12px 24px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;">💬 Contacter le support</a>
+    <a href="https://wa.me/22996816868" target="_blank" style="padding:12px 24px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;"><i data-lucide="message-circle" class="lc" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> Contacter le support</a>
   </div>
   <div style="margin-top:24px;font-size:11px;color:#999;" id="errorDebugInfo"></div>
 </div>
@@ -1250,9 +1361,6 @@ window.addEventListener('offline', updateOnlineStatus);
 updateOnlineStatus();
 </script>
 
-<!-- Sentry SDK (lightweight, async) -->
-<script src="https://js.sentry-cdn.com/examplePublicKey.min.js" crossorigin="anonymous" async defer
-  onerror="console.log('[AgroPrix] Sentry not loaded (OK in dev)')"></script>
 
 </body>
 </html>

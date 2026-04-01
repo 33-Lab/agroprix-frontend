@@ -238,9 +238,13 @@
     var user = getUser();
 
     if (token && user) {
-      // Session exists, update UI and optionally verify
+      // Session exists, update UI
       updateAuthUI(user);
-      // Verify token is still valid in background
+      // Skip backend verification for demo mode — token non-JWT
+      if (user.demo === true || token === 'demo-token-v6') {
+        return; // Demo mode: pas de vérification backend
+      }
+      // Verify token is still valid in background (real users only)
       fetchProfile().catch(function() {
         // Token expired, show login
         showAuthScreen('login');

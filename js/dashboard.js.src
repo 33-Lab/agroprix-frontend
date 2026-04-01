@@ -43,12 +43,12 @@
     return total;
   }
   function getLevel(pts) {
-    if (pts >= 2000) return { name: 'Expert Marche', emoji: '👑', next: null, progress: 100 };
+    if (pts >= 2000) return { name: 'Expert Marche', emoji: '<i data-lucide="crown" class="lc"></i>', next: null, progress: 100 };
     if (pts >= 1000) return { name: 'Negociant Pro', emoji: '<i data-lucide="gem" class="lc"></i>', next: 2000, progress: Math.round((pts-1000)/10) };
-    if (pts >= 500) return { name: 'Analyste Confirme', emoji: '🏅', next: 1000, progress: Math.round((pts-500)/5) };
+    if (pts >= 500) return { name: 'Analyste Confirme', emoji: '<i data-lucide="award" class="lc"></i>', next: 1000, progress: Math.round((pts-500)/5) };
     if (pts >= 200) return { name: 'Producteur Actif', emoji: '<i data-lucide="sparkles" class="lc"></i>', next: 500, progress: Math.round((pts-200)/3) };
     if (pts >= 50) return { name: 'Debutant Motive', emoji: '<i data-lucide="sprout" class="lc"></i>', next: 200, progress: Math.round((pts-50)/1.5) };
-    return { name: 'Nouveau', emoji: '🆕', next: 50, progress: Math.round(pts/0.5) };
+    return { name: 'Nouveau', emoji: '<i data-lucide="badge-plus" class="lc"></i>', next: 50, progress: Math.round(pts/0.5) };
   }
   function getBadges() {
     return JSON.parse(localStorage.getItem('agroprix_badges') || '[]');
@@ -143,10 +143,10 @@
             var rain = today.rain || today.precipitation || 0;
             var month = new Date().getMonth();
             var desc, icon, tip;
-            if (rain > 5) { desc = 'Pluie prevue'; icon = '🌧️'; tip = 'Verifiez le sechage de vos recoltes'; }
-            else if (month >= 5 && month <= 9) { desc = 'Saison des pluies'; icon = '🌦️'; tip = 'Surveillez l\'humidite de vos stocks'; }
-            else if (month >= 10 || month <= 1) { desc = 'Harmattan'; icon = '🌫️'; tip = 'Protegez vos stocks de l\'humidite'; }
-            else { desc = 'Saison seche'; icon = '☀️'; tip = 'Bon moment pour negocier les prix'; }
+            if (rain > 5) { desc = 'Pluie prevue'; icon = '<i data-lucide="cloud-rain" class="lc" style="width:28px;height:28px;"></i>'; tip = 'Verifiez le sechage de vos recoltes'; }
+            else if (month >= 5 && month <= 9) { desc = 'Saison des pluies'; icon = '<i data-lucide="cloud-drizzle" class="lc" style="width:28px;height:28px;"></i>'; tip = 'Surveillez l\'humidite de vos stocks'; }
+            else if (month >= 10 || month <= 1) { desc = 'Harmattan'; icon = '<i data-lucide="cloud-fog" class="lc" style="width:28px;height:28px;"></i>'; tip = 'Protegez vos stocks de l\'humidite'; }
+            else { desc = 'Saison seche'; icon = '<i data-lucide="sun" class="lc" style="width:28px;height:28px;"></i>'; tip = 'Bon moment pour negocier les prix'; }
             cachedWeather = { temp: temp, desc: desc, icon: icon, tip: tip, real: true };
           }
         } catch(e) {}
@@ -159,9 +159,9 @@
 
   function getWeatherFallback() {
     var month = new Date().getMonth();
-    if (month >= 5 && month <= 9) return { temp: 28, desc: 'Saison des pluies', icon: '🌧️', tip: 'Verifiez le sechage de vos recoltes', real: false };
-    if (month >= 10 || month <= 1) return { temp: 33, desc: 'Harmattan', icon: '🌫️', tip: 'Protegez vos stocks', real: false };
-    return { temp: 32, desc: 'Saison seche', icon: '☀️', tip: 'Bon moment pour negocier les prix', real: false };
+    if (month >= 5 && month <= 9) return { temp: 28, desc: 'Saison des pluies', icon: '<i data-lucide="cloud-rain" class="lc" style="width:28px;height:28px;"></i>', tip: 'Verifiez le sechage de vos recoltes', real: false };
+    if (month >= 10 || month <= 1) return { temp: 33, desc: 'Harmattan', icon: '<i data-lucide="cloud-fog" class="lc" style="width:28px;height:28px;"></i>', tip: 'Protegez vos stocks', real: false };
+    return { temp: 32, desc: 'Saison seche', icon: '<i data-lucide="sun" class="lc" style="width:28px;height:28px;"></i>', tip: 'Bon moment pour negocier les prix', real: false };
   }
 
   function getWeather() {
@@ -195,7 +195,7 @@
     var badges = getBadges();
 
     // Check first visit badge
-    checkBadge('first_visit', '🎉 Premier pas');
+    checkBadge('first_visit', 'Premier pas');
 
     var html = '';
 
@@ -232,7 +232,7 @@
     html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1;">';
     html += '<div>';
     html += '<div style="font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:1px;">' + greeting + '</div>';
-    html += '<div style="font-size:22px;font-weight:800;margin-top:2px;">' + name + ' 👋</div>';
+    html += '<div style="font-size:22px;font-weight:800;margin-top:2px;">' + name + '</div>';
     html += '</div>';
     html += '<div style="text-align:right;">';
     html += '<div style="font-size:28px;">' + weather.icon + '</div>';
@@ -275,7 +275,7 @@
     // ─── 2. PRICE ALERTS TICKER ───
     html += '<div style="background:linear-gradient(90deg, #FEF3C7, #FDE68A);border-radius:14px;padding:14px 16px;margin-bottom:16px;border:1px solid #E8862A33;">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
-    html += '<div style="font-size:13px;font-weight:700;color:#92400E;">📡 ALERTES MARCHE</div>';
+    html += '<div style="font-size:13px;font-weight:700;color:#92400E;"><i data-lucide="radio" class="lc"></i> ALERTES MARCHE</div>';
     html += '<div style="font-size:10px;color:#B45309;background:linear-gradient(180deg,#fff,#FAFCFB);padding:2px 8px;border-radius:8px;">En direct</div>';
     html += '</div>';
 
@@ -316,7 +316,7 @@
     var actions = [
       { label: 'Analyser un prix', pts: 50, icon: '<i data-lucide="bar-chart-3" class="lc"></i>', view: 'analyse' },
       { label: 'Publier une offre', pts: 100, icon: '<i data-lucide="package" class="lc"></i>', view: 'market' },
-      { label: 'Signaler un prix intrant', pts: 30, icon: '🌿', view: 'inputs' },
+      { label: 'Signaler un prix intrant', pts: 30, icon: '<i data-lucide="leaf" class="lc"></i>', view: 'inputs' },
       { label: 'Completer mon profil', pts: 80, icon: '<i data-lucide="user" class="lc"></i>', view: 'scoring' }
     ];
 

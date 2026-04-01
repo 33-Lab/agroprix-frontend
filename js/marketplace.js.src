@@ -65,13 +65,13 @@
     var m3 = markets[2] ? markets[2].name : 'Marche local';
 
     var demoOffers = [
-      { id: generateId(), type: 'sell', crop: 'mais', cropName: 'Mais', quantity: 10, unit: 'tonnes', price: 265, priceUnit: 'FCFA/kg', market: m1, description: 'Mais blanc, seche, qualite A. Disponible immediatement.', seller: 'Comptoir Cerealier du Sud', phone: '+229 97 XX XX XX', date: new Date(Date.now() - 7200000).toISOString(), status: 'active' },
-      { id: generateId(), type: 'sell', crop: 'cajou', cropName: 'Cajou', quantity: 5, unit: 'tonnes', price: 850, priceUnit: 'FCFA/kg', market: m2, description: 'Cajou WW320, bon calibre, stock disponible.', seller: 'GIE Anacarde Plus', phone: '+229 96 XX XX XX', date: new Date(Date.now() - 18000000).toISOString(), status: 'active' },
-      { id: generateId(), type: 'sell', crop: 'soja', cropName: 'Soja', quantity: 3, unit: 'tonnes', price: 380, priceUnit: 'FCFA/kg', market: m3, description: 'Soja grain, recolte 2025-2026. Propre et sec.', seller: 'Ferme Adjovi', phone: '+229 95 XX XX XX', date: new Date(Date.now() - 86400000).toISOString(), status: 'active' }
+      { id: generateId(), type: 'sell', crop: 'mais', cropName: 'Mais', quantity: 10, unit: 'tonnes', price: 265, priceUnit: 'FCFA/kg', market: m1, description: 'Mais blanc, seche, qualite A. Disponible immediatement.', seller: 'Comptoir Cerealier Ouest', phone: '+XXX XX XX XX XX', date: new Date(Date.now() - 7200000).toISOString(), status: 'active' },
+      { id: generateId(), type: 'sell', crop: 'cajou', cropName: 'Cajou', quantity: 5, unit: 'tonnes', price: 850, priceUnit: 'FCFA/kg', market: m2, description: 'Cajou WW320, bon calibre, stock disponible.', seller: 'GIE Anacarde Plus', phone: '+XXX XX XX XX XX', date: new Date(Date.now() - 18000000).toISOString(), status: 'active' },
+      { id: generateId(), type: 'sell', crop: 'soja', cropName: 'Soja', quantity: 3, unit: 'tonnes', price: 380, priceUnit: 'FCFA/kg', market: m3, description: 'Soja grain, recolte 2025-2026. Propre et sec.', seller: 'Agri Producteurs UEMOA', phone: '+XXX XX XX XX XX', date: new Date(Date.now() - 86400000).toISOString(), status: 'active' }
     ];
     var demoDemands = [
-      { id: generateId(), type: 'buy', crop: 'cajou', cropName: 'Cajou', quantity: 50, unit: 'tonnes', maxPrice: 1280, priceUnit: 'USD/t FOB', market: m1, description: 'Cajou WW320 FOB Cotonou. Deadline: 30 avril 2026.', buyer: 'Export West Africa SARL', phone: '+229 91 XX XX XX', date: new Date(Date.now() - 18000000).toISOString(), status: 'active', verified: true },
-      { id: generateId(), type: 'buy', crop: 'mais', cropName: 'Mais', quantity: 20, unit: 'tonnes', maxPrice: 250, priceUnit: 'FCFA/kg', market: m2, description: 'Mais blanc pour provenderie. Livraison sous 2 semaines.', buyer: 'Aliments du Benin SA', phone: '+229 94 XX XX XX', date: new Date(Date.now() - 43200000).toISOString(), status: 'active', verified: false }
+      { id: generateId(), type: 'buy', crop: 'cajou', cropName: 'Cajou', quantity: 50, unit: 'tonnes', maxPrice: 1280, priceUnit: 'USD/t FOB', market: m1, description: 'Cajou WW320 FOB port regional. Deadline: 30 avril 2026.', buyer: 'Export West Africa SARL', phone: '+XXX XX XX XX XX', date: new Date(Date.now() - 18000000).toISOString(), status: 'active', verified: true },
+      { id: generateId(), type: 'buy', crop: 'mais', cropName: 'Mais', quantity: 20, unit: 'tonnes', maxPrice: 250, priceUnit: 'FCFA/kg', market: m2, description: 'Mais blanc pour provenderie. Livraison sous 2 semaines.', buyer: 'Agro-Industries Regionales', phone: '+XXX XX XX XX XX', date: new Date(Date.now() - 43200000).toISOString(), status: 'active', verified: false }
     ];
 
     demoOffers.forEach(saveOffer);
@@ -160,8 +160,8 @@
 
     all.forEach(function(item) {
       var isSell = item._type === 'sell';
-      var emoji = cropEmojis[item.crop] || '🌿';
-      var phone = item.phone || '+229 XX XX XX XX';
+      var emoji = cropEmojis[item.crop] || '<i data-lucide="wheat" class="lc" style="width:20px;height:20px;"></i>';
+      var phone = item.phone || '+XXX XX XX XX XX';
 
       html += '<div class="card" style="margin-bottom:14px;padding:20px;">';
 
@@ -184,7 +184,7 @@
 
       // WhatsApp button (style guide)
       html += '<a href="https://wa.me/' + phone.replace(/[^0-9+]/g, '') + '?text=Bonjour%2C%20je%20suis%20interesse%20par%20votre%20offre%20' + encodeURIComponent(item.cropName) + '%20sur%20AgroPrix" target="_blank" style="display:block;margin-top:12px;padding:12px;background:#25D366;color:#fff;border-radius:12px;text-align:center;font-size:14px;font-weight:700;text-decoration:none;">'
-        + '💬 CONTACTER VIA WHATSAPP</a>';
+        + '<i data-lucide="message-circle" class="lc" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> CONTACTER VIA WHATSAPP</a>';
 
       // QR button
       html += '<button onclick="event.stopPropagation();AgroPrix.marketplace.showQR(\'' + item.id + '\')" style="display:block;width:100%;margin-top:8px;padding:10px;font-size:12px;font-weight:600;border:1.5px solid #2D6A4F;color:#2D6A4F;background:#fff;border-radius:12px;cursor:pointer;"><i data-lucide="smartphone" class="lc"></i> QR Tracabilite</button>';
@@ -255,11 +255,11 @@
       + '<div class="form-group"><label class="form-label" style="font-weight:600;">' + (isSell ? 'Votre nom / entreprise' : 'Votre nom / entreprise') + '</label>'
       + '<input type="text" id="mpContact" value="' + getUserName() + '" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;"></div>'
       + '<div class="form-group"><label class="form-label" style="font-weight:600;">Telephone</label>'
-      + '<input type="tel" id="mpPhone" placeholder="+229 XX XX XX XX" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;"></div></div>';
+      + '<input type="tel" id="mpPhone" placeholder="+XXX XX XX XX XX" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;"></div></div>';
 
     // Submit
     html += '<button class="btn-analyse" style="width:100%;font-size:14px;padding:12px;" onclick="AgroPrix.marketplace.publish(\'' + type + '\')">'
-      + '📢 Publier ' + (isSell ? 'l\'offre' : 'la demande') + '</button>';
+      + '<i data-lucide="megaphone" class="lc"></i> Publier ' + (isSell ? 'l\'offre' : 'la demande') + '</button>';
 
     html += '<div id="mpSuccess" style="display:none;margin-top:12px;padding:10px;background:#d1fae5;border-radius:8px;text-align:center;font-size:13px;color:#1B4332;font-weight:600;"></div>';
 
@@ -297,7 +297,7 @@
           + '<div><strong>' + o.quantity + o.unit + ' ' + o.cropName + '</strong> — ' + o.market + '</div>'
           + '<span style="font-size:13px;font-weight:700;color:var(--green);">' + formatFCFA(o.price) + '/kg</span>'
           + '</div>'
-          + '<div style="font-size:11px;color:var(--text-light);margin-top:2px;">' + timeAgo(o.date) + ' — ' + (o.status === 'active' ? '🟢 Active' : '⚪ Terminee') + '</div>'
+          + '<div style="font-size:11px;color:var(--text-light);margin-top:2px;">' + timeAgo(o.date) + ' — ' + (o.status === 'active' ? '<span style="color:#10B981;">●</span> Active' : '<span style="color:#9CA3AF;">●</span> Terminee') + '</div>'
           + '</div>';
       });
       html += '</div>';
@@ -312,7 +312,7 @@
           + '<div><strong>' + d.quantity + d.unit + ' ' + d.cropName + '</strong> — ' + d.market + '</div>'
           + '<span style="font-size:13px;font-weight:700;color:var(--blue,#3b82f6);">Max ' + d.maxPrice + ' ' + d.priceUnit + '</span>'
           + '</div>'
-          + '<div style="font-size:11px;color:var(--text-light);margin-top:2px;">' + timeAgo(d.date) + ' — ' + (d.status === 'active' ? '🟢 Active' : '⚪ Terminee') + '</div>'
+          + '<div style="font-size:11px;color:var(--text-light);margin-top:2px;">' + timeAgo(d.date) + ' — ' + (d.status === 'active' ? '<span style="color:#10B981;">●</span> Active' : '<span style="color:#9CA3AF;">●</span> Terminee') + '</div>'
           + '</div>';
       });
       html += '</div>';
@@ -454,7 +454,7 @@
     html += '<div class="card" style="padding:20px;text-align:center;margin-bottom:16px;">'
       + '<div style="font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Certificat de Tracabilite AgroPrix</div>'
       + '<div style="border:3px solid var(--primary);border-radius:16px;padding:16px;display:inline-block;margin-bottom:12px;">'
-      + '<img src="' + qrUrl + '" alt="QR Tracabilite" style="width:200px;height:200px;border-radius:8px;">'
+      + '<img src="' + qrUrl + '" alt="QR Tracabilite" style="width:100%;max-width:200px;height:auto;border-radius:8px;">'
       + '</div>'
       + '<div style="font-size:11px;color:#999;margin-bottom:12px;">Scannez ce QR code pour verifier l\'origine du lot</div>'
       + '</div>';

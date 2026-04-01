@@ -1,72 +1,303 @@
+// AgroPrix — Négoce Module (country-aware)
+// Transactions, opportunités et calculateur transport — données localisées par pays
 (function(AP) {
-  function init() {
-    // Transaction data
-    var transactions = [
-      { date:'14/03/2026', culture:'Maïs', marche:'Dantokpa', qty:2500, prixAchat:245, prixVente:298, status:'vendu' },
-      { date:'12/03/2026', culture:'Niébé', marche:'Bohicon', qty:1800, prixAchat:410, prixVente:485, status:'vendu' },
-      { date:'10/03/2026', culture:'Sorgho', marche:'Parakou', qty:3200, prixAchat:195, prixVente:228, status:'vendu' },
-      { date:'08/03/2026', culture:'Maïs', marche:'Glazoué', qty:1500, prixAchat:252, prixVente:290, status:'vendu' },
-      { date:'05/03/2026', culture:'Riz local', marche:'Malanville', qty:2000, prixAchat:380, prixVente:425, status:'vendu' },
-      { date:'03/03/2026', culture:'Tomate', marche:'Dantokpa', qty:800, prixAchat:350, prixVente:520, status:'vendu' },
-      { date:'28/02/2026', culture:'Oignon', marche:'Parakou', qty:1200, prixAchat:280, prixVente:265, status:'vendu' },
-      { date:'25/02/2026', culture:'Maïs', marche:'Natitingou', qty:2800, prixAchat:238, prixVente:275, status:'vendu' },
-      { date:'15/03/2026', culture:'Maïs', marche:'Dantokpa', qty:3000, prixAchat:248, prixVente:null, status:'en_stock' },
-      { date:'13/03/2026', culture:'Niébé', marche:'Glazoué', qty:1500, prixAchat:405, prixVente:null, status:'en_stock' },
-      { date:'11/03/2026', culture:'Sorgho', marche:'Bohicon', qty:2200, prixAchat:198, prixVente:null, status:'en_stock' }
-    ];
 
-    // Populate transactions table
-    var tbody = document.getElementById('transactionsBody');
-    if (!tbody) return;
+  function getUserCountry() {
+    var user = AP.auth ? AP.auth.getUser() : null;
+    return (user && (user.pays || user.country)) || 'benin';
+  }
 
+  // =========================================================================
+  // Données transactions par pays
+  // =========================================================================
+  var transactionsByCountry = {
+    benin: [
+      { date:'14/03/2026', culture:'Maïs',     marche:'Dantokpa (Cotonou)', qty:2500, prixAchat:245, prixVente:298, status:'vendu' },
+      { date:'12/03/2026', culture:'Niébé',    marche:'Bohicon',            qty:1800, prixAchat:410, prixVente:485, status:'vendu' },
+      { date:'10/03/2026', culture:'Sorgho',   marche:'Parakou',            qty:3200, prixAchat:195, prixVente:228, status:'vendu' },
+      { date:'08/03/2026', culture:'Maïs',     marche:'Glazoué',            qty:1500, prixAchat:252, prixVente:290, status:'vendu' },
+      { date:'05/03/2026', culture:'Riz local',marche:'Malanville',         qty:2000, prixAchat:380, prixVente:425, status:'vendu' },
+      { date:'03/03/2026', culture:'Tomate',   marche:'Dantokpa (Cotonou)', qty:800,  prixAchat:350, prixVente:520, status:'vendu' },
+      { date:'15/03/2026', culture:'Maïs',     marche:'Dantokpa (Cotonou)', qty:3000, prixAchat:248, prixVente:null, status:'en_stock' },
+      { date:'13/03/2026', culture:'Niébé',    marche:'Glazoué',            qty:1500, prixAchat:405, prixVente:null, status:'en_stock' }
+    ],
+    cote_divoire: [
+      { date:'14/03/2026', culture:'Cacao',    marche:'Abidjan (Adjamé)',   qty:1500, prixAchat:1420, prixVente:1680, status:'vendu' },
+      { date:'12/03/2026', culture:'Cajou',    marche:'Daloa',              qty:2000, prixAchat:720,  prixVente:860,  status:'vendu' },
+      { date:'10/03/2026', culture:'Maïs',     marche:'Bouaké',             qty:3000, prixAchat:265,  prixVente:310,  status:'vendu' },
+      { date:'08/03/2026', culture:'Cacao',    marche:'Korhogo',            qty:1200, prixAchat:1400, prixVente:1620, status:'vendu' },
+      { date:'05/03/2026', culture:'Igname',   marche:'Man',                qty:2500, prixAchat:185,  prixVente:240,  status:'vendu' },
+      { date:'03/03/2026', culture:'Riz local',marche:'Abidjan (Adjamé)',   qty:1800, prixAchat:420,  prixVente:490,  status:'vendu' },
+      { date:'15/03/2026', culture:'Cacao',    marche:'Abidjan (Adjamé)',   qty:2000, prixAchat:1450, prixVente:null, status:'en_stock' },
+      { date:'13/03/2026', culture:'Cajou',    marche:'Korhogo',            qty:1500, prixAchat:710,  prixVente:null, status:'en_stock' }
+    ],
+    burkina_faso: [
+      { date:'14/03/2026', culture:'Sorgho',   marche:'Ouagadougou (Rood Woko)', qty:3000, prixAchat:195, prixVente:235, status:'vendu' },
+      { date:'12/03/2026', culture:'Niébé',    marche:'Bobo-Dioulasso',          qty:2000, prixAchat:385, prixVente:460, status:'vendu' },
+      { date:'10/03/2026', culture:'Sésame',   marche:'Koudougou',               qty:1500, prixAchat:580, prixVente:680, status:'vendu' },
+      { date:'08/03/2026', culture:'Maïs',     marche:'Ouahigouya',              qty:2500, prixAchat:230, prixVente:275, status:'vendu' },
+      { date:'05/03/2026', culture:'Arachide', marche:'Pouytenga',               qty:1800, prixAchat:350, prixVente:420, status:'vendu' },
+      { date:'03/03/2026', culture:'Sorgho',   marche:'Dédougou',                qty:2200, prixAchat:190, prixVente:228, status:'vendu' },
+      { date:'15/03/2026', culture:'Sorgho',   marche:'Ouagadougou (Rood Woko)', qty:2800, prixAchat:200, prixVente:null, status:'en_stock' },
+      { date:'13/03/2026', culture:'Niébé',    marche:'Dédougou',                qty:1200, prixAchat:390, prixVente:null, status:'en_stock' }
+    ],
+    mali: [
+      { date:'14/03/2026', culture:'Mil',      marche:'Bamako',    qty:3500, prixAchat:210, prixVente:252, status:'vendu' },
+      { date:'12/03/2026', culture:'Sorgho',   marche:'Sikasso',   qty:2800, prixAchat:190, prixVente:228, status:'vendu' },
+      { date:'10/03/2026', culture:'Coton',    marche:'Koutiala',  qty:5000, prixAchat:285, prixVente:320, status:'vendu' },
+      { date:'08/03/2026', culture:'Maïs',     marche:'Ségou',     qty:2200, prixAchat:240, prixVente:285, status:'vendu' },
+      { date:'05/03/2026', culture:'Riz local',marche:'Mopti',     qty:2500, prixAchat:375, prixVente:430, status:'vendu' },
+      { date:'03/03/2026', culture:'Arachide', marche:'Sikasso',   qty:1800, prixAchat:325, prixVente:390, status:'vendu' },
+      { date:'15/03/2026', culture:'Mil',      marche:'Bamako',    qty:3000, prixAchat:215, prixVente:null, status:'en_stock' },
+      { date:'13/03/2026', culture:'Coton',    marche:'Koutiala',  qty:4000, prixAchat:285, prixVente:null, status:'en_stock' }
+    ],
+    niger: [
+      { date:'14/03/2026', culture:'Mil',      marche:'Niamey',  qty:4000, prixAchat:215, prixVente:258, status:'vendu' },
+      { date:'12/03/2026', culture:'Oignon',   marche:'Maradi',  qty:3000, prixAchat:160, prixVente:210, status:'vendu' },
+      { date:'10/03/2026', culture:'Sorgho',   marche:'Zinder',  qty:2500, prixAchat:195, prixVente:232, status:'vendu' },
+      { date:'08/03/2026', culture:'Niébé',    marche:'Dosso',   qty:1800, prixAchat:370, prixVente:440, status:'vendu' },
+      { date:'05/03/2026', culture:'Arachide', marche:'Niamey',  qty:1500, prixAchat:340, prixVente:405, status:'vendu' },
+      { date:'03/03/2026', culture:'Oignon',   marche:'Agadez',  qty:2200, prixAchat:155, prixVente:208, status:'vendu' },
+      { date:'15/03/2026', culture:'Mil',      marche:'Maradi',  qty:3500, prixAchat:220, prixVente:null, status:'en_stock' },
+      { date:'13/03/2026', culture:'Oignon',   marche:'Agadez',  qty:2000, prixAchat:165, prixVente:null, status:'en_stock' }
+    ],
+    senegal: [
+      { date:'14/03/2026', culture:'Mil',       marche:'Dakar (Sandaga)', qty:3000, prixAchat:220, prixVente:265, status:'vendu' },
+      { date:'12/03/2026', culture:'Arachide',  marche:'Kaolack',         qty:2500, prixAchat:285, prixVente:345, status:'vendu' },
+      { date:'10/03/2026', culture:'Niébé',     marche:'Touba',           qty:2000, prixAchat:380, prixVente:455, status:'vendu' },
+      { date:'08/03/2026', culture:'Riz local', marche:'Saint-Louis',     qty:2800, prixAchat:395, prixVente:460, status:'vendu' },
+      { date:'05/03/2026', culture:'Maïs',      marche:'Dakar (Sandaga)', qty:2200, prixAchat:245, prixVente:292, status:'vendu' },
+      { date:'03/03/2026', culture:'Arachide',  marche:'Ziguinchor',      qty:1800, prixAchat:280, prixVente:345, status:'vendu' },
+      { date:'15/03/2026', culture:'Arachide',  marche:'Kaolack',         qty:2000, prixAchat:290, prixVente:null, status:'en_stock' },
+      { date:'13/03/2026', culture:'Mil',       marche:'Kaolack',         qty:2500, prixAchat:225, prixVente:null, status:'en_stock' }
+    ],
+    togo: [
+      { date:'14/03/2026', culture:'Maïs',    marche:'Lomé (Adawlato)', qty:2800, prixAchat:240, prixVente:288, status:'vendu' },
+      { date:'12/03/2026', culture:'Manioc',  marche:'Kara',            qty:4000, prixAchat:95,  prixVente:128, status:'vendu' },
+      { date:'10/03/2026', culture:'Igname',  marche:'Sokodé',          qty:2500, prixAchat:185, prixVente:238, status:'vendu' },
+      { date:'08/03/2026', culture:'Cajou',   marche:'Atakpamé',        qty:1800, prixAchat:680, prixVente:820, status:'vendu' },
+      { date:'05/03/2026', culture:'Sorgho',  marche:'Kara',            qty:3000, prixAchat:195, prixVente:232, status:'vendu' },
+      { date:'03/03/2026', culture:'Maïs',    marche:'Atakpamé',        qty:2500, prixAchat:235, prixVente:282, status:'vendu' },
+      { date:'15/03/2026', culture:'Maïs',    marche:'Lomé (Adawlato)', qty:3200, prixAchat:245, prixVente:null, status:'en_stock' },
+      { date:'13/03/2026', culture:'Manioc',  marche:'Sokodé',          qty:3000, prixAchat:98,  prixVente:null, status:'en_stock' }
+    ],
+    guinee_bissau: [
+      { date:'14/03/2026', culture:'Cajou',    marche:'Bissau (Bandim)', qty:3000, prixAchat:660, prixVente:790, status:'vendu' },
+      { date:'12/03/2026', culture:'Riz local',marche:'Bafatá',          qty:2000, prixAchat:425, prixVente:495, status:'vendu' },
+      { date:'10/03/2026', culture:'Cajou',    marche:'Gabú',            qty:2500, prixAchat:650, prixVente:780, status:'vendu' },
+      { date:'08/03/2026', culture:'Arachide', marche:'Bissau (Bandim)', qty:1500, prixAchat:295, prixVente:365, status:'vendu' },
+      { date:'05/03/2026', culture:'Cajou',    marche:'Bafatá',          qty:2000, prixAchat:645, prixVente:775, status:'vendu' },
+      { date:'15/03/2026', culture:'Cajou',    marche:'Bissau (Bandim)', qty:4000, prixAchat:670, prixVente:null, status:'en_stock' },
+      { date:'13/03/2026', culture:'Riz local',marche:'Gabú',            qty:1800, prixAchat:430, prixVente:null, status:'en_stock' }
+    ]
+  };
+
+  // =========================================================================
+  // Opportunités de négoce par pays
+  // =========================================================================
+  var opportunitiesByCountry = {
+    benin: [
+      { culture:'Maïs',  achat:'Glazoué', vente:'Dantokpa (Cotonou)', pa:242, pv:298, marge:23.1, raison:"Déficit d'approvisionnement à Cotonou. Stocks Glazoué abondants post-récolte.", urgence:'high' },
+      { culture:'Niébé', achat:'Malanville', vente:'Bohicon', pa:395, pv:478, marge:21.0, raison:'Arrivage frontalier depuis le Niger. Prix bas à Malanville, demande forte au sud.', urgence:'high' },
+      { culture:'Sorgho', achat:'Natitingou', vente:'Parakou', pa:188, pv:225, marge:19.7, raison:"Surplus régional dans l'Atacora. Transport court, marge nette attractive.", urgence:'medium' }
+    ],
+    cote_divoire: [
+      { culture:'Cacao',  achat:'Korhogo', vente:'Abidjan (Adjamé)', pa:1400, pv:1680, marge:20.0, raison:"Prix bord champ bas à Korhogo post-récolte principale. Forte demande exportateurs Abidjan.", urgence:'high' },
+      { culture:'Cajou',  achat:'Man', vente:'Daloa', pa:700, pv:845, marge:20.7, raison:"Surplus cajou brut zones forestières ouest. Transformation à Daloa payante.", urgence:'high' },
+      { culture:'Igname', achat:'Bouaké', vente:'Abidjan (Adjamé)', pa:175, pv:240, marge:37.1, raison:"Igname Kponan abondante en zone centre. Prix Abidjan 40% plus élevés qu'à Bouaké.", urgence:'medium' }
+    ],
+    burkina_faso: [
+      { culture:'Niébé',  achat:'Dédougou', vente:'Ouagadougou (Rood Woko)', pa:380, pv:458, marge:20.5, raison:"Surplus niébé Boucle du Mouhoun. Stocks Ouagadougou bas en saison sèche.", urgence:'high' },
+      { culture:'Sésame', achat:'Pouytenga', vente:'Bobo-Dioulasso', pa:575, pv:690, marge:20.0, raison:"Sésame Sahel abondant post-récolte. Collecteurs export présents à Bobo-Dioulasso.", urgence:'high' },
+      { culture:'Sorgho', achat:'Ouahigouya', vente:'Koudougou', pa:188, pv:228, marge:21.3, raison:"Surplus céréalier nord. Transport court Ouahigouya-Koudougou.", urgence:'medium' }
+    ],
+    mali: [
+      { culture:'Mil',      achat:'Mopti', vente:'Bamako', pa:205, pv:252, marge:22.9, raison:"Surplus mil Delta intérieur. Déficit Bamako en saison sèche.", urgence:'high' },
+      { culture:'Coton',    achat:'Koutiala', vente:'Bamako', pa:285, pv:330, marge:15.8, raison:"Coton CMDT disponible à Koutiala. Demande industries textiles Bamako.", urgence:'medium' },
+      { culture:'Arachide', achat:'Sikasso', vente:'Ségou', pa:320, pv:390, marge:21.9, raison:"Arachide abondante zone Sikasso. Huileries Ségou en déficit d'approvisionnement.", urgence:'medium' }
+    ],
+    niger: [
+      { culture:'Mil',    achat:'Maradi', vente:'Niamey', pa:210, pv:258, marge:22.9, raison:"Surplus mil région Maradi post-récolte. Niamey en tension d'approvisionnement.", urgence:'high' },
+      { culture:'Oignon', achat:'Agadez', vente:'Maradi', pa:158, pv:208, marge:31.6, raison:"Oignon violet Agadez abondant. Prix Maradi 32% plus élevés, demande export active.", urgence:'high' },
+      { culture:'Niébé',  achat:'Dosso', vente:'Niamey', pa:365, pv:440, marge:20.5, raison:"Production excédentaire département Dosso. Forte demande Niamey saison sèche.", urgence:'medium' }
+    ],
+    senegal: [
+      { culture:'Arachide',  achat:'Ziguinchor', vente:'Kaolack', pa:280, pv:345, marge:23.2, raison:"Arachide Casamance post-récolte. Bassins arachidiers Kaolack payent une prime.", urgence:'high' },
+      { culture:'Mil',       achat:'Touba', vente:'Dakar (Sandaga)', pa:215, pv:265, marge:23.3, raison:"Surplus mil Diourbel après bonne campagne. Dakar en déficit.", urgence:'high' },
+      { culture:'Riz local', achat:'Saint-Louis', vente:'Dakar (Sandaga)', pa:385, pv:460, marge:19.5, raison:"Riz vallée du fleuve disponible à Saint-Louis. Forte demande Dakar.", urgence:'medium' }
+    ],
+    togo: [
+      { culture:'Maïs',  achat:'Kara', vente:'Lomé (Adawlato)', pa:235, pv:288, marge:22.6, raison:"Excédent maïs zone nord Togo. Lomé en déficit pré-exportation vers le Ghana.", urgence:'high' },
+      { culture:'Igname', achat:'Sokodé', vente:'Lomé (Adawlato)', pa:178, pv:238, marge:33.7, raison:"Igname Tchaoudjo abondante. Prix Lomé jusqu'à 34% plus élevés qu'à Sokodé.", urgence:'high' },
+      { culture:'Cajou',  achat:'Atakpamé', vente:'Lomé (Adawlato)', pa:670, pv:820, marge:22.4, raison:"Cajou Plateaux disponible post-récolte. Exportateurs Lomé cherchent approvisionnement.", urgence:'medium' }
+    ],
+    guinee_bissau: [
+      { culture:'Cajou',    achat:'Gabú', vente:'Bissau (Bandim)', pa:645, pv:790, marge:22.5, raison:"Cajou régions intérieures moins cher que port Bissau. Marge nette 23% après transport.", urgence:'high' },
+      { culture:'Cajou',    achat:'Bafatá', vente:'Bissau (Bandim)', pa:640, pv:780, marge:21.9, raison:"Bafatá surplus post-récolte. Acheteurs export présents à Bissau mars-mai.", urgence:'high' },
+      { culture:'Riz local',achat:'Bafatá', vente:'Bissau (Bandim)', pa:420, pv:495, marge:17.9, raison:"Riz Bafatá 15% moins cher qu'à Bissau. Forte demande riz local en milieu urbain.", urgence:'medium' }
+    ]
+  };
+
+  // =========================================================================
+  // Calcul distance (Haversine) entre deux marchés
+  // =========================================================================
+  function haversine(lat1, lng1, lat2, lng2) {
+    var R = 6371;
+    var dLat = (lat2 - lat1) * Math.PI / 180;
+    var dLng = (lng2 - lng1) * Math.PI / 180;
+    var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+            Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+            Math.sin(dLng/2)*Math.sin(dLng/2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+
+  // =========================================================================
+  // Render helpers
+  // =========================================================================
+  function buildRows(transactions) {
     var rows = '';
-    var totalMargeSum = 0, totalMargeCount = 0, totalValeurStock = 0, nbVendues = 0, nbStock = 0;
-
-    for (var i = 0; i < transactions.length; i++) {
-      var t = transactions[i];
+    transactions.forEach(function(t) {
       var qtyF = t.qty.toLocaleString('fr-FR');
-      var paF = t.prixAchat.toLocaleString('fr-FR');
+      var paF  = t.prixAchat.toLocaleString('fr-FR');
+      if (t.status === 'en_stock') {
+        rows += '<tr><td>' + t.date + '</td><td>' + t.culture + '</td><td>' + t.marche + '</td>'
+          + '<td>' + qtyF + ' kg</td><td>' + paF + ' FCFA/kg</td>'
+          + '<td colspan="2" style="text-align:center;color:#E8862A;font-weight:600;">En stock</td></tr>';
+      } else {
+        var margin = ((t.prixVente - t.prixAchat) / t.prixAchat * 100).toFixed(1);
+        var mc = parseFloat(margin) >= 0 ? '#2D6A4F' : '#e76f51';
+        var ms = parseFloat(margin) >= 0 ? '+' : '';
+        var pvF = t.prixVente.toLocaleString('fr-FR');
+        rows += '<tr><td>' + t.date + '</td><td>' + t.culture + '</td><td>' + t.marche + '</td>'
+          + '<td>' + qtyF + ' kg</td><td>' + paF + ' FCFA/kg</td>'
+          + '<td>' + pvF + ' FCFA/kg</td>'
+          + '<td style="color:' + mc + ';font-weight:600;">' + ms + margin + '%</td></tr>';
+      }
+    });
+    return rows;
+  }
 
+  function buildOpportunities(opportunities) {
+    return opportunities.map(function(o) {
+      var urgClass = o.urgence === 'high' ? '#E8862A' : '#2D6A4F';
+      return '<div style="border-left:4px solid ' + urgClass + ';padding:14px 16px;margin-bottom:14px;border-radius:0 16px 16px 0;background:#fff;">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+        + '<div style="font-size:18px;font-weight:800;color:#333;">' + o.culture + '</div>'
+        + '<span style="background:#D8F3DC;color:#2D6A4F;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:800;">+' + o.marge + '%</span>'
+        + '</div>'
+        + '<div style="font-size:14px;color:#333;margin-top:4px;">' + o.achat + ' → ' + o.vente + '</div>'
+        + '<div style="font-size:13px;color:#666;margin-top:4px;">Achat: ' + o.pa + ' FCFA/kg · Vente estimée: ' + o.pv + ' FCFA/kg</div>'
+        + '<div style="font-size:12px;color:#2D6A4F;font-style:italic;margin-top:6px;">' + o.raison + '</div>'
+        + '</div>';
+    }).join('');
+  }
+
+  function updateStats(transactions) {
+    var nbVendues = 0, nbStock = 0, totalMarge = 0, nbMarge = 0, totalValeurStock = 0;
+    transactions.forEach(function(t) {
       if (t.status === 'en_stock') {
         nbStock++;
         totalValeurStock += t.qty * t.prixAchat;
-        rows += '<tr><td>' + t.date + '</td><td>' + t.culture + '</td><td>' + t.marche + '</td><td>' + qtyF + ' kg</td><td>' + paF + ' FCFA/kg</td><td colspan="2" style="text-align:center;color:#E8862A;font-weight:600;">En stock</td></tr>';
       } else {
         nbVendues++;
-        var margin = ((t.prixVente - t.prixAchat) / t.prixAchat * 100).toFixed(1);
-        var marginColor = parseFloat(margin) >= 0 ? '#2D6A4F' : '#e76f51';
-        var marginSign = parseFloat(margin) >= 0 ? '+' : '';
-        totalMargeSum += parseFloat(margin);
-        totalMargeCount++;
-        var pvF = t.prixVente.toLocaleString('fr-FR');
-        rows += '<tr><td>' + t.date + '</td><td>' + t.culture + '</td><td>' + t.marche + '</td><td>' + qtyF + ' kg</td><td>' + paF + ' FCFA/kg</td><td>' + pvF + ' FCFA/kg</td><td style="color:' + marginColor + ';font-weight:600;">' + marginSign + margin + '%</td></tr>';
+        var m = (t.prixVente - t.prixAchat) / t.prixAchat * 100;
+        totalMarge += m; nbMarge++;
       }
-    }
-    tbody.innerHTML = rows;
-
-    // Update stat cards
+    });
     var el;
     el = document.getElementById('negoceStatTransactions');
     if (el) el.textContent = transactions.length;
     el = document.getElementById('negoceStatStock');
     if (el) el.textContent = nbStock + ' lots';
     el = document.getElementById('negoceStatMarge');
-    if (el) el.textContent = '+' + (totalMargeCount > 0 ? (totalMargeSum / totalMargeCount).toFixed(1) : '0') + '%';
+    if (el) el.textContent = (nbMarge > 0 ? '+' + (totalMarge/nbMarge).toFixed(1) : '0') + '%';
     el = document.getElementById('negoceStatValeur');
     if (el) el.textContent = totalValeurStock.toLocaleString('fr-FR') + ' FCFA';
+  }
 
-    // Populate opportunities
-    var opportunities = [
-      { culture:'Maïs', achat:'Glazoué', vente:'Dantokpa (Cotonou)', pa:242, pv:298, marge:23.1, raison:"Déficit d'approvisionnement à Cotonou, stocks Glazoué abondants post-récolte", urgence:'high' },
-      { culture:'Niébé', achat:'Malanville', vente:'Bohicon', pa:395, pv:478, marge:21.0, raison:'Arrivage frontalier depuis le Niger, prix bas à Malanville. Demande forte au sud.', urgence:'high' },
-      { culture:'Sorgho', achat:'Natitingou', vente:'Parakou', pa:188, pv:225, marge:19.7, raison:"Surplus régional dans l'Atacora. Transport court.", urgence:'medium' }
-    ];
+  function fillTransportSelects(markets) {
+    var opts = '<option>-- Choisir --</option>' + markets.map(function(m) {
+      return '<option value="' + m.name + '">' + m.name + '</option>';
+    }).join('');
+    var d = document.getElementById('transportDepart');
+    var a = document.getElementById('transportArrivee');
+    if (d) d.innerHTML = opts;
+    if (a) a.innerHTML = opts;
+  }
 
-    var oppGrid = document.getElementById('opportunitiesGrid');
-    if (oppGrid) {
-      oppGrid.innerHTML = opportunities.map(function(o) {
-        return '<div class="opportunity-card severity-' + o.urgence + '"><div class="opp-header"><span class="opp-culture">' + o.culture + '</span><span class="opp-margin" style="background:rgba(45,106,79,.15);color:#2D6A4F;">+' + o.marge + '%</span></div><div class="opp-market">' + o.achat + ' → ' + o.vente + '</div><div class="opp-price">Achat: ' + o.pa + ' CFA/kg · Vente estimée: ' + o.pv + ' CFA/kg</div><div class="opp-reco">' + o.raison + '</div></div>';
-      }).join('');
+  // =========================================================================
+  // Init principal
+  // =========================================================================
+  function init() {
+    var country = getUserCountry();
+    var transactions  = transactionsByCountry[country]  || transactionsByCountry.benin;
+    var opportunities = opportunitiesByCountry[country] || opportunitiesByCountry.benin;
+    var markets       = (AP.marketsByCountry && AP.marketsByCountry[country]) || [];
+
+    // Transactions
+    var tbody = document.getElementById('transactionsBody');
+    if (tbody) tbody.innerHTML = buildRows(transactions);
+
+    // Opportunités
+    var grid = document.getElementById('opportunitiesGrid');
+    if (grid) {
+      grid.style.display = '';
+      grid.innerHTML = buildOpportunities(opportunities);
+    }
+
+    // Calculateur transport — sélects dynamiques
+    fillTransportSelects(markets);
+
+    // Statistiques
+    updateStats(transactions);
+  }
+
+  // =========================================================================
+  // Calculateur Transport (utilise coordonnées GPS des marchés)
+  // =========================================================================
+  function calculateTransport() {
+    var country  = getUserCountry();
+    var markets  = (AP.marketsByCountry && AP.marketsByCountry[country]) || [];
+    var departEl = document.getElementById('transportDepart');
+    var arriveeEl = document.getElementById('transportArrivee');
+    var qtyEl    = document.querySelector('#viewNegoce input[type="number"]:nth-of-type(1)');
+    var prixEl   = document.querySelector('#viewNegoce input[type="number"]:nth-of-type(2)');
+    if (!departEl || !arriveeEl || !qtyEl || !prixEl) return;
+
+    var departName  = departEl.value;
+    var arriveeName = arriveeEl.value;
+    var qty      = parseFloat(qtyEl.value) || 5;
+    var prixAchat = parseInt(prixEl.value) || 250;
+
+    var mDepart  = markets.find(function(m) { return m.name === departName; });
+    var mArrivee = markets.find(function(m) { return m.name === arriveeName; });
+
+    var transportPerTonne;
+    if (mDepart && mArrivee && mDepart.lat && mArrivee.lat) {
+      var dist = haversine(mDepart.lat, mDepart.lng, mArrivee.lat, mArrivee.lng);
+      // 55 FCFA/km/tonne + 1500 FCFA fixe chargement/déchargement
+      transportPerTonne = Math.round(dist * 55 + 1500);
+    } else {
+      transportPerTonne = 15000; // fallback
+    }
+
+    var totalTransport = transportPerTonne * qty;
+    var totalAchat     = prixAchat * qty * 1000;
+    var totalCout      = totalAchat + totalTransport;
+    var prixRevientKg  = Math.round(totalCout / (qty * 1000));
+    var margeMin       = Math.round(prixRevientKg * 1.10);
+
+    var resultsEl = document.getElementById('transportResults');
+    if (resultsEl) {
+      resultsEl.innerHTML = '<div class="card" style="margin-top:16px;background:#D8F3DC;">'
+        + '<div style="font-size:16px;font-weight:800;color:#1B4332;margin-bottom:12px;"><i data-lucide="bar-chart-3" class="lc"></i> Résultat</div>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
+        + '<div><div style="font-size:11px;color:#666;">Coût achat</div><div style="font-size:16px;font-weight:800;">' + totalAchat.toLocaleString('fr') + ' FCFA</div></div>'
+        + '<div><div style="font-size:11px;color:#666;">Coût transport</div><div style="font-size:16px;font-weight:800;">' + totalTransport.toLocaleString('fr') + ' FCFA</div></div>'
+        + '<div><div style="font-size:11px;color:#666;">Prix de revient</div><div style="font-size:16px;font-weight:800;color:#E8862A;">' + prixRevientKg + ' FCFA/kg</div></div>'
+        + '<div><div style="font-size:11px;color:#666;">Vente min +10%</div><div style="font-size:16px;font-weight:800;color:#2D6A4F;">' + margeMin + ' FCFA/kg</div></div>'
+        + '</div></div>';
+      if (window.refreshIcons) refreshIcons();
     }
   }
 
@@ -76,54 +307,6 @@
 
   AP.negoce = { init: init, addTransaction: addTransaction };
   window.addTransaction = addTransaction;
+  window.calculateTransport = calculateTransport;
 
-  AP.negoce = { init: init };
 })(window.AgroPrix);
-
-// Calculateur Transport Inter-Marches (global function)
-function calculateTransport() {
-  var depart = document.querySelector('#viewNegoce select:nth-of-type(1)');
-  var arrivee = document.querySelector('#viewNegoce select:nth-of-type(2)');
-  var qtyEl = document.querySelector('#viewNegoce input[type="number"]:nth-of-type(1)');
-  var prixEl = document.querySelector('#viewNegoce input[type="number"]:nth-of-type(2)');
-
-  if (!depart || !arrivee || !qtyEl || !prixEl) return;
-
-  var qty = parseFloat(qtyEl.value) || 5;
-  var prixAchat = parseInt(prixEl.value) || 245;
-
-  // Transport costs (FCFA/tonne) between markets
-  var costs = {
-    'Dantokpa (Cotonou)-Bohicon': 8000, 'Dantokpa (Cotonou)-Parakou': 18000,
-    'Dantokpa (Cotonou)-Malanville': 25000, 'Dantokpa (Cotonou)-Glazoue': 12000,
-    'Bohicon-Parakou': 12000, 'Bohicon-Malanville': 20000, 'Bohicon-Glazoue': 6000,
-    'Parakou-Malanville': 10000, 'Parakou-Glazoue': 8000,
-    'Glazoue-Malanville': 15000
-  };
-
-  var key1 = depart.value + '-' + arrivee.value;
-  var key2 = arrivee.value + '-' + depart.value;
-  var transportPerTonne = costs[key1] || costs[key2] || 15000;
-
-  var totalTransport = transportPerTonne * qty;
-  var totalAchat = prixAchat * qty * 1000; // qty en tonnes, prix en FCFA/kg
-  var totalCout = totalAchat + totalTransport;
-  var prixRevientKg = Math.round(totalCout / (qty * 1000));
-  var margeMin = Math.round(prixRevientKg * 1.1); // 10% marge minimum
-
-  var resultsEl = document.getElementById('transportResults');
-  if (resultsEl) {
-    resultsEl.innerHTML = '<div class="card" style="margin-top:16px;background:#D8F3DC;">'
-      + '<div style="font-size:16px;font-weight:800;color:#1B4332;margin-bottom:12px;"><i data-lucide="bar-chart-3" class="lc"></i> Resultat</div>'
-      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
-      + '<div><div style="font-size:11px;color:#666;">Cout achat</div><div style="font-size:16px;font-weight:800;">' + totalAchat.toLocaleString('fr') + ' FCFA</div></div>'
-      + '<div><div style="font-size:11px;color:#666;">Cout transport</div><div style="font-size:16px;font-weight:800;">' + totalTransport.toLocaleString('fr') + ' FCFA</div></div>'
-      + '<div><div style="font-size:11px;color:#666;">Cout total</div><div style="font-size:16px;font-weight:800;color:#E8862A;">' + totalCout.toLocaleString('fr') + ' FCFA</div></div>'
-      + '<div><div style="font-size:11px;color:#666;">Prix de revient</div><div style="font-size:16px;font-weight:800;color:#E8862A;">' + prixRevientKg + ' FCFA/kg</div></div>'
-      + '</div>'
-      + '<div style="margin-top:12px;padding:10px;background:#fff;border-radius:12px;font-size:13px;color:#1B4332;">'
-      + '<i data-lucide="lightbulb" class="lc"></i> Pour une marge de 10% minimum, vendez a <strong>' + margeMin + ' FCFA/kg</strong> ou plus a ' + arrivee.value + '.'
-      + '</div>'
-      + '</div>';
-  }
-}
