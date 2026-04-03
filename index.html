@@ -3,8 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="AgroPrix — Intelligence des prix agricoles UEMOA. Analysez, négociez, exportez.">
+  <meta name="description" content="AgroPrix — Intelligence des prix agricoles UEMOA. Analysez les prix en temps réel, négociez et exportez au Bénin, Côte d'Ivoire, Sénégal et dans toute l'UEMOA.">
   <meta name="theme-color" content="#1B4332">
+  <meta name="keywords" content="prix agricoles, UEMOA, Bénin, Côte d'Ivoire, Sénégal, maïs, riz, soja, analyse prix, marché agricole, AgroPrix">
+
+  <!-- Canonical URL — résout "Page en double sans URL canonique" -->
+  <link rel="canonical" href="https://app.agroprix.app/">
+
+  <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
+  <meta property="og:title" content="AgroPrix — Prix agricoles UEMOA en temps réel">
+  <meta property="og:description" content="Analysez les prix agricoles, scorez vos acheteurs, négociez et exportez dans toute la zone UEMOA.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://app.agroprix.app/">
+  <meta property="og:image" content="https://app.agroprix.app/img/og-agroprix.png">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:site_name" content="AgroPrix by 33Lab">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AgroPrix — Prix agricoles UEMOA en temps réel">
+  <meta name="twitter:description" content="Analysez les prix agricoles, scorez vos acheteurs, négociez et exportez dans toute la zone UEMOA.">
+  <meta name="twitter:image" content="https://app.agroprix.app/img/og-agroprix.png">
 
   <!-- Analytics: Plausible (RGPD-friendly, no cookies) -->
   <script defer data-domain="agroprix.app" src="https://plausible.io/js/script.js"
@@ -715,10 +734,39 @@
 
     <!-- ═══ VIEW: CARTE ═══ -->
     <div class="view-container" id="viewCarte">
-      <div class="card">
-        <div class="card-title"><span class="icon"><i data-lucide="map" class="lc"></i></span> Carte des marches UEMOA</div>
-        <div id="fullMap" style="height:500px;border-radius:8px;"></div>
+      <!-- Filtres carte -->
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-title"><span class="icon"><i data-lucide="map" class="lc"></i></span> Carte des marchés UEMOA & Mes Parcelles</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:8px;">
+          <select id="carteCountry" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text);font-size:13px;">
+            <option value="benin">Bénin</option>
+            <option value="cote_divoire">Côte d'Ivoire</option>
+            <option value="senegal">Sénégal</option>
+            <option value="mali">Mali</option>
+            <option value="burkina_faso">Burkina Faso</option>
+            <option value="niger">Niger</option>
+            <option value="togo">Togo</option>
+            <option value="guinee_bissau">Guinée-Bissau</option>
+          </select>
+          <button onclick="loadCarteMarkets()" class="btn-analyse" style="padding:8px 16px;font-size:13px;">
+            <i data-lucide="refresh-cw" class="lc" style="width:14px;height:14px;"></i> Actualiser
+          </button>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+            <input type="checkbox" id="carteParcelles" onchange="loadCarteMarkets()" checked style="accent-color:var(--green);">
+            Afficher mes parcelles
+          </label>
+          <span id="carteStatus" style="font-size:12px;color:var(--text-light);"></span>
+        </div>
       </div>
+      <!-- Légende -->
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;font-size:12px;">
+        <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#2d8a4e;"></span> Marchés WFP</span>
+        <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#2563eb;"></span> Mes parcelles (EUDR vert)</span>
+        <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#f59e0b;"></span> Parcelle (EUDR partiel)</span>
+        <span style="display:flex;align-items:center;gap:5px;"><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dc2626;"></span> Parcelle (EUDR insuffisant)</span>
+      </div>
+      <!-- Carte -->
+      <div id="fullMap" style="height:520px;border-radius:12px;border:1px solid var(--border);"></div>
     </div>
 
     <!-- ═══ VIEW: NOS OFFRES ═══ -->
@@ -1289,6 +1337,7 @@ document.addEventListener('click',function(e){var m=document.getElementById('mor
 <script src="/js/financing.js?v=6.11"></script>
 <script src="/js/scoring.js?v=6.11"></script>
 <script src="/js/ndvi.js?v=6.11"></script>
+<script src="/js/carte.js?v=7.0"></script>
 <script src="/js/hevea.js?v=6.11"></script>
 <script src="/js/plantain.js?v=6.11"></script>
 <script src="/js/dashboard.js?v=6.11"></script>
