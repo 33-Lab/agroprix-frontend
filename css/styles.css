@@ -189,6 +189,33 @@ h4 { font-size: var(--font-size-md); }
   padding: 16px 0;
 }
 
+/* Fix: les <a> de la sidebar n'ont pas la classe sidebar-nav-item */
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  border-left: 3px solid transparent;
+  text-decoration: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sidebar-nav a:hover {
+  color: #ffffff;
+  background: var(--navy-light);
+}
+
+.sidebar-nav a.active {
+  color: #ffffff;
+  background: var(--navy-light);
+  border-left-color: var(--primary);
+}
+
 .sidebar-nav-item {
   display: flex;
   align-items: center;
@@ -1825,6 +1852,47 @@ button, .btn-analyse {
 @media (min-width: 1400px) {
   .page-content {
     padding: 32px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Desktop fixes — AgroPrix V2.0
+   -------------------------------------------------------------------------- */
+
+/* 1. Centrage du contenu sur grands écrans */
+.page-content {
+  margin: 0 auto;
+}
+
+/* 2. Topbar desktop : masquer le logo (déjà dans la sidebar) */
+@media (min-width: 1025px) {
+  .topbar-logo {
+    display: none;
+  }
+
+  /* 3. Afficher le titre de vue dans la topbar */
+  #viewTitle {
+    display: block !important;
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  /* 4. Grilles tablet/desktop manquantes */
+  .factors-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+
+  .scenario-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+
+  .stats-row {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .hero-kpi-row {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   }
 }
 
