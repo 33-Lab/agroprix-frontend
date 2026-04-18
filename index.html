@@ -30,7 +30,7 @@
     onerror="console.log('[AgroPrix] Plausible not loaded (OK in dev)')"></script>
 
   <!-- Security: CSP -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://plausible.io https://cdn.kkiapay.me; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdn.kkiapay.me; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.qrserver.com https://api.open-meteo.com https://agromonitoring.com https://*.railway.app https://*.vercel.app https://plausible.io https://api.kkiapay.me https://sandbox.kkiapay.me; frame-src https://cdn.kkiapay.me https://api.kkiapay.me;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://plausible.io https://cdn.fedapay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdn.fedapay.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.qrserver.com https://api.open-meteo.com https://agromonitoring.com https://*.railway.app https://*.vercel.app https://plausible.io https://api.fedapay.com https://live.fedapay.com; frame-src https://cdn.fedapay.com https://checkout.fedapay.com https://*.fedapay.com;">
   <meta name="referrer" content="strict-origin-when-cross-origin">
 
   <!-- PWA Meta -->
@@ -52,8 +52,8 @@
   <!-- Lucide Icons (SVG professionnelles) -->
   <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
 
-  <!-- KKiaPay — Paiement Mobile Money (MTN MoMo, Moov, Carte) -->
-  <script src="https://cdn.kkiapay.me/k.js"></script>
+  <!-- FedaPay — Paiement Mobile Money (MTN MoMo, Moov, Carte) -->
+  <script src="https://cdn.fedapay.com/checkout.js?v=1.1.7"></script>
 
   <!-- App Styles -->
   <link rel="stylesheet" href="/css/styles.css">
@@ -191,7 +191,7 @@
     <div class="nav-section-label">FINANCEMENT <span class="new-badge">NOUVEAU</span></div>
     <a id="navFinancing" onclick="showView('financing', this)"><span class="nav-icon"><i data-lucide="coins" class="lc"></i></span> GPS Financement</a>
     <a id="navNdvi" onclick="showView('ndvi', this)"><span class="nav-icon"><i data-lucide="satellite" class="lc"></i></span> Sante Parcelle</a>
-    <a id="navScoring" onclick="showView('scoring', this)"><span class="nav-icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Mon Score Credit</a>
+    <a id="navScoring" onclick="showView('scoring', this)"><span class="nav-icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Mon Score Profil</a>
 
     <!-- FILIERES -->
     <div class="nav-section-label">FILIERES <span class="pro-badge">PRO</span></div>
@@ -334,7 +334,7 @@
               <div class="toggle-switch active" id="togCompare" onclick="toggleSwitch(this)"></div>
             </div>
             <div class="toggle-row">
-              <label><i data-lucide="bot" class="lc"></i> Previsions IA (J+30, J+90)</label>
+              <label><i data-lucide="trending-up" class="lc"></i> Projections tendancielles (J+30, J+90)</label>
               <div class="toggle-switch active" id="togForecast" onclick="toggleSwitch(this)"></div>
             </div>
             <div class="toggle-row">
@@ -400,7 +400,7 @@
         <div class="section-sep"><h3><i data-lucide="newspaper" class="lc"></i> Actualites & Alertes</h3></div>
         <div class="card"><div class="news-feed" id="newsFeed"></div></div>
 
-        <div class="section-sep"><h3><i data-lucide="bot" class="lc"></i> Recommandations IA</h3></div>
+        <div class="section-sep"><h3><i data-lucide="lightbulb" class="lc"></i> Recommandations de marche</h3></div>
         <div class="reco-card" id="recoCard"><div id="recoContainer"></div></div>
 
         <div class="action-bar">
@@ -789,7 +789,7 @@
           <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> 3 marches</div>
           <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> 1 produit</div>
           <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Prix de base</div>
-          <div style="padding:6px 0;color:#ccc;"><i data-lucide="x-circle" class="lc"></i> Conseil IA</div>
+          <div style="padding:6px 0;color:#ccc;"><i data-lucide="x-circle" class="lc"></i> Recommandations expertes</div>
         </div>
         <button style="width:100%;margin-top:12px;padding:12px;background:#F5F5F5;color:#666;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Plan actuel</button>
       </div>
@@ -822,9 +822,9 @@
         </div>
         <div style="margin-top:12px;font-size:13px;color:#666;">
           <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Tous les produits</div>
-          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Conseil IA complet</div>
+          <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Recommandations expertes avancees</div>
           <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> GPS Financement</div>
-          <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Score Credit</div>
+          <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Score Profil Producteur</div>
         </div>
         <button onclick="souscrirePlan('Pro', 2900)" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Choisir Pro</button>
       </div>
@@ -912,7 +912,7 @@
         <div style="margin-top:12px;font-size:13px;color:#666;">
           <div style="padding:6px 0;border-bottom:1px solid #e0e8e3;"><i data-lucide="check-circle" class="lc"></i> Deploiement dans vos programmes</div>
           <div style="padding:6px 0;border-bottom:1px solid #e0e8e3;"><i data-lucide="check-circle" class="lc"></i> Dashboard d'impact personnalise</div>
-          <div style="padding:6px 0;border-bottom:1px solid #e0e8e3;"><i data-lucide="check-circle" class="lc"></i> API Credit Scoring</div>
+          <div style="padding:6px 0;border-bottom:1px solid #e0e8e3;"><i data-lucide="check-circle" class="lc"></i> API Score Profil Producteur</div>
           <div style="padding:6px 0;border-bottom:1px solid #e0e8e3;"><i data-lucide="check-circle" class="lc"></i> Donnees aggregees par region</div>
           <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Support dedie + SLA</div>
         </div>
@@ -982,8 +982,8 @@
           </div>
           <div style="font-size:13px;color:#333;line-height:1.8;">
             <p><strong>Article 1 — Objet</strong><br>Les presentes Conditions Generales de Vente (CGV) regissent les relations contractuelles entre 33 Lab SARL ("AgroPrix") et ses clients ("Utilisateurs") pour l'acces aux services payants de la plateforme AgroPrix.</p>
-            <p><strong>Article 2 — Services</strong><br>AgroPrix propose des abonnements mensuels donnant acces a des fonctionnalites avancees : analyse de prix multi-pays, conseil IA, GPS Financement, Credit Scoring, NDVI satellite, traçabilite QR et marketplace P2P.</p>
-            <p><strong>Article 3 — Tarifs</strong><br>• Gratuit : 0 FCFA/mois — fonctionnalites de base<br>• Starter : 990 FCFA/mois — tous les marches, 5 produits<br>• Pro : 2 900 FCFA/mois — conseil IA, GPS Financement, Score Credit<br>• Expert : 14 900 FCFA/mois — export, conformite, marketplace prioritaire<br>• Plantain Pro : 1 490 FCFA/mois<br>• Hevea Pro : 1 490 FCFA/mois<br>• Institution : sur devis</p>
+            <p><strong>Article 2 — Services</strong><br>AgroPrix propose des abonnements mensuels donnant acces a des fonctionnalites avancees : analyse de prix multi-pays, recommandations de marche, GPS Financement, Score Profil Producteur, suivi cartographique des parcelles, tracabilite QR et marketplace P2P.</p>
+            <p><strong>Article 3 — Tarifs</strong><br>• Gratuit : 0 FCFA/mois — fonctionnalites de base<br>• Starter : 990 FCFA/mois — tous les marches, 5 produits<br>• Pro : 2 900 FCFA/mois — recommandations, GPS Financement, Score Profil<br>• Expert : 14 900 FCFA/mois — export, conformite, marketplace prioritaire<br>• Plantain Pro : 1 490 FCFA/mois<br>• Hevea Pro : 1 490 FCFA/mois<br>• Institution : sur devis</p>
             <p><strong>Article 4 — Paiement</strong><br>Les paiements sont effectues via FedaPay (MTN Mobile Money, Moov Money, carte bancaire). Le paiement est du au debut de chaque periode mensuelle. En cas de non-paiement, l'acces aux fonctionnalites premium est suspendu.</p>
             <p><strong>Article 5 — Resiliation</strong><br>L'utilisateur peut resilier son abonnement a tout moment depuis les parametres de l'application. La resiliation prend effet a la fin de la periode en cours. Aucun remboursement au prorata.</p>
             <p><strong>Article 6 — Responsabilite</strong><br>AgroPrix fournit des analyses et conseils a titre informatif. Les decisions d'achat, de vente ou d'investissement restent de la responsabilite exclusive de l'utilisateur. AgroPrix ne garantit pas l'exactitude absolue des prix affiches.</p>
@@ -1004,8 +1004,8 @@
           </div>
           <div style="font-size:13px;color:#333;line-height:1.8;">
             <p><strong>1. Donnees collectees</strong><br>Nous collectons : nom, email, telephone, pays, cultures pratiquees, superficie, donnees de prix saisies, donnees de transactions marketplace, localisation GPS des parcelles (avec consentement).</p>
-            <p><strong>2. Finalites</strong><br>Ces donnees servent a : personnaliser les analyses de prix, calculer le credit scoring, fournir des recommandations de production, ameliorer le service via des donnees agregees et anonymisees.</p>
-            <p><strong>3. Partage</strong><br>Vos donnees individuelles ne sont JAMAIS vendues. Les donnees agregees et anonymisees peuvent etre partagees avec des institutions financieres partenaires (banques, MFIs, assureurs) dans le cadre du credit scoring, avec votre consentement explicite.</p>
+            <p><strong>2. Finalites</strong><br>Ces donnees servent a : personnaliser les analyses de prix, calculer le score profil producteur (indicateur de completude et d'activite), fournir des recommandations de production, ameliorer le service via des donnees agregees et anonymisees.</p>
+            <p><strong>3. Partage</strong><br>Vos donnees individuelles ne sont JAMAIS vendues. Les donnees agregees et anonymisees peuvent etre partagees avec des institutions financieres partenaires (banques, MFIs, assureurs) dans le cadre du dispositif de profil producteur, avec votre consentement explicite. La decision finale de financement releve exclusivement de l'institution partenaire.</p>
             <p><strong>4. Stockage</strong><br>Les donnees sont stockees sur des serveurs securises (Railway, PostgreSQL) avec chiffrement en transit (HTTPS/TLS). Les donnees hors-ligne sont stockees localement dans le navigateur (localStorage).</p>
             <p><strong>5. Duree de conservation</strong><br>Vos donnees sont conservees tant que votre compte est actif. Apres 24 mois d'inactivite, votre compte et vos donnees sont supprimes. Vous pouvez demander la suppression a tout moment.</p>
             <p><strong>6. Vos droits</strong><br>Conformement a la loi beninoise sur le numerique, vous avez le droit d'acces, de rectification, de suppression et de portabilite de vos donnees. Contactez-nous a : contact@agroprix.app</p>
@@ -1215,8 +1215,8 @@
           </div>
           <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('scoring')">
             <div style="font-size:32px;margin-bottom:8px;"><i data-lucide="bar-chart-3" class="lc"></i></div>
-            <div style="font-size:13px;font-weight:700;color:var(--text);">Mon Score Credit</div>
-            <div style="font-size:11px;color:var(--text-light);">Score 0-1000</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);">Mon Score Profil</div>
+            <div style="font-size:11px;color:var(--text-light);">Indicateur 0-1000</div>
           </div>
           <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('ndvi')">
             <div style="font-size:32px;margin-bottom:8px;"><i data-lucide="satellite" class="lc"></i></div>
@@ -1246,7 +1246,7 @@
           <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('plantain')">
             <div style="font-size:32px;margin-bottom:8px;">🍌</div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Plantain Pro</div>
-            <div style="font-size:11px;color:var(--text-light);">Recolte + Marche + IA</div>
+            <div style="font-size:11px;color:var(--text-light);">Recolte + Marche + Conseil expert</div>
           </div>
           <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('proprietaire')">
             <div style="font-size:32px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;"><i data-lucide="home" class="lc" style="width:32px;height:32px;color:#1B4332;"></i></div>
@@ -1283,7 +1283,7 @@
     </div>
     <div style="text-align:center;cursor:pointer;" onclick="showView('scoring');closeMoreMenu()">
       <div style="width:50px;height:50px;border-radius:14px;background:#FFF3E0;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="bar-chart-3" class="lc"></i></div>
-      <div style="font-size:11px;font-weight:600;">Score Credit</div>
+      <div style="font-size:11px;font-weight:600;">Score Profil</div>
     </div>
     <div style="text-align:center;cursor:pointer;" onclick="showView('ndvi');closeMoreMenu()">
       <div style="width:50px;height:50px;border-radius:14px;background:#E0F2F1;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="satellite" class="lc"></i></div>

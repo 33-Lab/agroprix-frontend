@@ -1,13 +1,16 @@
 // AgroPrix — Santé Parcelle / NDVI Module
-// Indice de végétation satellite (Sentinel-2 via Agromonitoring API)
-// Enregistrement parcelle GPS → NDVI hebdomadaire → alertes → assurance paramétrique
+// Source satellite : Planet Insights Platform (PlanetScope 3m, ARPS)
+// Phase 1 (actuelle) : disponibilité des scènes Planet via /api/ndvi/parcelle/:id
+// Phase 2 (à venir)  : extraction pixel NDVI via Planet Orders API bandmath
+// ⚠️ Les valeurs NDVI affichées ci-dessous sont des DÉMOS simulées tant que
+//    la phase 2 n'est pas déployée. Les dates de scènes Planet, elles, sont réelles.
 (function(AP) {
   'use strict';
 
   var PARCELS_KEY = 'agroprix_parcels';
   var NDVI_HISTORY_KEY = 'agroprix_ndvi_history';
 
-  // Demo NDVI data (simulated Sentinel-2 values)
+  // ⚠️ Valeurs NDVI simulées (démonstration) — remplacées par Planet Orders API en phase 2
   var DEMO_NDVI = [
     { date: '2025-10-01', ndvi: 0.42 },
     { date: '2025-10-15', ndvi: 0.48 },
@@ -80,9 +83,15 @@
     var container = document.getElementById('ndviContent');
     if (!container) return;
 
-    var html = '<div style="text-align:center;margin-bottom:16px;">'
+    var html = '<div style="text-align:center;margin-bottom:12px;">'
       + '<h3 style="margin:0 0 4px;color:var(--primary);">Sante Parcelle</h3>'
-      + '<p style="font-size:12px;color:var(--text-light);">Suivez la sante de vos cultures par satellite (NDVI Sentinel-2)</p>'
+      + '<p style="font-size:12px;color:var(--text-light);">Suivi satellite des cultures (Planet PlanetScope 3m)</p>'
+      + '</div>'
+      + '<div style="background:#FEF3C7;border-left:4px solid #E8862A;padding:10px 12px;border-radius:8px;margin-bottom:14px;font-size:12px;color:#92400E;line-height:1.4;">'
+      + '<strong><i data-lucide="info" class="lc" style="width:14px;height:14px;vertical-align:-2px;"></i> Module NDVI en cours de migration</strong><br>'
+      + 'Les <em>valeurs</em> NDVI ci-dessous sont simulees a des fins de demonstration. '
+      + 'La connexion Planet Insights (PlanetScope 3m) est deployee — le calcul des '
+      + 'valeurs NDVI reelles par parcelle arrive en phase 2 (Orders API bandmath).'
       + '</div>';
 
     if (parcels.length === 0) {

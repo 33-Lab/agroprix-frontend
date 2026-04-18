@@ -260,37 +260,46 @@ window.chercherTechniciens = function() {
 // NOTE: calculateTransport() est dans negoce.js.src — ne pas dupliquer ici
 
 // ============================================================
-// Souscription Plan — Paiement KKiaPay (MTN MoMo, Moov, Carte)
+// Souscription Plan — Paiement FedaPay (MTN MoMo, Moov, Carte)
 // ============================================================
 window.souscrirePlan = function(plan, montant) {
   var AP = window.AgroPrix;
   var user = JSON.parse(localStorage.getItem('agroprix_user') || '{}');
-  var kkiapayKey = AP && AP.KKIAPAY_KEY;
-  var keyReady = kkiapayKey && kkiapayKey !== 'VOTRE_CLE_PUBLIQUE_KKIAPAY_ICI';
+  var fedapayKey = AP && AP.FEDAPAY_KEY;
+  var keyReady = fedapayKey && fedapayKey !== 'VOTRE_CLE_PUBLIQUE_FEDAPAY_ICI';
 
-  // Si KKiaPay est configuré → paiement réel
-  if (keyReady && window.openKkiapayWidget) {
-    // Écouter le succès (une seule fois)
-    if (window.addSuccessListener) {
-      window.addSuccessListener(function(response) {
-        onKkiapaySuccess(plan, montant, response);
-      });
-    }
-    // Ouvrir le widget KKiaPay
-    window.openKkiapayWidget({
-      amount: montant,
-      api_key: kkiapayKey,
-      sandbox: AP.KKIAPAY_SANDBOX || false,
-      email: user.email || '',
-      phone: user.phone || '',
-      name: user.nom || user.name || 'Client AgroPrix',
-      callback: window.location.origin,
-      theme: '#1B4332'
-    });
+  // Si FedaPay est configuré → paiement réel
+  if (keyReady && window.FedaPay) {
+    var nameParts = (user.nom || user.name || 'Client AgroPrix').split(' ');
+    var firstname = nameParts[0] || 'Client';
+    var lastname = nameParts.slice(1).join(' ') || 'AgroPrix';
+
+    FedaPay.init({
+      public_key: fedapayKey,
+      transaction: {
+        amount: montant,
+        description: 'Abonnement Plan ' + plan + ' — AgroPrix',
+        custom_metadata: {
+          user_id: user.id || user.user_id || '',
+          plan: plan,
+          source: 'agroprix_web'
+        }
+      },
+      customer: {
+        email: user.email || 'client@agroprix.app',
+        lastname: lastname,
+        firstname: firstname
+      },
+      onComplete: function(resp) {
+        if (resp.reason === FedaPay.CHECKOUT_COMPLETED) {
+          onFedapaySuccess(plan, montant, resp);
+        }
+      }
+    }).open();
     return;
   }
 
-  // Fallback simulation (tant que la clé n'est pas configurée)
+  // Fallback WhatsApp (tant que la clé n'est pas configurée)
   var fmt = montant.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   var overlay = document.createElement('div');
   overlay.id = 'paymentOverlay';
@@ -302,7 +311,7 @@ window.souscrirePlan = function(plan, montant) {
     + '<div style="font-size:28px;font-weight:800;color:#E8862A;margin-top:8px;">' + fmt + ' FCFA<span style="font-size:14px;color:#999;font-weight:500;">/mois</span></div>'
     + '</div>'
     + '<div style="padding:14px;background:#FEF3C7;border-radius:12px;font-size:13px;color:#92400E;margin-bottom:16px;">'
-    + '<strong>Paiement bientôt disponible</strong><br>KKiaPay sera activé dans les prochaines heures. Revenez ou contactez-nous via WhatsApp.'
+    + '<strong>Paiement bientôt disponible</strong><br>FedaPay sera activé dans les prochaines heures. Revenez ou contactez-nous via WhatsApp.'
     + '</div>'
     + '<a href="https://wa.me/22960000000?text=Je veux souscrire au Plan ' + plan + ' (' + fmt + ' FCFA/mois)" target="_blank" style="display:block;width:100%;padding:14px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:10px;"><i data-lucide="message-circle" class="lc" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> Payer via WhatsApp</a>'
     + '<button onclick="document.getElementById(\'paymentOverlay\').remove()" style="width:100%;padding:12px;background:none;border:1px solid #ddd;border-radius:12px;font-size:14px;color:#999;cursor:pointer;">Fermer</button>'
@@ -310,9 +319,11 @@ window.souscrirePlan = function(plan, montant) {
   document.body.appendChild(overlay);
 };
 
-// Callback succès paiement KKiaPay
-function onKkiapaySuccess(plan, montant, response) {
-  var transactionId = response && response.transactionId ? response.transactionId : 'N/A';
+// Callback succès paiement FedaPay
+function onFedapaySuccess(plan, montant, response) {
+  var transactionId = response && response.transaction && response.transaction.id
+    ? response.transaction.id
+    : (response && response.id ? response.id : 'N/A');
   var user = JSON.parse(localStorage.getItem('agroprix_user') || '{}');
 
   // Mettre à jour le plan de l'utilisateur en localStorage

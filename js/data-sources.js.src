@@ -1,6 +1,6 @@
 // ============================================================
 // AgroPrix — Data Sources Connector v1.0
-// Sources : WFP HDX, FAOSTAT, FEWS NET, Banque Mondiale
+// Sources : WFP HDX, FAOSTAT, Banque Mondiale, NASA POWER
 // Auteur  : 33 Lab Agency Solutions
 // Date    : 31 mars 2026
 //
@@ -76,15 +76,9 @@ window.AgroPrix = window.AgroPrix || {};
       requiresKey: false,
       frequency: 'annual',
       coverage: 8
-    },
-    // FEWS NET — marchés ruraux (CSV public, sans clé)
-    FEWS_NET: {
-      name: 'FEWS NET / USAID',
-      baseUrl: 'https://fews.net',
-      requiresKey: false,
-      frequency: 'monthly',
-      coverage: 7
     }
+    // Note : FEWS NET retiré — non implémenté côté fetch. Source envisagée
+    // pour phase 2 (CSV Food Price Database USAID).
   };
 
   // ── Cache interne (24h) ───────────────────────────────────────────────────

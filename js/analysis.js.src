@@ -224,6 +224,30 @@ window.AgroPrix = window.AgroPrix || {};
 
     if (data.length === 0) return;
 
+    // ── Calibrage avec données de référence SIM nationaux ──────────────────
+    // Mapping clés cultures analysis → clés DataSources
+    var DS_CULTURE_MAP = {
+      riz_local: 'riz', riz_importe: 'riz', cajou: 'anacarde'
+    };
+    var dsCulture = DS_CULTURE_MAP[culture] || culture;
+    var refPrices = (AP.DataSources) ? AP.DataSources.getReferenceData(country, dsCulture) : [];
+    var dataSubtitle = 'Mars 2026 \u00b7 Analyse en temps r\u00e9el';
+
+    if (refPrices.length > 0 && refPrices[0].price > 0) {
+      var refPrice = refPrices[0].price;
+      var rawCurrent = data[data.length - 1];
+      if (rawCurrent > 0) {
+        var scale = refPrice / rawCurrent;
+        data = data.map(function(p) { return Math.round(p * scale); });
+        prevData = prevData.map(function(p) { return Math.round(p * scale); });
+        forecast = forecast.map(function(p) { return Math.round(p * scale); });
+        allData = allData.map(function(p) { return Math.round(p * scale); });
+      }
+      var srcLabel = refPrices[0].market || 'SIM nationaux';
+      var trendLabel = refPrices[0].trend ? ' \u00b7 ' + refPrices[0].trend : '';
+      dataSubtitle = srcLabel + trendLabel + ' \u00b7 Mars 2026';
+    }
+
     var currentPrice = data[data.length - 1];
     var prevPrice    = data.length > 1 ? data[data.length - 2] : currentPrice;
     var momChange    = prevPrice ? ((currentPrice - prevPrice) / prevPrice * 100).toFixed(1) : '0.0';
@@ -231,8 +255,7 @@ window.AgroPrix = window.AgroPrix || {};
     var yoyChange    = yoyPrice ? ((currentPrice - yoyPrice) / yoyPrice * 100).toFixed(1) : '0.0';
     var vol          = AP.calculateVolatility(data);
 
-    _updateHero(flag, cultureName, cName, currentPrice, momChange, yoyChange, vol,
-      'Mars 2026 \u00b7 Analyse en temps r\u00e9el');
+    _updateHero(flag, cultureName, cName, currentPrice, momChange, yoyChange, vol, dataSubtitle);
 
     _updateStats(data, allData);
 
@@ -344,7 +367,7 @@ window.AgroPrix = window.AgroPrix || {};
         pointHoverRadius: 5
       },
       {
-        label: 'Pr\u00e9vision IA',
+        label: 'Projection tendancielle',
         data: forecastLine,
         borderColor: COLORS.forecast,
         borderWidth: 2,
@@ -419,7 +442,7 @@ window.AgroPrix = window.AgroPrix || {};
         pointRadius: 0
       },
       {
-        label: 'Pr\u00e9vision IA',
+        label: 'Projection tendancielle',
         data: forecastLine,
         borderColor: COLORS.forecast,
         borderWidth: 2,
