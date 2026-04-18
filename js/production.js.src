@@ -119,37 +119,42 @@
     piment: {
       name: 'Piment',
       varietes: [
-        { nom:'Piment oiseau (local)', cycle:'90-120 jours', rendement:'3-5 t/ha', resistance:'Bonne rusticité', remarque:'Très piquant, forte demande locale' },
-        { nom:'Gbatakin (local)', cycle:'100-130 jours', rendement:'5-8 t/ha', resistance:'Tolérance virus modérée', remarque:'Gros fruits, marché Dantokpa' },
-        { nom:'Cayenne longue', cycle:'110-140 jours', rendement:'6-10 t/ha', resistance:'Bonne adaptation', remarque:'Export possible, séchage facile' }
+        { nom:'Gogoví (Bénin — local)', cycle:'90-110 jours', rendement:'3-6 t/ha frais', resistance:'Bonne rusticité, sensible CMV', remarque:'Très piquant (Scoville 80 000-100 000). Référence du marché Dantokpa. Excellent séché en poudre rouge. Demande permanente Cotonou, Lagos, Abidjan.' },
+        { nom:'Gbatakin (Bénin — local)', cycle:'100-130 jours', rendement:'6-10 t/ha', resistance:'Tolérance virose modérée', remarque:'Gros fruits allongés, moins piquant. Apprécié frais et en conserve. Meilleur prix/kg quand séché et exporté vers diaspora africaine Europe.' },
+        { nom:'Dibi-Dibi (Niger/Mali)', cycle:'85-100 jours', rendement:'2-4 t/ha', resistance:'Excellente tolérance sécheresse', remarque:'Minuscule, extrêmement piquant. Séché en poudre rouge — produit artisanal stratégique Sahel. Export informel vers Abidjan et Lagos.' },
+        { nom:'Habanero (CI, Sénégal)', cycle:'100-120 jours', rendement:'4-7 t/ha', resistance:'Sensible Phytophthora', remarque:'Orange/rouge, très fort. Demande croissante marchés Abidjan et Dakar. Niche export condiments vers Europe (diaspora). Prix frais 600-900 FCFA/kg.' },
+        { nom:'Cayenne longue', cycle:'110-140 jours', rendement:'7-12 t/ha', resistance:'Bonne adaptation', remarque:'Polyvalente — frais + séchage + poudre. Facilement séchable au soleil (3-4 jours). Reconditionnement sachets possible pour valeur ajoutée +300%.' },
+        { nom:'Piment doux / Poivron (Commercial)', cycle:'90-120 jours', rendement:'15-25 t/ha', resistance:'Modérée', remarque:'Niches restaurants, hôtels, GMS Abidjan/Dakar. Prix premium 500-800 FCFA/kg. Irrigation obligatoire.' }
       ],
       couts: {
-        semences: 60000,
-        engrais: 130000,
-        pesticides: 95000,
-        irrigation: 120000,
-        mainOeuvre: 220000,
-        transport: 40000,
-        divers: 30000
+        semences: 65000,
+        engrais: 140000,
+        pesticides: 110000,
+        irrigation: 130000,
+        mainOeuvre: 230000,
+        transport: 45000,
+        divers: 35000
       },
-      niveaux: { faible:0.7, moyen:1.0, intensif:1.35 },
+      niveaux: { faible:0.7, moyen:1.0, intensif:1.4 },
       scenarios: [
-        { label:'Faible', rendement:2.5, prix:400, couleur:'#e76f51' },
-        { label:'Moyen', rendement:5, prix:550, couleur:'#E8862A' },
-        { label:'Bon', rendement:7.5, prix:700, couleur:'#52b788' },
-        { label:'Excellent', rendement:10, prix:900, couleur:'#2D6A4F' }
+        { label:'Faible', rendement:2.5, prix:380, couleur:'#e76f51' },
+        { label:'Moyen', rendement:5, prix:520, couleur:'#E8862A' },
+        { label:'Bon (séché)', rendement:1.2, prix:2200, couleur:'#52b788' },
+        { label:'Excellent (poudre export)', rendement:1.0, prix:3500, couleur:'#2D6A4F' }
       ],
       calendrier: [
-        { mois:'Mois 1', activite:'Pépinière', detail:'Semis en pépinière ombragée, arrosage fin' },
-        { mois:'Mois 2', activite:'Repiquage & installation', detail:'Repiquage à 45 jours, paillage' },
-        { mois:'Mois 3-4', activite:'Entretien & fructification', detail:'Irrigation, traitements, taille si nécessaire' },
-        { mois:'Mois 5', activite:'Récolte échelonnée', detail:'Récolte sur 4-6 semaines, séchage possible' }
+        { mois:'Mois 1 (Oct-Nov)', activite:'Pépinière ombragée', detail:'Semis en pépinière sous ombrage 50%, substrat compost+sable, arrosage fin matin. Traitement semences à la thirame. Durée 35-45 jours avant repiquage.' },
+        { mois:'Mois 2', activite:'Repiquage & paillage', detail:'Repiquage le soir ou par temps couvert. Écartement 40x50 cm sur buttes. Paillage paille/plastique obligatoire (conserve humidité, réduit adventices). Application Carbofuran si symphylan.' },
+        { mois:'Mois 3-4', activite:'Entretien, traitements, taille', detail:'Irrigation goutte-à-goutte ou arrosoir tous les 2-3 jours. Apport urée + potasse. Traitement hebdo Lambda-cyhalothrine + Mancozèbe. Taille basale branches stériles.' },
+        { mois:'Mois 4-5', activite:'Récolte échelonnée (frais ou séchage)', detail:'Récolte tous les 3-4 jours. Pour séchage : couper à maturité rouge complète. Séchage solaire sur claies 3-5 jours (humidité cible < 12%). Triage, ensachage polyéthylène.' },
+        { mois:'Après récolte', activite:'Transformation & valorisation', detail:'Poudre de piment : broyage sec, tamisage, conditionnement sachets 50g/100g/500g. Pâte de piment : broyage humide + huile + sel + conservateur. Valeur ajoutée x3 à x5 vs vente fraîche.' }
       ],
       risques: [
-        { type:'Maladie', nom:'Anthracnose', probabilite:'Moyenne', impact:'Perte fruits 20-40%', conseil:'Fongicide cuivre, rotation 2 ans' },
-        { type:'Ravageur', nom:'Pucerons & mouches blanches', probabilite:'Élevée', impact:'Transmission virus, déformation', conseil:'Piégeage, insecticide biologique' },
-        { type:'Climat', nom:'Excès humidité', probabilite:'Moyenne', impact:'Pourriture collet et fruits', conseil:'Bon drainage, culture sur buttes' },
-        { type:'Marché', nom:'Fluctuation prix frais', probabilite:'Élevée', impact:'Prix divisé par 2-3 en saison', conseil:'Séchage et transformation, stockage' }
+        { type:'Maladie', nom:'Anthracnose fruits (Colletotrichum capsici)', probabilite:'Très élevée en saison des pluies', impact:'30-60% perte fruits, déclassement total', conseil:'Fongicide cuivre en préventif + Mancozèbe. Éviter blessures à la récolte. Rotation 2 ans minimum.' },
+        { type:'Virus', nom:'CMV / Virus mosaïque concombre (pucerons)', probabilite:'Élevée', impact:'Déformation feuilles et fruits, rendement -40 à -80%', conseil:'Lutte chimique pucerons (Imidaclopride), filets anti-insectes pépinière, détruire plants infectés.' },
+        { type:'Virus', nom:'TSWV / Virus Bronzure tomate (thrips)', probabilite:'Moyenne-élevée', impact:'Mort précoce plants, pertes totales parcelles', conseil:'Traitement thrips en pépinière (Spinosad), variétés tolérantes, délai plantation entre pépinières.' },
+        { type:'Ravageur', nom:'Nématodes à galles (Meloidogyne)', probabilite:'Élevée sols légers/sableux', impact:'Blocage croissance, rendement -50%', conseil:'Rotation avec niébé ou maïs, fumigation avant plantation, variétés tolérantes, NeemAzal.' },
+        { type:'Marché', nom:'Effondrement prix frais en pleine saison', probabilite:'Très élevée (Oct-Déc)', impact:'Prix divisé par 3-4 : 150 FCFA vs 500+ hors saison', conseil:'Sécher et stocker la récolte de pointe. Vendre poudre/pâte en saison sèche. Accord avec transformateur.' }
       ]
     },
 
@@ -334,6 +339,277 @@
         { type:'Ravageur', nom:'Mineuse de l\'épi (Heliocheilus)', probabilite:'Élevée', impact:'Destruction grains 20-40%', conseil:'Dates semis optimales, traitement biologique' },
         { type:'Ravageur', nom:'Oiseaux (Quelea quelea)', probabilite:'Élevée', impact:'Perte 20-50%', conseil:'Gardiennage, filets, variétés aristées' },
         { type:'Climat', nom:'Déficit pluviométrique', probabilite:'Moyenne', impact:'Échec culture possible', conseil:'Variétés extra-précoces, techniques CES/DRS' }
+      ]
+    },
+
+    cacao: {
+      name: 'Cacao',
+      varietes: [
+        { nom:'Amelonado (locale)', cycle:'Plantation 3-4 ans avant production', rendement:'400-700 kg/ha', resistance:'Sensible Black Pod', remarque:'Variété historique, goût fin mais faible rendement' },
+        { nom:'Trinitario (hybride local)', cycle:'2-3 ans', rendement:'700-1200 kg/ha', resistance:'Tolérance modérée maladies', remarque:'Qualité arôme supérieure, très répandu CI' },
+        { nom:'Clone CNRA Cl 1 à Cl 20', cycle:'2-3 ans', rendement:'1200-2000 kg/ha', resistance:'Meilleure tolérance CSSV et Black Pod', remarque:'Variétés sélectionnées CNRA-CI, haut rendement' },
+        { nom:'IMC 67 (Forastero amélioré)', cycle:'3 ans', rendement:'1000-1800 kg/ha', resistance:'Bonne tolérance sécheresse', remarque:'Diffusé par CCC, adapté zones nord CI' }
+      ],
+      couts: {
+        semences: 120000,
+        engrais: 150000,
+        pesticides: 200000,
+        irrigation: 0,
+        mainOeuvre: 350000,
+        transport: 60000,
+        divers: 50000
+      },
+      niveaux: { faible:0.5, moyen:1.0, intensif:1.6 },
+      scenarios: [
+        { label:'Faible', rendement:0.5, prix:1500, couleur:'#e76f51' },
+        { label:'Moyen', rendement:0.9, prix:1650, couleur:'#E8862A' },
+        { label:'Bon', rendement:1.4, prix:1700, couleur:'#52b788' },
+        { label:'Excellent', rendement:2.0, prix:1750, couleur:'#2D6A4F' }
+      ],
+      calendrier: [
+        { mois:'Oct - Nov', activite:'Récolte principale (grande traite)', detail:'Cabossage, fermentation 5-7 jours, séchage 10-14 jours au soleil' },
+        { mois:'Déc - Jan', activite:'Taille & entretien', detail:'Taille de formation, désherbage, application phytosanitaires' },
+        { mois:'Mar - Avr', activite:'Petite récolte + traitement', detail:'Ramassage cabosses, traitement fongicide cuprique (Black Pod)' },
+        { mois:'Mai - Sep', activite:'Entretien plantations', detail:'Désherbage, fertilisation NPK, surveillance CSSD (swollen shoot)' }
+      ],
+      risques: [
+        { type:'Maladie', nom:'Black Pod (Phytophthora)', probabilite:'Très élevée', impact:'Perte 30-80% si non traitée', conseil:'Bouillie bordelaise, ramassage cabosses malades, drainage' },
+        { type:'Maladie', nom:'Swollen Shoot (CSSV)', probabilite:'Moyenne (zones endémiques)', impact:'Mort plantations — irréversible', conseil:'Surveillance ANADER, arrachage immédiat plants infectés' },
+        { type:'Ravageur', nom:'Capsides (Sahlbergella singularis)', probabilite:'Élevée', impact:'Perte 25-40% rendement', conseil:'Insecticides systémiques, taille aérée' },
+        { type:'Marché', nom:'Chute prix international', probabilite:'Moyenne', impact:'Revenu -30% si prix < 1400 FCFA/kg', conseil:'Adhérer à une coopérative pour prix garanti CCC' }
+      ]
+    },
+
+    cajou: {
+      name: 'Anacarde (Cajou)',
+      varietes: [
+        { nom:'Population locale CI/BF', cycle:'3-4 ans avant production', rendement:'300-600 kg/ha', resistance:'Bonne tolérance sécheresse', remarque:'80% des vergers UEMOA — peu entretenu, faible rendement' },
+        { nom:'Clone CCA 20-204 (CI)', cycle:'2-3 ans', rendement:'800-1500 kg/ha', resistance:'Bonne', remarque:'Sélectionné Conseil Coton-Anacarde CI' },
+        { nom:'EMBRAPA (Brésil) — Jumbo', cycle:'2-3 ans', rendement:'1000-2000 kg/ha', resistance:'Bonne', remarque:'Gros calibre, prime export' }
+      ],
+      couts: {
+        semences: 80000,
+        engrais: 100000,
+        pesticides: 80000,
+        irrigation: 0,
+        mainOeuvre: 250000,
+        transport: 50000,
+        divers: 30000
+      },
+      niveaux: { faible:0.5, moyen:1.0, intensif:1.5 },
+      scenarios: [
+        { label:'Faible', rendement:0.4, prix:600, couleur:'#e76f51' },
+        { label:'Moyen', rendement:0.7, prix:680, couleur:'#E8862A' },
+        { label:'Bon', rendement:1.0, prix:700, couleur:'#52b788' },
+        { label:'Excellent', rendement:1.5, prix:720, couleur:'#2D6A4F' }
+      ],
+      calendrier: [
+        { mois:'Jan - Fév', activite:'Floraison & traitement', detail:'Surveillance thrips et anthracnose, traitement insecticide' },
+        { mois:'Mar - Avr', activite:'Récolte principale', detail:'Ramassage noix tombées, triage, séchage 3-4 jours, ensachage' },
+        { mois:'Mai - Jul', activite:'Taille & nettoyage', detail:'Taille légère, désherbage, brûlage résidus infestés' },
+        { mois:'Août - Déc', activite:'Entretien hivernage', detail:'Désherbage, fertilisation organique si disponible' }
+      ],
+      risques: [
+        { type:'Ravageur', nom:'Thrips (Selenothrips rubrocinctus)', probabilite:'Élevée', impact:'Brûlures feuilles, chute noix 20-30%', conseil:'Traitement Lambda-cyhalothrine à la floraison' },
+        { type:'Maladie', nom:'Anthracnose (Colletotrichum gloeosporioides)', probabilite:'Moyenne', impact:'Noircissement pommes et noix 15-25%', conseil:'Variétés tolérantes, fongicide cuivre' },
+        { type:'Marché', nom:'Contrebande Guinée-Bissau / Ghana', probabilite:'Haute (saison)', impact:'Baisse prix bord champ 10-20%', conseil:'Vendre via coopérative agréée CCA pour prix garanti' },
+        { type:'Stockage', nom:'Mycotoxines (aflatoxines)', probabilite:'Élevée si mal séché', impact:'Refus export, perte totale', conseil:'Séchage < 8% humidité, stockage aéré, contrôle régulier' }
+      ]
+    },
+
+    coton: {
+      name: 'Coton',
+      varietes: [
+        { nom:'STAM F-94 / STAM 59A (zone UEMOA)', cycle:'160-180 jours', rendement:'1200-2000 kg/ha graine', resistance:'Tolérance sécheresse modérée', remarque:'Variété dominante UEMOA (BF, ML, TG, CI). Bonne longueur fibre (28-30 mm). Intrants fournis en crédit par société cotonnière.' },
+        { nom:'FK 37 / FK 290 (Burkina Faso — SOFITEX)', cycle:'150-165 jours', rendement:'1000-1800 kg/ha', resistance:'Tolérance jassides élevée', remarque:'Sélectionné SOFITEX. Précoce, adapté zone nord Burkina (Dédougou, Tougan). Fibre uniforme grade B.' },
+        { nom:'NTA L 142 / NTA L 208 (Bénin — SONAPRA/AIC)', cycle:'160-175 jours', rendement:'1500-2500 kg/ha', resistance:'Bonne tolérance ravageurs majeurs', remarque:'Variétés officielles filière coton Bénin. Zones: Borgou, Alibori, Atacora. Achat garanti AIC à 290 FCFA/kg (2025-26).' },
+        { nom:'IRMA 96+97 (Mali — CMDT)', cycle:'155-170 jours', rendement:'1400-2200 kg/ha', resistance:'Bonne tolérance TSWV', remarque:'Sélectionné CMDT. Zone Koutiala-Bougouni-Sikasso. Prix garanti CMDT 285 FCFA/kg (1er choix 2025-26). Crédit intrants BNDA.' },
+        { nom:'HS 117 / BS 717 (SOFITEX Burkina)', cycle:'155-175 jours', rendement:'1600-2800 kg/ha', resistance:'Résistant Striga et capsides', remarque:'Nouveau clone SOFITEX haute performance. Zone Bobo-Dioulasso, Banfora. Record terrain 3.2 t/ha sous gestion optimale.' }
+      ],
+      couts: {
+        semences: 30000,
+        engrais: 230000,
+        pesticides: 160000,
+        irrigation: 0,
+        mainOeuvre: 290000,
+        transport: 60000,
+        divers: 40000
+      },
+      niveaux: { faible:0.6, moyen:1.0, intensif:1.5 },
+      scenarios: [
+        { label:'Faible', rendement:0.8, prix:275, couleur:'#e76f51' },
+        { label:'Moyen', rendement:1.4, prix:300, couleur:'#E8862A' },
+        { label:'Bon', rendement:1.9, prix:315, couleur:'#52b788' },
+        { label:'Excellent', rendement:2.6, prix:330, couleur:'#2D6A4F' }
+      ],
+      calendrier: [
+        { mois:'Mai - Juin', activite:'Préparation & semis', detail:'Labour profond 30 cm, application fumure fond NPK 200 kg/ha (fourni en crédit société cotonnière). Semis en ligne 80x30 cm après premières pluies d\'installation (> 30 mm en 3 jours).' },
+        { mois:'Juillet', activite:'Démariage, 1er sarclage & urée', detail:'Démariage à 2 plants/poquet (3 semaines), 1er sarclage mécanique ou manuel. Application urée 50 kg/ha au 30e jour. Début programme phytosanitaire (traitement 1 à J+45).' },
+        { mois:'Août - Sept', activite:'Traitements calendrier + 2e sarclage', detail:'6-8 traitements insecticides (cyperméthrine + acétamipride toutes les 14 jours). Surveillance capsides, Helicoverpa, Spodoptera. Buttage 2e sarclage. Application potasse.' },
+        { mois:'Oct - Nov', activite:'Floraison, capsulation & récolte 1er passage', detail:'Arrêt traitements à l\'ouverture capsules. Récolte manuelle 1er passage (capsules ouvertes). Stockage coton-graine propre, sec, à l\'abri de la pluie. Pesée sur balance certifiée.' },
+        { mois:'Déc - Jan', activite:'Récolte 2e passage & livraison', detail:'2e passage récolte (capsules retardataires). Livraison à la société cotonnière (SOFITEX, CMDT, AIC, NST). Paiement sous 30-45 jours. Conservation semences pour rotation.' }
+      ],
+      risques: [
+        { type:'Ravageur', nom:'Helicoverpa armigera (chenille capsule)', probabilite:'Très élevée', impact:'Perte 40-70% sans traitement — ravageur numéro 1', conseil:'Programme insecticide calendrier STRICT (6-8 traitements dès J+45). Rotation molécules (pyréthrine→organophosphoré). Surveillance hebdo.' },
+        { type:'Ravageur', nom:'Capsides (Mirides : Campylomma, Creontiades)', probabilite:'Élevée (début cycle)', impact:'Déformation capsules, chute prématurée 20-30%', conseil:'Traitement thiamethoxame à J+45 + J+60. Variétés tolérantes SOFITEX.' },
+        { type:'Ravageur', nom:'Jassides & pucerons (début saison)', probabilite:'Élevée', impact:'Virus + fumagine, rendement -15-25%', conseil:'Imidaclopride traitement semence, variétés tolérantes (FK 37 BF).' },
+        { type:'Marché', nom:'Poids tare (déchets, humidité)', probabilite:'Certaine', impact:'Déduction 5-15% sur pesée = perte revenu directe', conseil:'Sécher soigneusement avant livraison, pas de coton souillé ou humide. Réclamer double pesée.' },
+        { type:'Système', nom:'Retard paiement société cotonnière', probabilite:'Moyenne (pays AES)', impact:'Trésorerie bloquée 2-4 mois, impact campagne suivante', conseil:'Adhérer à une organisation de producteurs (OP) qui négocie délais de paiement groupés.' }
+      ]
+    },
+
+    hevea: {
+      name: 'Hévéa',
+      varietes: [
+        { nom:'GT 1 (Gondang Tapen 1)', cycle:'6-7 ans ouverture, 30 ans exploitation', rendement:'1500-2200 kg/ha/an', resistance:'Sensible SALB', remarque:'Clone historique, 60% vergers CI — fiable mais pas le plus productif' },
+        { nom:'IRCA 109', cycle:'5-6 ans', rendement:'2000-2800 kg/ha/an', resistance:'Bonne tolérance SALB', remarque:'Clone CNRA-CI, haute production, le plus utilisé en nouvelles plantations' },
+        { nom:'IRCA 230', cycle:'5-6 ans', rendement:'2200-3000 kg/ha/an', resistance:'Excellente tolérance SALB et CSPD', remarque:'Clone élite CNRA, programme APROMAC 500 000 ha' },
+        { nom:'PB 260', cycle:'5-6 ans', rendement:'1800-2500 kg/ha/an', resistance:'Bonne', remarque:'Clone asiatique diffusé en CI — bon en zone humide' }
+      ],
+      couts: {
+        semences: 350000,
+        engrais: 200000,
+        pesticides: 120000,
+        irrigation: 0,
+        mainOeuvre: 450000,
+        transport: 80000,
+        divers: 60000
+      },
+      niveaux: { faible:0.7, moyen:1.0, intensif:1.3 },
+      scenarios: [
+        { label:'Faible', rendement:1.2, prix:800, couleur:'#e76f51' },
+        { label:'Moyen', rendement:1.8, prix:890, couleur:'#E8862A' },
+        { label:'Bon', rendement:2.4, prix:920, couleur:'#52b788' },
+        { label:'Excellent', rendement:3.0, prix:950, couleur:'#2D6A4F' }
+      ],
+      calendrier: [
+        { mois:'Années 1-6', activite:'Plantation & entretien immature', detail:'Mise en place, désherbage, fertilisation NPK, traitements maladies de feuilles (SALB)' },
+        { mois:'Ouverture (an 6-7)', activite:'Mise en saignée', detail:'Encoches en 1/2 spirale descendante, fréquence d/2 (un jour sur deux)' },
+        { mois:'Toute l\'année', activite:'Saignée & collecte', detail:'Saignée tôt le matin (5h-7h), collecte latex 6h-9h, coagulation, séchage fumoir ou soleil' },
+        { mois:'Saison sèche', activite:'Repos physiologique', detail:'Refoliation complète, traitement SALB, fertilisation forte' }
+      ],
+      risques: [
+        { type:'Maladie', nom:'SALB (Microcyclus ulei)', probabilite:'Élevée zones humides', impact:'Destruction totale plantation possible', conseil:'Clones IRCA résistants, programme APROMAC, pas de plantation > 900m alt.' },
+        { type:'Maladie', nom:'Corynespora (CSPD)', probabilite:'Moyenne', impact:'Défoliation répétée, perte production 20-40%', conseil:'Fongicides systémiques, clone IRCA 230' },
+        { type:'Réglementation', nom:'EUDR (EU Deforestation Regulation 2025)', probabilite:'Certaine', impact:'Blocage export Europe si pas de géolocalisation', conseil:'Géolocaliser parcelles via AgroPrix, garder titres fonciers, joindre APROMAC' },
+        { type:'Marché', nom:'Chute cours TSR20 (TOCOM)', probabilite:'Moyenne', impact:'Revenu -30% si TSR < 900 FCFA/kg', conseil:'Prix bord champ APROMAC recalibré chaque semaine — consulter AgroPrix' }
+      ]
+    },
+
+    plantain: {
+      name: 'Plantain',
+      varietes: [
+        { nom:'Orishele (True Horn)', cycle:'12-14 mois premier cycle, 10-12 mois rejets', rendement:'10-18 t/ha', resistance:'Sensible Fusarium, nématodes', remarque:'Variété dominante CI et Togo — gros régimes, très commercialisée Abidjan' },
+        { nom:'Agnrin (French plantain)', cycle:'11-13 mois', rendement:'15-22 t/ha', resistance:'Modérée', remarque:'Forte production rejets, adapté zones humides forêt' },
+        { nom:'CRBP 39 (hybride amélioré CARBAP)', cycle:'10-12 mois', rendement:'25-40 t/ha', resistance:'Résistant Fusarium race 1, Sigatoka noire', remarque:'Hybride CARBAP — meilleur rendement, semences certifiées' },
+        { nom:'PITA 3 (IITA)', cycle:'11-13 mois', rendement:'20-35 t/ha', resistance:'Résistant Black Sigatoka', remarque:'Diffusé programmes STCP/CORAF — adapté petits producteurs' }
+      ],
+      couts: {
+        semences: 150000,
+        engrais: 120000,
+        pesticides: 100000,
+        irrigation: 0,
+        mainOeuvre: 320000,
+        transport: 70000,
+        divers: 40000
+      },
+      niveaux: { faible:0.6, moyen:1.0, intensif:1.5 },
+      scenarios: [
+        { label:'Faible', rendement:8, prix:280, couleur:'#e76f51' },
+        { label:'Moyen', rendement:15, prix:320, couleur:'#E8862A' },
+        { label:'Bon', rendement:22, prix:350, couleur:'#52b788' },
+        { label:'Excellent', rendement:35, prix:380, couleur:'#2D6A4F' }
+      ],
+      calendrier: [
+        { mois:'Mois 1-2', activite:'Préparation & plantation', detail:'Labour ou andains, plantation rejets 2.5m x 2.5m ou 3m x 3m, compost fond de trou' },
+        { mois:'Mois 3-5', activite:'Entretien précoce', detail:'Désherbage, gestion rejets (garder 1 successeur/bananier), fertilisation urée' },
+        { mois:'Mois 6-10', activite:'Croissance & protection', detail:'Traitement nématodes, surveillance Sigatoka noire, buttage' },
+        { mois:'Mois 11-14', activite:'Récolte & régénération', detail:'Récolte régimes à maturité (doigts arrondis), tronçonnage, sélection successeur' }
+      ],
+      risques: [
+        { type:'Maladie', nom:'Sigatoka noire (Mycosphaerella fijiensis)', probabilite:'Très élevée', impact:'Perte rendement 30-50%, fruits non commerciaux', conseil:'Traitements fongicides Mancozèbe + huile minérale, variétés résistantes CARBAP' },
+        { type:'Maladie', nom:'Fusariose (Mal de Panama race 4)', probabilite:'Faible CI actuellement', impact:'Destruction totale plantation si arrivée', conseil:'Ne pas transplanter de rejets depuis zones infectées (Togo, Ghana)' },
+        { type:'Ravageur', nom:'Charançon du bananier (Cosmopolites sordidus)', probabilite:'Élevée', impact:'Déracinement plants, perte 20-30%', conseil:'Pièges rhizomes, NeemAzal, rotation partielle' },
+        { type:'Marché', nom:'Chute prix saison principale (Oct-Nov)', probabilite:'Élevée', impact:'Prix -40% en pleine récolte', conseil:'Vente en vert à coopérative, accord avec collecteur Abidjan via AgroPrix' }
+      ]
+    },
+
+    ananas: {
+      name: 'Ananas',
+      varietes: [
+        { nom:'Pain de Sucre (Bénin — variété star)', cycle:'14-18 mois 1er cycle, 10-12 mois ratoons', rendement:'15-25 t/ha (1er cycle)', resistance:'Sensible Phytophthora, cochenille (PMWaV)', remarque:'VARIÉTÉ EMBLÉMATIQUE DU BÉNIN. Chair jaune dorée, très sucrée (16-18° Brix), quasi sans acidité, peu fibreuse. Poids 0.8-2 kg, couronne courte. Zones: Plateau (Kétou, Adja-Ouèrè, Pobè), Atlantique (Allada, Toffo, Zè). Export premium vers Belgique, France, Pays-Bas (€3-6/fruit). 2e producteur africain derrière CI sur ce type.' },
+        { nom:'Cayenne Lisse (Côte d\'Ivoire/TG)', cycle:'12-15 mois', rendement:'30-50 t/ha', resistance:'Modérée', remarque:'Variété industrielle dominante mondiale. Grosse production CI pour export et transformation (jus, conserves). Moins sucrée que Pain de Sucre mais très productive.' },
+        { nom:'Smooth Cayenne améliorée (hybrides)', cycle:'12-14 mois', rendement:'40-60 t/ha', resistance:'Meilleure tolérance viroses', remarque:'Hybrides sélectionnés pour production industrielle. Utilisée par grandes plantations exportatrices CI. Standardisation fruits facilitée.' },
+        { nom:'CRBP 39 (hybride CARBAP)', cycle:'11-13 mois', rendement:'25-40 t/ha', resistance:'Résistant Fusariose, meilleur que Cayenne vs maladies', remarque:'Développé Centre de Recherches sur Bananiers et Plantains. Bon compromis rendement/qualité pour petits producteurs.' },
+        { nom:'Sugarloaf / Perola (Guinée, CI)', cycle:'14-16 mois', rendement:'12-18 t/ha', resistance:'Sensible', remarque:'Proche Pain de Sucre, chair blanche. Marché local niche. Moins exporté mais très apprécié consommateurs.' }
+      ],
+      couts: {
+        semences: 180000,
+        engrais: 160000,
+        pesticides: 130000,
+        irrigation: 80000,
+        mainOeuvre: 350000,
+        transport: 80000,
+        divers: 60000
+      },
+      niveaux: { faible:0.6, moyen:1.0, intensif:1.4 },
+      scenarios: [
+        { label:'Faible (local)', rendement:10, prix:150, couleur:'#e76f51' },
+        { label:'Moyen (local+export)', rendement:18, prix:280, couleur:'#E8862A' },
+        { label:'Bon (export GMS)', rendement:22, prix:450, couleur:'#52b788' },
+        { label:'Excellent (export premium EU)', rendement:25, prix:700, couleur:'#2D6A4F' }
+      ],
+      calendrier: [
+        { mois:'Mois 1-2', activite:'Sélection & préparation rejets + sol', detail:'Sélection rejets sains (cayeux ou bulbilles 200-400g). TRAITEMENT OBLIGATOIRE : immersion rejets 15 min dans solution pesticide (Carbofuran 5G ou Chlorpyrifos) contre nématodes et symphylan. Préparation sol : labour + compost 10 t/ha. Écartement : 30x30x90 cm (plantation en double rang).' },
+        { mois:'Mois 3-8', activite:'Phase végétative & traitements', detail:'Arrosage régulier (critère sécheresse). Apport engrais foliaire mensuel (Solution NPK 13-3-43). Traitement insecticide mensuel contre cochenilles (Spirotetramate ou Buprofézine). Surveillance symptômes Wilt (feuilles rougeâtres = PMWaV → arrachage immédiat).' },
+        { mois:'Mois 12-14', activite:'Induction florale (forçage)', detail:'TECHNIQUE CLÉ : application acétylène (carbure de calcium 4g/L eau, 50 mL/cœur de nuit) ou Ethephon 200 ppm pour uniformiser floraison et anticiper récolte. Synchronisation = export groupé.' },
+        { mois:'Mois 14-18', activite:'Maturation, récolte & emballage', detail:'Surveiller couleur pédoncule (virescence), son creux à la percussion. Récolte au bon stade (Translucidité 0-25%). Emballage export : carton double cannelure 12-14 fruits, film individuel PE, couche kraft. Palettes 1.2T, conteneur réfrigéré +8°C, transit max 4 semaines.' },
+        { mois:'Après récolte', activite:'Ratoons (rejets de 2e & 3e cycle)', detail:'Conserver 1 rejet/pied pour le cycle suivant (ratoon). 2e cycle = 10-12 mois, rendement 70-80% du 1er. 3e cycle possible mais baisse qualité. Entretien inter-rang, recyclage feuilles en mulch. 3-4 cycles possibles avant replantation complète.' }
+      ],
+      risques: [
+        { type:'Maladie', nom:'Pourriture du coeur — Phytophthora paradoxa', probabilite:'Élevée en saison des pluies / sol mal drainé', impact:'Mort du plant jeune ou chute couronne — pertes 20-60% si mal drainé', conseil:'Plantation sur billons ou plates-bandes surélevées. Drainage rigoureux. Traitement foliaire + sol Métalaxyl dès symptômes. Éviter arrosage par aspersion sur cœur.' },
+        { type:'Virus', nom:'PMWaV / Wilt de l\'ananas (vecteur: cochenille)', probabilite:'Élevée si cochenilles non contrôlées', impact:'Mort progressive plants (feuilles rouge-orangé), perte total lot infecté', conseil:'Lutte chimique cochenilles MENSUELLE (Spirotetramate, Buprofézine). Éliminer fourmis (vecteurs cochenilles). Détruire immédiatement plants Wilt.' },
+        { type:'Ravageur', nom:'Symphylan (Hanseniella sp.) — ravageur racines', probabilite:'Élevée sols sableux/humifères', impact:'Destruction racines jeunes plants, mort dès mois 1-3', conseil:'Traitement rejets avant plantation (immersion Carbofuran). Fumigation sol si historique infestation. Rotation 3 ans minimum.' },
+        { type:'Ravageur', nom:'Nématodes (Pratylenchus, Rotylenchulus)', probabilite:'Élevée sols argileux-limoneux', impact:'Nécrose racines, rendement -25-40% sur 2e cycle+', conseil:'Analyse sol avant plantation. Application nématicide (NeemAzal, Vydate). Chaulage. Jachère avec Tagetes erecta (répulsif naturel nématodes).' },
+        { type:'Export', nom:'Non-conformité résidus pesticides (MRL Europe)', probabilite:'Réelle si traitements non maîtrisés', impact:'Refus lot à l\'import, perte totale + suspension exportateur', conseil:'Respecter délai avant récolte (DAR) de chaque pesticide. Cahier de traçabilité obligatoire. Certification GlobalGAP recommandée pour accès GMS Europe.' }
+      ]
+    },
+
+    arachide: {
+      name: 'Arachide',
+      varietes: [
+        { nom:'Fleur 11 (Sénégal)', cycle:'90-100 jours', rendement:'1200-2000 kg/ha gousses', resistance:'Bonne tolérance rosette', remarque:'Variété dominante Sénégal/Mali — qualité huilerie SONACOS' },
+        { nom:'55-437 (Sénégal)', cycle:'85-95 jours', rendement:'1000-1800 kg/ha', resistance:'Tolérante sécheresse', remarque:'Précoce, adaptée zones de faibles pluies (Diourbel, Louga)' },
+        { nom:'GH 119-20 (Ghana/CI)', cycle:'100-110 jours', rendement:'1500-2500 kg/ha', resistance:'Bonne résistance Cercospora', remarque:'Diffusé CI et Bénin, bon pour consommation et huile' },
+        { nom:'ICIAR 19BT (ICRISAT)', cycle:'105-115 jours', rendement:'2000-3000 kg/ha', resistance:'Résistante Aflatoxine', remarque:'Nouvelle variété ICRISAT, conforme exigences export Europe' }
+      ],
+      couts: {
+        semences: 120000,
+        engrais: 90000,
+        pesticides: 60000,
+        irrigation: 0,
+        mainOeuvre: 200000,
+        transport: 45000,
+        divers: 25000
+      },
+      niveaux: { faible:0.6, moyen:1.0, intensif:1.4 },
+      scenarios: [
+        { label:'Faible', rendement:0.8, prix:350, couleur:'#e76f51' },
+        { label:'Moyen', rendement:1.4, prix:400, couleur:'#E8862A' },
+        { label:'Bon', rendement:2.0, prix:420, couleur:'#52b788' },
+        { label:'Excellent', rendement:2.8, prix:440, couleur:'#2D6A4F' }
+      ],
+      calendrier: [
+        { mois:'Mois 1', activite:'Préparation & semis', detail:'Labour léger, semis en ligne après pluies installation, fumure phosphatée de fond' },
+        { mois:'Mois 2', activite:'Sarclage & thinning', detail:'1er sarclage, démariage (1 plant/poquet), pas d\'urée (légumineuse fixatrice N)' },
+        { mois:'Mois 3', activite:'Floraison & gynophores', detail:'Arrêter tout sarclage (destruction gynophores), surveiller rosette, traitement insecticide léger' },
+        { mois:'Mois 3.5-4', activite:'Récolte & séchage', detail:'Arrachage à maturité (jaunissement feuilles), fanage 3-5 jours en andains, battage, triage' }
+      ],
+      risques: [
+        { type:'Maladie', nom:'Rosette virale (GPRAV)', probabilite:'Élevée (Sahel)', impact:'Perte 80-100% si infection précoce', conseil:'Semis précoce, variétés résistantes (55-437, Fleur 11), lutte puceron vecteur' },
+        { type:'Stockage', nom:'Aflatoxines (Aspergillus flavus)', probabilite:'Très élevée si mal séché', impact:'Refus export, risque santé, perte totale lot', conseil:'Séchage < 9% humidité, stockage sacs respirants, variétés ICIAR 19BT' },
+        { type:'Ravageur', nom:'Foreur des tiges (Spodoptera)', probabilite:'Moyenne', impact:'Perte 10-20%', conseil:'Traitement préventif Lambda-cyhalothrine au démarrage végétatif' },
+        { type:'Sol', nom:'Carence en calcium (gousses vides)', probabilite:'Élevée sols sableux', impact:'Taux gousses vides 20-40%', conseil:'Apport gypse agricole 200 kg/ha à la floraison' }
       ]
     }
   };

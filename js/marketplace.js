@@ -1,722 +1,147 @@
-// AgroPrix — Marketplace Module (P2P offres/demandes)
-// Offres de vente, demandes d'achat, matching, transactions
-// Storage : backend /api/market/offers (source de vérité) + localStorage (cache
-// synchrone pour render). Les deux sont tenus en cohérence par syncFromBackend().
-(function(AP) {
-  'use strict';
-
-  var currentTab = 'marche'; // marche, vendre, acheter, mes-transactions
-  var OFFERS_KEY = 'agroprix_marketplace_offers';
-  var DEMANDS_KEY = 'agroprix_marketplace_demands';
-  var API_BASE = (AP && AP.API_BASE) ? AP.API_BASE : '';
-
-  function _authHeaders() {
-    var token = localStorage.getItem('agroprix_token');
-    var h = { 'Content-Type': 'application/json' };
-    if (token) h['Authorization'] = 'Bearer ' + token;
-    return h;
-  }
-
-  // Backend row -> frontend offer/demand
-  function _fromBackend(row) {
-    return {
-      id: row.id != null ? String(row.id) : (Date.now().toString(36)),
-      type: row.type,
-      crop: row.crop,
-      cropName: row.crop_name || row.crop,
-      quantity: row.quantity,
-      unit: row.unit || 'tonnes',
-      price: row.type === 'buy' ? undefined : row.price,
-      maxPrice: row.type === 'buy' ? row.price : undefined,
-      priceUnit: row.price_unit || 'FCFA/kg',
-      market: row.market || '',
-      description: row.description || '',
-      seller: row.type === 'sell' ? (row.seller || 'Utilisateur') : undefined,
-      buyer: row.type === 'buy' ? (row.seller || 'Utilisateur') : undefined,
-      phone: row.phone || '',
-      country: row.country || 'benin',
-      date: row.created_at || new Date().toISOString(),
-      status: row.status || 'active'
-    };
-  }
-
-  // Frontend object -> backend payload
-  function _toBackend(item) {
-    return {
-      type: item.type,
-      crop: item.crop,
-      crop_name: item.cropName || item.crop,
-      quantity: Number(item.quantity) || 0,
-      unit: item.unit || 'tonnes',
-      price: Number(item.type === 'buy' ? item.maxPrice : item.price) || 0,
-      price_unit: item.priceUnit || 'FCFA/kg',
-      market: item.market || '',
-      description: item.description || '',
-      phone: item.phone || '',
-      country: item.country || (AP.auth && AP.auth.getUser && (AP.auth.getUser().pays || AP.auth.getUser().country)) || 'benin'
-    };
-  }
-
-  // =========================================================================
-  // Storage (cache local, alimenté par le backend)
-  // =========================================================================
-  function getOffers() {
-    try { return JSON.parse(localStorage.getItem(OFFERS_KEY) || '[]'); } catch(e) { return []; }
-  }
-  function getDemands() {
-    try { return JSON.parse(localStorage.getItem(DEMANDS_KEY) || '[]'); } catch(e) { return []; }
-  }
-  function saveOffer(offer) {
-    // 1. cache local immédiat (UX réactive)
-    var offers = getOffers(); offers.unshift(offer);
-    localStorage.setItem(OFFERS_KEY, JSON.stringify(offers));
-    // 2. envoi backend (best-effort)
-    if (API_BASE) {
-      fetch(API_BASE + '/api/market/offers', {
-        method: 'POST',
-        headers: _authHeaders(),
-        body: JSON.stringify(_toBackend(offer))
-      }).then(function(r) {
-        if (!r.ok) console.warn('[marketplace] saveOffer backend HTTP', r.status);
-        else setTimeout(syncFromBackend, 500); // resync pour récupérer l'id backend
-      }).catch(function(e) { console.warn('[marketplace] saveOffer backend fail', e); });
-    }
-  }
-  function saveDemand(demand) {
-    var demands = getDemands(); demands.unshift(demand);
-    localStorage.setItem(DEMANDS_KEY, JSON.stringify(demands));
-    if (API_BASE) {
-      fetch(API_BASE + '/api/market/offers', {
-        method: 'POST',
-        headers: _authHeaders(),
-        body: JSON.stringify(_toBackend(demand))
-      }).then(function(r) {
-        if (!r.ok) console.warn('[marketplace] saveDemand backend HTTP', r.status);
-        else setTimeout(syncFromBackend, 500);
-      }).catch(function(e) { console.warn('[marketplace] saveDemand backend fail', e); });
-    }
-  }
-
-  // Récupère les offres/demandes réelles depuis le backend et rafraîchit le cache local.
-  function syncFromBackend(cb) {
-    if (!API_BASE) { if (cb) cb(); return; }
-    fetch(API_BASE + '/api/market/offers?offer_type=sell', { headers: _authHeaders() })
-      .then(function(r) { return r.ok ? r.json() : null; })
-      .then(function(data) {
-        if (data && Array.isArray(data.offers)) {
-          localStorage.setItem(OFFERS_KEY, JSON.stringify(data.offers.map(_fromBackend)));
-        }
-        return fetch(API_BASE + '/api/market/offers?offer_type=buy', { headers: _authHeaders() });
-      })
-      .then(function(r) { return r && r.ok ? r.json() : null; })
-      .then(function(data) {
-        if (data && Array.isArray(data.offers)) {
-          localStorage.setItem(DEMANDS_KEY, JSON.stringify(data.offers.map(_fromBackend)));
-        }
-        if (cb) cb();
-      })
-      .catch(function() { if (cb) cb(); });
-  }
-
-  // =========================================================================
-  // Helpers
-  // =========================================================================
-  function getUserCountry() {
-    var user = AP.auth ? AP.auth.getUser() : null;
-    return (user && (user.pays || user.country)) || 'benin';
-  }
-  function getMarkets() {
-    return (AP.marketsByCountry && AP.marketsByCountry[getUserCountry()]) || [];
-  }
-  function getUserName() {
-    var user = AP.auth ? AP.auth.getUser() : null;
-    return (user && (user.nom || user.name)) || 'Utilisateur';
-  }
-  function formatFCFA(n) {
-    if (!n) return '—';
-    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' FCFA';
-  }
-  function timeAgo(iso) {
-    var diff = Date.now() - new Date(iso).getTime();
-    var hours = Math.floor(diff / 3600000);
-    if (hours < 1) return 'A l\'instant';
-    if (hours < 24) return 'Il y a ' + hours + 'h';
-    var days = Math.floor(hours / 24);
-    if (days < 7) return 'Il y a ' + days + 'j';
-    return new Date(iso).toLocaleDateString('fr');
-  }
-  function generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
-  }
-
-  // Demo data for first load
-  function seedDemoData() {
-    if (getOffers().length > 0 || getDemands().length > 0) return;
-    var markets = getMarkets();
-    var m1 = markets[0] ? markets[0].name : 'Marche central';
-    var m2 = markets[1] ? markets[1].name : 'Marche secondaire';
-    var m3 = markets[2] ? markets[2].name : 'Marche local';
-
-    var demoOffers = [
-      { id: generateId(), type: 'sell', crop: 'mais', cropName: 'Mais', quantity: 10, unit: 'tonnes', price: 265, priceUnit: 'FCFA/kg', market: m1, description: 'Mais blanc, seche, qualite A. Disponible immediatement.', seller: 'Comptoir Cerealier Ouest', phone: '+XXX XX XX XX XX', date: new Date(Date.now() - 7200000).toISOString(), status: 'active' },
-      { id: generateId(), type: 'sell', crop: 'cajou', cropName: 'Cajou', quantity: 5, unit: 'tonnes', price: 850, priceUnit: 'FCFA/kg', market: m2, description: 'Cajou WW320, bon calibre, stock disponible.', seller: 'GIE Anacarde Plus', phone: '+XXX XX XX XX XX', date: new Date(Date.now() - 18000000).toISOString(), status: 'active' },
-      { id: generateId(), type: 'sell', crop: 'soja', cropName: 'Soja', quantity: 3, unit: 'tonnes', price: 380, priceUnit: 'FCFA/kg', market: m3, description: 'Soja grain, recolte 2025-2026. Propre et sec.', seller: 'Agri Producteurs UEMOA', phone: '+XXX XX XX XX XX', date: new Date(Date.now() - 86400000).toISOString(), status: 'active' }
-    ];
-    var demoDemands = [
-      { id: generateId(), type: 'buy', crop: 'cajou', cropName: 'Cajou', quantity: 50, unit: 'tonnes', maxPrice: 1280, priceUnit: 'USD/t FOB', market: m1, description: 'Cajou WW320 FOB port regional. Deadline: 30 avril 2026.', buyer: 'Export West Africa SARL', phone: '+XXX XX XX XX XX', date: new Date(Date.now() - 18000000).toISOString(), status: 'active', verified: true },
-      { id: generateId(), type: 'buy', crop: 'mais', cropName: 'Mais', quantity: 20, unit: 'tonnes', maxPrice: 250, priceUnit: 'FCFA/kg', market: m2, description: 'Mais blanc pour provenderie. Livraison sous 2 semaines.', buyer: 'Agro-Industries Regionales', phone: '+XXX XX XX XX XX', date: new Date(Date.now() - 43200000).toISOString(), status: 'active', verified: false }
-    ];
-
-    demoOffers.forEach(saveOffer);
-    demoDemands.forEach(saveDemand);
-  }
-
-  // =========================================================================
-  // Matching engine
-  // =========================================================================
-  function findMatches() {
-    var offers = getOffers().filter(function(o) { return o.status === 'active'; });
-    var demands = getDemands().filter(function(d) { return d.status === 'active'; });
-    var matches = [];
-
-    demands.forEach(function(d) {
-      offers.forEach(function(o) {
-        if (o.crop === d.crop) {
-          var priceMatch = true; // simplified for V1
-          matches.push({ offer: o, demand: d, cropMatch: true, priceMatch: priceMatch });
-        }
-      });
-    });
-
-    return matches;
-  }
-
-  // =========================================================================
-  // Render
-  // =========================================================================
-  function render() {
-    var html = '';
-
-    // Tabs
-    html += '<div style="display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border);">';
-    [
-      { id: 'marche', label: '<i data-lucide="store" class="lc"></i> Marche' },
-      { id: 'vendre', label: '<i data-lucide="package" class="lc"></i> Vendre' },
-      { id: 'acheter', label: '<i data-lucide="shopping-cart" class="lc"></i> Acheter' },
-      { id: 'mes-transactions', label: '<i data-lucide="clipboard-list" class="lc"></i> Mes annonces' }
-    ].forEach(function(t) {
-      var active = currentTab === t.id;
-      html += '<button onclick="AgroPrix.marketplace.setTab(\'' + t.id + '\')" style="flex:1;padding:10px;font-size:12px;font-weight:' + (active ? '700' : '500') + ';color:' + (active ? 'var(--green)' : 'var(--text-light)') + ';background:none;border:none;border-bottom:' + (active ? '3px solid var(--green)' : '3px solid transparent') + ';cursor:pointer;font-family:inherit;">' + t.label + '</button>';
-    });
-    html += '</div>';
-
-    if (currentTab === 'marche') html += renderMarche();
-    else if (currentTab === 'vendre') html += renderForm('sell');
-    else if (currentTab === 'acheter') html += renderForm('buy');
-    else if (currentTab === 'mes-transactions') html += renderMesAnnonces();
-
-    var container = document.getElementById('marketplaceContent');
-    if (container) container.innerHTML = html;
-  }
-
-  // =========================================================================
-  // Tab: Marche (all offers + demands)
-  // =========================================================================
-  function renderMarche() {
-    var offers = getOffers().filter(function(o) { return o.status === 'active'; });
-    var demands = getDemands().filter(function(d) { return d.status === 'active'; });
-    var matches = findMatches();
-    var totalMatchRate = (offers.length + demands.length) > 0 ? Math.round(matches.length / Math.max(offers.length, demands.length) * 100) : 0;
-    var html = '';
-    var cropEmojis = { mais: '🌽', cajou: '🥜', soja: '🫘', riz: '<i data-lucide="wheat" class="lc"></i>', tomate: '🍅', oignon: '🧅', manioc: '🥔', arachide: '🥜', niebe: '🫘', igname: '🍠', coton: '🌿', cafe: '☕', cacao: '🍫', mil: '<i data-lucide="wheat" class="lc"></i>', sorgho: '<i data-lucide="wheat" class="lc"></i>' };
-
-    // Header Place de Marche
-    html += '<div style="background:linear-gradient(135deg,#1B4332,#2D6A4F);border-radius:20px;padding:20px;color:#fff;margin-bottom:16px;text-align:center;">';
-    html += '<div style="font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:2px;">PLACE DE MARCHE</div>';
-    html += '<div style="font-size:20px;font-weight:800;margin-top:4px;"><i data-lucide="store" class="lc"></i> Offres & Demandes</div>';
-    html += '</div>';
-
-    // Annonces style guide
-    var all = [];
-    offers.forEach(function(o) { all.push(Object.assign({ _type: 'sell' }, o)); });
-    demands.forEach(function(d) { all.push(Object.assign({ _type: 'buy' }, d)); });
-    all.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
-
-    if (all.length === 0) {
-      html += '<div class="card" style="padding:32px;text-align:center;">'
-        + '<div style="font-size:48px;margin-bottom:12px;"><i data-lucide="store" class="lc"></i></div>'
-        + '<h3 style="color:#666;">Aucune annonce</h3>'
-        + '<p style="font-size:13px;color:#999;">Soyez le premier a publier une offre ou une demande!</p>'
-        + '</div>';
-      return html;
-    }
-
-    all.forEach(function(item) {
-      var isSell = item._type === 'sell';
-      var emoji = cropEmojis[item.crop] || '<i data-lucide="wheat" class="lc" style="width:20px;height:20px;"></i>';
-      var phone = item.phone || '+XXX XX XX XX XX';
-
-      html += '<div class="card" style="margin-bottom:14px;padding:20px;">';
-
-      // Product info (style guide: emoji + nom + quantite + lieu + prix)
-      html += '<div style="font-size:18px;font-weight:800;color:#333;">'
-        + emoji + ' <strong>' + item.cropName + '</strong> — ' + item.quantity + ' ' + (item.unit || 'tonnes')
-        + '</div>';
-      html += '<div style="font-size:15px;color:#333;margin-top:4px;">— ' + (item.market || 'Non precise') + '</div>';
-      html += '<div style="font-size:15px;color:#333;margin-top:2px;">— ' + (isSell ? formatFCFA(item.price) + '/kg' : item.maxPrice + ' ' + item.priceUnit) + '</div>';
-
-      if (item.description) {
-        html += '<div style="font-size:13px;color:#666;margin-top:8px;font-style:italic;">' + item.description + '</div>';
-      }
-
-      // Contact info
-      html += '<div style="font-size:12px;color:#999;margin-top:8px;">'
-        + (isSell ? item.seller : item.buyer) + ' · ' + timeAgo(item.date);
-      if (item.verified) html += ' · <span style="background:#D8F3DC;color:#2D6A4F;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">Verifie</span>';
-      html += '</div>';
-
-      // WhatsApp button (style guide)
-      html += '<a href="https://wa.me/' + phone.replace(/[^0-9+]/g, '') + '?text=Bonjour%2C%20je%20suis%20interesse%20par%20votre%20offre%20' + encodeURIComponent(item.cropName) + '%20sur%20AgroPrix" target="_blank" style="display:block;margin-top:12px;padding:12px;background:#25D366;color:#fff;border-radius:12px;text-align:center;font-size:14px;font-weight:700;text-decoration:none;">'
-        + '<i data-lucide="message-circle" class="lc" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> CONTACTER VIA WHATSAPP</a>';
-
-      // QR button
-      html += '<button onclick="event.stopPropagation();AgroPrix.marketplace.showQR(\'' + item.id + '\')" style="display:block;width:100%;margin-top:8px;padding:10px;font-size:12px;font-weight:600;border:1.5px solid #2D6A4F;color:#2D6A4F;background:#fff;border-radius:12px;cursor:pointer;"><i data-lucide="smartphone" class="lc"></i> QR Tracabilite</button>';
-
-      html += '</div>';
-    });
-
-    // Stats bar (style guide: X OFFRES · X DEMANDES · X% MISE EN RELATION)
-    html += '<div style="text-align:center;padding:16px;font-size:13px;font-weight:700;color:#666;letter-spacing:0.5px;">'
-      + offers.length + ' OFFRES · ' + demands.length + ' DEMANDES · ' + totalMatchRate + '% MISE EN RELATION'
-      + '</div>';
-
-    return html;
-  }
-
-  // =========================================================================
-  // Tab: Vendre / Acheter (form)
-  // =========================================================================
-  function renderForm(type) {
-    var isSell = type === 'sell';
-    var markets = getMarkets();
-    var cultures = AP.cultureNames || {};
-    var html = '';
-
-    html += '<div class="card" style="padding:16px;">'
-      + '<div class="card-title"><span class="icon">' + (isSell ? '<i data-lucide="package" class="lc"></i>' : '<i data-lucide="shopping-cart" class="lc"></i>') + '</span> ' + (isSell ? 'Publier une offre de vente' : 'Publier une demande d\'achat') + '</div>'
-      + '<p style="font-size:12px;color:var(--text-light);margin-bottom:12px;">' + (isSell ? 'Proposez vos produits aux acheteurs.' : 'Decrivez ce que vous recherchez.') + '</p>';
-
-    // Culture
-    html += '<div class="form-group" style="margin-bottom:12px;">'
-      + '<label class="form-label" style="font-weight:600;">Produit</label>'
-      + '<select id="mpCrop" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;">';
-    Object.keys(cultures).forEach(function(k) {
-      html += '<option value="' + k + '">' + cultures[k] + '</option>';
-    });
-    html += '</select></div>';
-
-    // Quantity + Unit
-    html += '<div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px;">'
-      + '<div class="form-group"><label class="form-label" style="font-weight:600;">Quantite</label>'
-      + '<input type="number" id="mpQuantity" placeholder="Ex: 10" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;" min="0"></div>'
-      + '<div class="form-group"><label class="form-label" style="font-weight:600;">Unite</label>'
-      + '<select id="mpUnit" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;">'
-      + '<option value="kg">kg</option><option value="tonnes" selected>tonnes</option><option value="sacs">sacs</option><option value="paniers">paniers</option>'
-      + '</select></div></div>';
-
-    // Price
-    html += '<div class="form-group" style="margin-bottom:12px;">'
-      + '<label class="form-label" style="font-weight:600;">' + (isSell ? 'Prix demande (FCFA/kg)' : 'Prix maximum (FCFA/kg)') + '</label>'
-      + '<input type="number" id="mpPrice" placeholder="Ex: 265" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;" min="0">'
-      + '</div>';
-
-    // Market
-    html += '<div class="form-group" style="margin-bottom:12px;">'
-      + '<label class="form-label" style="font-weight:600;">Lieu / Marche</label>'
-      + '<select id="mpMarket" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;">';
-    markets.forEach(function(m) { html += '<option value="' + m.name + '">' + m.name + '</option>'; });
-    html += '<option value="Autre">Autre</option></select></div>';
-
-    // Description
-    html += '<div class="form-group" style="margin-bottom:12px;">'
-      + '<label class="form-label" style="font-weight:600;">Description</label>'
-      + '<textarea id="mpDescription" rows="3" placeholder="' + (isSell ? 'Qualite, disponibilite, conditions...' : 'Specifications, deadline, conditions...') + '" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;resize:vertical;"></textarea>'
-      + '</div>';
-
-    // Contact
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">'
-      + '<div class="form-group"><label class="form-label" style="font-weight:600;">' + (isSell ? 'Votre nom / entreprise' : 'Votre nom / entreprise') + '</label>'
-      + '<input type="text" id="mpContact" value="' + getUserName() + '" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;"></div>'
-      + '<div class="form-group"><label class="form-label" style="font-weight:600;">Telephone</label>'
-      + '<input type="tel" id="mpPhone" placeholder="+XXX XX XX XX XX" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;"></div></div>';
-
-    // Submit
-    html += '<button class="btn-analyse" style="width:100%;font-size:14px;padding:12px;" onclick="AgroPrix.marketplace.publish(\'' + type + '\')">'
-      + '<i data-lucide="megaphone" class="lc"></i> Publier ' + (isSell ? 'l\'offre' : 'la demande') + '</button>';
-
-    html += '<div id="mpSuccess" style="display:none;margin-top:12px;padding:10px;background:#d1fae5;border-radius:8px;text-align:center;font-size:13px;color:#1B4332;font-weight:600;"></div>';
-
-    html += '</div>';
-    return html;
-  }
-
-  // =========================================================================
-  // Tab: Mes annonces
-  // =========================================================================
-  function renderMesAnnonces() {
-    var offers = getOffers();
-    var demands = getDemands();
-    var userName = getUserName();
-    var html = '';
-
-    var myOffers = offers.filter(function(o) { return o.seller === userName; });
-    var myDemands = demands.filter(function(d) { return d.buyer === userName; });
-
-    if (myOffers.length === 0 && myDemands.length === 0) {
-      html += '<div class="card" style="padding:32px;text-align:center;">'
-        + '<div style="font-size:48px;margin-bottom:12px;"><i data-lucide="clipboard-list" class="lc"></i></div>'
-        + '<h3 style="color:var(--text-light);">Aucune annonce</h3>'
-        + '<p style="font-size:13px;color:var(--text-muted);">Publiez une offre ou une demande pour la retrouver ici.</p>'
-        + '</div>';
-      return html;
-    }
-
-    if (myOffers.length > 0) {
-      html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
-        + '<div class="card-title"><span class="icon"><i data-lucide="package" class="lc"></i></span> Mes offres de vente (' + myOffers.length + ')</div>';
-      myOffers.forEach(function(o) {
-        html += '<div style="padding:8px 0;border-bottom:1px solid var(--border);">'
-          + '<div style="display:flex;justify-content:space-between;align-items:center;">'
-          + '<div><strong>' + o.quantity + o.unit + ' ' + o.cropName + '</strong> — ' + o.market + '</div>'
-          + '<span style="font-size:13px;font-weight:700;color:var(--green);">' + formatFCFA(o.price) + '/kg</span>'
-          + '</div>'
-          + '<div style="font-size:11px;color:var(--text-light);margin-top:2px;">' + timeAgo(o.date) + ' — ' + (o.status === 'active' ? '<span style="color:#10B981;">●</span> Active' : '<span style="color:#9CA3AF;">●</span> Terminee') + '</div>'
-          + '</div>';
-      });
-      html += '</div>';
-    }
-
-    if (myDemands.length > 0) {
-      html += '<div class="card" style="padding:16px;">'
-        + '<div class="card-title"><span class="icon"><i data-lucide="shopping-cart" class="lc"></i></span> Mes demandes d\'achat (' + myDemands.length + ')</div>';
-      myDemands.forEach(function(d) {
-        html += '<div style="padding:8px 0;border-bottom:1px solid var(--border);">'
-          + '<div style="display:flex;justify-content:space-between;align-items:center;">'
-          + '<div><strong>' + d.quantity + d.unit + ' ' + d.cropName + '</strong> — ' + d.market + '</div>'
-          + '<span style="font-size:13px;font-weight:700;color:var(--blue,#3b82f6);">Max ' + d.maxPrice + ' ' + d.priceUnit + '</span>'
-          + '</div>'
-          + '<div style="font-size:11px;color:var(--text-light);margin-top:2px;">' + timeAgo(d.date) + ' — ' + (d.status === 'active' ? '<span style="color:#10B981;">●</span> Active' : '<span style="color:#9CA3AF;">●</span> Terminee') + '</div>'
-          + '</div>';
-      });
-      html += '</div>';
-    }
-
-    return html;
-  }
-
-  // =========================================================================
-  // Actions
-  // =========================================================================
-  function publish(type) {
-    var cropEl = document.getElementById('mpCrop');
-    var qtyEl = document.getElementById('mpQuantity');
-    var unitEl = document.getElementById('mpUnit');
-    var priceEl = document.getElementById('mpPrice');
-    var marketEl = document.getElementById('mpMarket');
-    var descEl = document.getElementById('mpDescription');
-    var contactEl = document.getElementById('mpContact');
-    var phoneEl = document.getElementById('mpPhone');
-
-    if (!cropEl || !qtyEl || !priceEl || !qtyEl.value || !priceEl.value) {
-      alert('Veuillez remplir les champs obligatoires (produit, quantite, prix).');
-      return;
-    }
-
-    var cultures = AP.cultureNames || {};
-    var cropName = cultures[cropEl.value] || cropEl.value;
-
-    if (type === 'sell') {
-      var offer = {
-        id: generateId(),
-        type: 'sell',
-        crop: cropEl.value,
-        cropName: cropName,
-        quantity: parseFloat(qtyEl.value),
-        unit: unitEl ? unitEl.value : 'tonnes',
-        price: parseInt(priceEl.value),
-        priceUnit: 'FCFA/kg',
-        market: marketEl ? marketEl.value : '',
-        description: descEl ? descEl.value.trim() : '',
-        seller: contactEl ? contactEl.value.trim() : getUserName(),
-        phone: phoneEl ? phoneEl.value.trim() : '',
-        date: new Date().toISOString(),
-        status: 'active'
-      };
-      saveOffer(offer);
-    } else {
-      var demand = {
-        id: generateId(),
-        type: 'buy',
-        crop: cropEl.value,
-        cropName: cropName,
-        quantity: parseFloat(qtyEl.value),
-        unit: unitEl ? unitEl.value : 'tonnes',
-        maxPrice: parseInt(priceEl.value),
-        priceUnit: 'FCFA/kg',
-        market: marketEl ? marketEl.value : '',
-        description: descEl ? descEl.value.trim() : '',
-        buyer: contactEl ? contactEl.value.trim() : getUserName(),
-        phone: phoneEl ? phoneEl.value.trim() : '',
-        date: new Date().toISOString(),
-        status: 'active',
-        verified: false
-      };
-      saveDemand(demand);
-    }
-
-    // Show success
-    var successEl = document.getElementById('mpSuccess');
-    if (successEl) {
-      successEl.textContent = '<i data-lucide="check-circle" class="lc"></i> Annonce publiee ! ' + cropName + ' — ' + (type === 'sell' ? 'offre de vente' : 'demande d\'achat');
-      successEl.style.display = 'block';
-      setTimeout(function() { successEl.style.display = 'none'; }, 3000);
-    }
-
-    // Switch to marche tab after short delay
-    setTimeout(function() { currentTab = 'marche'; render(); window.scrollTo(0, 0); }, 1500);
-  }
-
-  function setTab(tabId) {
-    currentTab = tabId;
-    render();
-    window.scrollTo(0, 0);
-  }
-
-  // =========================================================================
-  // Init
-  // =========================================================================
-  function init() {
-    currentTab = 'marche';
-    // Source de vérité = backend /api/market/offers. On hydrate le cache
-    // localStorage depuis le backend avant le premier render (fallback
-    // gracieux sur cache existant si l'API est injoignable).
-    if (typeof syncFromBackend === 'function') {
-      syncFromBackend(render);
-    } else {
-      render();
-    }
-  }
-
-  // =========================================================================
-  // QR Traceability
-  // =========================================================================
-
-  // Generate QR code URL (via Google Charts API - lightweight, no library needed)
-  function getQRUrl(data, size) {
-    size = size || 200;
-    return 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size + '&data=' + encodeURIComponent(data);
-  }
-
-  // Build traceability data string for QR
-  function buildTraceData(item) {
-    var data = {
-      id: item.id,
-      platform: 'AgroPrix',
-      type: item.type === 'sell' ? 'VENTE' : 'ACHAT',
-      product: item.cropName || item.crop,
-      quantity: item.quantity + ' ' + (item.unit || 'kg'),
-      price: item.type === 'sell' ? (item.price + ' FCFA/kg') : (item.maxPrice + ' ' + item.priceUnit),
-      seller: item.seller || item.buyer || '—',
-      market: item.market || '—',
-      date: item.date ? item.date.split('T')[0] : '—',
-      country: getUserCountry(),
-      verified: item.verified ? 'OUI' : 'NON',
-      url: 'https://agroprix.app/trace/' + item.id
-    };
-    return JSON.stringify(data);
-  }
-
-  function showQR(itemId) {
-    var offers = getOffers();
-    var demands = getDemands();
-    var item = offers.find(function(o) { return o.id === itemId; })
-      || demands.find(function(d) { return d.id === itemId; });
-    if (!item) return;
-
-    var traceData = buildTraceData(item);
-    var qrUrl = getQRUrl(traceData, 250);
-    var isSell = item.type === 'sell';
-    var container = document.getElementById('marketplaceContent');
-
-    var html = '<button class="action-btn" onclick="AgroPrix.marketplace.init()" style="font-size:12px;margin-bottom:16px;">← Retour au marche</button>';
-
-    html += '<div class="card" style="padding:20px;text-align:center;margin-bottom:16px;">'
-      + '<div style="font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Certificat de Tracabilite AgroPrix</div>'
-      + '<div style="border:3px solid var(--primary);border-radius:16px;padding:16px;display:inline-block;margin-bottom:12px;">'
-      + '<img src="' + qrUrl + '" alt="QR Tracabilite" style="width:100%;max-width:200px;height:auto;border-radius:8px;">'
-      + '</div>'
-      + '<div style="font-size:11px;color:#999;margin-bottom:12px;">Scannez ce QR code pour verifier l\'origine du lot</div>'
-      + '</div>';
-
-    // Traceability details
-    html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
-      + '<div class="card-title"><span class="icon"><i data-lucide="clipboard-list" class="lc"></i></span> Fiche de tracabilite</div>'
-      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
-
-    var fields = [
-      { label: 'ID Lot', value: item.id },
-      { label: 'Type', value: isSell ? '<i data-lucide="package" class="lc"></i> Vente' : '<i data-lucide="shopping-cart" class="lc"></i> Achat' },
-      { label: 'Produit', value: item.cropName || item.crop },
-      { label: 'Quantite', value: item.quantity + ' ' + (item.unit || 'kg') },
-      { label: 'Prix', value: isSell ? formatFCFA(item.price) + '/kg' : item.maxPrice + ' ' + item.priceUnit },
-      { label: 'Lieu', value: item.market || '—' },
-      { label: isSell ? 'Vendeur' : 'Acheteur', value: isSell ? item.seller : item.buyer },
-      { label: 'Date', value: item.date ? item.date.split('T')[0] : '—' },
-      { label: 'Pays', value: getUserCountry() },
-      { label: 'Verifie', value: item.verified ? '<i data-lucide="check-circle" class="lc"></i> Oui' : '<i data-lucide="hourglass" class="lc"></i> En attente' }
-    ];
-
-    fields.forEach(function(f) {
-      html += '<div style="background:var(--bg);padding:8px 10px;border-radius:8px;">'
-        + '<div style="font-size:10px;color:#999;">' + f.label + '</div>'
-        + '<div style="font-size:13px;font-weight:600;">' + f.value + '</div>'
-        + '</div>';
-    });
-
-    html += '</div></div>';
-
-    // Conformity info
-    html += '<div class="card" style="padding:14px;margin-bottom:16px;background:linear-gradient(135deg,#D8F3DC,#B7E4C7);border:1px solid #2D6A4F33;">'
-      + '<div style="font-size:12px;font-weight:700;color:#1B4332;margin-bottom:6px;"><i data-lucide="globe-2" class="lc"></i> Conformite reglementation UE</div>'
-      + '<div style="font-size:11px;color:#2D6A4F;">Ce QR code repond aux exigences du reglement europeen anti-deforestation '
-      + '(EUDR, applicable juin 2026) qui impose la tracabilite des produits agricoles importes dans l\'UE, '
-      + 'notamment le cacao, le cafe, le soja et le cajou.</div>'
-      + '</div>';
-
-    // Payment section (only for sell offers)
-    if (isSell) {
-      var totalAmount = (item.price || 0) * (item.quantity || 0) * (item.unit === 'tonnes' ? 1000 : 1);
-      var isPaid = localStorage.getItem('agroprix_paid_' + item.id);
-
-      if (isPaid) {
-        html += '<div class="card" style="padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#d1fae5,#a7f3d0);border:2px solid var(--green);text-align:center;">'
-          + '<div style="font-size:32px;margin-bottom:6px;"><i data-lucide="check-circle" class="lc"></i></div>'
-          + '<div style="font-size:14px;font-weight:700;color:#1B4332;">Paiement confirme</div>'
-          + '<div style="font-size:12px;color:#047857;margin-top:4px;">' + formatFCFA(totalAmount) + ' via Mobile Money</div>'
-          + '<div style="font-size:10px;color:#059669;margin-top:4px;">Ref: FDP-' + item.id.toUpperCase().substr(0,8) + ' | ' + new Date().toLocaleDateString('fr') + '</div>'
-          + '</div>';
-      } else {
-        html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
-          + '<div class="card-title"><span class="icon"><i data-lucide="credit-card" class="lc"></i></span> Paiement securise</div>'
-          + '<div style="font-size:12px;color:var(--text-light);margin-bottom:12px;">Payez directement le producteur via Mobile Money. Transaction securisee par FedaPay.</div>'
-          + '<div style="background:var(--bg);padding:12px;border-radius:10px;margin-bottom:12px;">'
-          + '<div style="display:flex;justify-content:space-between;font-size:13px;"><span>Produit</span><strong>' + (item.cropName || item.crop) + '</strong></div>'
-          + '<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:4px;"><span>Quantite</span><strong>' + item.quantity + ' ' + (item.unit || 'kg') + '</strong></div>'
-          + '<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:4px;"><span>Prix unitaire</span><strong>' + formatFCFA(item.price) + '/kg</strong></div>'
-          + '<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800;margin-top:8px;padding-top:8px;border-top:2px solid var(--border);"><span>TOTAL</span><span style="color:var(--green);">' + formatFCFA(totalAmount) + '</span></div>'
-          + '</div>'
-          + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">'
-          + '<div style="text-align:center;padding:10px;border:2px solid var(--border);border-radius:10px;cursor:pointer;" onclick="this.style.borderColor=\'var(--green)\'">'
-          + '<div style="font-size:20px;"><i data-lucide="smartphone" class="lc"></i></div><div style="font-size:10px;font-weight:600;">MTN MoMo</div></div>'
-          + '<div style="text-align:center;padding:10px;border:2px solid var(--border);border-radius:10px;cursor:pointer;" onclick="this.style.borderColor=\'var(--green)\'">'
-          + '<div style="font-size:20px;"><i data-lucide="smartphone" class="lc"></i></div><div style="font-size:10px;font-weight:600;">Moov Money</div></div>'
-          + '<div style="text-align:center;padding:10px;border:2px solid var(--border);border-radius:10px;cursor:pointer;" onclick="this.style.borderColor=\'var(--green)\'">'
-          + '<div style="font-size:20px;"><i data-lucide="credit-card" class="lc"></i></div><div style="font-size:10px;font-weight:600;">Carte</div></div>'
-          + '</div>'
-          + '<button onclick="AgroPrix.marketplace.processPayment(\'' + item.id + '\')" style="width:100%;padding:14px;background:linear-gradient(135deg,#E8862A,#E8862A);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">'
-          + '<i data-lucide="credit-card" class="lc"></i> Payer ' + formatFCFA(totalAmount) + '</button>'
-          + '<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;">'
-          + '<span style="font-size:9px;color:#999;"><i data-lucide="lock" class="lc"></i> Paiement securise par</span>'
-          + '<span style="font-size:11px;font-weight:700;color:#1B4332;">FedaPay</span>'
-          + '</div></div>';
-      }
-    }
-
-    // Share button
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">'
-      + '<button style="padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;" '
-      + 'onclick="AgroPrix.marketplace.shareQR(\'' + item.id + '\')"><i data-lucide="share-2" class="lc"></i> Partager</button>'
-      + '<button style="padding:12px;background:linear-gradient(180deg,#fff,#FAFCFB);color:var(--primary);border:2px solid var(--primary);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;" '
-      + 'onclick="AgroPrix.marketplace.init()"><i data-lucide="store" class="lc"></i> Retour</button>'
-      + '</div>';
-
-    container.innerHTML = html;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function processPayment(itemId) {
-    // Demo mode: simulate FedaPay payment flow
-    var offers = getOffers();
-    var item = offers.find(function(o) { return o.id === itemId; });
-    if (!item) return;
-
-    var totalAmount = (item.price || 0) * (item.quantity || 0) * (item.unit === 'tonnes' ? 1000 : 1);
-
-    // Show processing animation
-    var btn = event.target;
-    btn.disabled = true;
-    btn.innerHTML = '<i data-lucide="hourglass" class="lc"></i> Traitement en cours...';
-    btn.style.background = '#6b7280';
-
-    setTimeout(function() {
-      // Mark as paid in localStorage
-      localStorage.setItem('agroprix_paid_' + itemId, JSON.stringify({
-        amount: totalAmount,
-        method: 'Mobile Money',
-        ref: 'FDP-' + itemId.toUpperCase().substr(0,8),
-        date: new Date().toISOString()
-      }));
-
-      // Update offer status
-      var offers = getOffers();
-      offers = offers.map(function(o) {
-        if (o.id === itemId) o.paid = true;
-        return o;
-      });
-      localStorage.setItem(OFFERS_KEY, JSON.stringify(offers));
-
-      // Refresh QR view with payment confirmed
-      showQR(itemId);
-    }, 2000);
-  }
-
-  function shareQR(itemId) {
-    var offers = getOffers();
-    var demands = getDemands();
-    var item = offers.find(function(o) { return o.id === itemId; })
-      || demands.find(function(d) { return d.id === itemId; });
-    if (!item) return;
-
-    var text = 'Tracabilite AgroPrix\n'
-      + 'Produit: ' + (item.cropName || item.crop) + '\n'
-      + 'Quantite: ' + item.quantity + ' ' + (item.unit || 'kg') + '\n'
-      + 'Lieu: ' + (item.market || '—') + '\n'
-      + 'Date: ' + (item.date ? item.date.split('T')[0] : '—') + '\n'
-      + 'ID: ' + item.id + '\n'
-      + 'Verification: https://agroprix.app/trace/' + item.id;
-
-    if (navigator.share) {
-      navigator.share({ title: 'Tracabilite AgroPrix', text: text }).catch(function() {});
-    } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard.writeText(text).then(function() {
-        alert('Informations de tracabilite copiees !');
-      }).catch(function() {
-        prompt('Copiez les informations de tracabilite :', text);
-      });
-    }
-  }
-
-  // =========================================================================
-  // Expose
-  // =========================================================================
-  AP.marketplace = {
-    init: init,
-    setTab: setTab,
-    publish: publish,
-    showQR: showQR,
-    shareQR: shareQR,
-    processPayment: processPayment
-  };
-
-})(window.AgroPrix);
+/*! AgroPrix marketplace.js - generated from marketplace.js.src on 2026-04-18 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+(function(AP){'use strict';var currentTab='marche';var OFFERS_KEY='agroprix_marketplace_offers';var DEMANDS_KEY='agroprix_marketplace_demands';var API_BASE=(AP&&AP.API_BASE)?AP.API_BASE:'';function _authHeaders(){var token=localStorage.getItem('agroprix_token');var h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;return h;}
+function _fromBackend(row){return{id:row.id!=null?String(row.id):(Date.now().toString(36)),type:row.type,crop:row.crop,cropName:row.crop_name||row.crop,quantity:row.quantity,unit:row.unit||'tonnes',price:row.type==='buy'?undefined:row.price,maxPrice:row.type==='buy'?row.price:undefined,priceUnit:row.price_unit||'FCFA/kg',market:row.market||'',description:row.description||'',seller:row.type==='sell'?(row.seller||'Utilisateur'):undefined,buyer:row.type==='buy'?(row.seller||'Utilisateur'):undefined,phone:row.phone||'',country:row.country||'benin',date:row.created_at||new Date().toISOString(),status:row.status||'active'};}
+function _toBackend(item){return{type:item.type,crop:item.crop,crop_name:item.cropName||item.crop,quantity:Number(item.quantity)||0,unit:item.unit||'tonnes',price:Number(item.type==='buy'?item.maxPrice:item.price)||0,price_unit:item.priceUnit||'FCFA/kg',market:item.market||'',description:item.description||'',phone:item.phone||'',country:item.country||(AP.auth&&AP.auth.getUser&&(AP.auth.getUser().pays||AP.auth.getUser().country))||'benin'};}
+function getOffers(){try{return JSON.parse(localStorage.getItem(OFFERS_KEY)||'[]');}catch(e){return[];}}
+function getDemands(){try{return JSON.parse(localStorage.getItem(DEMANDS_KEY)||'[]');}catch(e){return[];}}
+function saveOffer(offer){var offers=getOffers();offers.unshift(offer);localStorage.setItem(OFFERS_KEY,JSON.stringify(offers));if(API_BASE){fetch(API_BASE+'/api/market/offers',{method:'POST',headers:_authHeaders(),body:JSON.stringify(_toBackend(offer))}).then(function(r){if(!r.ok)console.warn('[marketplace] saveOffer backend HTTP',r.status);else setTimeout(syncFromBackend,500);}).catch(function(e){console.warn('[marketplace] saveOffer backend fail',e);});}}
+function saveDemand(demand){var demands=getDemands();demands.unshift(demand);localStorage.setItem(DEMANDS_KEY,JSON.stringify(demands));if(API_BASE){fetch(API_BASE+'/api/market/offers',{method:'POST',headers:_authHeaders(),body:JSON.stringify(_toBackend(demand))}).then(function(r){if(!r.ok)console.warn('[marketplace] saveDemand backend HTTP',r.status);else setTimeout(syncFromBackend,500);}).catch(function(e){console.warn('[marketplace] saveDemand backend fail',e);});}}
+function syncFromBackend(cb){if(!API_BASE){if(cb)cb();return;}
+fetch(API_BASE+'/api/market/offers?offer_type=sell',{headers:_authHeaders()}).then(function(r){return r.ok?r.json():null;}).then(function(data){if(data&&Array.isArray(data.offers)){localStorage.setItem(OFFERS_KEY,JSON.stringify(data.offers.map(_fromBackend)));}
+return fetch(API_BASE+'/api/market/offers?offer_type=buy',{headers:_authHeaders()});}).then(function(r){return r&&r.ok?r.json():null;}).then(function(data){if(data&&Array.isArray(data.offers)){localStorage.setItem(DEMANDS_KEY,JSON.stringify(data.offers.map(_fromBackend)));}
+if(cb)cb();}).catch(function(){if(cb)cb();});}
+function getUserCountry(){var user=AP.auth?AP.auth.getUser():null;return(user&&(user.pays||user.country))||'benin';}
+function getMarkets(){return(AP.marketsByCountry&&AP.marketsByCountry[getUserCountry()])||[];}
+function getUserName(){var user=AP.auth?AP.auth.getUser():null;return(user&&(user.nom||user.name))||'Utilisateur';}
+function formatFCFA(n){if(!n)return'—';return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ')+' FCFA';}
+function timeAgo(iso){var diff=Date.now()-new Date(iso).getTime();var hours=Math.floor(diff/3600000);if(hours<1)return'A l\'instant';if(hours<24)return'Il y a '+hours+'h';var days=Math.floor(hours/24);if(days<7)return'Il y a '+days+'j';return new Date(iso).toLocaleDateString('fr');}
+function generateId(){return Date.now().toString(36)+Math.random().toString(36).substr(2,6);}
+function seedDemoData(){if(getOffers().length>0||getDemands().length>0)return;var markets=getMarkets();var m1=markets[0]?markets[0].name:'Marche central';var m2=markets[1]?markets[1].name:'Marche secondaire';var m3=markets[2]?markets[2].name:'Marche local';var demoOffers=[{id:generateId(),type:'sell',crop:'mais',cropName:'Mais',quantity:10,unit:'tonnes',price:265,priceUnit:'FCFA/kg',market:m1,description:'Mais blanc, seche, qualite A. Disponible immediatement.',seller:'Comptoir Cerealier Ouest',phone:'+XXX XX XX XX XX',date:new Date(Date.now()-7200000).toISOString(),status:'active'},{id:generateId(),type:'sell',crop:'cajou',cropName:'Cajou',quantity:5,unit:'tonnes',price:850,priceUnit:'FCFA/kg',market:m2,description:'Cajou WW320, bon calibre, stock disponible.',seller:'GIE Anacarde Plus',phone:'+XXX XX XX XX XX',date:new Date(Date.now()-18000000).toISOString(),status:'active'},{id:generateId(),type:'sell',crop:'soja',cropName:'Soja',quantity:3,unit:'tonnes',price:380,priceUnit:'FCFA/kg',market:m3,description:'Soja grain, recolte 2025-2026. Propre et sec.',seller:'Agri Producteurs UEMOA',phone:'+XXX XX XX XX XX',date:new Date(Date.now()-86400000).toISOString(),status:'active'}];var demoDemands=[{id:generateId(),type:'buy',crop:'cajou',cropName:'Cajou',quantity:50,unit:'tonnes',maxPrice:1280,priceUnit:'USD/t FOB',market:m1,description:'Cajou WW320 FOB port regional. Deadline: 30 avril 2026.',buyer:'Export West Africa SARL',phone:'+XXX XX XX XX XX',date:new Date(Date.now()-18000000).toISOString(),status:'active',verified:true},{id:generateId(),type:'buy',crop:'mais',cropName:'Mais',quantity:20,unit:'tonnes',maxPrice:250,priceUnit:'FCFA/kg',market:m2,description:'Mais blanc pour provenderie. Livraison sous 2 semaines.',buyer:'Agro-Industries Regionales',phone:'+XXX XX XX XX XX',date:new Date(Date.now()-43200000).toISOString(),status:'active',verified:false}];demoOffers.forEach(saveOffer);demoDemands.forEach(saveDemand);}
+function findMatches(){var offers=getOffers().filter(function(o){return o.status==='active';});var demands=getDemands().filter(function(d){return d.status==='active';});var matches=[];demands.forEach(function(d){offers.forEach(function(o){if(o.crop===d.crop){var priceMatch=true;matches.push({offer:o,demand:d,cropMatch:true,priceMatch:priceMatch});}});});return matches;}
+function render(){var html='';html+='<div style="display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border);">';[{id:'marche',label:'<i data-lucide="store" class="lc"></i> Marche'},{id:'vendre',label:'<i data-lucide="package" class="lc"></i> Vendre'},{id:'acheter',label:'<i data-lucide="shopping-cart" class="lc"></i> Acheter'},{id:'mes-transactions',label:'<i data-lucide="clipboard-list" class="lc"></i> Mes annonces'}].forEach(function(t){var active=currentTab===t.id;html+='<button onclick="AgroPrix.marketplace.setTab(\''+t.id+'\')" style="flex:1;padding:10px;font-size:12px;font-weight:'+(active?'700':'500')+';color:'+(active?'var(--green)':'var(--text-light)')+';background:none;border:none;border-bottom:'+(active?'3px solid var(--green)':'3px solid transparent')+';cursor:pointer;font-family:inherit;">'+t.label+'</button>';});html+='</div>';if(currentTab==='marche')html+=renderMarche();else if(currentTab==='vendre')html+=renderForm('sell');else if(currentTab==='acheter')html+=renderForm('buy');else if(currentTab==='mes-transactions')html+=renderMesAnnonces();var container=document.getElementById('marketplaceContent');if(container)container.innerHTML=html;}
+function renderMarche(){var offers=getOffers().filter(function(o){return o.status==='active';});var demands=getDemands().filter(function(d){return d.status==='active';});var matches=findMatches();var totalMatchRate=(offers.length+demands.length)>0?Math.round(matches.length/Math.max(offers.length,demands.length)*100):0;var html='';var cropEmojis={mais:'🌽',cajou:'🥜',soja:'🫘',riz:'<i data-lucide="wheat" class="lc"></i>',tomate:'🍅',oignon:'🧅',manioc:'🥔',arachide:'🥜',niebe:'🫘',igname:'🍠',coton:'🌿',cafe:'☕',cacao:'🍫',mil:'<i data-lucide="wheat" class="lc"></i>',sorgho:'<i data-lucide="wheat" class="lc"></i>'};html+='<div style="background:linear-gradient(135deg,#1B4332,#2D6A4F);border-radius:20px;padding:20px;color:#fff;margin-bottom:16px;text-align:center;">';html+='<div style="font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:2px;">PLACE DE MARCHE</div>';html+='<div style="font-size:20px;font-weight:800;margin-top:4px;"><i data-lucide="store" class="lc"></i> Offres & Demandes</div>';html+='</div>';var all=[];offers.forEach(function(o){all.push(Object.assign({_type:'sell'},o));});demands.forEach(function(d){all.push(Object.assign({_type:'buy'},d));});all.sort(function(a,b){return new Date(b.date)-new Date(a.date);});if(all.length===0){html+='<div class="card" style="padding:32px;text-align:center;">'
++'<div style="font-size:48px;margin-bottom:12px;"><i data-lucide="store" class="lc"></i></div>'
++'<h3 style="color:#666;">Aucune annonce</h3>'
++'<p style="font-size:13px;color:#999;">Soyez le premier a publier une offre ou une demande!</p>'
++'</div>';return html;}
+all.forEach(function(item){var isSell=item._type==='sell';var emoji=cropEmojis[item.crop]||'<i data-lucide="wheat" class="lc" style="width:20px;height:20px;"></i>';var phone=item.phone||'+XXX XX XX XX XX';html+='<div class="card" style="margin-bottom:14px;padding:20px;">';html+='<div style="font-size:18px;font-weight:800;color:#333;">'
++emoji+' <strong>'+item.cropName+'</strong> — '+item.quantity+' '+(item.unit||'tonnes')
++'</div>';html+='<div style="font-size:15px;color:#333;margin-top:4px;">— '+(item.market||'Non precise')+'</div>';html+='<div style="font-size:15px;color:#333;margin-top:2px;">— '+(isSell?formatFCFA(item.price)+'/kg':item.maxPrice+' '+item.priceUnit)+'</div>';if(item.description){html+='<div style="font-size:13px;color:#666;margin-top:8px;font-style:italic;">'+item.description+'</div>';}
+html+='<div style="font-size:12px;color:#999;margin-top:8px;">'
++(isSell?item.seller:item.buyer)+' · '+timeAgo(item.date);if(item.verified)html+=' · <span style="background:#D8F3DC;color:#2D6A4F;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">Verifie</span>';html+='</div>';html+='<a href="https://wa.me/'+phone.replace(/[^0-9+]/g,'')+'?text=Bonjour%2C%20je%20suis%20interesse%20par%20votre%20offre%20'+encodeURIComponent(item.cropName)+'%20sur%20AgroPrix" target="_blank" style="display:block;margin-top:12px;padding:12px;background:#25D366;color:#fff;border-radius:12px;text-align:center;font-size:14px;font-weight:700;text-decoration:none;">'
++'<i data-lucide="message-circle" class="lc" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> CONTACTER VIA WHATSAPP</a>';html+='<button onclick="event.stopPropagation();AgroPrix.marketplace.showQR(\''+item.id+'\')" style="display:block;width:100%;margin-top:8px;padding:10px;font-size:12px;font-weight:600;border:1.5px solid #2D6A4F;color:#2D6A4F;background:#fff;border-radius:12px;cursor:pointer;"><i data-lucide="smartphone" class="lc"></i> QR Tracabilite</button>';html+='</div>';});html+='<div style="text-align:center;padding:16px;font-size:13px;font-weight:700;color:#666;letter-spacing:0.5px;">'
++offers.length+' OFFRES · '+demands.length+' DEMANDES · '+totalMatchRate+'% MISE EN RELATION'
++'</div>';return html;}
+function renderForm(type){var isSell=type==='sell';var markets=getMarkets();var cultures=AP.cultureNames||{};var html='';html+='<div class="card" style="padding:16px;">'
++'<div class="card-title"><span class="icon">'+(isSell?'<i data-lucide="package" class="lc"></i>':'<i data-lucide="shopping-cart" class="lc"></i>')+'</span> '+(isSell?'Publier une offre de vente':'Publier une demande d\'achat')+'</div>'
++'<p style="font-size:12px;color:var(--text-light);margin-bottom:12px;">'+(isSell?'Proposez vos produits aux acheteurs.':'Decrivez ce que vous recherchez.')+'</p>';html+='<div class="form-group" style="margin-bottom:12px;">'
++'<label class="form-label" style="font-weight:600;">Produit</label>'
++'<select id="mpCrop" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;">';Object.keys(cultures).forEach(function(k){html+='<option value="'+k+'">'+cultures[k]+'</option>';});html+='</select></div>';html+='<div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px;">'
++'<div class="form-group"><label class="form-label" style="font-weight:600;">Quantite</label>'
++'<input type="number" id="mpQuantity" placeholder="Ex: 10" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;" min="0"></div>'
++'<div class="form-group"><label class="form-label" style="font-weight:600;">Unite</label>'
++'<select id="mpUnit" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;">'
++'<option value="kg">kg</option><option value="tonnes" selected>tonnes</option><option value="sacs">sacs</option><option value="paniers">paniers</option>'
++'</select></div></div>';html+='<div class="form-group" style="margin-bottom:12px;">'
++'<label class="form-label" style="font-weight:600;">'+(isSell?'Prix demande (FCFA/kg)':'Prix maximum (FCFA/kg)')+'</label>'
++'<input type="number" id="mpPrice" placeholder="Ex: 265" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;" min="0">'
++'</div>';html+='<div class="form-group" style="margin-bottom:12px;">'
++'<label class="form-label" style="font-weight:600;">Lieu / Marche</label>'
++'<select id="mpMarket" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;">';markets.forEach(function(m){html+='<option value="'+m.name+'">'+m.name+'</option>';});html+='<option value="Autre">Autre</option></select></div>';html+='<div class="form-group" style="margin-bottom:12px;">'
++'<label class="form-label" style="font-weight:600;">Description</label>'
++'<textarea id="mpDescription" rows="3" placeholder="'+(isSell?'Qualite, disponibilite, conditions...':'Specifications, deadline, conditions...')+'" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;resize:vertical;"></textarea>'
++'</div>';html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">'
++'<div class="form-group"><label class="form-label" style="font-weight:600;">'+(isSell?'Votre nom / entreprise':'Votre nom / entreprise')+'</label>'
++'<input type="text" id="mpContact" value="'+getUserName()+'" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;"></div>'
++'<div class="form-group"><label class="form-label" style="font-weight:600;">Telephone</label>'
++'<input type="tel" id="mpPhone" placeholder="+XXX XX XX XX XX" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;"></div></div>';html+='<button class="btn-analyse" style="width:100%;font-size:14px;padding:12px;" onclick="AgroPrix.marketplace.publish(\''+type+'\')">'
++'<i data-lucide="megaphone" class="lc"></i> Publier '+(isSell?'l\'offre':'la demande')+'</button>';html+='<div id="mpSuccess" style="display:none;margin-top:12px;padding:10px;background:#d1fae5;border-radius:8px;text-align:center;font-size:13px;color:#1B4332;font-weight:600;"></div>';html+='</div>';return html;}
+function renderMesAnnonces(){var offers=getOffers();var demands=getDemands();var userName=getUserName();var html='';var myOffers=offers.filter(function(o){return o.seller===userName;});var myDemands=demands.filter(function(d){return d.buyer===userName;});if(myOffers.length===0&&myDemands.length===0){html+='<div class="card" style="padding:32px;text-align:center;">'
++'<div style="font-size:48px;margin-bottom:12px;"><i data-lucide="clipboard-list" class="lc"></i></div>'
++'<h3 style="color:var(--text-light);">Aucune annonce</h3>'
++'<p style="font-size:13px;color:var(--text-muted);">Publiez une offre ou une demande pour la retrouver ici.</p>'
++'</div>';return html;}
+if(myOffers.length>0){html+='<div class="card" style="padding:16px;margin-bottom:16px;">'
++'<div class="card-title"><span class="icon"><i data-lucide="package" class="lc"></i></span> Mes offres de vente ('+myOffers.length+')</div>';myOffers.forEach(function(o){html+='<div style="padding:8px 0;border-bottom:1px solid var(--border);">'
++'<div style="display:flex;justify-content:space-between;align-items:center;">'
++'<div><strong>'+o.quantity+o.unit+' '+o.cropName+'</strong> — '+o.market+'</div>'
++'<span style="font-size:13px;font-weight:700;color:var(--green);">'+formatFCFA(o.price)+'/kg</span>'
++'</div>'
++'<div style="font-size:11px;color:var(--text-light);margin-top:2px;">'+timeAgo(o.date)+' — '+(o.status==='active'?'<span style="color:#10B981;">●</span> Active':'<span style="color:#9CA3AF;">●</span> Terminee')+'</div>'
++'</div>';});html+='</div>';}
+if(myDemands.length>0){html+='<div class="card" style="padding:16px;">'
++'<div class="card-title"><span class="icon"><i data-lucide="shopping-cart" class="lc"></i></span> Mes demandes d\'achat ('+myDemands.length+')</div>';myDemands.forEach(function(d){html+='<div style="padding:8px 0;border-bottom:1px solid var(--border);">'
++'<div style="display:flex;justify-content:space-between;align-items:center;">'
++'<div><strong>'+d.quantity+d.unit+' '+d.cropName+'</strong> — '+d.market+'</div>'
++'<span style="font-size:13px;font-weight:700;color:var(--blue,#3b82f6);">Max '+d.maxPrice+' '+d.priceUnit+'</span>'
++'</div>'
++'<div style="font-size:11px;color:var(--text-light);margin-top:2px;">'+timeAgo(d.date)+' — '+(d.status==='active'?'<span style="color:#10B981;">●</span> Active':'<span style="color:#9CA3AF;">●</span> Terminee')+'</div>'
++'</div>';});html+='</div>';}
+return html;}
+function publish(type){var cropEl=document.getElementById('mpCrop');var qtyEl=document.getElementById('mpQuantity');var unitEl=document.getElementById('mpUnit');var priceEl=document.getElementById('mpPrice');var marketEl=document.getElementById('mpMarket');var descEl=document.getElementById('mpDescription');var contactEl=document.getElementById('mpContact');var phoneEl=document.getElementById('mpPhone');if(!cropEl||!qtyEl||!priceEl||!qtyEl.value||!priceEl.value){alert('Veuillez remplir les champs obligatoires (produit, quantite, prix).');return;}
+var cultures=AP.cultureNames||{};var cropName=cultures[cropEl.value]||cropEl.value;if(type==='sell'){var offer={id:generateId(),type:'sell',crop:cropEl.value,cropName:cropName,quantity:parseFloat(qtyEl.value),unit:unitEl?unitEl.value:'tonnes',price:parseInt(priceEl.value),priceUnit:'FCFA/kg',market:marketEl?marketEl.value:'',description:descEl?descEl.value.trim():'',seller:contactEl?contactEl.value.trim():getUserName(),phone:phoneEl?phoneEl.value.trim():'',date:new Date().toISOString(),status:'active'};saveOffer(offer);}else{var demand={id:generateId(),type:'buy',crop:cropEl.value,cropName:cropName,quantity:parseFloat(qtyEl.value),unit:unitEl?unitEl.value:'tonnes',maxPrice:parseInt(priceEl.value),priceUnit:'FCFA/kg',market:marketEl?marketEl.value:'',description:descEl?descEl.value.trim():'',buyer:contactEl?contactEl.value.trim():getUserName(),phone:phoneEl?phoneEl.value.trim():'',date:new Date().toISOString(),status:'active',verified:false};saveDemand(demand);}
+var successEl=document.getElementById('mpSuccess');if(successEl){successEl.textContent='<i data-lucide="check-circle" class="lc"></i> Annonce publiee ! '+cropName+' — '+(type==='sell'?'offre de vente':'demande d\'achat');successEl.style.display='block';setTimeout(function(){successEl.style.display='none';},3000);}
+setTimeout(function(){currentTab='marche';render();window.scrollTo(0,0);},1500);}
+function setTab(tabId){currentTab=tabId;render();window.scrollTo(0,0);}
+function init(){currentTab='marche';if(typeof syncFromBackend==='function'){syncFromBackend(render);}else{render();}}
+function getQRUrl(data,size){size=size||200;return'https://api.qrserver.com/v1/create-qr-code/?size='+size+'x'+size+'&data='+encodeURIComponent(data);}
+function buildTraceData(item){var data={id:item.id,platform:'AgroPrix',type:item.type==='sell'?'VENTE':'ACHAT',product:item.cropName||item.crop,quantity:item.quantity+' '+(item.unit||'kg'),price:item.type==='sell'?(item.price+' FCFA/kg'):(item.maxPrice+' '+item.priceUnit),seller:item.seller||item.buyer||'—',market:item.market||'—',date:item.date?item.date.split('T')[0]:'—',country:getUserCountry(),verified:item.verified?'OUI':'NON',url:'https://agroprix.app/trace/'+item.id};return JSON.stringify(data);}
+function showQR(itemId){var offers=getOffers();var demands=getDemands();var item=offers.find(function(o){return o.id===itemId;})||demands.find(function(d){return d.id===itemId;});if(!item)return;var traceData=buildTraceData(item);var qrUrl=getQRUrl(traceData,250);var isSell=item.type==='sell';var container=document.getElementById('marketplaceContent');var html='<button class="action-btn" onclick="AgroPrix.marketplace.init()" style="font-size:12px;margin-bottom:16px;">← Retour au marche</button>';html+='<div class="card" style="padding:20px;text-align:center;margin-bottom:16px;">'
++'<div style="font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Certificat de Tracabilite AgroPrix</div>'
++'<div style="border:3px solid var(--primary);border-radius:16px;padding:16px;display:inline-block;margin-bottom:12px;">'
++'<img src="'+qrUrl+'" alt="QR Tracabilite" style="width:100%;max-width:200px;height:auto;border-radius:8px;">'
++'</div>'
++'<div style="font-size:11px;color:#999;margin-bottom:12px;">Scannez ce QR code pour verifier l\'origine du lot</div>'
++'</div>';html+='<div class="card" style="padding:16px;margin-bottom:16px;">'
++'<div class="card-title"><span class="icon"><i data-lucide="clipboard-list" class="lc"></i></span> Fiche de tracabilite</div>'
++'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';var fields=[{label:'ID Lot',value:item.id},{label:'Type',value:isSell?'<i data-lucide="package" class="lc"></i> Vente':'<i data-lucide="shopping-cart" class="lc"></i> Achat'},{label:'Produit',value:item.cropName||item.crop},{label:'Quantite',value:item.quantity+' '+(item.unit||'kg')},{label:'Prix',value:isSell?formatFCFA(item.price)+'/kg':item.maxPrice+' '+item.priceUnit},{label:'Lieu',value:item.market||'—'},{label:isSell?'Vendeur':'Acheteur',value:isSell?item.seller:item.buyer},{label:'Date',value:item.date?item.date.split('T')[0]:'—'},{label:'Pays',value:getUserCountry()},{label:'Verifie',value:item.verified?'<i data-lucide="check-circle" class="lc"></i> Oui':'<i data-lucide="hourglass" class="lc"></i> En attente'}];fields.forEach(function(f){html+='<div style="background:var(--bg);padding:8px 10px;border-radius:8px;">'
++'<div style="font-size:10px;color:#999;">'+f.label+'</div>'
++'<div style="font-size:13px;font-weight:600;">'+f.value+'</div>'
++'</div>';});html+='</div></div>';html+='<div class="card" style="padding:14px;margin-bottom:16px;background:linear-gradient(135deg,#D8F3DC,#B7E4C7);border:1px solid #2D6A4F33;">'
++'<div style="font-size:12px;font-weight:700;color:#1B4332;margin-bottom:6px;"><i data-lucide="globe-2" class="lc"></i> Conformite reglementation UE</div>'
++'<div style="font-size:11px;color:#2D6A4F;">Ce QR code repond aux exigences du reglement europeen anti-deforestation '
++'(EUDR, applicable juin 2026) qui impose la tracabilite des produits agricoles importes dans l\'UE, '
++'notamment le cacao, le cafe, le soja et le cajou.</div>'
++'</div>';if(isSell){var totalAmount=(item.price||0)*(item.quantity||0)*(item.unit==='tonnes'?1000:1);var isPaid=localStorage.getItem('agroprix_paid_'+item.id);if(isPaid){html+='<div class="card" style="padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#d1fae5,#a7f3d0);border:2px solid var(--green);text-align:center;">'
++'<div style="font-size:32px;margin-bottom:6px;"><i data-lucide="check-circle" class="lc"></i></div>'
++'<div style="font-size:14px;font-weight:700;color:#1B4332;">Paiement confirme</div>'
++'<div style="font-size:12px;color:#047857;margin-top:4px;">'+formatFCFA(totalAmount)+' via Mobile Money</div>'
++'<div style="font-size:10px;color:#059669;margin-top:4px;">Ref: FDP-'+item.id.toUpperCase().substr(0,8)+' | '+new Date().toLocaleDateString('fr')+'</div>'
++'</div>';}else{html+='<div class="card" style="padding:16px;margin-bottom:16px;">'
++'<div class="card-title"><span class="icon"><i data-lucide="credit-card" class="lc"></i></span> Paiement securise</div>'
++'<div style="font-size:12px;color:var(--text-light);margin-bottom:12px;">Payez directement le producteur via Mobile Money. Transaction securisee par FedaPay.</div>'
++'<div style="background:var(--bg);padding:12px;border-radius:10px;margin-bottom:12px;">'
++'<div style="display:flex;justify-content:space-between;font-size:13px;"><span>Produit</span><strong>'+(item.cropName||item.crop)+'</strong></div>'
++'<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:4px;"><span>Quantite</span><strong>'+item.quantity+' '+(item.unit||'kg')+'</strong></div>'
++'<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:4px;"><span>Prix unitaire</span><strong>'+formatFCFA(item.price)+'/kg</strong></div>'
++'<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800;margin-top:8px;padding-top:8px;border-top:2px solid var(--border);"><span>TOTAL</span><span style="color:var(--green);">'+formatFCFA(totalAmount)+'</span></div>'
++'</div>'
++'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">'
++'<div style="text-align:center;padding:10px;border:2px solid var(--border);border-radius:10px;cursor:pointer;" onclick="this.style.borderColor=\'var(--green)\'">'
++'<div style="font-size:20px;"><i data-lucide="smartphone" class="lc"></i></div><div style="font-size:10px;font-weight:600;">MTN MoMo</div></div>'
++'<div style="text-align:center;padding:10px;border:2px solid var(--border);border-radius:10px;cursor:pointer;" onclick="this.style.borderColor=\'var(--green)\'">'
++'<div style="font-size:20px;"><i data-lucide="smartphone" class="lc"></i></div><div style="font-size:10px;font-weight:600;">Moov Money</div></div>'
++'<div style="text-align:center;padding:10px;border:2px solid var(--border);border-radius:10px;cursor:pointer;" onclick="this.style.borderColor=\'var(--green)\'">'
++'<div style="font-size:20px;"><i data-lucide="credit-card" class="lc"></i></div><div style="font-size:10px;font-weight:600;">Carte</div></div>'
++'</div>'
++'<button onclick="AgroPrix.marketplace.processPayment(\''+item.id+'\')" style="width:100%;padding:14px;background:linear-gradient(135deg,#E8862A,#E8862A);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">'
++'<i data-lucide="credit-card" class="lc"></i> Payer '+formatFCFA(totalAmount)+'</button>'
++'<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;">'
++'<span style="font-size:9px;color:#999;"><i data-lucide="lock" class="lc"></i> Paiement securise par</span>'
++'<span style="font-size:11px;font-weight:700;color:#1B4332;">FedaPay</span>'
++'</div></div>';}}
+html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">'
++'<button style="padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;" '
++'onclick="AgroPrix.marketplace.shareQR(\''+item.id+'\')"><i data-lucide="share-2" class="lc"></i> Partager</button>'
++'<button style="padding:12px;background:linear-gradient(180deg,#fff,#FAFCFB);color:var(--primary);border:2px solid var(--primary);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;" '
++'onclick="AgroPrix.marketplace.init()"><i data-lucide="store" class="lc"></i> Retour</button>'
++'</div>';container.innerHTML=html;window.scrollTo({top:0,behavior:'smooth'});}
+function processPayment(itemId){var offers=getOffers();var item=offers.find(function(o){return o.id===itemId;});if(!item)return;var totalAmount=(item.price||0)*(item.quantity||0)*(item.unit==='tonnes'?1000:1);var btn=event.target;btn.disabled=true;btn.innerHTML='<i data-lucide="hourglass" class="lc"></i> Traitement en cours...';btn.style.background='#6b7280';setTimeout(function(){localStorage.setItem('agroprix_paid_'+itemId,JSON.stringify({amount:totalAmount,method:'Mobile Money',ref:'FDP-'+itemId.toUpperCase().substr(0,8),date:new Date().toISOString()}));var offers=getOffers();offers=offers.map(function(o){if(o.id===itemId)o.paid=true;return o;});localStorage.setItem(OFFERS_KEY,JSON.stringify(offers));showQR(itemId);},2000);}
+function shareQR(itemId){var offers=getOffers();var demands=getDemands();var item=offers.find(function(o){return o.id===itemId;})||demands.find(function(d){return d.id===itemId;});if(!item)return;var text='Tracabilite AgroPrix\n'
++'Produit: '+(item.cropName||item.crop)+'\n'
++'Quantite: '+item.quantity+' '+(item.unit||'kg')+'\n'
++'Lieu: '+(item.market||'—')+'\n'
++'Date: '+(item.date?item.date.split('T')[0]:'—')+'\n'
++'ID: '+item.id+'\n'
++'Verification: https://agroprix.app/trace/'+item.id;if(navigator.share){navigator.share({title:'Tracabilite AgroPrix',text:text}).catch(function(){});}else{navigator.clipboard.writeText(text).then(function(){alert('Informations de tracabilite copiees !');}).catch(function(){prompt('Copiez les informations de tracabilite :',text);});}}
+AP.marketplace={init:init,setTab:setTab,publish:publish,showQR:showQR,shareQR:shareQR,processPayment:processPayment};})(window.AgroPrix);
