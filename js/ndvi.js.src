@@ -171,13 +171,13 @@
 
     html += '</div>';
 
-    // Insurance banner
+    // Insurance banner — annonce d'une feature PREVUE, pas active.
     html += '<div class="card" style="padding:12px;margin-bottom:16px;background:linear-gradient(135deg,#D8F3DC,#B7E4C7);border:1px solid #2D6A4F33;">'
       + '<div style="display:flex;align-items:center;gap:10px;">'
       + '<span style="font-size:28px;color:#1B4332;"><i data-lucide="shield" class="lc"></i></span>'
       + '<div>'
-      + '<div style="font-size:12px;font-weight:700;color:#1B4332;">Assurance parametrique disponible</div>'
-      + '<div style="font-size:11px;color:#2D6A4F;">Si votre NDVI chute sous 0.3, vous etes automatiquement indemnise. Sans expert terrain.</div>'
+      + '<div style="font-size:12px;font-weight:700;color:#1B4332;">Apercu (phase 2) \u2014 Assurance parametrique prevue</div>'
+      + '<div style="font-size:11px;color:#2D6A4F;">Principe envisage : si le NDVI chute sous un seuil, l\'indemnisation serait declenchee sans expert terrain. Cette feature n\'est pas encore active.</div>'
       + '</div></div></div>';
 
     return html;
@@ -207,7 +207,7 @@
         + '</div></div>'
         + '<div style="margin-top:8px;display:flex;align-items:center;gap:8px;">'
         + sparkline
-        + '<div style="font-size:10px;color:#999;">Derniere mesure : ' + latest.date + '</div>'
+        + '<div style="font-size:10px;color:#999;">Derniere mesure : ' + latest.date + ' (demo)</div>'
         + '</div>'
         + '<div style="font-size:11px;color:' + status.color + ';margin-top:6px;font-style:italic;"><i data-lucide="lightbulb" class="lc"></i> ' + status.advice + '</div>'
         + '</div>';
@@ -268,7 +268,7 @@
       + '<div style="font-size:48px;font-weight:900;color:' + status.color + ';">' + latest.ndvi + '</div>'
       + '<div style="font-size:14px;font-weight:700;color:' + status.color + ';margin-bottom:8px;">' + status.emoji + ' ' + status.label + '</div>'
       + '<div style="font-size:12px;color:#666;">' + status.advice + '</div>'
-      + '<div style="font-size:10px;color:#999;margin-top:4px;">Derniere mesure : ' + latest.date + '</div>'
+      + '<div style="font-size:10px;color:#999;margin-top:4px;">Derniere mesure : ' + latest.date + ' (demo)</div>'
       + '</div>';
 
     // NDVI timeline (bar chart)
@@ -305,10 +305,10 @@
 
     // Insurance card
     html += '<div class="card" style="padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#FFF8E1,#FFECB3);border:1px solid #E8862A33;">'
-      + '<div class="card-title" style="color:#b45309;"><span class="icon"><i data-lucide="shield" class="lc"></i></span> Assurance parametrique</div>'
+      + '<div class="card-title" style="color:#b45309;"><span class="icon"><i data-lucide="shield" class="lc"></i></span> Assurance parametrique <span style="font-size:10px;background:#E8862A;color:#fff;padding:2px 6px;border-radius:4px;margin-left:6px;">PHASE 2</span></div>'
       + '<p style="font-size:12px;color:#92400e;margin-bottom:8px;">'
-      + 'Si le NDVI de cette parcelle descend en dessous de <b>0.3</b> pendant 2 mesures consecutives, '
-      + 'vous serez automatiquement eligible a une indemnisation.</p>'
+      + 'Apercu : si le NDVI de cette parcelle descendait en dessous de <b>0.3</b> pendant 2 mesures consecutives, '
+      + 'la parcelle serait potentiellement eligible a une indemnisation. Feature prevue en phase 2 (partenariat assureur a contractualiser).</p>'
       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
       + '<div style="background:linear-gradient(180deg,#fff,#FAFCFB);padding:8px;border-radius:8px;"><div style="font-size:10px;color:#666;">Seuil alerte</div><div style="font-weight:700;color:#e76f51;">NDVI < 0.3</div></div>'
       + '<div style="background:linear-gradient(180deg,#fff,#FAFCFB);padding:8px;border-radius:8px;"><div style="font-size:10px;color:#666;">Statut actuel</div><div style="font-weight:700;color:' + (latest.ndvi >= 0.3 ? '#2D6A4F' : '#e76f51') + ';">' + (latest.ndvi >= 0.3 ? 'Couvert' : 'ALERTE') + '</div></div>'

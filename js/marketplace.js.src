@@ -149,26 +149,13 @@
     return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
   }
 
-  // Demo data for first load
+  // Note honnetete: cette fonction pre-remplissait la marketplace avec des
+  // offres/demandes fictives (vendeurs inventes, telephones '+XXX', horodatages
+  // "il y a 2h") qui etaient rendues indistinctement des vraies annonces une
+  // fois stockees en localStorage. Neutralisee pour eviter toute confusion :
+  // la marketplace doit etre vide tant qu'aucune vraie annonce n'est publiee.
   function seedDemoData() {
-    if (getOffers().length > 0 || getDemands().length > 0) return;
-    var markets = getMarkets();
-    var m1 = markets[0] ? markets[0].name : 'Marche central';
-    var m2 = markets[1] ? markets[1].name : 'Marche secondaire';
-    var m3 = markets[2] ? markets[2].name : 'Marche local';
-
-    var demoOffers = [
-      { id: generateId(), type: 'sell', crop: 'mais', cropName: 'Mais', quantity: 10, unit: 'tonnes', price: 265, priceUnit: 'FCFA/kg', market: m1, description: 'Mais blanc, seche, qualite A. Disponible immediatement.', seller: 'Comptoir Cerealier Ouest', phone: '+XXX XX XX XX XX', date: new Date(Date.now() - 7200000).toISOString(), status: 'active' },
-      { id: generateId(), type: 'sell', crop: 'cajou', cropName: 'Cajou', quantity: 5, unit: 'tonnes', price: 850, priceUnit: 'FCFA/kg', market: m2, description: 'Cajou WW320, bon calibre, stock disponible.', seller: 'GIE Anacarde Plus', phone: '+XXX XX XX XX XX', date: new Date(Date.now() - 18000000).toISOString(), status: 'active' },
-      { id: generateId(), type: 'sell', crop: 'soja', cropName: 'Soja', quantity: 3, unit: 'tonnes', price: 380, priceUnit: 'FCFA/kg', market: m3, description: 'Soja grain, recolte 2025-2026. Propre et sec.', seller: 'Agri Producteurs UEMOA', phone: '+XXX XX XX XX XX', date: new Date(Date.now() - 86400000).toISOString(), status: 'active' }
-    ];
-    var demoDemands = [
-      { id: generateId(), type: 'buy', crop: 'cajou', cropName: 'Cajou', quantity: 50, unit: 'tonnes', maxPrice: 1280, priceUnit: 'USD/t FOB', market: m1, description: 'Cajou WW320 FOB port regional. Deadline: 30 avril 2026.', buyer: 'Export West Africa SARL', phone: '+XXX XX XX XX XX', date: new Date(Date.now() - 18000000).toISOString(), status: 'active', verified: true },
-      { id: generateId(), type: 'buy', crop: 'mais', cropName: 'Mais', quantity: 20, unit: 'tonnes', maxPrice: 250, priceUnit: 'FCFA/kg', market: m2, description: 'Mais blanc pour provenderie. Livraison sous 2 semaines.', buyer: 'Agro-Industries Regionales', phone: '+XXX XX XX XX XX', date: new Date(Date.now() - 43200000).toISOString(), status: 'active', verified: false }
-    ];
-
-    demoOffers.forEach(saveOffer);
-    demoDemands.forEach(saveDemand);
+    return;
   }
 
   // =========================================================================
@@ -645,39 +632,18 @@
   }
 
   function processPayment(itemId) {
-    // Demo mode: simulate FedaPay payment flow
-    var offers = getOffers();
-    var item = offers.find(function(o) { return o.id === itemId; });
-    if (!item) return;
-
-    var totalAmount = (item.price || 0) * (item.quantity || 0) * (item.unit === 'tonnes' ? 1000 : 1);
-
-    // Show processing animation
-    var btn = event.target;
-    btn.disabled = true;
-    btn.innerHTML = '<i data-lucide="hourglass" class="lc"></i> Traitement en cours...';
-    btn.style.background = '#6b7280';
-
-    setTimeout(function() {
-      // Mark as paid in localStorage
-      localStorage.setItem('agroprix_paid_' + itemId, JSON.stringify({
-        amount: totalAmount,
-        method: 'Mobile Money',
-        ref: 'FDP-' + itemId.toUpperCase().substr(0,8),
-        date: new Date().toISOString()
-      }));
-
-      // Update offer status
-      var offers = getOffers();
-      offers = offers.map(function(o) {
-        if (o.id === itemId) o.paid = true;
-        return o;
-      });
-      localStorage.setItem(OFFERS_KEY, JSON.stringify(offers));
-
-      // Refresh QR view with payment confirmed
-      showQR(itemId);
-    }, 2000);
+    // Paiement marketplace : pas encore cable a FedaPay pour les transactions
+    // entre acteurs (le pipeline FedaPay est reserve aux abonnements utilisateurs).
+    // Pour eviter toute confusion, on n'affiche AUCUNE confirmation de paiement
+    // tant que l'integration reelle n'est pas en place. Le bouton explique l'etat.
+    if (typeof window !== 'undefined' && window.alert) {
+      window.alert(
+        'Paiement marketplace bientot disponible.\n\n'
+        + 'Le paiement entre acteurs (acheteur/vendeur) passera par FedaPay dans '
+        + 'une prochaine mise a jour. Pour l\'instant, prenez contact directement '
+        + 'via WhatsApp ou telephone indique sur l\'offre.'
+      );
+    }
   }
 
   function shareQR(itemId) {

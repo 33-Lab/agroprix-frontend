@@ -156,11 +156,19 @@
   // =========================================================================
   function buildRows(transactions) {
     var rows = '';
+    // Les transactions pre-seedees dans negoce.js sont des EXEMPLES illustratifs,
+    // pas de vraies operations utilisateur. On prefixe chaque ligne par un
+    // badge "Exemple" pour que ce soit clair — sauf si la transaction a ete
+    // ajoutee par l'utilisateur (champ t.userAdded=true).
+    var exempleBadge = '<span style="background:#FEF3C7;color:#92400E;padding:2px 6px;'
+      + 'border-radius:4px;font-size:10px;font-weight:700;margin-right:6px;">EXEMPLE</span>';
     transactions.forEach(function(t) {
       var qtyF = t.qty.toLocaleString('fr-FR');
       var paF  = t.prixAchat.toLocaleString('fr-FR');
+      var isUserAdded = t.userAdded === true;
+      var dateCell = (isUserAdded ? '' : exempleBadge) + t.date;
       if (t.status === 'en_stock') {
-        rows += '<tr><td>' + t.date + '</td><td>' + t.culture + '</td><td>' + t.marche + '</td>'
+        rows += '<tr><td>' + dateCell + '</td><td>' + t.culture + '</td><td>' + t.marche + '</td>'
           + '<td>' + qtyF + ' kg</td><td>' + paF + ' FCFA/kg</td>'
           + '<td colspan="2" style="text-align:center;color:#E8862A;font-weight:600;">En stock</td></tr>';
       } else {
@@ -168,7 +176,7 @@
         var mc = parseFloat(margin) >= 0 ? '#2D6A4F' : '#e76f51';
         var ms = parseFloat(margin) >= 0 ? '+' : '';
         var pvF = t.prixVente.toLocaleString('fr-FR');
-        rows += '<tr><td>' + t.date + '</td><td>' + t.culture + '</td><td>' + t.marche + '</td>'
+        rows += '<tr><td>' + dateCell + '</td><td>' + t.culture + '</td><td>' + t.marche + '</td>'
           + '<td>' + qtyF + ' kg</td><td>' + paF + ' FCFA/kg</td>'
           + '<td>' + pvF + ' FCFA/kg</td>'
           + '<td style="color:' + mc + ';font-weight:600;">' + ms + margin + '%</td></tr>';
@@ -178,18 +186,28 @@
   }
 
   function buildOpportunities(opportunities) {
-    return opportunities.map(function(o) {
+    // Ces opportunites sont des exemples editoriaux (scenarios illustratifs),
+    // pas une detection automatique d'arbitrage temps reel. On prefixe par un
+    // bandeau d'honnetete pour que le trader ne les traite pas comme des
+    // signaux validables a la minute.
+    var banner = '<div style="font-size:11px;color:#92400E;background:#FEF3C7;'
+      + 'padding:6px 10px;border-radius:6px;margin-bottom:12px;font-style:italic;">'
+      + 'Exemples d\'opportunites illustratives \u2014 '
+      + 'la detection temps reel via SIM sera disponible en phase 2.'
+      + '</div>';
+    var cards = opportunities.map(function(o) {
       var urgClass = o.urgence === 'high' ? '#E8862A' : '#2D6A4F';
       return '<div style="border-left:4px solid ' + urgClass + ';padding:14px 16px;margin-bottom:14px;border-radius:0 16px 16px 0;background:#fff;">'
         + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
         + '<div style="font-size:18px;font-weight:800;color:#333;">' + o.culture + '</div>'
         + '<span style="background:#D8F3DC;color:#2D6A4F;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:800;">+' + o.marge + '%</span>'
         + '</div>'
-        + '<div style="font-size:14px;color:#333;margin-top:4px;">' + o.achat + ' → ' + o.vente + '</div>'
-        + '<div style="font-size:13px;color:#666;margin-top:4px;">Achat: ' + o.pa + ' FCFA/kg · Vente estimée: ' + o.pv + ' FCFA/kg</div>'
+        + '<div style="font-size:14px;color:#333;margin-top:4px;">' + o.achat + ' \u2192 ' + o.vente + '</div>'
+        + '<div style="font-size:13px;color:#666;margin-top:4px;">Achat: ' + o.pa + ' FCFA/kg \u00b7 Vente estimee: ' + o.pv + ' FCFA/kg</div>'
         + '<div style="font-size:12px;color:#2D6A4F;font-style:italic;margin-top:6px;">' + o.raison + '</div>'
         + '</div>';
     }).join('');
+    return banner + cards;
   }
 
   function updateStats(transactions) {

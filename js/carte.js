@@ -1,6 +1,6 @@
 /**
  * AgroPrix — Carte interactive des marchés UEMOA & parcelles géolocalisées
- * Leaflet.js — EUDR-ready — Compatible ECOAGRIS
+ * Leaflet.js — Compatibilité EUDR et ECOAGRIS prévue en phase 2.
  */
 
 (function (AP) {
@@ -99,13 +99,12 @@
             '<div style="font-size:12px;color:#666;margin-top:4px;">' +
             '<b>Produits suivis :</b> ' + (m.commodities_tracked || '—') + '<br>' +
             '<b>Dernière maj :</b> ' + (m.last_update || '—') + '<br>' +
-            '<b>Source :</b> WFP DataBridges</div>' +
-            '<div style="margin-top:8px;font-size:10px;color:#999;">Compatible ECOAGRIS</div>' +
+            '<b>Source :</b> ' + (m.source || 'AgroPrix (données indicatives)') + '</div>' +
             '</div>'
           );
           _marketsLayer.addLayer(marker);
         });
-        _setStatus(count + ' marchés WFP chargés');
+        _setStatus(count + ' marchés chargés');
       })
       .catch(function () {
         _setStatus('Données marchés indisponibles (hors ligne ?)');

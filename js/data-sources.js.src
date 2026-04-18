@@ -1,6 +1,7 @@
 // ============================================================
 // AgroPrix — Data Sources Connector v1.0
-// Sources : WFP HDX, FAOSTAT, Banque Mondiale, NASA POWER
+// Sources implémentées : WFP DataBridges (nécessite clé API) + FAOSTAT + bareme indicatif interne
+// Sources prévues (phase 2) : Banque Mondiale, NASA POWER
 // Auteur  : 33 Lab Agency Solutions
 // Date    : 31 mars 2026
 //
@@ -67,7 +68,8 @@ window.AgroPrix = window.AgroPrix || {};
       datasetId: 'wfp-food-prices',
       requiresKey: true,   // Clé gratuite sur data.humdata.org/user/register
       frequency: 'monthly',
-      coverage: 7          // 7/8 pays UEMOA (sauf Guinée-Bissau partielle)
+      coverage: 7,         // 7/8 pays UEMOA (sauf Guinée-Bissau partielle) — COUVERTURE THÉORIQUE
+      status: 'pending_key' // Non fonctionnel en prod tant que la clé n'est pas configurée côté backend
     },
     // FAOSTAT — prix production (public, sans clé)
     FAOSTAT: {
@@ -236,10 +238,13 @@ window.AgroPrix = window.AgroPrix || {};
     });
   }
 
-  // ── SOURCE 3 : Données de référence (fallback fiable) ────────────────────
-  // Prix moyens vérifiés sur les SIM nationaux (ONASA, OMA, SONAGESS, OCPV)
-  // Mis à jour : mars 2026
+  // ── SOURCE 3 : Barème indicatif interne (fallback) ────────────────────────
+  // Prix de référence collectés ponctuellement sur les SIM nationaux
+  // (ONASA/OMA/SONAGESS/OCPV) — révision manuelle mars 2026.
+  // ⚠️ Ce n'est PAS une synchronisation automatique avec les SIM ; c'est un
+  // barème statique servi en dépannage tant que WFP/SIM live ne sont pas câblés.
 
+  var REFERENCE_PRICES_LAST_REVIEW = '2026-03';  // derniere revue manuelle
   var REFERENCE_PRICES = {
     benin: {
       mais:     [{ market:'Dantokpa (Cotonou)', price:240, trend:'+3%' },
@@ -343,17 +348,20 @@ window.AgroPrix = window.AgroPrix || {};
 
     return markets.map(function(m) {
       return {
-        country:    countryLabel,
-        market:     m.market,
-        product:    productMeta.label,
-        price:      m.price,
-        unit:       productMeta.unit,
-        currency:   'XOF',
-        date:       new Date().toISOString().slice(0, 7) + '-01',
-        source:     'AgroPrix / SIM nationaux',
-        confidence: 'verified',
-        trend:      m.trend || null,
-        note:       m.note || null
+        country:        countryLabel,
+        market:         m.market,
+        product:        productMeta.label,
+        price:          m.price,
+        unit:           productMeta.unit,
+        currency:       'XOF',
+        // Pas de `date` ici : ces prix ne sont PAS une observation datee du
+        // jour, c'est un bareme indicatif revise manuellement. On expose a la
+        // place `lastReviewed` pour que l'UI puisse afficher la verite.
+        lastReviewed:   REFERENCE_PRICES_LAST_REVIEW,
+        source:         'Bareme indicatif AgroPrix',
+        confidence:     'indicative',
+        trend:          m.trend || null,
+        note:           m.note || null
       };
     });
   }
