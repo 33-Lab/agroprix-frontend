@@ -106,13 +106,14 @@
         });
       });
     } else {
-      // Fallback: hardcoded recent prices (not random)
+      // Fallback : exemples typiques (pas de donnees temps reel chargees).
+      // Labels explicites pour eviter toute confusion avec de vrais releves.
       alerts = [
-        { crop: 'Cajou', market: 'Dantokpa', change: 14, price: 850, time: 'Aujourd\'hui', isUp: true },
-        { crop: 'Tomate', market: 'Abidjan', change: 18, price: 550, time: 'Aujourd\'hui', isUp: true },
-        { crop: 'Oignon', market: 'Dakar', change: -10, price: 350, time: 'Hier', isUp: false },
-        { crop: 'Niebe', market: 'Ouagadougou', change: 8, price: 620, time: 'Hier', isUp: true },
-        { crop: 'Mais', market: 'Bamako', change: -7, price: 225, time: 'Il y a 2j', isUp: false }
+        { crop: 'Cajou', market: 'Dantokpa', change: 14, price: 850, time: 'Exemple', isUp: true, isFallback: true },
+        { crop: 'Tomate', market: 'Abidjan', change: 18, price: 550, time: 'Exemple', isUp: true, isFallback: true },
+        { crop: 'Oignon', market: 'Dakar', change: -10, price: 350, time: 'Exemple', isUp: false, isFallback: true },
+        { crop: 'Niebe', market: 'Ouagadougou', change: 8, price: 620, time: 'Exemple', isUp: true, isFallback: true },
+        { crop: 'Mais', market: 'Bamako', change: -7, price: 225, time: 'Exemple', isUp: false, isFallback: true }
       ];
     }
     return alerts;

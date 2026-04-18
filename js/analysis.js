@@ -1020,7 +1020,7 @@ window.AgroPrix = window.AgroPrix || {};
       + '<span class="reco-badge ' + actionClass + '" style="padding:8px 20px;border-radius:8px;font-weight:900;font-size:20px;letter-spacing:1px;' + actionColors[actionClass] + '">' + action + '</span>'
       + '<div>'
       + '<div style="font-size:18px;font-weight:700">' + cultureName + ' \u2014 ' + cName + '</div>'
-      + '<div style="font-size:13px;opacity:.6">Confiance : ' + confidence + '% \u00b7 Horizon : 90 jours \u00b7 Mars 2026</div>'
+      + '<div style="font-size:13px;opacity:.6">Confiance indicative : ' + confidence + '% \u00b7 Horizon : 90 jours \u00b7 Mode d\u00e9grad\u00e9 (API recommendations indisponible)</div>'
       + '</div></div>'
       // Strategy
       + '<div style="background:rgba(255,255,255,.04);border-radius:12px;padding:16px;margin-bottom:20px;font-size:14px;line-height:1.7;opacity:.9">'
