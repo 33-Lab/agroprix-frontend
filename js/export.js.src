@@ -5,7 +5,12 @@
   }
 
   function publishDemand() {
-    alert('Inscription requise pour publier une demande.\nFonctionnalité disponible en version complète.');
+    alert(
+      'Publication de demande export : fonctionnalite prevue en phase 2.\n\n'
+      + 'En attendant, contactez-nous directement :\n'
+      + '- Email : contact@agroprix.app\n'
+      + '- WhatsApp : +229 0190 5000 (Benin)'
+    );
   }
 
   AP.exportModule = { init: init, publishDemand: publishDemand };

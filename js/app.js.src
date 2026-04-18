@@ -311,7 +311,7 @@ window.souscrirePlan = function(plan, montant) {
     + '<div style="font-size:28px;font-weight:800;color:#E8862A;margin-top:8px;">' + fmt + ' FCFA<span style="font-size:14px;color:#999;font-weight:500;">/mois</span></div>'
     + '</div>'
     + '<div style="padding:14px;background:#FEF3C7;border-radius:12px;font-size:13px;color:#92400E;margin-bottom:16px;">'
-    + '<strong>Paiement bientôt disponible</strong><br>FedaPay sera activé dans les prochaines heures. Revenez ou contactez-nous via WhatsApp.'
+    + '<strong>Paiement en ligne non encore active</strong><br>Mobile Money et carte bancaire seront disponibles prochainement. En attendant, souscrivez directement via WhatsApp ci-dessous.'
     + '</div>'
     + '<a href="https://wa.me/22960000000?text=Je veux souscrire au Plan ' + plan + ' (' + fmt + ' FCFA/mois)" target="_blank" style="display:block;width:100%;padding:14px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:10px;"><i data-lucide="message-circle" class="lc" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> Payer via WhatsApp</a>'
     + '<button onclick="document.getElementById(\'paymentOverlay\').remove()" style="width:100%;padding:12px;background:none;border:1px solid #ddd;border-radius:12px;font-size:14px;color:#999;cursor:pointer;">Fermer</button>'
@@ -326,9 +326,12 @@ function onFedapaySuccess(plan, montant, response) {
     : (response && response.id ? response.id : 'N/A');
   var user = JSON.parse(localStorage.getItem('agroprix_user') || '{}');
 
-  // Mettre à jour le plan de l'utilisateur en localStorage
-  user.plan = plan;
-  user.planActivatedAt = new Date().toISOString();
+  // IMPORTANT : le backend n'upgrade plus le role avant webhook FedaPay.
+  // On garde trace localement du plan demande + transaction, mais on marque
+  // explicitement que l'activation n'est pas encore confirmee. Le vrai role
+  // sera renvoye par /api/auth/me apres webhook.
+  user.planPending = plan;
+  user.planPendingSince = new Date().toISOString();
   user.lastTransactionId = transactionId;
   localStorage.setItem('agroprix_user', JSON.stringify(user));
 

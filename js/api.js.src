@@ -20,8 +20,29 @@
       if (!raw) return null;
       var entry = JSON.parse(raw);
       if (Date.now() - entry.ts > CACHE_TTL_MS) return null; // périmé
+      // Conserver le timestamp pour que l'UI puisse afficher "cache de X min"
+      if (entry.data && typeof entry.data === 'object') {
+        try { entry.data._cacheAgeMs = Date.now() - entry.ts; } catch(e) {}
+      }
       return entry.data;
     } catch(e) { return null; }
+  }
+
+  // Banner "mode hors ligne" — injecte une bande discrete en haut si besoin.
+  // Appele automatiquement quand fetchRobust retombe sur le cache.
+  function showStaleBanner(ageMs) {
+    if (typeof document === 'undefined') return;
+    var existing = document.getElementById('ap-stale-banner');
+    var mins = Math.round((ageMs || 0) / 60000);
+    var msg = 'Mode hors ligne — donnees en cache (' + mins + ' min)';
+    if (existing) { existing.textContent = msg; return; }
+    var el = document.createElement('div');
+    el.id = 'ap-stale-banner';
+    el.textContent = msg;
+    el.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:6px 12px;'
+      + 'background:#fff3cd;color:#856404;font-size:12px;text-align:center;'
+      + 'z-index:9999;border-bottom:1px solid #ffe69c;';
+    if (document.body) document.body.appendChild(el);
   }
 
   // ── Fetch robuste : timeout + 1 retry + fallback cache ───────────────────
@@ -48,6 +69,8 @@
       if (cached) {
         console.warn('[AgroPrix] Réseau indisponible — données cache utilisées pour', cacheKey);
         cached._fromCache = true;
+        // Signale visuellement a l'utilisateur qu'il est hors ligne.
+        try { showStaleBanner(cached._cacheAgeMs); } catch(e) {}
         return cached;
       }
     }

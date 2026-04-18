@@ -2,7 +2,8 @@
 (function(AP){'use strict';var TOKEN_KEY='agroprix_token';var USER_KEY='agroprix_user';function getToken(){return localStorage.getItem(TOKEN_KEY);}
 function getUser(){try{var raw=localStorage.getItem(USER_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
 function saveSession(token,user){localStorage.setItem(TOKEN_KEY,token);localStorage.setItem(USER_KEY,JSON.stringify(user));updateAuthUI(user);}
-function clearSession(){localStorage.removeItem(TOKEN_KEY);localStorage.removeItem(USER_KEY);updateAuthUI(null);}
+function clearSession(){localStorage.removeItem(TOKEN_KEY);localStorage.removeItem(USER_KEY);try{localStorage.removeItem('agroprix_farmer_profile');localStorage.removeItem('agroprix_streak');localStorage.removeItem('agroprix_points');localStorage.removeItem('agroprix_badges');localStorage.removeItem('agroprix_last_visit');}catch(e){}
+updateAuthUI(null);}
 function isLoggedIn(){return!!getToken();}
 function authFetch(url,options){options=options||{};options.headers=options.headers||{};options.headers['Content-Type']='application/json';var token=getToken();if(token){options.headers['Authorization']='Bearer '+token;}
 return fetch(AP.API_BASE+url,options);}

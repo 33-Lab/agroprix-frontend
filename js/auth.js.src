@@ -28,8 +28,18 @@
   }
 
   function clearSession() {
+    // Cles core auth
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    // Donnees utilisateur privees : eviter que le compte suivant
+    // herite des points, streak, badges ou profil farmer.
+    try {
+      localStorage.removeItem('agroprix_farmer_profile');
+      localStorage.removeItem('agroprix_streak');
+      localStorage.removeItem('agroprix_points');
+      localStorage.removeItem('agroprix_badges');
+      localStorage.removeItem('agroprix_last_visit');
+    } catch (e) { /* ignore */ }
     updateAuthUI(null);
   }
 
