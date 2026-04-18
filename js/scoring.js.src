@@ -1,6 +1,9 @@
-// AgroPrix — Credit Scoring Module
-// Calcul du score 0-1000 basé sur profil enrichi + activité
+// AgroPrix — Score Profil Producteur Module
+// Calcul d'un indicateur 0-1000 basé sur profil enrichi + activité utilisateur
 // 6 dimensions : profil, production, transactions, stabilité, utilisation, ancienneté
+// NOTE : ce score est un indicateur interne AgroPrix de complétude et d'activité.
+// Il N'EST PAS un score de crédit réglementaire. Toute utilisation à des fins de
+// décision de crédit nécessite validation par l'institution financière partenaire.
 (function(AP) {
   'use strict';
 
@@ -295,7 +298,7 @@
       + '<div style="width:48px;height:48px;border-radius:50%;background:' + badge.color + ';display:flex;align-items:center;justify-content:center;">'
       + '<span style="color:#fff;font-size:16px;font-weight:800;">' + result.total + '</span></div>'
       + '<div>'
-      + '<div style="font-size:13px;font-weight:700;color:' + badge.color + ';">' + badge.emoji + ' Score Credit : ' + badge.label + '</div>'
+      + '<div style="font-size:13px;font-weight:700;color:' + badge.color + ';">' + badge.emoji + ' Score Profil : ' + badge.label + '</div>'
       + '<div style="font-size:11px;color:#666;">Cliquez pour voir le detail et ameliorer votre score →</div>'
       + '</div></div>';
   }
@@ -310,8 +313,9 @@
     var history = getScoreHistory();
 
     var html = '<div style="text-align:center;margin-bottom:20px;">'
-      + '<h3 style="margin:0 0 4px;color:var(--primary);">Mon Score Credit AgroPrix</h3>'
-      + '<p style="font-size:13px;color:var(--text-light);">Plus votre score est eleve, plus vous etes eligible aux financements.</p>'
+      + '<h3 style="margin:0 0 4px;color:var(--primary);">Mon Score Profil Producteur</h3>'
+      + '<p style="font-size:13px;color:var(--text-light);">Indicateur AgroPrix de completude et d\'activite. Facilite le filtrage des offres de financement proposees par nos partenaires.</p>'
+      + '<p style="font-size:11px;color:var(--text-muted);font-style:italic;">Ce score n\'est pas un score de credit reglementaire. Les decisions de financement restent a la discretion de l\'institution partenaire.</p>'
       + '</div>';
 
     // Gauge

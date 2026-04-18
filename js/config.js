@@ -3,8 +3,7 @@ window.AgroPrix = window.AgroPrix || {};
 
 (function(AP) {
   // API Configuration
-  // V6 Fix: Added fallback to agroprix-backend.onrender.com
-  // Always use Railway backend (production)
+  // Migrated from Railway to Render.com (Frankfurt region)
   // To use local backend for dev, uncomment the next line:
   // AP.API_BASE = 'http://localhost:8000';
   AP.API_BASE = 'https://web-production-46fb2.up.railway.app';
@@ -118,18 +117,17 @@ window.AgroPrix = window.AgroPrix || {};
     export:'Tableau Export', conformite:'Conformit\u00e9 Export',
     inputs:'Prix Intrants',
     financing:'GPS Financement',
-    scoring:'Mon Score Credit',
+    scoring:'Mon Score Profil Producteur',
     ndvi:'Sante Parcelle',
     market:'Offres & Demandes', rapports:'Rapports', params:'Param\u00e8tres',
     offres:'Nos Offres', plus:'Plus', proprietaire:'Proprietaire'
   };
 
   // ============================================================
-  // KKiaPay — Paiement Mobile Money (MTN MoMo, Moov, Carte)
-  // ⚠️ REMPLACER par la vraie clé publique KKiaPay (dashboard.kkiapay.me)
-  // Clé publique LIVE (commence par "live_") — NE PAS mettre la clé secrète ici
-  AP.KKIAPAY_KEY = '3401f3768803a2a9cddb289b07b82109e74ae88a';
-  AP.KKIAPAY_SANDBOX = false; // false = production live
+  // FedaPay — Paiement Mobile Money (MTN MoMo, Moov, Carte)
+  // ⚠️ REMPLACER par votre clé publique FedaPay (live.fedapay.com → API → Clé publique)
+  // Clé publique LIVE (commence par "pk_live_") — NE PAS mettre la clé secrète ici
+  AP.FEDAPAY_KEY = 'pk_live_w7Qq9hpZ5tuB-l3dmUtpdZyr';
   // ============================================================
 
   // View ID mapping (view name -> HTML element ID)
