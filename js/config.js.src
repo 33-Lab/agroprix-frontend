@@ -127,6 +127,18 @@ window.AgroPrix = window.AgroPrix || {};
   };
 
   // ============================================================
+  // UptimeRobot — Monitoring externe + status page publique
+  // Remplir AP.UPTIMEROBOT_READONLY_KEY avec une "Read-only API key"
+  // (Settings -> API Settings -> "Monitor-specific API keys" sur
+  // uptimerobot.com). La cle read-only ne permet PAS de modifier les
+  // monitors, seulement de lire le statut -> safe a embarquer cote client.
+  // Vide = widget masque (pas de promesse sans source).
+  AP.UPTIMEROBOT_READONLY_KEY = '';
+  // URL de la status page publique UptimeRobot (ex: https://stats.uptimerobot.com/XXX)
+  AP.UPTIMEROBOT_PUBLIC_STATUS_URL = '';
+  // ============================================================
+
+  // ============================================================
   // FedaPay — Paiement Mobile Money (MTN MoMo, Moov, Carte)
   // ⚠️ REMPLACER par votre clé publique FedaPay (live.fedapay.com → API → Clé publique)
   // Clé publique LIVE (commence par "pk_live_") — NE PAS mettre la clé secrète ici

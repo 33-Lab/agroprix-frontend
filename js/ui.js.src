@@ -114,6 +114,11 @@
     if (viewId === 'financing') { if (AP.financing && AP.financing.init) AP.financing.init(); }
     if (viewId === 'scoring') { if (AP.scoring && AP.scoring.render) AP.scoring.render(); }
     if (viewId === 'ndvi') { if (AP.ndvi && AP.ndvi.init) AP.ndvi.init(); }
+    if (viewId === 'params') {
+      if (AP.status && AP.status.renderDetail) {
+        AP.status.renderDetail(document.getElementById('statusWidget'));
+      }
+    }
 
     // V6 Fix: Scroll to top when showing production view
     if (viewId === 'production') {

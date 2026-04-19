@@ -1,4 +1,4 @@
-/*! AgroPrix ui.js - generated from ui.js.src on 2026-04-18 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix ui.js - generated from ui.js.src on 2026-04-19 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){var KOLA_EMAIL='kolawoleogounchi@outlook.com';var PLAN_LEVELS={'free':0,'demo':0,'gratuit':0,'Starter':1,'starter':1,'Pro':2,'pro':2,'Expert':3,'expert':3,'admin':99,'unlimited':99};var VIEW_MIN_PLAN={'analyse':0,'dashboard':0,'params':0,'offres':0,'historique':1,'carte':1,'negoce':1,'opportunites':1,'production':1,'conseilsProducteur':1,'inputs':1,'market':1,'financing':2,'gpsFinancement':2,'scoring':2,'ndvi':2,'hevea':2,'plantain':2,'export':3,'conformite':3};var PLAN_LABELS={0:'Gratuit',1:'Starter — 990 FCFA/mois',2:'Pro — 2 900 FCFA/mois',3:'Expert — 14 900 FCFA/mois'};var PLAN_UPGRADE_TARGET={1:function(){souscrirePlan('Starter',990);},2:function(){souscrirePlan('Pro',2900);},3:function(){souscrirePlan('Expert',14900);}};function getUserPlanLevel(){var user=AP.auth?AP.auth.getUser():null;if(!user)return 0;if(user.email&&user.email.toLowerCase()===KOLA_EMAIL.toLowerCase())return 99;if(user.role==='admin')return 99;var planKey=user.plan||user.role||'free';return PLAN_LEVELS[planKey]!==undefined?PLAN_LEVELS[planKey]:0;}
 function showUpgradeModal(requiredLevel){var planLabel=PLAN_LABELS[requiredLevel]||'Plan supérieur';var modal=document.getElementById('upgradeModal');if(!modal){modal=document.createElement('div');modal.id='upgradeModal';modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';document.body.appendChild(modal);}
 modal.innerHTML='<div style="background:#fff;border-radius:20px;padding:28px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);">'
@@ -18,6 +18,7 @@ if(viewId==='market'){if(AP.marketplace&&AP.marketplace.init)AP.marketplace.init
 if(viewId==='financing'){if(AP.financing&&AP.financing.init)AP.financing.init();}
 if(viewId==='scoring'){if(AP.scoring&&AP.scoring.render)AP.scoring.render();}
 if(viewId==='ndvi'){if(AP.ndvi&&AP.ndvi.init)AP.ndvi.init();}
+if(viewId==='params'){if(AP.status&&AP.status.renderDetail){AP.status.renderDetail(document.getElementById('statusWidget'));}}
 if(viewId==='production'){window.scrollTo({top:0,behavior:'smooth'});}
 closeMobileMenu();setTimeout(refreshIcons,100);}
 function toggleSwitch(el){el.classList.toggle('active');}
