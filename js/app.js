@@ -1,4 +1,4 @@
-/*! AgroPrix app.js - generated from app.js.src on 2026-04-18 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix app.js - generated from app.js.src on 2026-04-19 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){'use strict';function init(){if(AP.api&&AP.api.checkAPI){AP.api.checkAPI();}
 if(AP.ui&&AP.ui.updateMarkets){AP.ui.updateMarkets();}
 registerServiceWorker();setupInstallPrompt();if(AP.auth&&AP.auth.initAuth){AP.auth.initAuth();}
@@ -45,12 +45,28 @@ var fmt=montant.toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ');var overlay=docu
 +'</div>'
 +'<a href="https://wa.me/22960000000?text=Je veux souscrire au Plan '+plan+' ('+fmt+' FCFA/mois)" target="_blank" style="display:block;width:100%;padding:14px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:10px;"><i data-lucide="message-circle" class="lc" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> Payer via WhatsApp</a>'
 +'<button onclick="document.getElementById(\'paymentOverlay\').remove()" style="width:100%;padding:12px;background:none;border:1px solid #ddd;border-radius:12px;font-size:14px;color:#999;cursor:pointer;">Fermer</button>'
-+'</div>';document.body.appendChild(overlay);};function onFedapaySuccess(plan,montant,response){var transactionId=response&&response.transaction&&response.transaction.id?response.transaction.id:(response&&response.id?response.id:'N/A');var user=JSON.parse(localStorage.getItem('agroprix_user')||'{}');user.planPending=plan;user.planPendingSince=new Date().toISOString();user.lastTransactionId=transactionId;localStorage.setItem('agroprix_user',JSON.stringify(user));var AP=window.AgroPrix;if(AP&&AP.API_BASE){var token=localStorage.getItem('agroprix_token');fetch(AP.API_BASE+'/api/subscriptions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({plan:plan,montant:montant,transactionId:transactionId})}).catch(function(){});}
-var fmt=montant.toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ');var overlay=document.createElement('div');overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';overlay.innerHTML='<div style="background:#fff;border-radius:20px;padding:40px;max-width:400px;width:100%;text-align:center;">'
-+'<div style="margin-bottom:16px;"><i data-lucide="check-circle" style="width:64px;height:64px;color:#2D6A4F;" class="lc"></i></div>'
-+'<div style="font-size:22px;font-weight:800;color:#1B4332;">Paiement confirmé !</div>'
-+'<div style="font-size:15px;color:#666;margin-top:8px;">Plan <strong>'+plan+'</strong> activé — '+fmt+' FCFA/mois</div>'
-+'<div style="font-size:12px;color:#999;margin-top:6px;">Transaction : '+transactionId+'</div>'
-+'<div style="margin-top:16px;padding:12px;background:#D8F3DC;border-radius:12px;font-size:13px;color:#1B4332;">Merci ! Toutes les fonctionnalités sont maintenant disponibles.</div>'
-+'<button onclick="this.closest(\'[style*=fixed]\').remove()" style="width:100%;margin-top:16px;padding:14px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;">Accéder à mon compte</button>'
-+'</div>';document.body.appendChild(overlay);}
++'</div>';document.body.appendChild(overlay);};function onFedapaySuccess(plan,montant,response){var transactionId=response&&response.transaction&&response.transaction.id?response.transaction.id:(response&&response.id?response.id:'N/A');var user=JSON.parse(localStorage.getItem('agroprix_user')||'{}');var previousRole=user.role||'free';user.planPending=plan;user.planPendingSince=new Date().toISOString();user.lastTransactionId=transactionId;localStorage.setItem('agroprix_user',JSON.stringify(user));var AP=window.AgroPrix;var token=localStorage.getItem('agroprix_token');if(AP&&AP.API_BASE){fetch(AP.API_BASE+'/api/subscriptions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({plan:plan,montant:montant,transactionId:transactionId})}).catch(function(){});}
+var fmt=montant.toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ');var overlay=document.createElement('div');overlay.id='paymentActivationOverlay';overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';overlay.innerHTML='<div style="background:#fff;border-radius:20px;padding:32px 24px;max-width:400px;width:100%;text-align:center;">'
++'<div id="payIconWrap" style="margin-bottom:16px;">'
++'<div style="width:64px;height:64px;margin:0 auto;border:4px solid #D8F3DC;border-top-color:#2D6A4F;border-radius:50%;animation:spin 1s linear infinite;"></div>'
++'</div>'
++'<div id="payTitle" style="font-size:22px;font-weight:800;color:#1B4332;">Paiement reçu</div>'
++'<div id="paySub" style="font-size:14px;color:#666;margin-top:6px;">Activation du plan <strong>'+plan+'</strong> ('+fmt+' FCFA/mois) en cours…</div>'
++'<div style="font-size:12px;color:#999;margin-top:8px;">Transaction : '+transactionId+'</div>'
++'<div id="payStatus" style="margin-top:16px;padding:12px;background:#FEF3C7;border-radius:12px;font-size:13px;color:#92400E;line-height:1.5;">'
++'Nous attendons la confirmation de FedaPay (webhook). Cela prend habituellement quelques secondes.'
++'</div>'
++'<button id="payCloseBtn" onclick="document.getElementById(\'paymentActivationOverlay\').remove()" style="width:100%;margin-top:16px;padding:14px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;">OK, continuer</button>'
++'</div>'
++'<style>@keyframes spin{to{transform:rotate(360deg)}}</style>';document.body.appendChild(overlay);pollAuthMeForRoleUpgrade({previousRole:previousRole,expectedPlan:plan,maxAttempts:12,intervalMs:5000,onUpgrade:function(newUser){var wrap=document.getElementById('payIconWrap');var title=document.getElementById('payTitle');var sub=document.getElementById('paySub');var status=document.getElementById('payStatus');if(wrap)wrap.innerHTML='<i data-lucide="check-circle" style="width:64px;height:64px;color:#2D6A4F;" class="lc"></i>';if(title)title.textContent='Plan activé !';if(sub)sub.innerHTML='Plan <strong>'+plan+'</strong> actif — '+fmt+' FCFA/mois';if(status){status.style.background='#D8F3DC';status.style.color='#1B4332';status.innerHTML='Toutes les fonctionnalités sont maintenant disponibles.';}
+if(window.lucide&&lucide.createIcons)lucide.createIcons();},onTimeout:function(){var status=document.getElementById('payStatus');if(status){status.innerHTML='<strong>Paiement bien reçu</strong> — l\'activation prend un peu plus de temps que prévu. '
++'Rafraîchissez la page dans quelques minutes. Si le plan n\'est toujours pas actif, '
++'contactez support@agroprix.app avec la référence : <code>'+transactionId+'</code>';}}});}
+function pollAuthMeForRoleUpgrade(opts){var AP=window.AgroPrix;var token=localStorage.getItem('agroprix_token');if(!AP||!AP.API_BASE||!token){if(opts&&opts.onTimeout)opts.onTimeout();return;}
+var attempts=0;var max=opts.maxAttempts||12;var interval=opts.intervalMs||5000;var previousRole=opts.previousRole||'free';function tick(){attempts++;fetch(AP.API_BASE+'/api/auth/me',{headers:{'Authorization':'Bearer '+token},cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(body){var u=body&&body.utilisateur;if(u&&u.role&&u.role!==previousRole&&u.role!=='free'){try{var stored=JSON.parse(localStorage.getItem('agroprix_user')||'{}');stored.role=u.role;stored.rate_limit=u.rate_limit;stored.planPending=null;stored.planPendingSince=null;localStorage.setItem('agroprix_user',JSON.stringify(stored));}catch(e){}
+if(opts.onUpgrade)opts.onUpgrade(u);return;}
+if(attempts>=max){if(opts.onTimeout)opts.onTimeout();return;}
+setTimeout(tick,interval);}).catch(function(){if(attempts>=max){if(opts.onTimeout)opts.onTimeout();return;}
+setTimeout(tick,interval);});}
+setTimeout(tick,2000);}
+window.pollAuthMeForRoleUpgrade=pollAuthMeForRoleUpgrade;

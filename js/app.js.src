@@ -325,38 +325,141 @@ function onFedapaySuccess(plan, montant, response) {
     ? response.transaction.id
     : (response && response.id ? response.id : 'N/A');
   var user = JSON.parse(localStorage.getItem('agroprix_user') || '{}');
+  var previousRole = user.role || 'free';
 
-  // IMPORTANT : le backend n'upgrade plus le role avant webhook FedaPay.
-  // On garde trace localement du plan demande + transaction, mais on marque
-  // explicitement que l'activation n'est pas encore confirmee. Le vrai role
-  // sera renvoye par /api/auth/me apres webhook.
+  // IMPORTANT : le backend n'upgrade le role qu'apres reception du webhook
+  // FedaPay. On ne prend JAMAIS le role en confiance depuis le callback
+  // client (user peut rester sur la page ou fermer avant le webhook).
   user.planPending = plan;
   user.planPendingSince = new Date().toISOString();
   user.lastTransactionId = transactionId;
   localStorage.setItem('agroprix_user', JSON.stringify(user));
 
-  // Notifier le backend (non bloquant)
+  // Notifier le backend (non bloquant) — acknowledgment cote client
   var AP = window.AgroPrix;
+  var token = localStorage.getItem('agroprix_token');
   if (AP && AP.API_BASE) {
-    var token = localStorage.getItem('agroprix_token');
     fetch(AP.API_BASE + '/api/subscriptions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ plan: plan, montant: montant, transactionId: transactionId })
-    }).catch(function() {}); // Silencieux si hors ligne
+    }).catch(function() {});
   }
 
-  // Afficher la confirmation
+  // Afficher l'ecran "activation en cours" (HONNETE — pas de "active" tant
+  // que /api/auth/me n'a pas confirme l'upgrade de role via webhook)
   var fmt = montant.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   var overlay = document.createElement('div');
+  overlay.id = 'paymentActivationOverlay';
   overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
-  overlay.innerHTML = '<div style="background:#fff;border-radius:20px;padding:40px;max-width:400px;width:100%;text-align:center;">'
-    + '<div style="margin-bottom:16px;"><i data-lucide="check-circle" style="width:64px;height:64px;color:#2D6A4F;" class="lc"></i></div>'
-    + '<div style="font-size:22px;font-weight:800;color:#1B4332;">Paiement confirmé !</div>'
-    + '<div style="font-size:15px;color:#666;margin-top:8px;">Plan <strong>' + plan + '</strong> activé — ' + fmt + ' FCFA/mois</div>'
-    + '<div style="font-size:12px;color:#999;margin-top:6px;">Transaction : ' + transactionId + '</div>'
-    + '<div style="margin-top:16px;padding:12px;background:#D8F3DC;border-radius:12px;font-size:13px;color:#1B4332;">Merci ! Toutes les fonctionnalités sont maintenant disponibles.</div>'
-    + '<button onclick="this.closest(\'[style*=fixed]\').remove()" style="width:100%;margin-top:16px;padding:14px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;">Accéder à mon compte</button>'
-    + '</div>';
+  overlay.innerHTML =
+      '<div style="background:#fff;border-radius:20px;padding:32px 24px;max-width:400px;width:100%;text-align:center;">'
+    +   '<div id="payIconWrap" style="margin-bottom:16px;">'
+    +     '<div style="width:64px;height:64px;margin:0 auto;border:4px solid #D8F3DC;border-top-color:#2D6A4F;border-radius:50%;animation:spin 1s linear infinite;"></div>'
+    +   '</div>'
+    +   '<div id="payTitle" style="font-size:22px;font-weight:800;color:#1B4332;">Paiement reçu</div>'
+    +   '<div id="paySub" style="font-size:14px;color:#666;margin-top:6px;">Activation du plan <strong>' + plan + '</strong> (' + fmt + ' FCFA/mois) en cours…</div>'
+    +   '<div style="font-size:12px;color:#999;margin-top:8px;">Transaction : ' + transactionId + '</div>'
+    +   '<div id="payStatus" style="margin-top:16px;padding:12px;background:#FEF3C7;border-radius:12px;font-size:13px;color:#92400E;line-height:1.5;">'
+    +     'Nous attendons la confirmation de FedaPay (webhook). Cela prend habituellement quelques secondes.'
+    +   '</div>'
+    +   '<button id="payCloseBtn" onclick="document.getElementById(\'paymentActivationOverlay\').remove()" style="width:100%;margin-top:16px;padding:14px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;">OK, continuer</button>'
+    + '</div>'
+    + '<style>@keyframes spin{to{transform:rotate(360deg)}}</style>';
   document.body.appendChild(overlay);
+
+  // Demarrer le polling de /api/auth/me pour detecter l'upgrade de role
+  pollAuthMeForRoleUpgrade({
+    previousRole: previousRole,
+    expectedPlan: plan,
+    maxAttempts: 12,        // 12 x 5s = 60s max
+    intervalMs: 5000,
+    onUpgrade: function(newUser) {
+      var wrap = document.getElementById('payIconWrap');
+      var title = document.getElementById('payTitle');
+      var sub = document.getElementById('paySub');
+      var status = document.getElementById('payStatus');
+      if (wrap) wrap.innerHTML = '<i data-lucide="check-circle" style="width:64px;height:64px;color:#2D6A4F;" class="lc"></i>';
+      if (title) title.textContent = 'Plan activé !';
+      if (sub) sub.innerHTML = 'Plan <strong>' + plan + '</strong> actif — ' + fmt + ' FCFA/mois';
+      if (status) {
+        status.style.background = '#D8F3DC';
+        status.style.color = '#1B4332';
+        status.innerHTML = 'Toutes les fonctionnalités sont maintenant disponibles.';
+      }
+      if (window.lucide && lucide.createIcons) lucide.createIcons();
+    },
+    onTimeout: function() {
+      var status = document.getElementById('payStatus');
+      if (status) {
+        status.innerHTML =
+            '<strong>Paiement bien reçu</strong> — l\'activation prend un peu plus de temps que prévu. '
+          + 'Rafraîchissez la page dans quelques minutes. Si le plan n\'est toujours pas actif, '
+          + 'contactez support@agroprix.app avec la référence : <code>' + transactionId + '</code>';
+      }
+    }
+  });
 }
+
+// ============================================================
+// Polling /api/auth/me — detecte upgrade role apres webhook FedaPay
+// ============================================================
+// Le role n'est promu que par le webhook FedaPay cote serveur. On poll
+// /api/auth/me toutes les N secondes jusqu'a detecter un changement de
+// role (free -> pro/expert) ou jusqu'a timeout. Aucune promesse cote
+// client — si le webhook ne fire pas, on dit honnetement "activation
+// retardee" avec la reference transaction.
+function pollAuthMeForRoleUpgrade(opts) {
+  var AP = window.AgroPrix;
+  var token = localStorage.getItem('agroprix_token');
+  if (!AP || !AP.API_BASE || !token) {
+    if (opts && opts.onTimeout) opts.onTimeout();
+    return;
+  }
+
+  var attempts = 0;
+  var max = opts.maxAttempts || 12;
+  var interval = opts.intervalMs || 5000;
+  var previousRole = opts.previousRole || 'free';
+
+  function tick() {
+    attempts++;
+    fetch(AP.API_BASE + '/api/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + token },
+      cache: 'no-store'
+    })
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(body) {
+        var u = body && body.utilisateur;
+        if (u && u.role && u.role !== previousRole && u.role !== 'free') {
+          // Upgrade detecte — mettre a jour le localStorage et notifier
+          try {
+            var stored = JSON.parse(localStorage.getItem('agroprix_user') || '{}');
+            stored.role = u.role;
+            stored.rate_limit = u.rate_limit;
+            stored.planPending = null;
+            stored.planPendingSince = null;
+            localStorage.setItem('agroprix_user', JSON.stringify(stored));
+          } catch (e) {}
+          if (opts.onUpgrade) opts.onUpgrade(u);
+          return;
+        }
+        if (attempts >= max) {
+          if (opts.onTimeout) opts.onTimeout();
+          return;
+        }
+        setTimeout(tick, interval);
+      })
+      .catch(function() {
+        if (attempts >= max) {
+          if (opts.onTimeout) opts.onTimeout();
+          return;
+        }
+        setTimeout(tick, interval);
+      });
+  }
+
+  // Premier appel immediat, puis intervalle
+  setTimeout(tick, 2000); // 2s de grace pour laisser le webhook arriver
+}
+window.pollAuthMeForRoleUpgrade = pollAuthMeForRoleUpgrade;
