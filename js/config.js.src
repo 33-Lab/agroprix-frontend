@@ -8,7 +8,9 @@ window.AgroPrix = window.AgroPrix || {};
   // To use local backend for dev, uncomment the next line:
   // AP.API_BASE = 'http://localhost:8000';
   AP.API_BASE = 'https://web-production-46fb2.up.railway.app'; // Railway Hobby — actif
-  AP.API_AVAILABLE = false;
+  // Default true : backend Railway est prod live. checkAPI() confirmera au boot.
+  // Si le backend tombe, cache localStorage + fetchWithFallback gèrent le dégradé.
+  AP.API_AVAILABLE = true;
 
   // Clé API HDX (WFP food prices — data.humdata.org)
   // Compte OFFICIEL : Kayode Gnonlonfoun (kayode1974) — token agroprix-prod-v2
