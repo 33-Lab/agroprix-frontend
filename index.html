@@ -29,8 +29,45 @@
   <script defer data-domain="agroprix.app" src="https://plausible.io/js/script.js"
     onerror="console.log('[AgroPrix] Plausible not loaded (OK in dev)')"></script>
 
+  <!-- Sentry Browser SDK (observabilite erreurs prod). No-op tant que SENTRY_DSN est vide. -->
+  <script src="https://browser.sentry-cdn.com/7.114.0/bundle.tracing.min.js" crossorigin="anonymous"></script>
+  <script>
+    (function() {
+      // A remplir avec le DSN du projet Sentry "agroprix-frontend" quand cree.
+      // Vide = desactive (pas d'appel reseau, no-op total).
+      var SENTRY_DSN = "";
+      if (!SENTRY_DSN || !window.Sentry) return;
+      var host = window.location.hostname;
+      var env = (host === "app.agroprix.app" || host === "agroprix.app")
+        ? "production"
+        : (host === "localhost" || host === "127.0.0.1" ? "development" : "staging");
+      window.Sentry.init({
+        dsn: SENTRY_DSN,
+        environment: env,
+        tracesSampleRate: 0.1,
+        // RGPD : pas d'email/IP envoyes par defaut
+        sendDefaultPii: false,
+        ignoreErrors: [
+          "ResizeObserver loop limit exceeded",
+          "ResizeObserver loop completed with undelivered notifications",
+          "Non-Error promise rejection captured",
+          "Network request failed",
+          "Failed to fetch"
+        ],
+        denyUrls: [
+          /extensions\//i,
+          /^chrome:\/\//i,
+          /^moz-extension:\/\//i
+        ]
+      });
+      // Expose pour app.js (ex: Sentry.captureMessage sur erreurs metier)
+      window.AgroPrix = window.AgroPrix || {};
+      window.AgroPrix.Sentry = window.Sentry;
+    })();
+  </script>
+
   <!-- Security: CSP -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://plausible.io https://cdn.fedapay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdn.fedapay.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.qrserver.com https://api.open-meteo.com https://agromonitoring.com https://*.railway.app https://*.vercel.app https://plausible.io https://api.fedapay.com https://live.fedapay.com; frame-src https://cdn.fedapay.com https://checkout.fedapay.com https://*.fedapay.com;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://plausible.io https://cdn.fedapay.com https://browser.sentry-cdn.com https://js.sentry-cdn.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdn.fedapay.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.qrserver.com https://api.open-meteo.com https://agromonitoring.com https://*.railway.app https://*.vercel.app https://plausible.io https://api.fedapay.com https://live.fedapay.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io; frame-src https://cdn.fedapay.com https://checkout.fedapay.com https://*.fedapay.com;">
   <meta name="referrer" content="strict-origin-when-cross-origin">
 
   <!-- PWA Meta -->
