@@ -1,9 +1,7 @@
 /*! AgroPrix status.js - generated from status.js.src on 2026-04-19 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
-(function(AP){'use strict';var UR_API='https://api.uptimerobot.com/v2/getMonitors';var STATUS_LABELS={0:{txt:'En pause',bg:'#E5E7EB',fg:'#374151'},1:{txt:'En attente',bg:'#FEF3C7',fg:'#92400E'},2:{txt:'En ligne',bg:'#D1FAE5',fg:'#065F46'},8:{txt:'Instable',bg:'#FED7AA',fg:'#9A3412'},9:{txt:'Hors ligne',bg:'#FEE2E2',fg:'#991B1B'},};function _keys(){var k=AP.UPTIMEROBOT_READONLY_KEY;if(!k)return[];if(Array.isArray(k))return k.filter(Boolean);return[k];}
-function _fetchOne(key){var body='api_key='+encodeURIComponent(key)
-+'&format=json&logs=0&response_times=0';return fetch(UR_API,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded','Cache-Control':'no-cache'},body:body}).then(function(r){return r.ok?r.json():null;}).then(function(data){if(!data||data.stat!=='ok'||!Array.isArray(data.monitors))return[];return data.monitors;}).catch(function(){return[];});}
-function fetchStatus(){var keys=_keys();if(!keys.length)return Promise.resolve(null);return Promise.all(keys.map(_fetchOne)).then(function(batches){var seen={};var all=[];batches.forEach(function(arr){arr.forEach(function(m){if(seen[m.id])return;seen[m.id]=true;all.push({name:m.friendly_name,url:m.url,status:m.status,uptime_ratio:m.all_time_uptime_ratio});});});return all.length?all:null;});}
-function renderBadge(container){if(!container)return;if(!_keys().length){container.style.display='none';return;}
+(function(AP){'use strict';var STATUS_LABELS={0:{txt:'En pause',bg:'#E5E7EB',fg:'#374151'},1:{txt:'En attente',bg:'#FEF3C7',fg:'#92400E'},2:{txt:'En ligne',bg:'#D1FAE5',fg:'#065F46'},8:{txt:'Instable',bg:'#FED7AA',fg:'#9A3412'},9:{txt:'Hors ligne',bg:'#FEE2E2',fg:'#991B1B'},};function _enabled(){return!!(AP.API_BASE);}
+function fetchStatus(){if(!_enabled())return Promise.resolve(null);return fetch(AP.API_BASE+'/api/status/monitors',{method:'GET',headers:{'Cache-Control':'no-cache'},credentials:'include'}).then(function(r){return r.ok?r.json():null;}).then(function(data){if(!data||!Array.isArray(data.monitors)||!data.monitors.length)return null;return data.monitors.map(function(m){return{name:m.name,url:m.url,status:m.status,uptime_ratio:m.uptime_ratio};});}).catch(function(){return null;});}
+function renderBadge(container){if(!container)return;if(!_enabled()){container.style.display='none';return;}
 container.innerHTML='<div style="font-size:12px;opacity:0.6">Statut des services...</div>';fetchStatus().then(function(monitors){if(!monitors){container.innerHTML='<div style="font-size:12px;opacity:0.6">Statut indisponible</div>';return;}
 var worst=Math.max.apply(null,monitors.map(function(m){return m.status;}));var label=STATUS_LABELS[worst]||STATUS_LABELS[1];var linkPart=AP.UPTIMEROBOT_PUBLIC_STATUS_URL?' <a href="'+AP.UPTIMEROBOT_PUBLIC_STATUS_URL+'" target="_blank" rel="noopener"'
 +' style="margin-left:8px;font-size:11px;color:inherit;text-decoration:underline;opacity:0.7">voir details</a>':'';container.innerHTML='<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;'
@@ -12,7 +10,7 @@ var worst=Math.max.apply(null,monitors.map(function(m){return m.status;}));var l
 +'<span style="width:8px;height:8px;border-radius:50%;background:'+label.fg+';display:inline-block"></span>'
 +'Services: '+label.txt
 +'</span>'+linkPart;});}
-function renderDetail(container){if(!container)return;if(!_keys().length){container.innerHTML='<div style="padding:16px;border-radius:12px;background:#F3F4F6;color:#4B5563;font-size:14px">'
+function renderDetail(container){if(!container)return;if(!_enabled()){container.innerHTML='<div style="padding:16px;border-radius:12px;background:#F3F4F6;color:#4B5563;font-size:14px">'
 +'Monitoring public non configure. L\'administrateur peut renseigner '
 +'<code>UPTIMEROBOT_READONLY_KEY</code> dans <code>config.js</code> pour afficher le statut live.'
 +'</div>';return;}
