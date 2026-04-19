@@ -1,5 +1,6 @@
-/*! AgroPrix api.js - generated from api.js.src on 2026-04-18 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
-(function(AP){var API_TIMEOUT_MS=8000;var CACHE_PREFIX='ap_cache_';var CACHE_TTL_MS=6*60*60*1000;function cacheSet(key,data){try{localStorage.setItem(CACHE_PREFIX+key,JSON.stringify({ts:Date.now(),data:data}));}catch(e){}}
+/*! AgroPrix api.js - generated from api.js.src on 2026-04-19 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+(function(AP){var API_TIMEOUT_MS=8000;var CACHE_PREFIX='ap_cache_';var CACHE_TTL_MS=6*60*60*1000;function stripAccents(s){if(!s||typeof s.normalize!=='function')return s||'';return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function cacheSet(key,data){try{localStorage.setItem(CACHE_PREFIX+key,JSON.stringify({ts:Date.now(),data:data}));}catch(e){}}
 function cacheGet(key){try{var raw=localStorage.getItem(CACHE_PREFIX+key);if(!raw)return null;var entry=JSON.parse(raw);if(Date.now()-entry.ts>CACHE_TTL_MS)return null;if(entry.data&&typeof entry.data==='object'){try{entry.data._cacheAgeMs=Date.now()-entry.ts;}catch(e){}}
 return entry.data;}catch(e){return null;}}
 function showStaleBanner(ageMs){if(typeof document==='undefined')return;var existing=document.getElementById('ap-stale-banner');var mins=Math.round((ageMs||0)/60000);var msg='Mode hors ligne — donnees en cache ('+mins+' min)';if(existing){existing.textContent=msg;return;}
@@ -12,12 +13,12 @@ return cached;}}
 return null;}
 function checkAPI(){fetch(AP.API_BASE+'/',{method:'GET',signal:AbortSignal.timeout(3000)}).then(function(r){if(r.ok){AP.API_AVAILABLE=true;}}).catch(function(){AP.API_AVAILABLE=false;});}
 function periodToStartDate(periodKey){var now=new Date();var y=now.getFullYear(),m=now.getMonth()+1;switch(periodKey){case'12m':return(y-1)+'-'+String(m).padStart(2,'0')+'-01';case'3y':return(y-3)+'-'+String(m).padStart(2,'0')+'-01';case'5y':return(y-5)+'-'+String(m).padStart(2,'0')+'-01';case'10y':return(y-10)+'-'+String(m).padStart(2,'0')+'-01';default:return(y-1)+'-01-01';}}
-async function fetchPrices(country,commodity,periodKey){var wfpName=AP.cultureToWFP[commodity]||commodity;var startDate=periodToStartDate(periodKey);var url=AP.API_BASE+'/api/prices/monthly?country='+country
-+'&commodity='+encodeURIComponent(wfpName)
-+'&start_date='+startDate;var cacheKey='prices_'+country+'_'+wfpName+'_'+periodKey;var json=await fetchRobust(url,cacheKey);return(json&&json.data)?json.data:[];}
+async function fetchPrices(country,commodity,periodKey){var dbName=stripAccents(AP.cultureNames[commodity]||commodity);var startDate=periodToStartDate(periodKey);var url=AP.API_BASE+'/api/prices/monthly?country='+country
++'&commodity='+encodeURIComponent(dbName)
++'&start_date='+startDate;var cacheKey='prices_'+country+'_'+dbName+'_'+periodKey;var json=await fetchRobust(url,cacheKey);return(json&&json.data)?json.data:[];}
 async function fetchMarkets(country){var url=AP.API_BASE+'/api/prices/markets?country='+country;var json=await fetchRobust(url,'markets_'+country);return(json&&json.data)?json.data:[];}
-async function fetchCompare(commodity){var wfpName=AP.cultureToWFP[commodity]||commodity;var url=AP.API_BASE+'/api/prices/compare?commodity='+encodeURIComponent(wfpName);var json=await fetchRobust(url,'compare_'+wfpName);return(json&&json.data)?json.data:[];}
+async function fetchCompare(commodity){var dbName=stripAccents(AP.cultureNames[commodity]||commodity);var url=AP.API_BASE+'/api/prices/compare?commodity='+encodeURIComponent(dbName);var json=await fetchRobust(url,'compare_'+dbName);return(json&&json.data)?json.data:[];}
 async function fetchForecast(country){var url=AP.API_BASE+'/api/weather/forecast?country='+country;var json=await fetchRobust(url,'forecast_'+country);return json||{};}
-async function fetchRecommendations(country,commodity){var wfpName=AP.cultureToWFP[commodity]||commodity;var url=AP.API_BASE+'/api/recommendations/?country='+country
-+'&commodity='+encodeURIComponent(wfpName);var json=await fetchRobust(url,'reco_'+country+'_'+wfpName);return json||{};}
+async function fetchRecommendations(country,commodity){var dbName=stripAccents(AP.cultureNames[commodity]||commodity);var url=AP.API_BASE+'/api/recommendations/?country='+country
++'&commodity='+encodeURIComponent(dbName);var json=await fetchRobust(url,'reco_'+country+'_'+dbName);return json||{};}
 AP.api={checkAPI:checkAPI,periodToStartDate:periodToStartDate,fetchPrices:fetchPrices,fetchMarkets:fetchMarkets,fetchCompare:fetchCompare,fetchForecast:fetchForecast,fetchRecommendations:fetchRecommendations};})(window.AgroPrix);

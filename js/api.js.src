@@ -6,6 +6,14 @@
   var CACHE_PREFIX   = 'ap_cache_';
   var CACHE_TTL_MS   = 6 * 60 * 60 * 1000; // 6h de fraîcheur
 
+  // Strip accents : DB seed stocke "Mais", "Cafe", "Niebe" (ASCII sans accents).
+  // cultureNames UI contient les accents pour l'affichage humain ("Maïs", "Café").
+  // On normalise avant d'envoyer au backend pour matcher le seed exactement.
+  function stripAccents(s) {
+    if (!s || typeof s.normalize !== 'function') return s || '';
+    return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
   // ── Helpers cache localStorage ────────────────────────────────────────────
 
   function cacheSet(key, data) {
@@ -109,12 +117,15 @@
   // ── Endpoints ─────────────────────────────────────────────────────────────
 
   async function fetchPrices(country, commodity, periodKey) {
-    var wfpName = AP.cultureToWFP[commodity] || commodity;
+    // DB seed stocke les noms en FR sans accents (ex: "Mais", "Cafe", "Niebe").
+    // cultureNames UI = avec accents ("Maïs", "Café"). On strip avant d'envoyer.
+    // WFP sync reel viendra en Phase 2c avec mapping cote backend.
+    var dbName = stripAccents(AP.cultureNames[commodity] || commodity);
     var startDate = periodToStartDate(periodKey);
     var url = AP.API_BASE + '/api/prices/monthly?country=' + country
-            + '&commodity=' + encodeURIComponent(wfpName)
+            + '&commodity=' + encodeURIComponent(dbName)
             + '&start_date=' + startDate;
-    var cacheKey = 'prices_' + country + '_' + wfpName + '_' + periodKey;
+    var cacheKey = 'prices_' + country + '_' + dbName + '_' + periodKey;
     var json = await fetchRobust(url, cacheKey);
     return (json && json.data) ? json.data : [];
   }
@@ -126,9 +137,9 @@
   }
 
   async function fetchCompare(commodity) {
-    var wfpName = AP.cultureToWFP[commodity] || commodity;
-    var url = AP.API_BASE + '/api/prices/compare?commodity=' + encodeURIComponent(wfpName);
-    var json = await fetchRobust(url, 'compare_' + wfpName);
+    var dbName = stripAccents(AP.cultureNames[commodity] || commodity);
+    var url = AP.API_BASE + '/api/prices/compare?commodity=' + encodeURIComponent(dbName);
+    var json = await fetchRobust(url, 'compare_' + dbName);
     return (json && json.data) ? json.data : [];
   }
 
@@ -139,10 +150,10 @@
   }
 
   async function fetchRecommendations(country, commodity) {
-    var wfpName = AP.cultureToWFP[commodity] || commodity;
+    var dbName = stripAccents(AP.cultureNames[commodity] || commodity);
     var url = AP.API_BASE + '/api/recommendations/?country=' + country
-            + '&commodity=' + encodeURIComponent(wfpName);
-    var json = await fetchRobust(url, 'reco_' + country + '_' + wfpName);
+            + '&commodity=' + encodeURIComponent(dbName);
+    var json = await fetchRobust(url, 'reco_' + country + '_' + dbName);
     return json || {};
   }
 
