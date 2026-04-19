@@ -1115,7 +1115,7 @@ window.AgroPrix = window.AgroPrix || {};
         + '<span style="padding:8px 20px;border-radius:8px;font-weight:900;font-size:20px;letter-spacing:1px;' + actionColors[actionClass] + '">' + reco.action + '</span>'
         + '<div>'
         + '<div style="font-size:18px;font-weight:700">' + cultureName + ' \u2014 ' + cName + '</div>'
-        + '<div style="font-size:13px;opacity:.6">Confiance : ' + reco.confidence + ' \u00b7 ' + reco.signals_count + ' signaux analys\u00e9s \u00b7 Donn\u00e9es r\u00e9elles WFP</div>'
+        + '<div style="font-size:13px;opacity:.6">Confiance : ' + reco.confidence + ' \u00b7 ' + reco.signals_count + (reco.signals_count === 1 ? ' signal analys\u00e9' : ' signaux analys\u00e9s') + ' \u00b7 Donn\u00e9es r\u00e9elles WFP</div>'
         + '</div></div>'
         + '<div style="background:rgba(255,255,255,.04);border-radius:12px;padding:16px;margin-bottom:20px;font-size:14px;line-height:1.7;opacity:.9">' + reco.summary + '</div>'
         + '<div style="margin:16px 0">' + signalsHTML + '</div>'

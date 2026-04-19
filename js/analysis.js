@@ -1,4 +1,4 @@
-/*! AgroPrix analysis.js - generated from analysis.js.src on 2026-04-18 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix analysis.js - generated from analysis.js.src on 2026-04-19 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 window.AgroPrix=window.AgroPrix||{};(function(AP){'use strict';var priceChartInst=null;var regionChartInst=null;var mapInst=null;var mapMarkers=[];var COLORS={primary:'#2D6A4F',accent:'#E8862A',alert:'#e76f51',info:'#1a3a5c',forecast:'#40916C',green:'#10b981',red:'#ef4444',gold:'#f59e0b',blue:'#3b82f6',purple:'#8b5cf6',orange:'#f97316',cyan:'#06b6d4',pink:'#ec4899'};var BAR_PALETTE=[COLORS.primary,COLORS.green,COLORS.accent,COLORS.alert,COLORS.purple,COLORS.orange,COLORS.cyan,COLORS.pink];function destroyCharts(){if(priceChartInst){priceChartInst.destroy();priceChartInst=null;}
 if(regionChartInst){regionChartInst.destroy();regionChartInst=null;}
 ['priceChart','regionChart'].forEach(function(id){var canvas=document.getElementById(id);if(canvas&&typeof Chart!=='undefined'){var existing=Chart.getChart(canvas);if(existing)existing.destroy();}});if(mapMarkers.length){mapMarkers.forEach(function(m){if(mapInst)mapInst.removeLayer(m);});mapMarkers=[];}
@@ -120,7 +120,7 @@ var forecastHTML='<div style="display:grid;grid-template-columns:repeat(3,1fr);g
 +'<span style="padding:8px 20px;border-radius:8px;font-weight:900;font-size:20px;letter-spacing:1px;'+actionColors[actionClass]+'">'+reco.action+'</span>'
 +'<div>'
 +'<div style="font-size:18px;font-weight:700">'+cultureName+' \u2014 '+cName+'</div>'
-+'<div style="font-size:13px;opacity:.6">Confiance : '+reco.confidence+' \u00b7 '+reco.signals_count+' signaux analys\u00e9s \u00b7 Donn\u00e9es r\u00e9elles WFP</div>'
++'<div style="font-size:13px;opacity:.6">Confiance : '+reco.confidence+' \u00b7 '+reco.signals_count+(reco.signals_count===1?' signal analys\u00e9':' signaux analys\u00e9s')+' \u00b7 Donn\u00e9es r\u00e9elles WFP</div>'
 +'</div></div>'
 +'<div style="background:rgba(255,255,255,.04);border-radius:12px;padding:16px;margin-bottom:20px;font-size:14px;line-height:1.7;opacity:.9">'+reco.summary+'</div>'
 +'<div style="margin:16px 0">'+signalsHTML+'</div>'
