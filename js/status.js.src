@@ -17,11 +17,18 @@
     9: { txt: 'Hors ligne', bg: '#FEE2E2', fg: '#991B1B' },
   };
 
-  function fetchStatus() {
-    if (!AP.UPTIMEROBOT_READONLY_KEY) {
-      return Promise.resolve(null); // pas de cle -> rien a dire
-    }
-    var body = 'api_key=' + encodeURIComponent(AP.UPTIMEROBOT_READONLY_KEY)
+  // Normalise la conf : accepte une string (account-level key) OU un array
+  // de strings (monitor-specific keys, une par monitor). Les deux formats
+  // sont autorises par l'API UptimeRobot, on fan-out une requete par cle.
+  function _keys() {
+    var k = AP.UPTIMEROBOT_READONLY_KEY;
+    if (!k) return [];
+    if (Array.isArray(k)) return k.filter(Boolean);
+    return [k];
+  }
+
+  function _fetchOne(key) {
+    var body = 'api_key=' + encodeURIComponent(key)
              + '&format=json&logs=0&response_times=0';
     return fetch(UR_API, {
       method: 'POST',
@@ -30,23 +37,39 @@
     })
       .then(function(r) { return r.ok ? r.json() : null; })
       .then(function(data) {
-        if (!data || data.stat !== 'ok' || !Array.isArray(data.monitors)) return null;
-        return data.monitors.map(function(m) {
-          return {
+        if (!data || data.stat !== 'ok' || !Array.isArray(data.monitors)) return [];
+        return data.monitors;
+      })
+      .catch(function() { return []; });
+  }
+
+  function fetchStatus() {
+    var keys = _keys();
+    if (!keys.length) return Promise.resolve(null);
+    return Promise.all(keys.map(_fetchOne)).then(function(batches) {
+      // Fusion + deduplication par id (au cas ou 2 cles couvrent le meme monitor)
+      var seen = {};
+      var all = [];
+      batches.forEach(function(arr) {
+        arr.forEach(function(m) {
+          if (seen[m.id]) return;
+          seen[m.id] = true;
+          all.push({
             name: m.friendly_name,
             url: m.url,
             status: m.status,
             uptime_ratio: m.all_time_uptime_ratio
-          };
+          });
         });
-      })
-      .catch(function() { return null; });
+      });
+      return all.length ? all : null;
+    });
   }
 
   // Rendu d'un badge status compact (utilisable en sidebar, footer, params)
   function renderBadge(container) {
     if (!container) return;
-    if (!AP.UPTIMEROBOT_READONLY_KEY) { container.style.display = 'none'; return; }
+    if (!_keys().length) { container.style.display = 'none'; return; }
 
     container.innerHTML = '<div style="font-size:12px;opacity:0.6">Statut des services...</div>';
 
@@ -76,7 +99,7 @@
   // Rendu detaille (page Parametres) : liste des monitors + pourcentages
   function renderDetail(container) {
     if (!container) return;
-    if (!AP.UPTIMEROBOT_READONLY_KEY) {
+    if (!_keys().length) {
       container.innerHTML =
           '<div style="padding:16px;border-radius:12px;background:#F3F4F6;color:#4B5563;font-size:14px">'
         + 'Monitoring public non configure. L\'administrateur peut renseigner '

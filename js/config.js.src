@@ -133,7 +133,13 @@ window.AgroPrix = window.AgroPrix || {};
   // uptimerobot.com). La cle read-only ne permet PAS de modifier les
   // monitors, seulement de lire le statut -> safe a embarquer cote client.
   // Vide = widget masque (pas de promesse sans source).
-  AP.UPTIMEROBOT_READONLY_KEY = '';
+  // Accepte une string (account-level read-only key) OU un array de strings
+  // (monitor-specific keys format "m...-..."). UptimeRobot emet une cle
+  // monitor-specific par monitor coche -> on passe l'array ici.
+  AP.UPTIMEROBOT_READONLY_KEY = [
+    'm802878777-0727b9ba317fffe93c93e881', // AgroPrix Backend (Railway /api/ping)
+    'm802878746-15defdd33a20f7f97524399a'  // AgroPrix Frontend (Vercel app.agroprix.app)
+  ];
   // URL de la status page publique UptimeRobot (ex: https://stats.uptimerobot.com/XXX)
   AP.UPTIMEROBOT_PUBLIC_STATUS_URL = '';
   // ============================================================
