@@ -33,9 +33,9 @@
   <script src="https://browser.sentry-cdn.com/7.114.0/bundle.tracing.min.js" crossorigin="anonymous"></script>
   <script>
     (function() {
-      // A remplir avec le DSN du projet Sentry "agroprix-frontend" quand cree.
+      // DSN du projet Sentry "agroprix-frontend" (org 33lab, region DE).
       // Vide = desactive (pas d'appel reseau, no-op total).
-      var SENTRY_DSN = "";
+      var SENTRY_DSN = "https://ed5df772b53afa3fb0d70196a63f0b94@o4511241103409152.ingest.de.sentry.io/4511246162788432";
       if (!SENTRY_DSN || !window.Sentry) return;
       var host = window.location.hostname;
       var env = (host === "app.agroprix.app" || host === "agroprix.app")
