@@ -11,10 +11,20 @@
   var API_BASE = (AP && AP.API_BASE) ? AP.API_BASE : '';
 
   function _authHeaders() {
-    var token = localStorage.getItem('agroprix_token');
+    // Auth passe par le cookie httpOnly (refactor securite) — pas de token
+    // en Bearer. On garde un fallback pour les vieux clients qui auraient
+    // encore un token en localStorage le temps que la migration se purge.
     var h = { 'Content-Type': 'application/json' };
-    if (token) h['Authorization'] = 'Bearer ' + token;
+    var legacy = localStorage.getItem('agroprix_token');
+    if (legacy) h['Authorization'] = 'Bearer ' + legacy;
     return h;
+  }
+  // Toutes les fetch() vers l'API authentifiee DOIVENT passer credentials:'include'
+  // pour que le navigateur joigne le cookie httpOnly (cross-origin Vercel <-> Railway).
+  function _fetchOpts(extra) {
+    var o = extra || {};
+    o.credentials = 'include';
+    return o;
   }
 
   // Backend row -> frontend offer/demand
@@ -72,11 +82,11 @@
     localStorage.setItem(OFFERS_KEY, JSON.stringify(offers));
     // 2. envoi backend (best-effort)
     if (API_BASE) {
-      fetch(API_BASE + '/api/market/offers', {
+      fetch(API_BASE + '/api/market/offers', _fetchOpts({
         method: 'POST',
         headers: _authHeaders(),
         body: JSON.stringify(_toBackend(offer))
-      }).then(function(r) {
+      })).then(function(r) {
         if (!r.ok) console.warn('[marketplace] saveOffer backend HTTP', r.status);
         else setTimeout(syncFromBackend, 500); // resync pour récupérer l'id backend
       }).catch(function(e) { console.warn('[marketplace] saveOffer backend fail', e); });
@@ -86,11 +96,11 @@
     var demands = getDemands(); demands.unshift(demand);
     localStorage.setItem(DEMANDS_KEY, JSON.stringify(demands));
     if (API_BASE) {
-      fetch(API_BASE + '/api/market/offers', {
+      fetch(API_BASE + '/api/market/offers', _fetchOpts({
         method: 'POST',
         headers: _authHeaders(),
         body: JSON.stringify(_toBackend(demand))
-      }).then(function(r) {
+      })).then(function(r) {
         if (!r.ok) console.warn('[marketplace] saveDemand backend HTTP', r.status);
         else setTimeout(syncFromBackend, 500);
       }).catch(function(e) { console.warn('[marketplace] saveDemand backend fail', e); });
@@ -100,13 +110,13 @@
   // Récupère les offres/demandes réelles depuis le backend et rafraîchit le cache local.
   function syncFromBackend(cb) {
     if (!API_BASE) { if (cb) cb(); return; }
-    fetch(API_BASE + '/api/market/offers?offer_type=sell', { headers: _authHeaders() })
+    fetch(API_BASE + '/api/market/offers?offer_type=sell', _fetchOpts({ headers: _authHeaders() }))
       .then(function(r) { return r.ok ? r.json() : null; })
       .then(function(data) {
         if (data && Array.isArray(data.offers)) {
           localStorage.setItem(OFFERS_KEY, JSON.stringify(data.offers.map(_fromBackend)));
         }
-        return fetch(API_BASE + '/api/market/offers?offer_type=buy', { headers: _authHeaders() });
+        return fetch(API_BASE + '/api/market/offers?offer_type=buy', _fetchOpts({ headers: _authHeaders() }));
       })
       .then(function(r) { return r && r.ok ? r.json() : null; })
       .then(function(data) {

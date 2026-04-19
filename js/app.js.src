@@ -335,13 +335,14 @@ function onFedapaySuccess(plan, montant, response) {
   user.lastTransactionId = transactionId;
   localStorage.setItem('agroprix_user', JSON.stringify(user));
 
-  // Notifier le backend (non bloquant) — acknowledgment cote client
+  // Notifier le backend (non bloquant) — acknowledgment cote client.
+  // credentials:'include' -> envoi du cookie httpOnly de session (refactor auth).
   var AP = window.AgroPrix;
-  var token = localStorage.getItem('agroprix_token');
   if (AP && AP.API_BASE) {
     fetch(AP.API_BASE + '/api/subscriptions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ plan: plan, montant: montant, transactionId: transactionId })
     }).catch(function() {});
   }
@@ -411,8 +412,7 @@ function onFedapaySuccess(plan, montant, response) {
 // retardee" avec la reference transaction.
 function pollAuthMeForRoleUpgrade(opts) {
   var AP = window.AgroPrix;
-  var token = localStorage.getItem('agroprix_token');
-  if (!AP || !AP.API_BASE || !token) {
+  if (!AP || !AP.API_BASE) {
     if (opts && opts.onTimeout) opts.onTimeout();
     return;
   }
@@ -424,8 +424,9 @@ function pollAuthMeForRoleUpgrade(opts) {
 
   function tick() {
     attempts++;
+    // Cookie httpOnly envoye automatiquement via credentials:'include'.
     fetch(AP.API_BASE + '/api/auth/me', {
-      headers: { 'Authorization': 'Bearer ' + token },
+      credentials: 'include',
       cache: 'no-store'
     })
       .then(function(r) { return r.ok ? r.json() : null; })

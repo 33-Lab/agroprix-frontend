@@ -1,18 +1,24 @@
 // AgroPrix — Authentication Module (Frontend)
 // Handles login, register, session management, UI updates
+//
+// SECURITE (refactor) : le JWT est pose par le backend dans un cookie httpOnly
+// (agroprix_session) — inaccessible depuis JavaScript, donc a l'abri d'une
+// exfiltration XSS. Ce module ne lit/ecrit PLUS le token en localStorage.
+// Seul le profil utilisateur (nom, email, role — rien de secret) est mis en
+// cache localStorage pour un boot rapide ; la source de verite reste
+// GET /api/auth/me via cookie.
 (function(AP) {
   'use strict';
 
-  var TOKEN_KEY = 'agroprix_token';
   var USER_KEY = 'agroprix_user';
+  // Flag: si le localStorage contient encore un ancien token (migration), on
+  // l'envoie une fois en Authorization header pour que le backend re-pose le
+  // cookie, puis on le supprime.
+  var LEGACY_TOKEN_KEY = 'agroprix_token';
 
   // =========================================================================
-  // Token / Session management
+  // Session management (cookie-based — token invisible cote JS)
   // =========================================================================
-
-  function getToken() {
-    return localStorage.getItem(TOKEN_KEY);
-  }
 
   function getUser() {
     try {
@@ -21,18 +27,19 @@
     } catch (e) { return null; }
   }
 
-  function saveSession(token, user) {
-    localStorage.setItem(TOKEN_KEY, token);
+  function saveSession(user) {
+    // Le token est dans le cookie httpOnly pose par le backend — on ne le
+    // touche pas cote JS. On persiste juste le profil pour boot rapide.
     localStorage.setItem(USER_KEY, JSON.stringify(user));
     updateAuthUI(user);
   }
 
   function clearSession() {
-    // Cles core auth
-    localStorage.removeItem(TOKEN_KEY);
+    // Purge locale du cache user + donnees privees liees au compte sortant.
+    // Le cookie httpOnly, lui, ne peut etre efface que par le backend
+    // (POST /api/auth/logout) — clearSession() ne le touche pas directement.
     localStorage.removeItem(USER_KEY);
-    // Donnees utilisateur privees : eviter que le compte suivant
-    // herite des points, streak, badges ou profil farmer.
+    localStorage.removeItem(LEGACY_TOKEN_KEY);  // nettoyage migration
     try {
       localStorage.removeItem('agroprix_farmer_profile');
       localStorage.removeItem('agroprix_streak');
@@ -44,7 +51,9 @@
   }
 
   function isLoggedIn() {
-    return !!getToken();
+    // On a plus acces au token cote JS. La presence du cache user suffit pour
+    // l'UI optimiste ; la veridicite est verifiee par /me au boot.
+    return !!getUser();
   }
 
   // =========================================================================
@@ -55,12 +64,24 @@
     options = options || {};
     options.headers = options.headers || {};
     options.headers['Content-Type'] = 'application/json';
-    var token = getToken();
-    if (token) {
-      options.headers['Authorization'] = 'Bearer ' + token;
+    // credentials:'include' -> le navigateur envoie le cookie httpOnly
+    // meme en cross-origin (Vercel <-> Railway). Requiert CORS
+    // allow_credentials=true + origin explicite (pas de wildcard) cote API.
+    options.credentials = 'include';
+    // Migration : si un ancien token tra ne en localStorage, on l'envoie
+    // une derniere fois pour permettre au backend de poser le cookie via
+    // la requete suivante (login refait), puis on le purge des que /me
+    // repondra 200.
+    var legacyToken = localStorage.getItem(LEGACY_TOKEN_KEY);
+    if (legacyToken && !options.headers['Authorization']) {
+      options.headers['Authorization'] = 'Bearer ' + legacyToken;
     }
     return fetch(AP.API_BASE + url, options);
   }
+
+  // Export pour les autres modules qui font des appels API auth.
+  // Ils doivent utiliser authFetch au lieu de fetch brut.
+  // (API / paiement / parcelles / rapports ...)
 
   function register(email, password, name, phone, country) {
     var body = { email: email, password: password, name: name };
@@ -74,7 +95,9 @@
       if (!r.ok) return r.json().then(function(e) { throw e; });
       return r.json();
     }).then(function(data) {
-      saveSession(data.token, data.utilisateur);
+      // Le backend a pose le cookie httpOnly ; on garde juste le profil en cache.
+      localStorage.removeItem(LEGACY_TOKEN_KEY);
+      saveSession(data.utilisateur);
       return data;
     });
   }
@@ -87,7 +110,8 @@
       if (!r.ok) return r.json().then(function(e) { throw e; });
       return r.json();
     }).then(function(data) {
-      saveSession(data.token, data.utilisateur);
+      localStorage.removeItem(LEGACY_TOKEN_KEY);
+      saveSession(data.utilisateur);
       return data;
     });
   }
@@ -105,8 +129,14 @@
   }
 
   function logout() {
-    clearSession();
-    showAuthScreen('login');
+    // Backend doit effacer le cookie httpOnly — impossible cote JS.
+    // Best-effort: si le reseau echoue on purge quand meme le cache local.
+    authFetch('/api/auth/logout', { method: 'POST' })
+      .catch(function() { /* offline ou backend KO : on degrade */ })
+      .finally(function() {
+        clearSession();
+        showAuthScreen('login');
+      });
   }
 
   // =========================================================================
@@ -244,23 +274,31 @@
   // =========================================================================
 
   function initAuth() {
-    var token = getToken();
     var user = getUser();
+    var legacyToken = localStorage.getItem(LEGACY_TOKEN_KEY);
 
-    if (token && user) {
-      // Session exists, update UI
+    // Demo mode : le cache user contient le flag demo=true, pas d'appel backend.
+    if (user && user.demo === true) {
       updateAuthUI(user);
-      // Skip backend verification for demo mode — token non-JWT
-      if (user.demo === true || token === 'demo-token-v6') {
-        return; // Demo mode: pas de vérification backend
-      }
-      // Verify token is still valid in background (real users only)
-      fetchProfile().catch(function() {
-        // Token expired, show login
+      return;
+    }
+
+    if (user || legacyToken) {
+      // Boot optimiste: on affiche l'app tout de suite avec le cache local,
+      // puis on verifie que la session cookie est toujours valide. Si oui,
+      // on supprime le legacyToken (migration finie). Si non, on retombe
+      // sur l'ecran de login.
+      if (user) updateAuthUI(user);
+      fetchProfile().then(function() {
+        // Ok — cookie valide, le backend nous a reconnu. Purge definitive
+        // du token localStorage s'il tra nait encore.
+        localStorage.removeItem(LEGACY_TOKEN_KEY);
+      }).catch(function() {
+        clearSession();
         showAuthScreen('login');
       });
     } else {
-      // No session, show login screen
+      // Aucune trace de session -> login.
       showAuthScreen('login');
     }
   }
@@ -270,7 +308,10 @@
   // =========================================================================
 
   AP.auth = {
-    getToken: getToken,
+    // getToken a ete retire : le token httpOnly n'est plus accessible cote JS.
+    // Les modules qui veulent appeler l'API authentifiee doivent utiliser
+    // authFetch (qui envoie automatiquement le cookie via credentials:'include').
+    authFetch: authFetch,
     getUser: getUser,
     isLoggedIn: isLoggedIn,
     login: login,
