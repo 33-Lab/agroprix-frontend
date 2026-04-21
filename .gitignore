@@ -1,3 +1,11 @@
 node_modules/
 200.html
 CNAME
+
+.vercel
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
