@@ -10,6 +10,57 @@
   var PARCELS_KEY = 'agroprix_parcels';
   var NDVI_HISTORY_KEY = 'agroprix_ndvi_history';
 
+  // ---------- Backend integration (Phase 2b) ----------
+  function apiBase() { return (AP.API_BASE || '').replace(/\/$/, ''); }
+
+  function apiFetch(path, opts) {
+    opts = opts || {};
+    opts.credentials = 'include';
+    opts.headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
+    return fetch(apiBase() + path, opts);
+  }
+
+  // Sync une parcelle locale vers le backend (/api/parcelles/) pour obtenir un parcelle_id serveur
+  function syncParcelToBackend(idx) {
+    var parcels = getParcels();
+    var p = parcels[idx];
+    if (!p) return Promise.reject(new Error('parcelle introuvable'));
+    if (p.backendId) return Promise.resolve(p.backendId); // deja synchronise
+
+    var body = {
+      nom: p.name || ('Parcelle ' + (idx + 1)),
+      culture: p.cultureKey || p.culture || 'autre',
+      surface_ha: parseFloat(p.surface) || null,
+      lat: (typeof p.lat === 'number') ? p.lat : null,
+      lng: (typeof p.lon === 'number') ? p.lon : ((typeof p.lng === 'number') ? p.lng : null),
+      pays: p.pays || 'benin',
+      region: p.location || null,
+    };
+
+    return apiFetch('/api/parcelles/', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }).then(function(r) {
+      if (r.status === 401) throw new Error('Connectez-vous pour synchroniser');
+      if (!r.ok) return r.text().then(function(t) { throw new Error('Sync backend HTTP ' + r.status + ' ' + t.substring(0,120)); });
+      return r.json();
+    }).then(function(data) {
+      parcels[idx].backendId = data.id;
+      saveParcels(parcels);
+      return data.id;
+    });
+  }
+
+  // Recupere l'historique NDVI reel (Planet -> bandmath -> zonal stats) pour une parcelle
+  function fetchBackendTimeseries(backendId) {
+    return apiFetch('/api/ndvi/parcelle/' + backendId + '/timeseries?limit=50').then(function(r) {
+      if (r.status === 404) return { points: [], note: 'Aucune serie NDVI reelle calculee pour cette parcelle' };
+      if (r.status === 401) throw new Error('auth');
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+  }
+
   // ⚠️ Valeurs NDVI simulées (démonstration) — remplacées par Planet Orders API en phase 2
   var DEMO_NDVI = [
     { date: '2025-10-01', ndvi: 0.42 },
@@ -314,6 +365,22 @@
       + '<div style="background:linear-gradient(180deg,#fff,#FAFCFB);padding:8px;border-radius:8px;"><div style="font-size:10px;color:#666;">Statut actuel</div><div style="font-weight:700;color:' + (latest.ndvi >= 0.3 ? '#2D6A4F' : '#e76f51') + ';">' + (latest.ndvi >= 0.3 ? 'Couvert' : 'ALERTE') + '</div></div>'
       + '</div></div>';
 
+    // === Phase 2b: Backend NDVI real timeseries ===
+    html += '<div class="card" style="padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#E0F2FE,#DBEAFE);border:1px solid #1E40AF33;">'
+      + '<div class="card-title" style="color:#1E40AF;"><span class="icon"><i data-lucide="satellite-dish" class="lc"></i></span> NDVI reel (Planet Insights)</div>'
+      + '<div id="ndviBackendStatus-' + idx + '" style="font-size:12px;color:#1E3A8A;margin:8px 0;">'
+      + (p.backendId
+          ? 'Parcelle syncronisee backend (id #' + p.backendId + '). Cliquez ci-dessous pour charger la serie NDVI reelle calculee par le worker Phase 2b.'
+          : 'Cette parcelle est locale (demo). Synchronisez-la vers le backend pour activer le suivi NDVI reel (Planet PSScene + zonal stats).')
+      + '</div>'
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+      + (p.backendId
+          ? '<button class="btn-analyse" style="padding:8px 12px;font-size:12px;" onclick="AgroPrix.ndvi.loadBackendTimeseries(' + idx + ')"><i data-lucide="refresh-cw" class="lc"></i> Charger NDVI reel</button>'
+          : '<button class="btn-analyse" style="padding:8px 12px;font-size:12px;" onclick="AgroPrix.ndvi.syncToBackend(' + idx + ')"><i data-lucide="cloud-upload" class="lc"></i> Synchroniser vers backend</button>')
+      + '</div>'
+      + '<div id="ndviBackendSeries-' + idx + '"></div>'
+      + '</div>';
+
     // Delete parcel
     html += '<button style="width:100%;padding:10px;border:1px solid #e76f51;color:#e76f51;background:linear-gradient(180deg,#fff,#FAFCFB);border-radius:8px;font-size:12px;cursor:pointer;" '
       + 'onclick="if(confirm(\'Supprimer cette parcelle ?\')) { AgroPrix.ndvi.deleteParcel(' + idx + '); }"><i data-lucide="trash-2" class="lc"></i> Supprimer cette parcelle</button>';
@@ -444,6 +511,80 @@
   }
 
   // =========================================================================
+  // Phase 2b backend handlers
+  // =========================================================================
+  function syncToBackend(idx) {
+    var statusEl = document.getElementById('ndviBackendStatus-' + idx);
+    if (statusEl) statusEl.innerHTML = '<em>Synchronisation en cours...</em>';
+    syncParcelToBackend(idx).then(function(backendId) {
+      if (statusEl) statusEl.innerHTML = '<span style="color:#047857;">✓ Synchronise. Parcelle backend #' + backendId + '. Cliquez "Charger NDVI reel" pour voir la serie calculee.</span>';
+      // Re-render detail apres 500ms pour reveler bouton "Charger"
+      setTimeout(function() { showDetail(idx); }, 600);
+    }).catch(function(err) {
+      if (statusEl) statusEl.innerHTML = '<span style="color:#991B1B;">Erreur: ' + (err.message || err) + '</span>';
+    });
+  }
+
+  function loadBackendTimeseries(idx) {
+    var parcels = getParcels();
+    var p = parcels[idx];
+    if (!p || !p.backendId) return;
+    var seriesEl = document.getElementById('ndviBackendSeries-' + idx);
+    if (seriesEl) seriesEl.innerHTML = '<div style="padding:12px;opacity:0.6;font-size:12px;">Chargement timeseries backend...</div>';
+
+    fetchBackendTimeseries(p.backendId).then(function(data) {
+      if (!seriesEl) return;
+      var pts = (data && data.points) || [];
+      if (!pts.length) {
+        seriesEl.innerHTML = '<div style="padding:12px;font-size:12px;color:#92400E;background:#FEF3C7;border-radius:8px;margin-top:8px;">'
+          + '<strong>Aucune serie NDVI reelle calculee pour cette parcelle.</strong><br>'
+          + 'Pour generer une serie : soumettez un ordre Planet (POST /api/ndvi/order) sur des scenes PSScene, attendez state=success, puis POST /api/ndvi/order/{id}/compute. '
+          + 'Cette action consomme du quota Planet.'
+          + '</div>';
+        return;
+      }
+      // Render chart : mini-table + sparkline SVG
+      var rows = pts.map(function(pt) {
+        var d = (pt.date || '').substring(0, 10);
+        var mean = pt.mean != null ? pt.mean.toFixed(3) : '—';
+        var minV = pt.min != null ? pt.min.toFixed(2) : '—';
+        var maxV = pt.max != null ? pt.max.toFixed(2) : '—';
+        var pix = pt.pixels || 0;
+        return '<tr style="font-size:11px;border-bottom:1px solid #E5E7EB;">'
+          + '<td style="padding:4px 6px;">' + d + '</td>'
+          + '<td style="padding:4px 6px;text-align:right;font-weight:700;color:' + getNDVIStatus(pt.mean || 0).color + ';">' + mean + '</td>'
+          + '<td style="padding:4px 6px;text-align:right;color:#6B7280;">' + minV + ' / ' + maxV + '</td>'
+          + '<td style="padding:4px 6px;text-align:right;color:#9CA3AF;">' + pix.toLocaleString('fr-FR') + ' px</td>'
+          + '</tr>';
+      }).join('');
+
+      // Sparkline (mean over time, chronological asc)
+      var ordered = pts.slice().reverse();
+      var sparkHistory = ordered.map(function(pt) { return { date: (pt.date||'').substring(0,10), ndvi: pt.mean || 0 }; });
+      var spark = renderSparkline(sparkHistory, 280, 50);
+
+      seriesEl.innerHTML = '<div style="margin-top:10px;">'
+        + '<div style="text-align:center;margin-bottom:6px;">' + spark + '</div>'
+        + '<div style="font-size:11px;color:#6B7280;margin-bottom:4px;">' + pts.length + ' mesure(s) reelle(s) \u2014 source: ' + (data.source || 'Planet') + '</div>'
+        + '<div style="max-height:240px;overflow-y:auto;"><table style="width:100%;border-collapse:collapse;">'
+        + '<thead><tr style="font-size:10px;color:#6B7280;border-bottom:2px solid #D1D5DB;">'
+        + '<th style="padding:4px 6px;text-align:left;">Date</th>'
+        + '<th style="padding:4px 6px;text-align:right;">NDVI moyen</th>'
+        + '<th style="padding:4px 6px;text-align:right;">Min / Max</th>'
+        + '<th style="padding:4px 6px;text-align:right;">Pixels</th>'
+        + '</tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+      if (window.lucide) try { window.lucide.createIcons(); } catch(e) {}
+    }).catch(function(err) {
+      if (!seriesEl) return;
+      if (err && err.message === 'auth') {
+        seriesEl.innerHTML = '<div style="padding:12px;color:#991B1B;font-size:12px;">Session expiree. Reconnectez-vous.</div>';
+      } else {
+        seriesEl.innerHTML = '<div style="padding:12px;color:#991B1B;font-size:12px;">Erreur chargement: ' + (err.message || err) + '</div>';
+      }
+    });
+  }
+
+  // =========================================================================
   // Expose
   // =========================================================================
   AP.ndvi = {
@@ -454,7 +595,9 @@
     saveParcel: saveParcel,
     deleteParcel: deleteParcel,
     getGPS: getGPS,
-    getParcels: getParcels
+    getParcels: getParcels,
+    syncToBackend: syncToBackend,
+    loadBackendTimeseries: loadBackendTimeseries
   };
 
 })(window.AgroPrix);
