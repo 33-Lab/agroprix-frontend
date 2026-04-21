@@ -123,7 +123,8 @@ window.AgroPrix = window.AgroPrix || {};
     scoring:'Mon Score Profil Producteur',
     ndvi:'Sante Parcelle',
     market:'Offres & Demandes', rapports:'Rapports', params:'Param\u00e8tres',
-    offres:'Nos Offres', plus:'Plus', proprietaire:'Proprietaire'
+    offres:'Nos Offres', plus:'Plus', proprietaire:'Proprietaire',
+    partner:'Espace Partenaire'
   };
 
   // ============================================================
@@ -153,7 +154,8 @@ window.AgroPrix = window.AgroPrix || {};
     scoring:'viewScoring',
     ndvi:'viewNdvi',
     market:'viewMarket', rapports:'viewAnalyse', params:'viewParams',
-    offres:'viewOffres', plus:'viewPlus', proprietaire:'viewProprietaire'
+    offres:'viewOffres', plus:'viewPlus', proprietaire:'viewProprietaire',
+    partner:'viewPartner'
   };
 
 })(window.AgroPrix);

@@ -119,6 +119,11 @@
         AP.status.renderDetail(document.getElementById('statusWidget'));
       }
     }
+    if (viewId === 'partner') {
+      if (AP.partner && AP.partner.renderDashboard) {
+        AP.partner.renderDashboard(document.getElementById('partnerDashboard'));
+      }
+    }
 
     // V6 Fix: Scroll to top when showing production view
     if (viewId === 'production') {

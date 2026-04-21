@@ -165,6 +165,10 @@
         <label class="form-label">Confirmer *</label>
         <input type="password" id="regConfirm" placeholder="••••••••" required>
       </div>
+      <div class="form-group">
+        <label class="form-label">Code partenaire <small>(optionnel)</small></label>
+        <input type="text" id="regReferral" placeholder="Ex: AGP-XXXXXX" maxlength="32" style="text-transform:uppercase;">
+      </div>
       <div class="auth-error" id="registerError"></div>
       <button type="submit" class="btn-analyse" id="registerBtn" style="width:100%;margin-top:8px;">Creer mon compte</button>
       <div class="auth-link" style="margin-top:12px;text-align:center;">
@@ -240,6 +244,7 @@
     <a id="navMarket" onclick="showView('market', this)"><span class="nav-icon"><i data-lucide="handshake" class="lc"></i></span> Offres & Demandes</a>
 
     <div class="nav-separator"></div>
+    <a id="navPartner" onclick="showView('partner', this)"><span class="nav-icon"><i data-lucide="users" class="lc"></i></span> Espace Partenaire</a>
     <a id="navParams" onclick="showView('params', this)"><span class="nav-icon"><i data-lucide="settings" class="lc"></i></span> Parametres</a>
     <a onclick="logout()" style="color:#e76f51;"><span class="nav-icon"><i data-lucide="log-out" class="lc"></i></span> Deconnexion</a>
   </nav>
@@ -1100,6 +1105,17 @@
       <button class="btn-analyse" style="max-width:320px;background:var(--alert);" onclick="logout()"><i data-lucide="log-out" class="lc"></i> Se deconnecter</button>
     </div>
 
+  <!-- ═══ VIEW: PARTNER (Ambassadeur Commercial) ═══ -->
+    <div class="view-container" id="viewPartner" style="display:none;">
+      <div class="page-content">
+        <div class="card" style="padding:20px;margin-bottom:20px;background:linear-gradient(135deg,#065F46,#047857);color:#fff;border-radius:16px;">
+          <h2 style="font-size:20px;font-weight:800;margin-bottom:4px;"><i data-lucide="users" class="lc"></i> Espace Partenaire</h2>
+          <p style="font-size:13px;opacity:0.9;">Suivez vos filleuls et votre commission — Ambassadeur Commercial AgroPrix</p>
+        </div>
+        <div id="partnerDashboard"></div>
+      </div>
+    </div>
+
   <!-- ═══ VIEW: PROPRIETAIRE ═══ -->
     <div class="view-container" id="viewProprietaire" style="display:none;">
       <div class="page-content">
@@ -1386,6 +1402,7 @@ document.addEventListener('click',function(e){var m=document.getElementById('mor
 <script src="/js/security.js"></script>
 <script src="/js/config.js?v=6.8"></script>
 <script src="/js/status.js?v=1.0"></script>
+<script src="/js/partner.js?v=1.0"></script>
 <script src="/js/data.js?v=6.6"></script>
 <script src="/js/data-sources.js?v=1.0"></script>
 <script src="/js/api.js"></script>

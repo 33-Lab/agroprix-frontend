@@ -83,10 +83,11 @@
   // Ils doivent utiliser authFetch au lieu de fetch brut.
   // (API / paiement / parcelles / rapports ...)
 
-  function register(email, password, name, phone, country) {
+  function register(email, password, name, phone, country, referralCode) {
     var body = { email: email, password: password, name: name };
     if (phone) body.phone = phone;
     if (country) body.country = country;
+    if (referralCode) body.referral_code = referralCode;
 
     return authFetch('/api/auth/register', {
       method: 'POST',
@@ -206,6 +207,22 @@
       if (registerForm) registerForm.style.display = 'block';
       if (loginTab) loginTab.classList.remove('active');
       if (registerTab) registerTab.classList.add('active');
+
+      // Auto-remplit le code partenaire depuis ?ref=XXX (persiste aussi le
+      // referral en localStorage au cas ou l'utilisateur navigue avant de
+      // soumettre).
+      try {
+        var params = new URLSearchParams(window.location.search || '');
+        var refFromUrl = (params.get('ref') || '').trim().toUpperCase();
+        if (refFromUrl) {
+          localStorage.setItem('agp_referral', refFromUrl);
+        }
+        var cached = localStorage.getItem('agp_referral');
+        var refEl = document.getElementById('regReferral');
+        if (refEl && cached && !refEl.value) {
+          refEl.value = cached;
+        }
+      } catch (e) { /* noop */ }
     }
   }
 
@@ -241,6 +258,8 @@
     var country = document.getElementById('regCountry').value;
     var password = document.getElementById('regPassword').value;
     var confirm = document.getElementById('regConfirm').value;
+    var refEl = document.getElementById('regReferral');
+    var referral = refEl ? (refEl.value || '').trim().toUpperCase() : '';
     var errorEl = document.getElementById('registerError');
     var btn = document.getElementById('registerBtn');
 
@@ -260,7 +279,7 @@
     if (btn) { btn.disabled = true; btn.textContent = 'Création...'; }
     if (errorEl) errorEl.textContent = '';
 
-    register(email, password, name, phone, country).then(function() {
+    register(email, password, name, phone, country, referral).then(function() {
       if (btn) { btn.disabled = false; btn.textContent = 'Créer mon compte'; }
     }).catch(function(err) {
       if (btn) { btn.disabled = false; btn.textContent = 'Créer mon compte'; }
