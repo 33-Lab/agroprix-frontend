@@ -3,8 +3,7 @@ window.AgroPrix = window.AgroPrix || {};
 
 (function(AP) {
   // API Configuration
-  // V6 Fix: Added fallback to agroprix-backend.onrender.com
-  // Always use Railway backend (production)
+  // Backend Railway Hobby (ex-Render supprime le 23 avril 2026).
   // To use local backend for dev, uncomment the next line:
   // AP.API_BASE = 'http://localhost:8000';
   AP.API_BASE = 'https://web-production-46fb2.up.railway.app'; // Railway Hobby — actif
@@ -13,9 +12,12 @@ window.AgroPrix = window.AgroPrix || {};
   AP.API_AVAILABLE = true;
 
   // Clé API HDX (WFP food prices — data.humdata.org)
-  // Compte OFFICIEL : Kayode Gnonlonfoun (kayode1974) — token agroprix-prod-v2
-  // Expire : 2027-04-01
-  AP.HDX_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJOTktaOFo2cmtYOUd4Z3RteUpYOUR5TjlGMUpvaWhHeTJXdE9BNG5pMmNVIiwiaWF0IjoxNzc1MDMyNzMwLCJleHAiOjE4MDY1Njg3MzB9.8v2UiX0JM8lB7lOnkAJc6pax55s6TgwCZy-kkdEeUm0';
+  // [SECURITE 2026-04-25] La clé HDX a ete retiree du frontend public.
+  // Les appels HDX/WFP passent desormais par le backend (variable d'env
+  // HDX_API_KEY cote serveur, jamais exposee au navigateur).
+  // data-sources.js detecte l'absence de cle et bascule sur l'API backend
+  // /api/prices comme source unique.
+  AP.HDX_API_KEY = '';
 
   // Month names in French
   AP.MONTHS = ['Jan', 'F\u00e9v', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Ao\u00fb', 'Sep', 'Oct', 'Nov', 'D\u00e9c'];
@@ -122,6 +124,9 @@ window.AgroPrix = window.AgroPrix || {};
     financing:'GPS Financement',
     scoring:'Mon Score Profil Producteur',
     ndvi:'Sante Parcelle',
+    hevea:'Hevea Pro', plantain:'Plantain Pro',
+    mais:'Mais Pro', cajou:'Cajou Pro',
+    cacao:'Cacao Pro', tomate:'Tomate Pro',
     market:'Offres & Demandes', rapports:'Rapports', params:'Param\u00e8tres',
     offres:'Nos Offres', plus:'Plus', proprietaire:'Proprietaire',
     partner:'Espace Partenaire'
@@ -132,8 +137,8 @@ window.AgroPrix = window.AgroPrix || {};
   // Les cles read-only vivent desormais cote backend (UPTIMEROBOT_READONLY_KEYS
   // + fallback hardcode) car l'API UR ne supporte pas CORS. Le frontend
   // appelle /api/status/monitors (proxy + cache 60s).
-  // Seule l'URL de la status page publique reste optionnelle ici.
-  AP.UPTIMEROBOT_PUBLIC_STATUS_URL = '';
+  // URL de la status page publique - configuree 25/04/2026.
+  AP.UPTIMEROBOT_PUBLIC_STATUS_URL = 'https://stats.uptimerobot.com/mkaDryillf';
   // ============================================================
 
   // ============================================================
@@ -153,6 +158,9 @@ window.AgroPrix = window.AgroPrix || {};
     financing:'viewFinancing',
     scoring:'viewScoring',
     ndvi:'viewNdvi',
+    hevea:'viewHevea', plantain:'viewPlantain',
+    mais:'viewMais', cajou:'viewCajou',
+    cacao:'viewCacao', tomate:'viewTomate',
     market:'viewMarket', rapports:'viewAnalyse', params:'viewParams',
     offres:'viewOffres', plus:'viewPlus', proprietaire:'viewProprietaire',
     partner:'viewPartner'
