@@ -1,8 +1,17 @@
-// AgroPrix Service Worker — Cache hybride Prompt Master
-// Stratégie : Cache-first pour assets statiques, Network-first pour API
-// Version bumped à chaque déploiement pour forcer le refresh
+// AgroPrix Service Worker — Cache hybride
+// Stratégie : Stale-While-Revalidate pour assets locaux (jamais "stuck" sur vieille version),
+//             Cache-first pour CDN immutables, Network-first pour API.
+// Version bumpée à chaque déploiement pour purger les anciens caches au activate.
+//
+// Bug historique (FRONTEND-2 — 06/05/2026) : la stratégie cacheFirstVersioned
+// servait éternellement la première version cachée d'un /js/X.js?v=N sans jamais
+// la rafraîchir → utilisateurs Opera Mobile/WebView avec cache antérieur à
+// l'ajout de fonctions globales (ex. window.updateMarkets) plantaient en
+// ReferenceError. Stale-While-Revalidate : retourne le cache instantanément
+// MAIS en parallèle revalide le réseau et met à jour le cache → la version
+// suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = 'v6.11.0';
+const CACHE_VERSION = 'v6.12.0';
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 
@@ -121,14 +130,11 @@ self.addEventListener('fetch', function(event) {
     return;
   }
 
-  // 3. Assets versionnés (?v=X) → Cache-first (immutables par version, chargement instantané)
-  if (url.search && url.search.match(/[?&]v=\d/)) {
-    event.respondWith(cacheFirstVersioned(request));
-    return;
-  }
-
-  // 4. Assets locaux → Network-first avec fallback cache (toujours la dernière version)
-  event.respondWith(networkFirstLocal(request));
+  // 3. Assets versionnés ?v=X et assets locaux non versionnés → Stale-While-Revalidate.
+  //    Retourne le cache instantanément (perf) MAIS revalide en parallèle (fraîcheur).
+  //    Garantit qu'aucun utilisateur ne reste bloqué sur une vieille version d'un .js
+  //    après un deploy. Cf. bug FRONTEND-2 du 06/05/2026.
+  event.respondWith(staleWhileRevalidate(request));
 });
 
 // ============================================================
@@ -163,46 +169,50 @@ function cacheFirstCDN(request) {
 }
 
 // ============================================================
-// Stratégie 3 : Cache-first pour assets versionnés (?v=X)
+// Stratégie 3 : Stale-While-Revalidate pour assets locaux
+//
+// 1. Si on a un cache, on le retourne IMMÉDIATEMENT (perf).
+// 2. EN PARALLÈLE, on déclenche un fetch réseau qui met à jour le cache
+//    en arrière-plan. Le prochain chargement aura la nouvelle version.
+// 3. Si pas de cache, on fait un fetch réseau classique avec fallback
+//    SPA navigation → /index.html.
+//
+// Avantages vs cache-first naïf :
+//   - L'utilisateur n'est JAMAIS bloqué sur une vieille version périmée
+//     (le bug FRONTEND-2 du 06/05/2026 où window.updateMarkets manquait).
+//   - L'utilisateur n'attend pas le réseau au chargement (perf 3G).
 // ============================================================
-function cacheFirstVersioned(request) {
+function staleWhileRevalidate(request) {
   return caches.open(CACHE_NAME).then(function(cache) {
     return cache.match(request).then(function(cached) {
-      if (cached) return cached;
-      return fetch(request).then(function(response) {
-        if (response.status === 200) {
+      // Fetch réseau en arrière-plan, met à jour le cache pour la prochaine fois.
+      var networkUpdate = fetch(request).then(function(response) {
+        if (response && response.status === 200) {
+          // clone() OBLIGATOIRE : Response body ne peut être lu qu'une fois.
           cache.put(request, response.clone());
         }
         return response;
       }).catch(function() {
+        // Réseau down — pas grave si on a déjà servi le cache.
+        return null;
+      });
+
+      if (cached) {
+        // Sert immédiatement le cache. networkUpdate continue en background
+        // (event.waitUntil n'est pas nécessaire ici car la réponse est déjà
+        // livrée ; le SW reste vivant le temps que la promise se résolve).
+        return cached;
+      }
+
+      // Pas de cache — on attend le réseau.
+      return networkUpdate.then(function(response) {
+        if (response) return response;
+        // Réseau a échoué et pas de cache → SPA navigation fallback.
+        if (request.mode === 'navigate') {
+          return caches.match('/index.html');
+        }
         return new Response('', { status: 503 });
       });
-    });
-  });
-}
-
-// ============================================================
-// Stratégie 4 : Network-first pour assets locaux (timeout 2s)
-// ============================================================
-function networkFirstLocal(request) {
-  var networkTimeout = new Promise(function(_, reject) {
-    setTimeout(function() { reject(new Error('timeout')); }, 2000);
-  });
-  return Promise.race([fetch(request), networkTimeout]).then(function(response) {
-    if (response.status === 200) {
-      caches.open(CACHE_NAME).then(function(cache) {
-        cache.put(request, response.clone());
-      });
-    }
-    return response;
-  }).catch(function() {
-    return caches.match(request).then(function(cached) {
-      if (cached) return cached;
-      // Navigation fallback → index.html (SPA)
-      if (request.mode === 'navigate') {
-        return caches.match('/index.html');
-      }
-      return new Response('', { status: 404 });
     });
   });
 }
