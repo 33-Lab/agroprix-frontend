@@ -1399,6 +1399,8 @@ document.addEventListener('click',function(e){var m=document.getElementById('mor
 </div><!-- /#appContainer -->
 
 <!-- ═══ SCRIPTS ═══ -->
+<!-- ap-namespace.js doit être chargé EN PREMIER (FE-B1) — initialise window.AgroPrix.{ui,api,data,utils} -->
+<script src="/js/ap-namespace.js?v=1.0"></script>
 <script src="/js/security.js"></script>
 <script src="/js/config.js?v=6.8"></script>
 <script src="/js/status.js?v=1.0"></script>
