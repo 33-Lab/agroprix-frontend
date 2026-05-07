@@ -6,6 +6,38 @@
   var CACHE_PREFIX   = 'ap_cache_';
   var CACHE_TTL_MS   = 6 * 60 * 60 * 1000; // 6h de fraîcheur
 
+  // ── fetchWithTimeout ──────────────────────────────────────────────────────
+  // Compat universelle : AbortController + setTimeout natifs.
+  // Remplace AbortSignal.timeout() qui plante sur Chrome <103, Safari <16,
+  // et toutes les WebView in-app (Facebook, Instagram, WhatsApp, TikTok)
+  // pendant 6-12 mois après la sortie d'iOS/Android. Pas de polyfill.
+  // Disponible partout depuis Chrome 66 / Safari 12.1 (2018-2019).
+  function fetchWithTimeout(url, opts, ms) {
+    opts = opts || {};
+    ms = (typeof ms === 'number' && ms > 0) ? ms : API_TIMEOUT_MS;
+    var controller = new AbortController();
+    var timedOut = false;
+    var timer = setTimeout(function() {
+      timedOut = true;
+      controller.abort();
+    }, ms);
+    var fetchOpts = {};
+    for (var k in opts) { if (Object.prototype.hasOwnProperty.call(opts, k)) fetchOpts[k] = opts[k]; }
+    fetchOpts.signal = controller.signal;
+    return fetch(url, fetchOpts).then(function(res) {
+      clearTimeout(timer);
+      return res;
+    }).catch(function(err) {
+      clearTimeout(timer);
+      if (timedOut) {
+        var e = new Error('Timeout ' + ms + 'ms: ' + url);
+        e.name = 'TimeoutError';
+        throw e;
+      }
+      throw err;
+    });
+  }
+
   // Strip accents : DB seed stocke "Mais", "Cafe", "Niebe" (ASCII sans accents).
   // cultureNames UI contient les accents pour l'affichage humain ("Maïs", "Café").
   // On normalise avant d'envoyer au backend pour matcher le seed exactement.
@@ -59,7 +91,7 @@
     // 1. Essai réseau avec timeout
     for (var attempt = 0; attempt < 2; attempt++) {
       try {
-        var resp = await fetch(url, { signal: AbortSignal.timeout(API_TIMEOUT_MS) });
+        var resp = await fetchWithTimeout(url, {}, API_TIMEOUT_MS);
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         var json = await resp.json();
         if (cacheKey) cacheSet(cacheKey, json); // mettre en cache la bonne réponse
@@ -89,7 +121,7 @@
   // ── Check API disponibilité ───────────────────────────────────────────────
 
   function checkAPI() {
-    fetch(AP.API_BASE + '/', { method: 'GET', signal: AbortSignal.timeout(3000) })
+    fetchWithTimeout(AP.API_BASE + '/', { method: 'GET' }, 3000)
       .then(function(r) {
         if (r.ok) {
           AP.API_AVAILABLE = true;
@@ -161,6 +193,7 @@
 
   AP.api = {
     checkAPI: checkAPI,
+    fetchWithTimeout: fetchWithTimeout, // exposé pour autres modules
     periodToStartDate: periodToStartDate,
     fetchPrices: fetchPrices,
     fetchMarkets: fetchMarkets,
