@@ -99,6 +99,11 @@
       // Le backend a pose le cookie httpOnly ; on garde juste le profil en cache.
       localStorage.removeItem(LEGACY_TOKEN_KEY);
       saveSession(data.utilisateur);
+      // FIX inscription bloquée : sans updateAuthUI(), l'utilisateur reste
+      // bloqué sur l'écran register après création de son compte (compte créé
+      // en BDD + cookie posé, mais authScreen reste visible). La navigation
+      // fait partie naturelle du flow "session établie → afficher l'app".
+      updateAuthUI(data.utilisateur);
       return data;
     });
   }
@@ -113,6 +118,8 @@
     }).then(function(data) {
       localStorage.removeItem(LEGACY_TOKEN_KEY);
       saveSession(data.utilisateur);
+      // Même symétrie que register() — voir commentaire ci-dessus.
+      updateAuthUI(data.utilisateur);
       return data;
     });
   }
