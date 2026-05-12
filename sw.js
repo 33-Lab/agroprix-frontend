@@ -11,7 +11,7 @@
 // MAIS en parallèle revalide le réseau et met à jour le cache → la version
 // suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = 'v6.12.0';
+const CACHE_VERSION = 'v6.13.0';  // bump 12/05 : retrait fichier statique prix obsolète
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 
@@ -46,7 +46,9 @@ const STATIC_ASSETS = [
   '/js/hevea.js',
   '/js/plantain.js',
   // Data embarquée
-  '/data/prix_reels_uemoa.json',
+  // RETIRÉ 12/05/2026 : '/data/prix_reels_uemoa.json' qui contenait des trends
+  // null + dates obsolètes. Les modules consomment maintenant /api/prices/*
+  // directement (cf. refactor dashboard.js + cacao.js + tomate.js + hevea.js + plantain.js).
   '/data/institutions.json'
 ];
 

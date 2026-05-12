@@ -34,25 +34,44 @@ window.AgroPrix = window.AgroPrix || {};
     'Big Ebanga':  { rendement: [10,18], cycle: '13-15 mois', resistance: 'Sigatoka: moderee', usage: 'Frais, foutou', recommandation: 'Gros regime, marche local' }
   };
 
-  // ─── PRIX MARCHE PLANTAIN (FCFA/kg) ───
-  // Prix bord champ et detail — sources: OCPV, ANADER, enquetes terrain CI
-  var PRIX_PLANTAIN = [
-    { mois: '2025-01', bordChamp: 180, detail: 380, saison: 'haute' },
-    { mois: '2025-02', bordChamp: 200, detail: 400, saison: 'haute' },
-    { mois: '2025-03', bordChamp: 160, detail: 350, saison: 'transition' },
-    { mois: '2025-04', bordChamp: 130, detail: 280, saison: 'basse' },
-    { mois: '2025-05', bordChamp: 100, detail: 220, saison: 'basse' },
-    { mois: '2025-06', bordChamp: 90,  detail: 200, saison: 'basse' },
-    { mois: '2025-07', bordChamp: 110, detail: 250, saison: 'transition' },
-    { mois: '2025-08', bordChamp: 140, detail: 300, saison: 'transition' },
-    { mois: '2025-09', bordChamp: 120, detail: 270, saison: 'transition' },
-    { mois: '2025-10', bordChamp: 150, detail: 320, saison: 'haute' },
-    { mois: '2025-11', bordChamp: 170, detail: 360, saison: 'haute' },
-    { mois: '2025-12', bordChamp: 190, detail: 390, saison: 'haute' },
-    { mois: '2026-01', bordChamp: 185, detail: 385, saison: 'haute' },
-    { mois: '2026-02', bordChamp: 195, detail: 400, saison: 'haute' },
-    { mois: '2026-03', bordChamp: 175, detail: 370, saison: 'transition' }
-  ];
+  // ─── PRIX PLANTAIN (FCFA/kg) — REFACTOR 12/05/2026 ───
+  // Array vide au boot, rempli par loadPrixPlantainLive() depuis l'API.
+  var PRIX_PLANTAIN = [];
+  var PRIX_PLANTAIN_LOADING = false;
+  var PRIX_PLANTAIN_ERROR = null;
+
+  function loadPrixPlantainLive() {
+    if (PRIX_PLANTAIN_LOADING) return Promise.resolve();
+    PRIX_PLANTAIN_LOADING = true;
+    PRIX_PLANTAIN_ERROR = null;
+    if (!AP.api || !AP.api.fetchPricesByDbName) {
+      PRIX_PLANTAIN_LOADING = false;
+      PRIX_PLANTAIN_ERROR = 'API non disponible';
+      return Promise.resolve();
+    }
+    return AP.api.fetchPricesByDbName('cote_divoire', 'Plantain', '2024-01-01').then(function(rows) {
+      PRIX_PLANTAIN.length = 0;
+      (rows || []).forEach(function(r) {
+        var monthNum = parseInt(r.month.split('-')[1], 10);
+        var saison = (monthNum >= 10 || monthNum <= 3) ? 'haute'
+                   : (monthNum >= 4 && monthNum <= 6) ? 'basse' : 'transition';
+        PRIX_PLANTAIN.push({
+          mois: r.month,
+          bordChamp: Math.round(r.min_price || r.avg_price),
+          detail:    Math.round(r.max_price || r.avg_price),
+          prix:      Math.round(r.avg_price),
+          saison:    saison,
+          nbMarches: r.num_markets
+        });
+      });
+      PRIX_PLANTAIN_LOADING = false;
+      if (PRIX_PLANTAIN.length === 0) PRIX_PLANTAIN_ERROR = 'Aucune donnee BDD pour Plantain CI';
+    }).catch(function(err) {
+      PRIX_PLANTAIN_LOADING = false;
+      PRIX_PLANTAIN_ERROR = 'Reseau indisponible';
+      console.warn('[Plantain Pro] loadPrixPlantainLive failed:', err);
+    });
+  }
 
   // ─── MALADIES DATABASE ───
   var MALADIES = [
@@ -88,6 +107,10 @@ window.AgroPrix = window.AgroPrix || {};
     var data = loadData();
     renderDashboard(data);
     renderTabs();
+    // Refactor 12/05 : prix live BDD
+    loadPrixPlantainLive().then(function() {
+      if (typeof renderDashboard === 'function') renderDashboard(loadData());
+    });
   };
 
   // ─── TAB NAVIGATION ───

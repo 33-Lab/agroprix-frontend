@@ -78,28 +78,50 @@ window.AgroPrix = window.AgroPrix || {};
   //   - Basse saison / contre-saison (juin-août) : 800-1500 FCFA/kg
   //   - Transition (avril-mai, sept-oct) : 400-700 FCFA/kg
   // Sources : ONASA Bénin, Observatoire prix CI, ANSD Sénégal
-  var PRIX_TOMATE = [
-    { mois: '2024-08', prix: 1100, saison: 'contre-saison' },  // prix élevés été
-    { mois: '2024-09', prix: 850,  saison: 'contre-saison' },
-    { mois: '2024-10', prix: 600,  saison: 'transition' },
-    { mois: '2024-11', prix: 400,  saison: 'transition' },
-    { mois: '2024-12', prix: 250,  saison: 'grande-saison' },  // début glut
-    { mois: '2025-01', prix: 180,  saison: 'grande-saison' },  // glut maximal
-    { mois: '2025-02', prix: 150,  saison: 'grande-saison' },  // prix plancher
-    { mois: '2025-03', prix: 220,  saison: 'grande-saison' },
-    { mois: '2025-04', prix: 450,  saison: 'transition' },
-    { mois: '2025-05', prix: 650,  saison: 'transition' },
-    { mois: '2025-06', prix: 900,  saison: 'contre-saison' },
-    { mois: '2025-07', prix: 1200, saison: 'contre-saison' },  // pic prix
-    { mois: '2025-08', prix: 1350, saison: 'contre-saison' },  // prix max
-    { mois: '2025-09', prix: 1050, saison: 'contre-saison' },
-    { mois: '2025-10', prix: 700,  saison: 'transition' },
-    { mois: '2025-11', prix: 420,  saison: 'transition' },
-    { mois: '2025-12', prix: 280,  saison: 'grande-saison' },
-    { mois: '2026-01', prix: 200,  saison: 'grande-saison' },
-    { mois: '2026-02', prix: 175,  saison: 'grande-saison' },  // plancher 2026
-    { mois: '2026-03', prix: 300,  saison: 'grande-saison' }
-  ];
+  // REFACTOR 12/05/2026 : array vide au boot, rempli par loadPrixTomateLive()
+  // depuis /api/prices/monthly?country=benin&commodity=Tomate (Bénin = max marchés
+  // tomate UEMOA). Plus de prix hardcodés mensongers vendus 2900 FCFA/mois.
+  var PRIX_TOMATE = [];
+  var PRIX_TOMATE_LOADING = false;
+  var PRIX_TOMATE_ERROR = null;
+
+  function loadPrixTomateLive() {
+    if (PRIX_TOMATE_LOADING) return Promise.resolve();
+    PRIX_TOMATE_LOADING = true;
+    PRIX_TOMATE_ERROR = null;
+    if (!AP.api || !AP.api.fetchPricesByDbName) {
+      PRIX_TOMATE_LOADING = false;
+      PRIX_TOMATE_ERROR = 'API non disponible';
+      return Promise.resolve();
+    }
+    return AP.api.fetchPricesByDbName('benin', 'Tomate', '2024-01-01').then(function(rows) {
+      PRIX_TOMATE.length = 0;
+      (rows || []).forEach(function(r) {
+        // Inférer la saison à partir du mois (les WFP n'ont pas ce flag — on calcule)
+        var monthNum = parseInt(r.month.split('-')[1], 10);
+        var saison;
+        if (monthNum >= 12 || monthNum <= 3) saison = 'grande-saison';     // dec-mar : glut
+        else if (monthNum >= 6 && monthNum <= 9) saison = 'contre-saison'; // jun-sep : pic
+        else saison = 'transition';                                         // avr-mai, oct-nov
+        PRIX_TOMATE.push({
+          mois:   r.month,
+          prix:   Math.round(r.avg_price),
+          saison: saison,
+          min:    r.min_price,
+          max:    r.max_price,
+          nbMarches: r.num_markets
+        });
+      });
+      PRIX_TOMATE_LOADING = false;
+      if (PRIX_TOMATE.length === 0) {
+        PRIX_TOMATE_ERROR = 'Aucune donnee BDD pour Tomate Benin';
+      }
+    }).catch(function(err) {
+      PRIX_TOMATE_LOADING = false;
+      PRIX_TOMATE_ERROR = 'Reseau indisponible';
+      console.warn('[Tomate Pro] loadPrixTomateLive failed:', err);
+    });
+  }
 
   // Seuil de rentabilité estimé coût de production tomate UEMOA
   var SEUIL_RENTABILITE = 350; // FCFA/kg (base pluvial semi-intensif)
@@ -276,6 +298,10 @@ window.AgroPrix = window.AgroPrix || {};
     var data = loadData();
     renderDashboard(data);
     renderTabs();
+    // Refactor 12/05 : charger les prix live en arrière-plan (plus de hardcoded)
+    loadPrixTomateLive().then(function() {
+      if (typeof renderTomatePrixChart === 'function') renderTomatePrixChart();
+    });
   };
 
   // Alias exposé
@@ -698,6 +724,20 @@ window.AgroPrix = window.AgroPrix || {};
       if (tomatePrixChartInst) { tomatePrixChartInst.destroy(); tomatePrixChartInst = null; }
       var existing = Chart.getChart(canvas);
       if (existing) existing.destroy();
+
+      // Refactor 12/05 : si PRIX_TOMATE vide (API pas répondu), message clair.
+      if (!PRIX_TOMATE || PRIX_TOMATE.length === 0) {
+        var ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '14px sans-serif';
+        ctx.fillStyle = '#666';
+        ctx.textAlign = 'center';
+        var msg = PRIX_TOMATE_LOADING ? 'Chargement des prix BDD...'
+                : PRIX_TOMATE_ERROR ? ('Donnees indisponibles : ' + PRIX_TOMATE_ERROR)
+                : 'Aucune donnee de prix disponible';
+        ctx.fillText(msg, canvas.width / 2, canvas.height / 2);
+        return;
+      }
 
       var labels = PRIX_TOMATE.map(function(p) {
         var parts = p.mois.split('-');
