@@ -1,4 +1,4 @@
-/*! AgroPrix auth.js - generated from auth.js.src on 2026-04-21 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix auth.js - generated from auth.js.src on 2026-05-12 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){'use strict';var USER_KEY='agroprix_user';var LEGACY_TOKEN_KEY='agroprix_token';function getUser(){try{var raw=localStorage.getItem(USER_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
 function saveSession(user){localStorage.setItem(USER_KEY,JSON.stringify(user));updateAuthUI(user);}
 function clearSession(){localStorage.removeItem(USER_KEY);localStorage.removeItem(LEGACY_TOKEN_KEY);try{localStorage.removeItem('agroprix_farmer_profile');localStorage.removeItem('agroprix_streak');localStorage.removeItem('agroprix_points');localStorage.removeItem('agroprix_badges');localStorage.removeItem('agroprix_last_visit');}catch(e){}
