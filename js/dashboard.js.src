@@ -62,61 +62,75 @@
   }
 
   // =========================================================================
-  // Price alerts (from real data file)
+  // Price alerts — LIVE API (refactor 12/05/2026)
+  //
+  // AVANT : chargeait /data/prix_reels_uemoa.json (fichier statique avec
+  // trends null partout, dates obsolètes 2025-10 → 2026-03). Conséquence :
+  // toutes les alertes affichaient ▼ 0% / "Il y a 200+ jours". Promesse
+  // commerciale "prix temps réel" non tenue.
+  //
+  // MAINTENANT : appel API live /api/prices/compare + /api/recommendations
+  // qui consomment la BDD HDX (1.5M+ records, latest 2026-05). Le calcul
+  // de trend (mom_change_pct) est fait côté backend, on remonte ce qui est
+  // vrai et frais. Plus jamais de fallback figé qui ment à l'utilisateur.
   // =========================================================================
-  var realPriceData = null;
+  var liveAlerts = null;
 
   function loadRealPrices(callback) {
-    if (realPriceData) { callback(realPriceData); return; }
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', '/data/prix_reels_uemoa.json?v=' + Date.now(), true);
-    xhr.onload = function() {
-      if (xhr.status === 200) {
-        try { realPriceData = JSON.parse(xhr.responseText); } catch(e) { realPriceData = null; }
-      }
-      callback(realPriceData);
-    };
-    xhr.onerror = function() { callback(null); };
-    xhr.send();
+    if (liveAlerts) { callback({ data: liveAlerts }); return; }
+    if (!AP.api || !AP.api.fetchDashboardAlerts) {
+      // API pas encore chargée : impossible de récupérer des alertes.
+      // On retourne null sans fallback figé — l'UI affichera un message clair.
+      callback(null);
+      return;
+    }
+    AP.api.fetchDashboardAlerts().then(function(alerts) {
+      liveAlerts = alerts;
+      callback({ data: alerts });
+    }).catch(function() {
+      // Réseau down ou backend KO : pas de mensonge dans l'UI.
+      callback(null);
+    });
+  }
+
+  // Format pays (slug → label lisible)
+  function countryLabel(slug) {
+    if (!slug) return '';
+    var meta = AP.countryMeta && AP.countryMeta[slug];
+    return meta ? meta.name : slug.charAt(0).toUpperCase() + slug.slice(1).replace(/_/g, ' ');
+  }
+
+  // Fraîcheur des données : "Maj < 30j" / "Maj 1-3 mois" / "Maj > 3 mois"
+  function freshnessLabel(monthsAvailable) {
+    // monthsAvailable = nb de mois d'historique en BDD pour cette série.
+    // Pas de date directe, mais on peut afficher "Données mensuelles"
+    // ou un indicateur du nb de mois.
+    if (!monthsAvailable || monthsAvailable === 0) return 'Donnees indisponibles';
+    if (monthsAvailable < 2) return 'Historique limite';
+    return monthsAvailable + ' mois d\'historique';
   }
 
   function generateAlerts() {
-    var cultureNames = AP.cultureNames || {};
-    var alerts = [];
-
-    if (realPriceData && realPriceData.data) {
-      // Use real data, pick entries with significant trends
-      var entries = realPriceData.data.slice();
-      // Sort by absolute trend value
-      entries.sort(function(a, b) {
-        return Math.abs(parseFloat(b.trend)) - Math.abs(parseFloat(a.trend));
-      });
-      // Take top 8 most volatile
-      entries.slice(0, 8).forEach(function(e) {
-        var change = parseInt(e.trend) || 0;
-        var daysAgo = Math.floor((Date.now() - new Date(e.date).getTime()) / 86400000);
-        var timeLabel = daysAgo === 0 ? 'Aujourd\'hui' : daysAgo === 1 ? 'Hier' : 'Il y a ' + daysAgo + 'j';
-        alerts.push({
-          crop: cultureNames[e.commodity] || e.commodity.charAt(0).toUpperCase() + e.commodity.slice(1).replace('_', ' '),
-          market: e.market.split(' (')[0],
-          change: change,
-          price: e.price,
-          time: timeLabel,
-          isUp: change > 0
-        });
-      });
-    } else {
-      // Fallback : exemples typiques (pas de donnees temps reel chargees).
-      // Labels explicites pour eviter toute confusion avec de vrais releves.
-      alerts = [
-        { crop: 'Cajou', market: 'Dantokpa', change: 14, price: 850, time: 'Exemple', isUp: true, isFallback: true },
-        { crop: 'Tomate', market: 'Abidjan', change: 18, price: 550, time: 'Exemple', isUp: true, isFallback: true },
-        { crop: 'Oignon', market: 'Dakar', change: -10, price: 350, time: 'Exemple', isUp: false, isFallback: true },
-        { crop: 'Niebe', market: 'Ouagadougou', change: 8, price: 620, time: 'Exemple', isUp: true, isFallback: true },
-        { crop: 'Mais', market: 'Bamako', change: -7, price: 225, time: 'Exemple', isUp: false, isFallback: true }
-      ];
+    if (!liveAlerts) {
+      // Pas encore chargé. Si on est ici, c'est qu'un re-render a eu lieu
+      // avant la résolution de la promesse fetchDashboardAlerts. Le caller
+      // (refreshDashboard) doit avoir déjà appelé loadRealPrices() qui va
+      // déclencher un autre re-render quand les données arrivent.
+      return [];
     }
-    return alerts;
+
+    return liveAlerts.map(function(a) {
+      var change = Math.round(a.change);
+      return {
+        crop: a.commodity,
+        market: countryLabel(a.country),       // "Côte d'Ivoire" plutôt qu'un marché précis (compare = agrégation pays)
+        change: change,
+        price: Math.round(a.price || 0),
+        time: freshnessLabel(a.months_available),
+        isUp: change > 0,
+        num_markets: a.num_markets || 0
+      };
+    });
   }
 
   // =========================================================================

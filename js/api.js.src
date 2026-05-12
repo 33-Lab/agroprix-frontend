@@ -162,6 +162,83 @@
     return (json && json.data) ? json.data : [];
   }
 
+  // ── Variante : fetchPrices avec nom DB direct (sans mapping cultureNames) ─
+  // Utilisé par les modules Pro (Cacao/Tomate/Hevea/Plantain) qui ont des noms
+  // DB spécifiques en BDD (ex: "Rubber" pour Hevea — pas dans cultureNames).
+  async function fetchPricesByDbName(country, dbCommodity, startDate) {
+    var url = AP.API_BASE + '/api/prices/monthly?country=' + country
+            + '&commodity=' + encodeURIComponent(dbCommodity)
+            + (startDate ? '&start_date=' + startDate : '');
+    var cacheKey = 'prices_db_' + country + '_' + dbCommodity;
+    var json = await fetchRobust(url, cacheKey);
+    return (json && json.data) ? json.data : [];
+  }
+
+  // ── Alertes Dashboard : top variations régionales sur cultures phares ─────
+  // Remplace l'ancien fichier statique data/prix_reels_uemoa.json qui n'était
+  // JAMAIS mis à jour (trends null partout). Calcule en temps réel à partir
+  // des données BDD live (1.5M+ records HDX).
+  //
+  // Stratégie :
+  //   1. Fetch /api/prices/compare pour 5 cultures phares en parallèle
+  //   2. Pour chaque (culture × pays) avec données : calculer trend via
+  //      /api/recommendations/ (renvoie mom_change_pct)
+  //   3. Retourne top 8 trié par |trend| décroissant
+  //
+  // En cas d'échec d'un appel : on dégrade gracieusement (l'alerte est
+  // omise). JAMAIS de fallback à des données hardcodées (anti-mensonge).
+  async function fetchDashboardAlerts() {
+    var phareCommodities = ['Mais', 'Riz', 'Tomate', 'Cacao', 'Plantain'];
+    var allAlerts = [];
+
+    // 1. Pour chaque culture phare, récupérer les pays avec données
+    for (var i = 0; i < phareCommodities.length; i++) {
+      var commodity = phareCommodities[i];
+      try {
+        var compareUrl = AP.API_BASE + '/api/prices/compare?commodity=' + commodity;
+        var resp = await fetchWithTimeout(compareUrl, {}, 8000);
+        if (!resp.ok) continue;
+        var json = await resp.json();
+        var rows = (json && json.data) ? json.data : [];
+
+        // 2. Top 2 pays par commodity (pour limiter le nombre d'appels reco)
+        var topCountries = rows.slice(0, 2);
+        for (var j = 0; j < topCountries.length; j++) {
+          var country = topCountries[j].country;
+          // Filtrer les noms de pays bizarres (ex: 'cote_ivoire' duplicate)
+          if (!country || country === 'cote_ivoire' || country === 'burkina') continue;
+
+          try {
+            var recoUrl = AP.API_BASE + '/api/recommendations/?country=' + country
+                        + '&commodity=' + commodity;
+            var recoResp = await fetchWithTimeout(recoUrl, {}, 8000);
+            if (!recoResp.ok) continue;
+            var reco = await recoResp.json();
+            var trend = reco && reco.data && reco.data.trend;
+            if (!trend) continue;
+
+            // Date du dernier observation (récupérée via avg_price disponible)
+            allAlerts.push({
+              commodity: commodity,
+              country: country,
+              price: trend.current_price || topCountries[j].avg_price || null,
+              change: trend.mom_change_pct || 0,
+              direction: trend.direction || 'stable',
+              months_available: trend.months_available || 0,
+              num_markets: topCountries[j].num_markets || 0
+            });
+          } catch (e) { /* skip si reco indisponible pour ce pays */ }
+        }
+      } catch (e) { /* skip cette culture */ }
+    }
+
+    // 3. Trier par |change| décroissant et garder top 8
+    allAlerts.sort(function(a, b) {
+      return Math.abs(b.change) - Math.abs(a.change);
+    });
+    return allAlerts.slice(0, 8);
+  }
+
   async function fetchMarkets(country) {
     var url = AP.API_BASE + '/api/prices/markets?country=' + country;
     var json = await fetchRobust(url, 'markets_' + country);
@@ -196,6 +273,8 @@
     fetchWithTimeout: fetchWithTimeout, // exposé pour autres modules
     periodToStartDate: periodToStartDate,
     fetchPrices: fetchPrices,
+    fetchPricesByDbName: fetchPricesByDbName, // pour modules Pro (noms DB directs)
+    fetchDashboardAlerts: fetchDashboardAlerts, // top alertes live (no static)
     fetchMarkets: fetchMarkets,
     fetchCompare: fetchCompare,
     fetchForecast: fetchForecast,

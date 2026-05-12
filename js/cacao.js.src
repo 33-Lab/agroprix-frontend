@@ -74,35 +74,56 @@ window.AgroPrix = window.AgroPrix || {};
     }
   };
 
-  // ─── PRIX CACAO UEMOA (FCFA/kg fèves sèches) ───
-  // Sources : CGFCC (CI), Cocobod (Ghana), ICE Futures Londres/New York
-  // Contexte : pic historique 2024-2025 (El Niño + déficit production mondiale)
-  // Corrélation ICE Futures : 1 USD/tonne ≈ 0,65 FCFA/kg (taux BCEAO 2024-2025)
-  var PRIX_CACAO = [
-    // 2024 — montée progressive vers le pic historique
-    { mois: '2024-08', prix: 3200,  iceUsd: 4950  },
-    { mois: '2024-09', prix: 3450,  iceUsd: 5320  },
-    { mois: '2024-10', prix: 3800,  iceUsd: 5860  },
-    { mois: '2024-11', prix: 4100,  iceUsd: 6330  },
-    { mois: '2024-12', prix: 4400,  iceUsd: 6780  },
-    // 2025 — pic historique (pénurie mondiale, sécheresse CI/Ghana)
-    { mois: '2025-01', prix: 4850,  iceUsd: 7480  },
-    { mois: '2025-02', prix: 5200,  iceUsd: 8020  },
-    { mois: '2025-03', prix: 5500,  iceUsd: 8490  },  // pic absolu
-    { mois: '2025-04', prix: 5350,  iceUsd: 8250  },
-    { mois: '2025-05', prix: 5100,  iceUsd: 7870  },
-    { mois: '2025-06', prix: 4800,  iceUsd: 7410  },
-    { mois: '2025-07', prix: 4500,  iceUsd: 6940  },
-    { mois: '2025-08', prix: 4200,  iceUsd: 6480  },
-    { mois: '2025-09', prix: 3900,  iceUsd: 6020  },
-    { mois: '2025-10', prix: 3650,  iceUsd: 5630  },
-    { mois: '2025-11', prix: 3400,  iceUsd: 5250  },
-    { mois: '2025-12', prix: 3200,  iceUsd: 4940  },
-    // 2026 — légère reprise (retour partiel normale)
-    { mois: '2026-01', prix: 3050,  iceUsd: 4710  },
-    { mois: '2026-02', prix: 2950,  iceUsd: 4550  },
-    { mois: '2026-03', prix: 2800,  iceUsd: 4320  }
-  ];
+  // ─── PRIX CACAO UEMOA (FCFA/kg fèves sèches) — REFACTOR 12/05/2026 ───
+  //
+  // AVANT : array de 20 mois HARDCODÉ (2024-08 → 2026-03). Aucune mise à jour
+  // possible sans modifier le code. Les abonnés Pro (2900 FCFA/mois) voyaient
+  // des prix figés alors que la promesse commerciale est "prix temps réel".
+  //
+  // MAINTENANT : array vide au boot, rempli en async par loadPrixCacaoLive()
+  // qui interroge /api/prices/monthly?country=cote_divoire&commodity=Cacao.
+  // Si l'API échoue : array reste vide → renderCacaoPrixChart() affiche un
+  // message "Données indisponibles" plutôt que des prix mensongers.
+  //
+  // ICE USD : pas dispo en BDD HDX (qui est un dataset WFP terrain). Pour
+  // l'ajouter, créer un endpoint backend qui scrape ICE/Bloomberg. Pour
+  // l'instant : on retourne iceUsd: null et le code de rendu masquera le
+  // dataset secondaire.
+  var PRIX_CACAO = [];
+  var PRIX_CACAO_LOADING = false;
+  var PRIX_CACAO_ERROR = null;
+
+  function loadPrixCacaoLive() {
+    if (PRIX_CACAO_LOADING) return Promise.resolve();
+    PRIX_CACAO_LOADING = true;
+    PRIX_CACAO_ERROR = null;
+    if (!AP.api || !AP.api.fetchPricesByDbName) {
+      PRIX_CACAO_LOADING = false;
+      PRIX_CACAO_ERROR = 'API non disponible';
+      return Promise.resolve();
+    }
+    return AP.api.fetchPricesByDbName('cote_divoire', 'Cacao', '2024-01-01').then(function(rows) {
+      PRIX_CACAO.length = 0;
+      (rows || []).forEach(function(r) {
+        PRIX_CACAO.push({
+          mois:   r.month,                    // déjà au format YYYY-MM (BDD)
+          prix:   Math.round(r.avg_price),
+          iceUsd: null,                       // non disponible dans HDX
+          min:    r.min_price,
+          max:    r.max_price,
+          nbMarches: r.num_markets
+        });
+      });
+      PRIX_CACAO_LOADING = false;
+      if (PRIX_CACAO.length === 0) {
+        PRIX_CACAO_ERROR = 'Aucune donnee BDD pour Cacao CI';
+      }
+    }).catch(function(err) {
+      PRIX_CACAO_LOADING = false;
+      PRIX_CACAO_ERROR = 'Reseau indisponible';
+      console.warn('[Cacao Pro] loadPrixCacaoLive failed:', err);
+    });
+  }
 
   // ─── CALENDRIER CULTURAL CACAO ───
   // 4 phases principales — filière UEMOA (CI, Ghana, Togo)
@@ -220,6 +241,11 @@ window.AgroPrix = window.AgroPrix || {};
     var data = loadData();
     renderDashboard(data);
     renderTabs();
+    // Charger les prix live en arrière-plan (refactor 12/05 : plus de hardcoded).
+    // Quand les données arrivent, re-render le chart pour qu'il s'affiche.
+    loadPrixCacaoLive().then(function() {
+      if (typeof renderCacaoPrixChart === 'function') renderCacaoPrixChart();
+    });
   };
 
   // ─── TAB NAVIGATION (exposé globalement pour onclick HTML) ───
@@ -629,6 +655,22 @@ window.AgroPrix = window.AgroPrix || {};
       if (cacaoPrixChartInst) { cacaoPrixChartInst.destroy(); cacaoPrixChartInst = null; }
       var existing = Chart.getChart(canvas);
       if (existing) existing.destroy();
+
+      // Refactor 12/05/2026 : PRIX_CACAO peut être vide si l'API n'a pas répondu
+      // ou en cours de chargement. Plutôt qu'afficher un graphique mensonger
+      // (anciennement hardcodé), on affiche un message clair.
+      if (!PRIX_CACAO || PRIX_CACAO.length === 0) {
+        var ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '14px sans-serif';
+        ctx.fillStyle = '#666';
+        ctx.textAlign = 'center';
+        var msg = PRIX_CACAO_LOADING ? 'Chargement des prix BDD...'
+                : PRIX_CACAO_ERROR ? ('Donnees indisponibles : ' + PRIX_CACAO_ERROR)
+                : 'Aucune donnee de prix disponible';
+        ctx.fillText(msg, canvas.width / 2, canvas.height / 2);
+        return;
+      }
 
       var labels = PRIX_CACAO.map(function(p) {
         var parts = p.mois.split('-');

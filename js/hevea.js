@@ -35,17 +35,36 @@ window.AgroPrix = window.AgroPrix || {};
     'RRIM 600':{ rendement: [1200,1600], vigueur: 'Moderee',   sensibilites: 'Vent',            recommandation: 'Zones interieures',              immaturite: 7 }
   };
 
-  // ─── PRIX APROMAC HISTORIQUE (FCFA/kg) ───
-  // Prix APROMAC officiels bord champ (FCFA/kg) — sources: 7info.ci, yessouan.ci, APROMAC
-  var PRIX_APROMAC = [
-    { mois: '2024-08', prix: 357 }, { mois: '2024-09', prix: 366 }, { mois: '2024-10', prix: 395 },
-    { mois: '2024-11', prix: 434 }, { mois: '2024-12', prix: 426 },
-    { mois: '2025-01', prix: 442 }, { mois: '2025-02', prix: 442 }, { mois: '2025-03', prix: 454 },
-    { mois: '2025-04', prix: 438 }, { mois: '2025-05', prix: 445 }, { mois: '2025-06', prix: 452 },
-    { mois: '2025-07', prix: 460 }, { mois: '2025-08', prix: 468 }, { mois: '2025-09', prix: 475 },
-    { mois: '2025-10', prix: 470 }, { mois: '2025-11', prix: 462 }, { mois: '2025-12', prix: 458 },
-    { mois: '2026-01', prix: 465 }, { mois: '2026-02', prix: 472 }, { mois: '2026-03', prix: 478 }
-  ];
+  // ─── PRIX HEVEA (FCFA/kg) — REFACTOR 12/05/2026 ───
+  // Avant : 20 mois hardcodés (APROMAC stylé). Maintenant : fetch API live
+  // depuis /api/prices/monthly?country=cote_divoire&commodity=Rubber (le nom
+  // DB HDX pour le caoutchouc). 19 mois disponibles en BDD vérifié.
+  var PRIX_APROMAC = [];
+  var PRIX_APROMAC_LOADING = false;
+  var PRIX_APROMAC_ERROR = null;
+
+  function loadPrixApromacLive() {
+    if (PRIX_APROMAC_LOADING) return Promise.resolve();
+    PRIX_APROMAC_LOADING = true;
+    PRIX_APROMAC_ERROR = null;
+    if (!AP.api || !AP.api.fetchPricesByDbName) {
+      PRIX_APROMAC_LOADING = false;
+      PRIX_APROMAC_ERROR = 'API non disponible';
+      return Promise.resolve();
+    }
+    return AP.api.fetchPricesByDbName('cote_divoire', 'Rubber', '2024-01-01').then(function(rows) {
+      PRIX_APROMAC.length = 0;
+      (rows || []).forEach(function(r) {
+        PRIX_APROMAC.push({ mois: r.month, prix: Math.round(r.avg_price), min: r.min_price, max: r.max_price, nbMarches: r.num_markets });
+      });
+      PRIX_APROMAC_LOADING = false;
+      if (PRIX_APROMAC.length === 0) PRIX_APROMAC_ERROR = 'Aucune donnee BDD pour Hevea CI';
+    }).catch(function(err) {
+      PRIX_APROMAC_LOADING = false;
+      PRIX_APROMAC_ERROR = 'Reseau indisponible';
+      console.warn('[Hevea Pro] loadPrixApromacLive failed:', err);
+    });
+  }
 
   // ─── SYSTEMES DE SAIGNEE ───
   var SYSTEMES_SAIGNEE = {
@@ -78,6 +97,11 @@ window.AgroPrix = window.AgroPrix || {};
     var data = loadData();
     renderDashboard(data);
     renderTabs();
+    // Refactor 12/05 : prix live BDD
+    loadPrixApromacLive().then(function() {
+      // Re-render le dashboard quand les données arrivent
+      if (typeof renderDashboard === 'function') renderDashboard(loadData());
+    });
   };
 
   // ─── TAB NAVIGATION ───
