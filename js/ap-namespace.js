@@ -1,0 +1,7 @@
+/*! AgroPrix ap-namespace.js - generated from ap-namespace.js.src on 2026-05-07 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+(function(global){'use strict';global.AgroPrix=global.AgroPrix||{};var AP=global.AgroPrix;AP.ui=AP.ui||{};AP.api=AP.api||{};AP.data=AP.data||{};AP.utils=AP.utils||{};if(!AP.version){AP.version='v6.7-2026-05-07';}
+if(!AP.utils.report){AP.utils.report=function(level,message,extra){var lvl=(level==='error'||level==='warning'||level==='info')?level:'warning';try{if(global.Sentry&&typeof global.Sentry.captureMessage==='function'){global.Sentry.captureMessage(message,{level:lvl,extra:Object.assign({ap_version:AP.version},extra||{})});return;}}catch(_e){}
+try{var fn=(lvl==='error')?console.error:(lvl==='info')?console.info:console.warn;fn.call(console,'[AgroPrix:'+lvl+']',message,extra||'');}catch(_e){}};}
+if(!AP.utils.safeBind){AP.utils.safeBind=function(elementId,eventName,handler,label){var lbl=label||(elementId+':'+eventName);try{var el=document.getElementById(elementId);if(!el){AP.utils.report('warning','safeBind:element-missing',{id:elementId,evt:eventName,label:lbl});return false;}
+if(typeof handler!=='function'){AP.utils.report('warning','safeBind:handler-missing',{id:elementId,evt:eventName,label:lbl});return false;}
+el.addEventListener(eventName,handler);return true;}catch(e){AP.utils.report('error','safeBind:exception',{id:elementId,evt:eventName,label:lbl,msg:String(e)});return false;}};}})(typeof window!=='undefined'?window:this);

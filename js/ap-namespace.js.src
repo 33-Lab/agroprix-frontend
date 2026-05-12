@@ -1,0 +1,113 @@
+// ============================================================
+// AgroPrix — Namespace Initialization (FE-B1)
+//
+// Initialise le namespace global `window.AgroPrix` avec une structure stable.
+// Ce fichier DOIT être chargé EN PREMIER dans index.html, avant tous les
+// autres modules JS (security.js, config.js, modules métier, etc.).
+//
+// Pattern : tous les modules font `(function(AP) { AP.<sub>.<fn> = ... })(window.AgroPrix);`.
+// Cette init formelle :
+//   1. Garantit que `window.AgroPrix.{ui,api,data,utils}` existent toujours
+//      (pas de "Cannot read property of undefined" si un module charge
+//      hors ordre ou échoue silencieusement).
+//   2. Expose `AP.version` pour que Sentry/logs/UI puissent afficher la
+//      version courante (utile pour distinguer les bugs de cache).
+//   3. Fournit `AP.utils.report(level, message, extra)` — wrapper Sentry
+//      avec fallback console. Utilisé par les modules pour signaler
+//      des conditions inattendues sans crasher.
+//
+// Préparation pour FE-B2 (suppression onchange inline) — cf.
+// `js/register-handlers.js.src` futur qui appellera `AP.utils.report` si
+// un bind addEventListener échoue (élément manquant, handler manquant).
+//
+// Compatibilité : ne casse rien. Les modules existants qui font
+// `window.AgroPrix = window.AgroPrix || {};` voient déjà l'objet et le
+// laissent intact (l'opérateur `||` est court-circuité).
+// ============================================================
+
+(function(global) {
+  'use strict';
+
+  // Création du namespace si pas encore là, sinon préservation totale.
+  global.AgroPrix = global.AgroPrix || {};
+
+  var AP = global.AgroPrix;
+
+  // Sous-namespaces stables. Si un module a déjà commencé à peupler `AP.ui`
+  // (par exemple ui.js chargé avant ap-namespace.js — cas hypothétique),
+  // on préserve son contenu existant.
+  AP.ui    = AP.ui    || {};
+  AP.api   = AP.api   || {};
+  AP.data  = AP.data  || {};
+  AP.utils = AP.utils || {};
+
+  // Version courante — utile pour les logs Sentry et le debug.
+  // Mise à jour manuelle au déploiement (futur : injection automatique
+  // par build_js.py via un placeholder).
+  if (!AP.version) {
+    AP.version = 'v6.7-2026-05-07';
+  }
+
+  // ── AP.utils.report ──────────────────────────────────────────────────
+  // Wrapper de remontée d'incidents. Préfère Sentry si dispo (chargé via
+  // CDN dans index.html), fallback console.
+  //
+  // Usage :
+  //   AP.utils.report('warning', 'handler-bind-failed', { id: 'countrySelect', evt: 'change' });
+  //   AP.utils.report('error', 'unexpected-state', { context: 'X' });
+  //
+  // Contrats :
+  //   - level ∈ {'info', 'warning', 'error'} (mappé vers Sentry levels)
+  //   - message string court (titre du finding Sentry)
+  //   - extra optional object (context attaché au breadcrumb)
+  //   - jamais throw : sécurisé contre absence de Sentry, console, ou
+  //     extra non-sérialisable.
+  if (!AP.utils.report) {
+    AP.utils.report = function(level, message, extra) {
+      var lvl = (level === 'error' || level === 'warning' || level === 'info') ? level : 'warning';
+      try {
+        if (global.Sentry && typeof global.Sentry.captureMessage === 'function') {
+          global.Sentry.captureMessage(message, {
+            level: lvl,
+            extra: Object.assign({ ap_version: AP.version }, extra || {})
+          });
+          return;
+        }
+      } catch (_e) { /* Sentry buggy ou non chargé — fallback */ }
+
+      try {
+        var fn = (lvl === 'error') ? console.error : (lvl === 'info') ? console.info : console.warn;
+        fn.call(console, '[AgroPrix:' + lvl + ']', message, extra || '');
+      } catch (_e) { /* console indispo — silence total */ }
+    };
+  }
+
+  // ── AP.utils.safeBind ────────────────────────────────────────────────
+  // Helper pour FE-B2 (suppression onchange inline). Fait un addEventListener
+  // tolérant aux erreurs : si l'élément ou le handler manquent, log un
+  // breadcrumb au lieu de crasher. Ne sera utilisé qu'à partir de
+  // register-handlers.js.src (PR future), mais on le pose ici pour que
+  // l'API soit déjà publique et stable.
+  if (!AP.utils.safeBind) {
+    AP.utils.safeBind = function(elementId, eventName, handler, label) {
+      var lbl = label || (elementId + ':' + eventName);
+      try {
+        var el = document.getElementById(elementId);
+        if (!el) {
+          AP.utils.report('warning', 'safeBind:element-missing', { id: elementId, evt: eventName, label: lbl });
+          return false;
+        }
+        if (typeof handler !== 'function') {
+          AP.utils.report('warning', 'safeBind:handler-missing', { id: elementId, evt: eventName, label: lbl });
+          return false;
+        }
+        el.addEventListener(eventName, handler);
+        return true;
+      } catch (e) {
+        AP.utils.report('error', 'safeBind:exception', { id: elementId, evt: eventName, label: lbl, msg: String(e) });
+        return false;
+      }
+    };
+  }
+
+})(typeof window !== 'undefined' ? window : this);
