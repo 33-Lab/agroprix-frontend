@@ -61,6 +61,50 @@
     });
   }
 
+  // NDVI REEL Sentinel-2 (gratuit, Element84 STAC) — calcul synchrone cote backend
+  function fetchSentinelNDVI(backendId) {
+    return apiFetch('/api/ndvi/sentinel/parcelle/' + backendId + '?days=90&n_scenes=3', { method: 'GET' }).then(function(r) {
+      if (r.status === 401) throw new Error('auth');
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+  }
+
+  // Lance l'analyse satellite reelle pour une parcelle : sync backend -> Sentinel-2.
+  function analyzeSatellite(idx) {
+    var parcels = getParcels();
+    var p = parcels[idx];
+    if (!p) return;
+    var btn = document.getElementById('sat-btn-' + idx);
+    if (btn) { btn.disabled = true; btn.textContent = 'Analyse satellite en cours (~10s)...'; }
+    syncParcelToBackend(idx).then(function(backendId) {
+      return fetchSentinelNDVI(backendId);
+    }).then(function(res) {
+      var stats = (res && res.stats) ? res.stats : [];
+      if (!stats.length) {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="satellite" class="lc"></i> Reessayer l\'analyse satellite'; if (window.lucide) try { window.lucide.createIcons(); } catch(e){} }
+        alert('Aucune scene satellite claire recente (couverture nuageuse). Reessayez plus tard.');
+        return;
+      }
+      var latest = stats[0];
+      var ps = getParcels();
+      ps[idx].realNDVI = {
+        mean: latest.mean, min: latest.min, max: latest.max,
+        date: String(latest.datetime || '').split('T')[0],
+        cloud: latest.cloud_cover, source: res.source || 'sentinel-2'
+      };
+      ps[idx].realHistory = stats.map(function(s) {
+        return { date: String(s.datetime || '').split('T')[0], ndvi: Math.round((s.mean || 0) * 100) / 100 };
+      }).reverse();
+      saveParcels(ps);
+      render();
+    }).catch(function(e) {
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="satellite" class="lc"></i> Analyser au satellite (reel)'; if (window.lucide) try { window.lucide.createIcons(); } catch(ex){} }
+      if (String(e && e.message) === 'auth') alert('Connectez-vous pour lancer l\'analyse satellite reelle.');
+      else alert('Analyse satellite indisponible : ' + (e && e.message ? e.message : 'erreur'));
+    });
+  }
+
   // ⚠️ Valeurs NDVI simulées (démonstration) — remplacées par Planet Orders API en phase 2
   var DEMO_NDVI = [
     { date: '2025-10-01', ndvi: 0.42 },
@@ -139,10 +183,10 @@
       + '<p style="font-size:12px;color:var(--text-light);">Suivi satellite des cultures (Planet PlanetScope 3m)</p>'
       + '</div>'
       + '<div style="background:#FEF3C7;border-left:4px solid #E8862A;padding:10px 12px;border-radius:8px;margin-bottom:14px;font-size:12px;color:#92400E;line-height:1.4;">'
-      + '<strong><i data-lucide="info" class="lc" style="width:14px;height:14px;vertical-align:-2px;"></i> Module NDVI en cours de migration</strong><br>'
-      + 'Les <em>valeurs</em> NDVI ci-dessous sont simulees a des fins de demonstration. '
-      + 'La connexion Planet Insights (PlanetScope 3m) est deployee — le calcul des '
-      + 'valeurs NDVI reelles par parcelle arrive en phase 2 (Orders API bandmath).'
+      + '<strong><i data-lucide="info" class="lc" style="width:14px;height:14px;vertical-align:-2px;"></i> NDVI satellite reel disponible</strong><br>'
+      + 'Les valeurs affichees sont <em>simulees par defaut</em>. Sur chaque parcelle, cliquez '
+      + '<strong>Analyser au satellite (reel)</strong> pour calculer un NDVI <strong>Sentinel-2 reel</strong> '
+      + '(ESA/Copernicus, gratuit, ~10s). Necessite d\'etre connecte.'
       + '</div>';
 
     if (parcels.length === 0) {
@@ -189,7 +233,7 @@
     var totalNDVI = 0;
     var alertCount = 0;
     parcels.forEach(function(p) {
-      var latest = p.ndviHistory && p.ndviHistory.length > 0 ? p.ndviHistory[p.ndviHistory.length - 1].ndvi : 0;
+      var latest = p.realNDVI ? p.realNDVI.mean : (p.ndviHistory && p.ndviHistory.length > 0 ? p.ndviHistory[p.ndviHistory.length - 1].ndvi : 0);
       totalNDVI += latest;
       if (latest < THRESHOLDS.good) alertCount++;
     });
@@ -239,11 +283,16 @@
       + '<div class="card-title"><span class="icon"><i data-lucide="map" class="lc"></i></span> Mes parcelles</div>';
 
     parcels.forEach(function(p, idx) {
-      var latest = p.ndviHistory && p.ndviHistory.length > 0 ? p.ndviHistory[p.ndviHistory.length - 1] : { ndvi: 0, date: '' };
+      var real = p.realNDVI;
+      var hist = (real && p.realHistory && p.realHistory.length) ? p.realHistory : (p.ndviHistory || []);
+      var latest = real
+        ? { ndvi: Math.round((real.mean || 0) * 100) / 100, date: real.date }
+        : (p.ndviHistory && p.ndviHistory.length > 0 ? p.ndviHistory[p.ndviHistory.length - 1] : { ndvi: 0, date: '' });
       var status = getNDVIStatus(latest.ndvi);
-
-      // NDVI sparkline
-      var sparkline = renderSparkline(p.ndviHistory || [], 120, 30);
+      var sparkline = renderSparkline(hist, 120, 30);
+      var measureLine = real
+        ? '<i data-lucide="satellite" class="lc"></i> Sentinel-2 reel · ' + (real.date || '—') + ' · nuages ' + Math.round(real.cloud || 0) + '%'
+        : 'Derniere mesure : ' + latest.date + ' (demo)';
 
       html += '<div style="padding:12px;border-radius:10px;background:' + status.bg + ';margin-bottom:10px;cursor:pointer;" '
         + 'onclick="AgroPrix.ndvi.showDetail(' + idx + ')">'
@@ -258,9 +307,10 @@
         + '</div></div>'
         + '<div style="margin-top:8px;display:flex;align-items:center;gap:8px;">'
         + sparkline
-        + '<div style="font-size:10px;color:#999;">Derniere mesure : ' + latest.date + ' (demo)</div>'
+        + '<div style="font-size:10px;color:' + (real ? '#2D6A4F' : '#999') + ';font-weight:' + (real ? '600' : '400') + ';">' + measureLine + '</div>'
         + '</div>'
         + '<div style="font-size:11px;color:' + status.color + ';margin-top:6px;font-style:italic;"><i data-lucide="lightbulb" class="lc"></i> ' + status.advice + '</div>'
+        + '<button id="sat-btn-' + idx + '" onclick="event.stopPropagation();AgroPrix.ndvi.analyzeSatellite(' + idx + ')" style="margin-top:8px;width:100%;padding:8px;border:1px solid var(--primary);background:#fff;color:var(--primary);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;"><i data-lucide="satellite" class="lc"></i> ' + (real ? 'Reactualiser le satellite (reel)' : 'Analyser au satellite (reel)') + '</button>'
         + '</div>';
     });
 
@@ -597,7 +647,8 @@
     getGPS: getGPS,
     getParcels: getParcels,
     syncToBackend: syncToBackend,
-    loadBackendTimeseries: loadBackendTimeseries
+    loadBackendTimeseries: loadBackendTimeseries,
+    analyzeSatellite: analyzeSatellite
   };
 
 })(window.AgroPrix);
