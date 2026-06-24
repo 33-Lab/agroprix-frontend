@@ -533,6 +533,68 @@
     return JSON.stringify(data);
   }
 
+  // --- Traçabilité réelle : crée un lot tracé côté backend (/api/trace) et
+  //     pointe le QR vers la page publique /api/trace/{code}/view. Le code est
+  //     mis en cache localement pour ne pas recréer un lot à chaque ouverture. ---
+  function getTraceCode(itemId) {
+    try { return (JSON.parse(localStorage.getItem('agroprix_trace_codes') || '{}'))[itemId] || null; }
+    catch (e) { return null; }
+  }
+  function setTraceCode(itemId, code) {
+    try {
+      var m = JSON.parse(localStorage.getItem('agroprix_trace_codes') || '{}');
+      m[itemId] = code;
+      localStorage.setItem('agroprix_trace_codes', JSON.stringify(m));
+    } catch (e) {}
+  }
+  function createTraceForItem(item) {
+    var d = item.date ? String(item.date).split('T')[0] : null;
+    var actor = item.seller || item.buyer || '';
+    var payload = {
+      product: item.cropName || item.crop || 'Lot agricole',
+      quantity: item.quantity || null,
+      unit: item.unit || 'kg',
+      producer_name: actor || null,
+      origin_locality: item.market || null,
+      harvest_date: d,
+      steps: [{ label: 'Mise en marché', actor: actor, date: d || '', location: item.market || '' }]
+    };
+    return fetch((AP.API_BASE || '') + '/api/trace', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(8000)
+    }).then(function (r) {
+      if (r.status === 401 || r.status === 403) return { _unauth: true };
+      return r.ok ? r.json() : null;
+    }).catch(function () { return null; });
+  }
+  function paintTraceQR(code) {
+    var img = document.getElementById('traceQrImg');
+    var msg = document.getElementById('traceQrMsg');
+    var cap = document.getElementById('traceQrCaption');
+    var viewUrl = (AP.API_BASE || '') + '/api/trace/' + code + '/view';
+    if (img) { img.src = getQRUrl(viewUrl, 250); img.style.display = 'inline-block'; }
+    if (msg) msg.style.display = 'none';
+    if (cap) cap.innerHTML = 'Scannez pour ouvrir la page de tracabilite publique<br>Code : <b>' + code + '</b>';
+  }
+  function ensureRealTraceQR(item) {
+    var cached = getTraceCode(item.id);
+    if (cached) { paintTraceQR(cached); return; }
+    createTraceForItem(item).then(function (res) {
+      var msg = document.getElementById('traceQrMsg');
+      var cap = document.getElementById('traceQrCaption');
+      if (res && res._unauth) {
+        if (msg) msg.innerHTML = 'Connecte-toi pour generer<br>le certificat verifiable';
+        if (cap) cap.textContent = '';
+        return;
+      }
+      if (res && res.code) { setTraceCode(item.id, res.code); paintTraceQR(res.code); return; }
+      if (msg) msg.textContent = 'Certificat indisponible (hors ligne).';
+      if (cap) cap.textContent = '';
+    });
+  }
+
   function showQR(itemId) {
     var offers = getOffers();
     var demands = getDemands();
@@ -540,8 +602,6 @@
       || demands.find(function(d) { return d.id === itemId; });
     if (!item) return;
 
-    var traceData = buildTraceData(item);
-    var qrUrl = getQRUrl(traceData, 250);
     var isSell = item.type === 'sell';
     var container = document.getElementById('marketplaceContent');
 
@@ -549,10 +609,11 @@
 
     html += '<div class="card" style="padding:20px;text-align:center;margin-bottom:16px;">'
       + '<div style="font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Certificat de Tracabilite AgroPrix</div>'
-      + '<div style="border:3px solid var(--primary);border-radius:16px;padding:16px;display:inline-block;margin-bottom:12px;">'
-      + '<img src="' + qrUrl + '" alt="QR Tracabilite" style="width:100%;max-width:200px;height:auto;border-radius:8px;">'
+      + '<div style="border:3px solid var(--primary);border-radius:16px;padding:16px;display:inline-block;margin-bottom:12px;min-width:180px;">'
+      + '<img id="traceQrImg" src="" alt="QR Tracabilite" style="width:100%;max-width:200px;height:auto;border-radius:8px;display:none;">'
+      + '<div id="traceQrMsg" style="font-size:12px;color:#999;padding:24px 8px;">Generation du certificat verifiable...</div>'
       + '</div>'
-      + '<div style="font-size:11px;color:#999;margin-bottom:12px;">Scannez ce QR code pour verifier l\'origine du lot</div>'
+      + '<div id="traceQrCaption" style="font-size:11px;color:#999;margin-bottom:12px;">Enregistrement du lot trace...</div>'
       + '</div>';
 
     // Traceability details
@@ -639,6 +700,7 @@
 
     container.innerHTML = html;
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    ensureRealTraceQR(item);
   }
 
   function processPayment(itemId) {
