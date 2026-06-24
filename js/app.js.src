@@ -67,23 +67,44 @@
   var deferredPrompt = null;
 
   function setupInstallPrompt() {
+    var installBtn = document.getElementById('installBtn');
+
+    // Capture the install opportunity: store the event and reveal the button.
     window.addEventListener('beforeinstallprompt', function(e) {
       e.preventDefault();
       deferredPrompt = e;
-      // Show install button if exists
-      var installBtn = document.getElementById('installBtn');
-      if (installBtn) {
-        installBtn.style.display = 'flex';
-        installBtn.addEventListener('click', function() {
-          if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then(function(result) {
-              deferredPrompt = null;
-              installBtn.style.display = 'none';
-            });
-          }
-        });
-      }
+      if (installBtn) installBtn.style.display = 'flex';
+    });
+
+    // Bind the click handler ONCE. Previously it was re-attached inside the
+    // beforeinstallprompt listener, which can fire multiple times: duplicate
+    // click listeners stacked up, so a single tap called prompt() several
+    // times. The 2nd+ call rejects with NotAllowedError ("must be called with
+    // a user gesture") and the unhandled rejection surfaced in Sentry.
+    if (installBtn) {
+      installBtn.addEventListener('click', function() {
+        if (!deferredPrompt) return;
+        var promptEvent = deferredPrompt;
+        deferredPrompt = null;            // consume once: prevents double prompt()
+        installBtn.style.display = 'none';
+        try {
+          // prompt() returns a promise in modern Chrome; swallow any rejection
+          // so it never bubbles up to onunhandledrejection.
+          var res = promptEvent.prompt();
+          if (res && typeof res.then === 'function') res.catch(function() {});
+        } catch (err) {
+          // older implementations may throw synchronously — ignore
+        }
+        if (promptEvent.userChoice && typeof promptEvent.userChoice.then === 'function') {
+          promptEvent.userChoice.then(function() {}).catch(function() {});
+        }
+      });
+    }
+
+    // Once installed, drop the deferred prompt and hide the button.
+    window.addEventListener('appinstalled', function() {
+      deferredPrompt = null;
+      if (installBtn) installBtn.style.display = 'none';
     });
   }
 
