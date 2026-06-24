@@ -1,4 +1,4 @@
-/*! AgroPrix scoring.js - generated from scoring.js.src on 2026-04-18 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix scoring.js - generated from scoring.js.src on 2026-06-24 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){'use strict';var SCORE_HISTORY_KEY='agroprix_score_history';var PROFILE_KEY='agroprix_farmer_profile';var SEARCHES_KEY='agroprix_financing_searches';var USER_KEY='agroprix_user';var ANALYSES_KEY='agroprix_analyses_count';var DIMENSIONS=[{id:'profile',label:'Profil complet',icon:'<i data-lucide="user" class="lc"></i>',max:150,color:'#2D6A4F'},{id:'production',label:'Activite production',icon:'<i data-lucide="wheat" class="lc"></i>',max:200,color:'#40916C'},{id:'transactions',label:'Historique transactions',icon:'<i data-lucide="coins" class="lc"></i>',max:250,color:'#52B788'},{id:'stability',label:'Stabilite financiere',icon:'<i data-lucide="building-2" class="lc"></i>',max:150,color:'#E8862A'},{id:'usage',label:'Utilisation app',icon:'<i data-lucide="smartphone" class="lc"></i>',max:100,color:'#264653'},{id:'seniority',label:'Anciennete',icon:'<i data-lucide="calendar" class="lc"></i>',max:150,color:'#6C757D'}];var BADGES=[{min:800,label:'Excellent',emoji:'<i data-lucide="star" class="lc"></i>',color:'#2D6A4F',bg:'#D8F3DC'},{min:600,label:'Bon',emoji:'<i data-lucide="check-circle" class="lc"></i>',color:'#40916C',bg:'#E8F5E9'},{min:400,label:'Moyen',emoji:'◆',color:'#E8862A',bg:'#FFF8E1'},{min:200,label:'En construction',emoji:'◆',color:'#e76f51',bg:'#FFF3E0'},{min:0,label:'Nouveau',emoji:'○',color:'#999',bg:'#F5F5F5'}];function calculate(){var profile=getProfile();var user=getUser();var scores={};var profilePts=0;if(profile.country)profilePts+=15;if(profile.crops&&profile.crops.length>0)profilePts+=25;if(profile.farmSize&&profile.farmSize>0)profilePts+=20;if(profile.age)profilePts+=15;if(profile.gender)profilePts+=10;if(profile.experience!==null&&profile.experience!==undefined)profilePts+=20;if(profile.farmerType&&profile.farmerType!=='individual')profilePts+=15;if(user&&user.nom)profilePts+=10;if(user&&user.telephone)profilePts+=10;if(user&&user.email)profilePts+=10;scores.profile=Math.min(profilePts,150);var prodPts=0;if(profile.crops){prodPts+=Math.min(profile.crops.length*20,60);}
 if(profile.farmSize){if(profile.farmSize>=10)prodPts+=50;else if(profile.farmSize>=5)prodPts+=40;else if(profile.farmSize>=2)prodPts+=30;else if(profile.farmSize>=0.5)prodPts+=20;else prodPts+=10;}
 if(profile.experience){if(profile.experience>=10)prodPts+=50;else if(profile.experience>=5)prodPts+=40;else if(profile.experience>=3)prodPts+=30;else if(profile.experience>=1)prodPts+=20;else prodPts+=10;}
@@ -41,37 +41,49 @@ function renderWidget(){var result=calculate();var badge=getBadge(result.total);
 +'<div style="font-size:13px;font-weight:700;color:'+badge.color+';">'+badge.emoji+' Score Profil : '+badge.label+'</div>'
 +'<div style="font-size:11px;color:#666;">Cliquez pour voir le detail et ameliorer votre score →</div>'
 +'</div></div>';}
-function render(){var result=calculate();var badge=getBadge(result.total);var tips=getTips(result);var history=getScoreHistory();var html='<div style="text-align:center;margin-bottom:20px;">'
+var INSTITUTION_LABELS={bank:'Banque',mfi:'Microfinance',insurance:'Assurance',cooperative:'Coopérative',fund:'Fonds public'};var DIM_LABELS={profil_agricole:'Profil agricole (parcelles)',historique_prix:'Historique prix signalés',activite_plateforme:'Activité plateforme',stabilite_financiere:'Stabilité financière',historique_transactions:'Historique transactions',anciennete:'Ancienneté'};var DIM_ORDER=['profil_agricole','historique_prix','activite_plateforme','stabilite_financiere','historique_transactions','anciennete'];var _institutions=[];var _selectedSlug='';function _apiBase(){return AP.API_BASE||'';}
+function _fetchInstitutions(){return fetch(_apiBase()+'/api/scoring/institutions',{signal:AbortSignal.timeout(8000)}).then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});}
+function _fetchCompute(slug){var url=_apiBase()+'/api/scoring/compute'+(slug?('?institution_slug='+encodeURIComponent(slug)):'');return fetch(url,{credentials:'include',signal:AbortSignal.timeout(8000)}).then(function(r){if(r.status===401||r.status===403)return{_unauth:true};return r.ok?r.json():null;}).catch(function(){return null;});}
+function _header(){return'<div style="text-align:center;margin-bottom:18px;">'
 +'<h3 style="margin:0 0 4px;color:var(--primary);">Mon Score Profil Producteur</h3>'
-+'<p style="font-size:13px;color:var(--text-light);">Indicateur AgroPrix de completude et d\'activite. Facilite le filtrage des offres de financement proposees par nos partenaires.</p>'
-+'<p style="font-size:11px;color:var(--text-muted);font-style:italic;">Ce score n\'est pas un score de credit reglementaire. Les decisions de financement restent a la discretion de l\'institution partenaire.</p>'
-+'</div>';html+='<div style="text-align:center;margin-bottom:20px;">'
-+renderGauge(result.total,200)
-+'</div>';html+='<div class="card" style="padding:16px;margin-bottom:16px;">'
-+'<div class="card-title"><span class="icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Detail par dimension</div>';DIMENSIONS.forEach(function(d){var pts=result.dimensions[d.id]||0;var pct=Math.round((pts/d.max)*100);html+='<div style="margin-bottom:10px;">'
++'<p style="font-size:13px;color:var(--text-light);">Score calculé par le serveur AgroPrix, paramétré par institution partenaire.</p>'
++'<p style="font-size:11px;color:var(--text-muted);font-style:italic;">Indicateur de profilage — la décision de financement reste à la discrétion de l\'institution.</p>'
++'</div>';}
+function _instSelector(){var html='<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:16px;">';html+=_instBtn('','Générique');_institutions.forEach(function(i){html+=_instBtn(i.institution_slug,INSTITUTION_LABELS[i.institution_type]||i.institution_type||i.institution_slug);});return html+'</div>';}
+function _instBtn(slug,label){var on=(slug===_selectedSlug);return'<button onclick="scoringPickInstitution(\''+slug+'\')" style="padding:6px 12px;border-radius:20px;border:1.5px solid '
++(on?'#2D6A4F':'#ccc')+';background:'+(on?'#2D6A4F':'#fff')+';color:'+(on?'#fff':'#555')
++';font-size:12px;font-weight:600;cursor:pointer;">'+label+'</button>';}
+function _eligibility(score){var ok=!!score.eligible,color=ok?'#2D6A4F':'#e76f51';var maxLoan=score.max_loan_fcfa;var loan=(maxLoan&&maxLoan>0)?('<div style="font-size:12px;color:#555;margin-top:2px;">Prêt max indicatif : <b>'+maxLoan.toLocaleString('fr-FR')+' FCFA</b></div>'):'';return'<div class="card" style="padding:16px;margin-bottom:16px;border:1.5px solid '+color+'55;background:'+(ok?'#D8F3DC':'#FFF3E0')+';">'
++'<div style="font-size:15px;font-weight:800;color:'+color+';">'+(ok?'✓ Éligible':'✗ Non éligible')+(_selectedSlug?'':' · profil générique')+'</div>'
++'<div style="font-size:12px;color:#555;margin-top:3px;">Score <b>'+score.total_score+'/1000</b> · seuil requis '+score.min_total_score+'</div>'
++loan+'</div>';}
+function _dimensions(score){var dims=score.dimensions||{};var html='<div class="card" style="padding:16px;margin-bottom:16px;">'
++'<div class="card-title"><span class="icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Détail par dimension</div>';DIM_ORDER.forEach(function(k){var d=dims[k];if(!d)return;var pct=Math.round((d.raw/1000)*100);var pass=!!d.passes_min,col=pass?'#2D6A4F':'#e76f51';html+='<div style="margin-bottom:10px;">'
 +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">'
-+'<span style="font-size:12px;font-weight:600;">'+d.icon+' '+d.label+'</span>'
-+'<span style="font-size:12px;font-weight:700;color:'+d.color+';">'+pts+'/'+d.max+'</span>'
-+'</div>'
-+'<div style="height:8px;background:#e9ecef;border-radius:4px;overflow:hidden;">'
-+'<div style="height:100%;width:'+pct+'%;background:'+d.color+';border-radius:4px;transition:width 0.8s ease;"></div>'
-+'</div></div>';});html+='</div>';if(tips.length>0){html+='<div class="card" style="padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #f59e0b;">'
-+'<div class="card-title" style="color:#b45309;"><span class="icon"><i data-lucide="lightbulb" class="lc"></i></span> Comment ameliorer votre score</div>';tips.forEach(function(t){html+='<div style="display:flex;align-items:start;gap:8px;margin-bottom:8px;">'
-+'<span style="font-size:14px;">'+t.icon+'</span>'
-+'<div style="font-size:12px;color:#92400e;">'+t.text
-+' <span style="font-weight:700;color:#b45309;">(+'+t.pts+' pts)</span></div>'
-+'</div>';});html+='</div>';}
-if(history.length>=2){html+='<div class="card" style="padding:16px;margin-bottom:16px;">'
-+'<div class="card-title"><span class="icon"><i data-lucide="trending-up" class="lc"></i></span> Evolution du score</div>';var maxH=60;var barW=Math.max(4,Math.min(16,Math.floor(280/history.length)));var maxScore=1000;html+='<div style="display:flex;align-items:end;gap:2px;height:'+(maxH+20)+'px;overflow-x:auto;">';history.slice(-30).forEach(function(h){var barH=Math.max(2,Math.round((h.score/maxScore)*maxH));var b=getBadge(h.score);html+='<div style="display:flex;flex-direction:column;align-items:center;min-width:'+barW+'px;">'
-+'<div style="font-size:7px;color:#999;margin-bottom:2px;">'+h.score+'</div>'
-+'<div style="width:'+barW+'px;height:'+barH+'px;background:'+b.color+';border-radius:2px;"></div>'
-+'</div>';});html+='</div>';html+='<div style="font-size:10px;color:#999;margin-top:6px;">Derniers '+Math.min(30,history.length)+' jours</div>';html+='</div>';}
-html+='<div class="card" style="padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#D8F3DC,#B7E4C7);border:1px solid #2D6A4F33;">'
-+'<div class="card-title" style="color:#1B4332;"><span class="icon"><i data-lucide="landmark" class="lc"></i></span> Ce que voient les institutions</div>'
-+'<p style="font-size:12px;color:#2D6A4F;margin-bottom:8px;">Quand une banque ou un fonds consulte votre profil via l\'API AgroPrix, elle voit :</p>'
-+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';var previewItems=[{label:'Score global',value:result.total+'/1000'},{label:'Badge',value:badge.emoji+' '+badge.label},{label:'Cultures',value:(getProfile().crops||[]).length+' culture(s)'},{label:'Superficie',value:(getProfile().farmSize||'—')+' ha'},{label:'Experience',value:(getProfile().experience||'—')+' ans'},{label:'Transactions',value:getMarketplaceData().confirmedSales+' confirmees'}];previewItems.forEach(function(item){html+='<div style="background:linear-gradient(180deg,#fff,#FAFCFB);padding:8px;border-radius:8px;">'
-+'<div style="font-size:10px;color:#666;">'+item.label+'</div>'
-+'<div style="font-size:13px;font-weight:700;color:#1B4332;">'+item.value+'</div>'
-+'</div>';});html+='</div></div>';var container=document.getElementById('scoringContent');if(container)container.innerHTML=html;}
-function getScore(){var result=calculate();return result.total;}
++'<span style="font-size:12px;font-weight:600;">'+(DIM_LABELS[k]||k)+' <span style="color:#999;font-weight:400;">(poids '+Math.round((d.weight||0)*100)+'%)</span></span>'
++'<span style="font-size:12px;font-weight:700;color:'+col+';">'+d.raw+'/1000 '+(pass?'✓':'✗')+'</span></div>'
++'<div style="height:8px;background:#e9ecef;border-radius:4px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:4px;transition:width .8s ease;"></div></div>'
++'</div>';});return html+'</div>';}
+function _serverTips(score){var dims=score.dimensions||{},fails=[];DIM_ORDER.forEach(function(k){var d=dims[k];if(d&&!d.passes_min)fails.push(DIM_LABELS[k]||k);});if(!fails.length)return'';return'<div class="card" style="padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #f59e0b;">'
++'<div class="card-title" style="color:#b45309;"><span class="icon"><i data-lucide="lightbulb" class="lc"></i></span> Pour progresser</div>'
++'<div style="font-size:12px;color:#92400e;">Dimensions sous le seuil de cette institution : <b>'+fails.join(', ')+'</b>.<br>Enregistrez vos parcelles, publiez des ventes sur le Marché et connectez-vous régulièrement pour les renforcer.</div>'
++'</div>';}
+function _renderBackend(container,score){var html=_header()
++'<div style="text-align:center;margin-bottom:14px;">'+renderGauge(score.total_score,200)+'</div>'
++_instSelector()
++_eligibility(score)
++_dimensions(score)
++_serverTips(score)
++'<p style="font-size:11px;color:#999;text-align:center;">Score serveur · snapshot enregistré'+(score.computed_at?(' · '+String(score.computed_at).split('T')[0]):'')+'</p>';container.innerHTML=html;if(window.lucide){try{window.lucide.createIcons();}catch(e){}}}
+function _renderLocalFallback(container,banner){var result=calculate();var html=_header()
++'<div style="background:#fff3cd;color:#856404;border:1px solid #ffe69c;border-radius:8px;padding:8px 12px;font-size:12px;text-align:center;margin-bottom:16px;">'+banner+'</div>'
++'<div style="text-align:center;margin-bottom:16px;">'+renderGauge(result.total,200)+'</div>'
++'<div class="card" style="padding:16px;margin-bottom:16px;"><div class="card-title"><span class="icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Estimation locale (démo)</div>';DIMENSIONS.forEach(function(d){var pts=result.dimensions[d.id]||0,pct=Math.round((pts/d.max)*100);html+='<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;margin-bottom:3px;">'
++'<span style="font-size:12px;font-weight:600;">'+d.label+'</span>'
++'<span style="font-size:12px;font-weight:700;color:'+d.color+';">'+pts+'/'+d.max+'</span></div>'
++'<div style="height:8px;background:#e9ecef;border-radius:4px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:'+d.color+';border-radius:4px;"></div></div></div>';});html+='</div>';container.innerHTML=html;if(window.lucide){try{window.lucide.createIcons();}catch(e){}}}
+function render(){var container=document.getElementById('scoringContent');if(!container)return;container.innerHTML=_header()+'<div style="text-align:center;padding:30px;color:#999;font-size:13px;">Calcul de votre score serveur…</div>';_fetchInstitutions().then(function(instRes){_institutions=(instRes&&instRes.institutions)?instRes.institutions:[];return _fetchCompute(_selectedSlug);}).then(function(score){if(score&&score._unauth){_renderLocalFallback(container,'Connectez-vous pour obtenir votre score serveur officiel (estimation locale ci-dessous).');return;}
+if(!score||typeof score.total_score!=='number'){_renderLocalFallback(container,'Score serveur indisponible — estimation locale (démo).');return;}
+_renderBackend(container,score);}).catch(function(){_renderLocalFallback(container,'Score serveur indisponible — estimation locale (démo).');});}
+window.scoringPickInstitution=function(slug){_selectedSlug=slug||'';render();};function getScore(){var result=calculate();return result.total;}
 AP.scoring={calculate:calculate,render:render,renderWidget:renderWidget,renderGauge:renderGauge,getScore:getScore,getBadge:getBadge};})(window.AgroPrix);
