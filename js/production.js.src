@@ -724,6 +724,9 @@
     html += '<span>Coût total estimé : <b>' + coutTotal.toLocaleString('fr-FR') + ' FCFA</b></span>';
     html += '</div></div>';
 
+    // Météo & conseil saisonnier (rempli en asynchrone après injection)
+    html += '<div id="prodMeteoPanel" style="font-size:.85rem;color:#94a3b8;margin-bottom:1rem;">Chargement de la météo locale…</div>';
+
     // Costs table
     html += '<h4 style="margin:1.5rem 0 .8rem;">Détail des coûts de production</h4>';
     html += '<div style="overflow-x:auto;"><table class="data-table" style="width:100%;"><thead><tr><th>Poste</th><th style="text-align:right;">Coût/ha</th><th style="text-align:right;">Total (' + surface + ' ha)</th></tr></thead><tbody>';
@@ -758,6 +761,83 @@
     resultDiv.innerHTML = html;
     resultDiv.style.display = 'block';
     resultDiv.scrollIntoView({ behavior:'smooth', block:'start' });
+
+    // Conseil météo réel (Open-Meteo via backend) — ne bloque pas l'affichage
+    loadMeteoAdvice(data, getProdCountry(), 'prodMeteoPanel');
+  }
+
+  // =========================================================================
+  // Météo & conseil saisonnier — données réelles Open-Meteo (/api/weather/forecast)
+  // Croise les prévisions 7 jours avec la phase du calendrier cultural du mois.
+  // Règles transparentes sur données réelles (pas de "boîte noire").
+  // =========================================================================
+  var FR_MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+  function getProdCountry() {
+    try {
+      var u = (AP.auth && AP.auth.getUser) ? AP.auth.getUser() : null;
+      return (u && (u.country || u.pays)) || 'benin';
+    } catch (e) { return 'benin'; }
+  }
+
+  // Cherche la ligne du calendrier cultural correspondant au mois courant.
+  function currentPhase(data) {
+    if (!data || !data.calendrier) return null;
+    var moisBas = FR_MONTHS[new Date().getMonth()].toLowerCase();
+    for (var i = 0; i < data.calendrier.length; i++) {
+      var m = (data.calendrier[i].mois || '').toLowerCase();
+      if (m.indexOf(moisBas) !== -1) return data.calendrier[i];
+    }
+    return null;
+  }
+
+  function loadMeteoAdvice(data, country, panelId) {
+    var panel = document.getElementById(panelId);
+    if (!panel || !AP.api || !AP.api.fetchForecast) { if (panel) panel.style.display = 'none'; return; }
+    AP.api.fetchForecast(country).then(function(res) {
+      var days = (res && res.forecast) ? res.forecast : [];
+      if (!days.length) { panel.style.display = 'none'; return; }
+
+      var horizon = days.slice(0, 7), precip7 = 0, tmaxSum = 0;
+      for (var i = 0; i < horizon.length; i++) {
+        precip7 += (horizon[i].precipitation || 0);
+        tmaxSum += (horizon[i].temp_max || 0);
+      }
+      precip7 = Math.round(precip7);
+      var tmaxAvg = horizon.length ? (tmaxSum / horizon.length) : 0;
+
+      var verdict, color, conseil;
+      if (precip7 >= 30) {
+        verdict = 'pluies significatives'; color = '#2563eb';
+        conseil = 'Favorable au semis et à la croissance. Évitez les traitements phyto juste avant une pluie et surveillez le drainage.';
+      } else if (precip7 < 5) {
+        verdict = 'temps sec'; color = '#E8862A';
+        conseil = 'Risque de stress hydrique — prévoyez l\'irrigation et paillez si possible.';
+      } else {
+        verdict = 'pluies modérées'; color = '#52b788';
+        conseil = 'Conditions correctes. Surveillez l\'évolution avant les opérations sensibles (semis, récolte, séchage).';
+      }
+      var heatNote = (tmaxAvg > 35) ? ' Chaleur élevée prévue (>35°C) : arrosez tôt le matin ou en soirée.' : '';
+
+      var phase = currentPhase(data);
+      var phaseHtml = phase
+        ? '<div style="font-size:.85rem;color:#555;margin-top:.4rem;">Phase culturale ce mois-ci (' + FR_MONTHS[new Date().getMonth()] + ') : <b>' + phase.activite + '</b> — ' + phase.detail + '</div>'
+        : '';
+
+      var first = days[0];
+      var loc = res.location || country;
+      panel.innerHTML =
+        '<div style="border:1px solid #e2e8f0;border-left:4px solid ' + color + ';border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.5rem;background:#fff;">'
+        + '<div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem;">'
+        + '<b style="color:' + color + ';">Météo &amp; conseil saisonnier</b>'
+        + '<span style="font-size:.72rem;color:#94a3b8;">' + loc + ' · données Open-Meteo (temps réel)</span></div>'
+        + '<div style="font-size:.9rem;color:#333;margin-bottom:.3rem;">Aujourd\'hui : <b>' + Math.round(first.temp_max) + '°C</b> / ' + Math.round(first.temp_min) + '°C'
+        + ' · cumul pluie 7 j : <b>' + precip7 + ' mm</b> (' + verdict + ')</div>'
+        + '<div style="font-size:.88rem;color:#444;">' + conseil + heatNote + '</div>'
+        + phaseHtml
+        + '</div>';
+      panel.style.display = 'block';
+    }).catch(function() { if (panel) panel.style.display = 'none'; });
   }
 
   AP.production = { calculate: calculateProduction };
