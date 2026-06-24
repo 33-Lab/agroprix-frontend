@@ -1,4 +1,4 @@
-/*! AgroPrix marketplace.js - generated from marketplace.js.src on 2026-04-19 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix marketplace.js - generated from marketplace.js.src on 2026-06-24 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){'use strict';var currentTab='marche';var OFFERS_KEY='agroprix_marketplace_offers';var DEMANDS_KEY='agroprix_marketplace_demands';var API_BASE=(AP&&AP.API_BASE)?AP.API_BASE:'';function _authHeaders(){var h={'Content-Type':'application/json'};var legacy=localStorage.getItem('agroprix_token');if(legacy)h['Authorization']='Bearer '+legacy;return h;}
 function _fetchOpts(extra){var o=extra||{};o.credentials='include';return o;}
 function _fromBackend(row){return{id:row.id!=null?String(row.id):(Date.now().toString(36)),type:row.type,crop:row.crop,cropName:row.crop_name||row.crop,quantity:row.quantity,unit:row.unit||'tonnes',price:row.type==='buy'?undefined:row.price,maxPrice:row.type==='buy'?row.price:undefined,priceUnit:row.price_unit||'FCFA/kg',market:row.market||'',description:row.description||'',seller:row.type==='sell'?(row.seller||'Utilisateur'):undefined,buyer:row.type==='buy'?(row.seller||'Utilisateur'):undefined,phone:row.phone||'',country:row.country||'benin',date:row.created_at||new Date().toISOString(),status:row.status||'active'};}
@@ -87,12 +87,23 @@ function setTab(tabId){currentTab=tabId;render();window.scrollTo(0,0);}
 function init(){currentTab='marche';if(typeof syncFromBackend==='function'){syncFromBackend(render);}else{render();}}
 function getQRUrl(data,size){size=size||200;return'https://api.qrserver.com/v1/create-qr-code/?size='+size+'x'+size+'&data='+encodeURIComponent(data);}
 function buildTraceData(item){var data={id:item.id,platform:'AgroPrix',type:item.type==='sell'?'VENTE':'ACHAT',product:item.cropName||item.crop,quantity:item.quantity+' '+(item.unit||'kg'),price:item.type==='sell'?(item.price+' FCFA/kg'):(item.maxPrice+' '+item.priceUnit),seller:item.seller||item.buyer||'—',market:item.market||'—',date:item.date?item.date.split('T')[0]:'—',country:getUserCountry(),verified:item.verified?'OUI':'NON',url:'https://agroprix.app/trace/'+item.id};return JSON.stringify(data);}
-function showQR(itemId){var offers=getOffers();var demands=getDemands();var item=offers.find(function(o){return o.id===itemId;})||demands.find(function(d){return d.id===itemId;});if(!item)return;var traceData=buildTraceData(item);var qrUrl=getQRUrl(traceData,250);var isSell=item.type==='sell';var container=document.getElementById('marketplaceContent');var html='<button class="action-btn" onclick="AgroPrix.marketplace.init()" style="font-size:12px;margin-bottom:16px;">← Retour au marche</button>';html+='<div class="card" style="padding:20px;text-align:center;margin-bottom:16px;">'
+function getTraceCode(itemId){try{return(JSON.parse(localStorage.getItem('agroprix_trace_codes')||'{}'))[itemId]||null;}
+catch(e){return null;}}
+function setTraceCode(itemId,code){try{var m=JSON.parse(localStorage.getItem('agroprix_trace_codes')||'{}');m[itemId]=code;localStorage.setItem('agroprix_trace_codes',JSON.stringify(m));}catch(e){}}
+function createTraceForItem(item){var d=item.date?String(item.date).split('T')[0]:null;var actor=item.seller||item.buyer||'';var payload={product:item.cropName||item.crop||'Lot agricole',quantity:item.quantity||null,unit:item.unit||'kg',producer_name:actor||null,origin_locality:item.market||null,harvest_date:d,steps:[{label:'Mise en marché',actor:actor,date:d||'',location:item.market||''}]};return fetch((AP.API_BASE||'')+'/api/trace',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:AbortSignal.timeout(8000)}).then(function(r){if(r.status===401||r.status===403)return{_unauth:true};return r.ok?r.json():null;}).catch(function(){return null;});}
+function paintTraceQR(code){var img=document.getElementById('traceQrImg');var msg=document.getElementById('traceQrMsg');var cap=document.getElementById('traceQrCaption');var viewUrl=(AP.API_BASE||'')+'/api/trace/'+code+'/view';if(img){img.src=getQRUrl(viewUrl,250);img.style.display='inline-block';}
+if(msg)msg.style.display='none';if(cap)cap.innerHTML='Scannez pour ouvrir la page de tracabilite publique<br>Code : <b>'+code+'</b>';}
+function ensureRealTraceQR(item){var cached=getTraceCode(item.id);if(cached){paintTraceQR(cached);return;}
+createTraceForItem(item).then(function(res){var msg=document.getElementById('traceQrMsg');var cap=document.getElementById('traceQrCaption');if(res&&res._unauth){if(msg)msg.innerHTML='Connecte-toi pour generer<br>le certificat verifiable';if(cap)cap.textContent='';return;}
+if(res&&res.code){setTraceCode(item.id,res.code);paintTraceQR(res.code);return;}
+if(msg)msg.textContent='Certificat indisponible (hors ligne).';if(cap)cap.textContent='';});}
+function showQR(itemId){var offers=getOffers();var demands=getDemands();var item=offers.find(function(o){return o.id===itemId;})||demands.find(function(d){return d.id===itemId;});if(!item)return;var isSell=item.type==='sell';var container=document.getElementById('marketplaceContent');var html='<button class="action-btn" onclick="AgroPrix.marketplace.init()" style="font-size:12px;margin-bottom:16px;">← Retour au marche</button>';html+='<div class="card" style="padding:20px;text-align:center;margin-bottom:16px;">'
 +'<div style="font-size:11px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Certificat de Tracabilite AgroPrix</div>'
-+'<div style="border:3px solid var(--primary);border-radius:16px;padding:16px;display:inline-block;margin-bottom:12px;">'
-+'<img src="'+qrUrl+'" alt="QR Tracabilite" style="width:100%;max-width:200px;height:auto;border-radius:8px;">'
++'<div style="border:3px solid var(--primary);border-radius:16px;padding:16px;display:inline-block;margin-bottom:12px;min-width:180px;">'
++'<img id="traceQrImg" src="" alt="QR Tracabilite" style="width:100%;max-width:200px;height:auto;border-radius:8px;display:none;">'
++'<div id="traceQrMsg" style="font-size:12px;color:#999;padding:24px 8px;">Generation du certificat verifiable...</div>'
 +'</div>'
-+'<div style="font-size:11px;color:#999;margin-bottom:12px;">Scannez ce QR code pour verifier l\'origine du lot</div>'
++'<div id="traceQrCaption" style="font-size:11px;color:#999;margin-bottom:12px;">Enregistrement du lot trace...</div>'
 +'</div>';html+='<div class="card" style="padding:16px;margin-bottom:16px;">'
 +'<div class="card-title"><span class="icon"><i data-lucide="clipboard-list" class="lc"></i></span> Fiche de tracabilite</div>'
 +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';var fields=[{label:'ID Lot',value:item.id},{label:'Type',value:isSell?'<i data-lucide="package" class="lc"></i> Vente':'<i data-lucide="shopping-cart" class="lc"></i> Achat'},{label:'Produit',value:item.cropName||item.crop},{label:'Quantite',value:item.quantity+' '+(item.unit||'kg')},{label:'Prix',value:isSell?formatFCFA(item.price)+'/kg':item.maxPrice+' '+item.priceUnit},{label:'Lieu',value:item.market||'—'},{label:isSell?'Vendeur':'Acheteur',value:isSell?item.seller:item.buyer},{label:'Date',value:item.date?item.date.split('T')[0]:'—'},{label:'Pays',value:getUserCountry()},{label:'Verifie',value:item.verified?'<i data-lucide="check-circle" class="lc"></i> Oui':'<i data-lucide="hourglass" class="lc"></i> En attente'}];fields.forEach(function(f){html+='<div style="background:var(--bg);padding:8px 10px;border-radius:8px;">'
@@ -136,7 +147,7 @@ html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bo
 +'onclick="AgroPrix.marketplace.shareQR(\''+item.id+'\')"><i data-lucide="share-2" class="lc"></i> Partager</button>'
 +'<button style="padding:12px;background:linear-gradient(180deg,#fff,#FAFCFB);color:var(--primary);border:2px solid var(--primary);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;" '
 +'onclick="AgroPrix.marketplace.init()"><i data-lucide="store" class="lc"></i> Retour</button>'
-+'</div>';container.innerHTML=html;window.scrollTo({top:0,behavior:'smooth'});}
++'</div>';container.innerHTML=html;window.scrollTo({top:0,behavior:'smooth'});ensureRealTraceQR(item);}
 function processPayment(itemId){if(typeof window!=='undefined'&&window.alert){window.alert('Paiement marketplace bientot disponible.\n\n'
 +'Le paiement entre acteurs (acheteur/vendeur) passera par FedaPay dans '
 +'une prochaine mise a jour. Pour l\'instant, prenez contact directement '
