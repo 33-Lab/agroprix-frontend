@@ -670,8 +670,8 @@
     for (var s = 0; s < data.scenarios.length; s++) {
       var sc = data.scenarios[s];
       var rendAjuste = (sc.rendement * mult).toFixed(1);
-      var production = (rendAjuste * surface).toFixed(0);
-      var revenu = Math.round(production * sc.prix);
+      var productionKg = Math.round(rendAjuste * surface * 1000);
+      var revenu = Math.round(productionKg * sc.prix);
       var benefice = revenu - coutTotal;
       var roi = coutTotal > 0 ? ((benefice / coutTotal) * 100).toFixed(0) : '0';
       var benefColor = benefice >= 0 ? '#2D6A4F' : '#e76f51';
@@ -679,7 +679,7 @@
 
       scenarioCards += '<div style="background:linear-gradient(180deg,#fff,#FAFCFB);border-radius:12px;padding:1.2rem;border-left:4px solid ' + sc.couleur + ';box-shadow:0 2px 8px rgba(0,0,0,.06);">';
       scenarioCards += '<div style="font-weight:700;color:' + sc.couleur + ';margin-bottom:.5rem;font-size:1.1rem;">' + sc.label + '</div>';
-      scenarioCards += '<div style="font-size:.85rem;color:#666;margin-bottom:.3rem;">Rendement: <b>' + rendAjuste + ' t/ha</b> → <b>' + parseFloat(production).toLocaleString('fr-FR') + ' kg</b></div>';
+      scenarioCards += '<div style="font-size:.85rem;color:#666;margin-bottom:.3rem;">Rendement: <b>' + rendAjuste + ' t/ha</b> → <b>' + productionKg.toLocaleString('fr-FR') + ' kg</b></div>';
       scenarioCards += '<div style="font-size:.85rem;color:#666;margin-bottom:.3rem;">Prix estimé: <b>' + sc.prix.toLocaleString('fr-FR') + ' FCFA/kg</b></div>';
       scenarioCards += '<div style="font-size:.85rem;color:#666;margin-bottom:.3rem;">Revenu brut: <b>' + revenu.toLocaleString('fr-FR') + ' FCFA</b></div>';
       scenarioCards += '<div style="font-size:1rem;font-weight:700;color:' + benefColor + ';margin-top:.5rem;">' + benefSign + benefice.toLocaleString('fr-FR') + ' FCFA (ROI: ' + benefSign + roi + '%)</div>';

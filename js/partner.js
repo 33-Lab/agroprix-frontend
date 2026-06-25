@@ -1,4 +1,4 @@
-/*! AgroPrix partner.js - generated from partner.js.src on 2026-04-21 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix partner.js - generated from partner.js.src on 2026-06-25 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){'use strict';function fmtFCFA(n){if(n===null||n===undefined||isNaN(n))return'0 FCFA';return Math.round(n).toLocaleString('fr-FR').replace(/\u202f|\u00a0/g,' ')+' FCFA';}
 function h(tag,attrs,children){var el=document.createElement(tag);if(attrs){for(var k in attrs){if(k==='style')el.style.cssText=attrs[k];else if(k==='onclick')el.onclick=attrs[k];else el.setAttribute(k,attrs[k]);}}
 (children||[]).forEach(function(c){if(c==null)return;el.appendChild(typeof c==='string'?document.createTextNode(c):c);});return el;}

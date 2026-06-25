@@ -1,4 +1,4 @@
-/*! AgroPrix tomate.js - generated from tomate.js.src on 2026-05-12 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix tomate.js - generated from tomate.js.src on 2026-06-25 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 window.AgroPrix=window.AgroPrix||{};(function(AP){'use strict';var STORAGE_KEY='agroprix_tomate';var COLOR='#C0392B';var COLOR_LIGHT='#FDECEA';var COLOR_DARK='#922B21';var initialized=false;var tomatePrixChartInst=null;function loadData(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||defaultData();}
 catch(e){return defaultData();}}
 function saveData(d){localStorage.setItem(STORAGE_KEY,JSON.stringify(d));}

@@ -1,4 +1,4 @@
-/*! AgroPrix api.js - generated from api.js.src on 2026-05-12 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix api.js - generated from api.js.src on 2026-06-25 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){var API_TIMEOUT_MS=8000;var CACHE_PREFIX='ap_cache_';var CACHE_TTL_MS=6*60*60*1000;function fetchWithTimeout(url,opts,ms){opts=opts||{};ms=(typeof ms==='number'&&ms>0)?ms:API_TIMEOUT_MS;var controller=new AbortController();var timedOut=false;var timer=setTimeout(function(){timedOut=true;controller.abort();},ms);var fetchOpts={};for(var k in opts){if(Object.prototype.hasOwnProperty.call(opts,k))fetchOpts[k]=opts[k];}
 fetchOpts.signal=controller.signal;return fetch(url,fetchOpts).then(function(res){clearTimeout(timer);return res;}).catch(function(err){clearTimeout(timer);if(timedOut){var e=new Error('Timeout '+ms+'ms: '+url);e.name='TimeoutError';throw e;}
 throw err;});}
