@@ -166,7 +166,9 @@
       var qtyF = t.qty.toLocaleString('fr-FR');
       var paF  = t.prixAchat.toLocaleString('fr-FR');
       var isUserAdded = t.userAdded === true;
-      var dateCell = (isUserAdded ? '' : exempleBadge) + t.date;
+      // Lien de suppression pour les transactions backend de l'utilisateur (avec id).
+      var delLink = (isUserAdded && t.id) ? ' <a onclick="deleteNegoceTransaction(' + t.id + ')" style="color:#e76f51;cursor:pointer;font-size:12px;font-weight:700;" title="Supprimer">×</a>' : '';
+      var dateCell = (isUserAdded ? '' : exempleBadge) + t.date + delLink;
       if (t.status === 'en_stock') {
         rows += '<tr><td>' + dateCell + '</td><td>' + t.culture + '</td><td>' + t.marche + '</td>'
           + '<td>' + qtyF + ' kg</td><td>' + paF + ' FCFA/kg</td>'
@@ -459,9 +461,22 @@
     }
   }
 
-  AP.negoce = { init: init, addTransaction: addTransaction, saveTransaction: saveTransaction };
+  function deleteNegoceTransaction(id) {
+    if (!negoceLoggedIn()) return;
+    if (!window.confirm('Supprimer cette transaction ?')) return;
+    var base = (AP.API_BASE || '').replace(/\/$/, '');
+    fetch(base + '/api/negoce/transactions/' + id, { method: 'DELETE', credentials: 'include', signal: AbortSignal.timeout(8000) })
+      .then(function(r) {
+        if (r.ok || r.status === 404) { loadBackendTransactions().then(function() { init(); }); }
+        else { alert('Suppression impossible (' + r.status + ').'); }
+      })
+      .catch(function() { alert('Suppression impossible (réseau).'); });
+  }
+
+  AP.negoce = { init: init, addTransaction: addTransaction, saveTransaction: saveTransaction, deleteTransaction: deleteNegoceTransaction };
   window.addTransaction = addTransaction;
   window.saveTransaction = saveTransaction;
+  window.deleteNegoceTransaction = deleteNegoceTransaction;
   window.calculateTransport = calculateTransport;
 
 })(window.AgroPrix);

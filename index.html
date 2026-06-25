@@ -1184,6 +1184,18 @@
           Version 6.0.0 - Mars 2026
         </p>
       </div>
+
+      <!-- RGPD : portabilité (art. 20) + droit à l'oubli (art. 17) -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title"><span class="icon"><i data-lucide="shield" class="lc"></i></span> Mes donnees (RGPD)</div>
+        <p style="font-size:12px;color:var(--text-light);margin-bottom:12px;">Telechargez l'ensemble de vos donnees, ou supprimez definitivement votre compte.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-analyse" style="flex:1;min-width:160px;" onclick="exportMyData()"><i data-lucide="download" class="lc"></i> Exporter mes donnees</button>
+          <button style="flex:1;min-width:160px;padding:12px;border:1px solid #e76f51;background:#fff;color:#e76f51;border-radius:10px;font-weight:700;cursor:pointer;" onclick="deleteMyAccount()"><i data-lucide="trash-2" class="lc"></i> Supprimer mon compte</button>
+        </div>
+        <div id="rgpdMsg" style="font-size:12px;margin-top:8px;"></div>
+      </div>
+
       <button class="btn-analyse" style="max-width:320px;background:var(--alert);" onclick="logout()"><i data-lucide="log-out" class="lc"></i> Se deconnecter</button>
     </div>
 
@@ -1590,7 +1602,7 @@ document.addEventListener('click',function(e){var m=document.getElementById('mor
 <script src="/js/api.js"></script>
 <script src="/js/ui.js?v=7.5"></script>
 <script src="/js/analysis.js?v=7.2"></script>
-<script src="/js/negoce.js?v=7.3"></script>
+<script src="/js/negoce.js?v=7.6"></script>
 <script src="/js/production.js?v=7.0"></script>
 <script src="/js/export.js?v=6.11"></script>
 <script src="/js/cgu.js?v=6.11"></script>
@@ -1605,7 +1617,7 @@ document.addEventListener('click',function(e){var m=document.getElementById('mor
 <script src="/js/cacao.js?v=7.4"></script>
 <script src="/js/tomate.js?v=7.4"></script>
 <script src="/js/dashboard.js?v=6.11"></script>
-<script src="/js/auth.js?v=6.11"></script>
+<script src="/js/auth.js?v=7.6"></script>
 <script src="/js/app.js?v=6.12"></script>
 
 <!-- ═══ ERROR BOUNDARY + OFFLINE + MONITORING (Prompt Master) ═══ -->
