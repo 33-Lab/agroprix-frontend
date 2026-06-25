@@ -118,9 +118,10 @@
     if (viewId === 'ndvi') { if (AP.ndvi && AP.ndvi.init) AP.ndvi.init(); }
     // Modules cultures Pro — leur init peuple les sections de la vue. Sans cet
     // appel, les vues s'affichaient vides (init défini mais jamais invoqué).
-    // NB : hevea/plantain ont le même besoin MAIS leur renderDashboard plante
-    // tant que les prix live ne sont pas chargés (lecture de prixActuel.* sur un
-    // tableau vide) — à corriger avant d'activer leur init (suivi documenté).
+    // Les 4 modules ont un guard "prix en cours de chargement" qui évite le
+    // crash au 1er rendu (re-render auto après l'arrivée des prix live).
+    if (viewId === 'hevea' && AP.heveaInit) AP.heveaInit();
+    if (viewId === 'plantain' && AP.plantainInit) AP.plantainInit();
     if (viewId === 'cacao' && AP.cacaoInit) AP.cacaoInit();
     if (viewId === 'tomate' && AP.tomateInit) AP.tomateInit();
     if (viewId === 'params') {
