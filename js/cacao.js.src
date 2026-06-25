@@ -89,6 +89,10 @@ window.AgroPrix = window.AgroPrix || {};
   // l'ajouter, créer un endpoint backend qui scrape ICE/Bloomberg. Pour
   // l'instant : on retourne iceUsd: null et le code de rendu masquera le
   // dataset secondaire.
+  // Prix officiel GARANTI bord-champ fixé par le Conseil du Café-Cacao (CI).
+  // Régulé par campagne — c'est le prix de référence réel pour le producteur,
+  // distinct de la moyenne marché WFP. À actualiser à chaque campagne (source CCC).
+  var PRIX_OFFICIEL_CCC = { principale: 2800, intermediaire: 1200, campagne: '2025-2026' };
   var PRIX_CACAO = [];
   var PRIX_CACAO_LOADING = false;
   var PRIX_CACAO_ERROR = null;
@@ -392,16 +396,23 @@ window.AgroPrix = window.AgroPrix || {};
 
       '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;background:linear-gradient(135deg,' + COLOR_DARK + ',' + COLOR + ');color:#fff;">' +
         (prixActuel ?
-          '<div style="font-size:12px;opacity:0.8;margin-bottom:4px;">Prix cacao UEMOA fèves sèches — ' + prixActuel.mois + '</div>' +
+          '<div style="font-size:12px;opacity:0.8;margin-bottom:4px;">Prix marché fèves sèches (WFP) — ' + prixActuel.mois + '</div>' +
           '<div style="font-size:32px;font-weight:900;">' + prixActuel.prix.toLocaleString() + ' <span style="font-size:14px;font-weight:500;">FCFA/kg</span></div>' +
           '<div style="font-size:13px;margin-top:4px;">' +
             (prixPrec ? '<span style="color:' + (variation >= 0 ? '#FFE082' : '#FFCDD2') + ';font-weight:700;">' + arrow + ' ' + Math.abs(variation).toLocaleString() + ' FCFA</span> vs mois précédent' : 'Données WFP/HDX') +
-          '</div>' +
-          (prixActuel.iceUsd != null ? '<div style="font-size:11px;opacity:0.7;margin-top:6px;">ICE Futures : ~' + prixActuel.iceUsd.toLocaleString() + ' USD/tonne</div>' : '')
+          '</div>'
         :
-          '<div style="font-size:12px;opacity:0.8;margin-bottom:4px;">Prix cacao UEMOA fèves sèches</div>' +
+          '<div style="font-size:12px;opacity:0.8;margin-bottom:4px;">Prix marché fèves sèches (WFP)</div>' +
           '<div style="font-size:18px;font-weight:700;">Chargement des prix live…</div>'
         ) +
+      '</div>' +
+
+      // Prix officiel GARANTI (CCC Côte d'Ivoire) — référence réelle producteur,
+      // distincte de la moyenne marché WFP ci-dessus.
+      '<div class="card" style="padding:14px;border-radius:14px;margin-bottom:12px;border-left:4px solid #2D6A4F;background:#F0FFF4;">' +
+        '<div style="font-size:12px;font-weight:700;color:#1B4332;margin-bottom:4px;"><i data-lucide="landmark" class="lc"></i> Prix officiel garanti — bord champ (CCC Côte d\'Ivoire)</div>' +
+        '<div style="font-size:13px;color:#333;">Campagne ' + PRIX_OFFICIEL_CCC.campagne + ' : <b>' + PRIX_OFFICIEL_CCC.principale.toLocaleString() + ' FCFA/kg</b> (principale, oct.–mars) · <b>' + PRIX_OFFICIEL_CCC.intermediaire.toLocaleString() + ' FCFA/kg</b> (intermédiaire, avril–sept.)</div>' +
+        '<div style="font-size:10px;color:#888;margin-top:4px;">Source : Conseil du Café-Cacao. Le prix marché WFP peut différer du prix garanti au producteur.</div>' +
       '</div>' +
 
       '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;border-left:4px solid ' + COLOR + ';">' +
