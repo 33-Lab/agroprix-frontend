@@ -200,6 +200,7 @@ window.AgroPrix = window.AgroPrix || {};
 
     var el = document.getElementById('hevea-dashboard');
     if (!el) return;
+    if (!PRIX_APROMAC.length) { el.innerHTML = '<div style="padding:24px;text-align:center;color:#888;font-size:13px;">Chargement des prix APROMAC…</div>'; return; }
 
     var nbParcelles = data.parcelles.length;
     var totalSurface = data.parcelles.reduce(function(s, p) { return s + (p.surface || 0); }, 0);
@@ -386,6 +387,7 @@ window.AgroPrix = window.AgroPrix || {};
   function renderMarche(data) {
     var el = document.getElementById('hevea-marche');
     if (!el) return;
+    if (!PRIX_APROMAC.length) { el.innerHTML = '<div style="padding:24px;text-align:center;color:#888;font-size:13px;">Chargement des prix APROMAC…</div>'; return; }
 
     var prixActuel = PRIX_APROMAC[PRIX_APROMAC.length - 1];
     var prixPrec = PRIX_APROMAC[PRIX_APROMAC.length - 2];
@@ -868,6 +870,7 @@ window.AgroPrix = window.AgroPrix || {};
     }
     if (q.match(/prix|apromac|vendre|marche|cours/)) {
       var prixActuel = PRIX_APROMAC[PRIX_APROMAC.length - 1];
+      if (!prixActuel) return 'Les prix APROMAC ne sont pas encore chargés. Réessayez dans un instant.';
       return '<b>Prix APROMAC actuel :</b> ' + prixActuel.prix + ' FCFA/kg (' + prixActuel.mois + ')<br>' +
         'Si un acheteur vous propose moins de ' + Math.round(prixActuel.prix * 0.85) + ' FCFA/kg, c\'est en dessous de 85% du prix officiel — signalez-le.<br>' +
         'Utilisez le <b>Journal de pesee</b> dans l\'onglet Marche pour enregistrer chaque livraison et detecter les ecarts.';

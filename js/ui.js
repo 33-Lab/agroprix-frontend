@@ -18,7 +18,7 @@ if(viewId==='market'){if(AP.marketplace&&AP.marketplace.init)AP.marketplace.init
 if(viewId==='financing'){if(AP.financing&&AP.financing.init)AP.financing.init();}
 if(viewId==='scoring'){if(AP.scoring&&AP.scoring.render)AP.scoring.render();}
 if(viewId==='ndvi'){if(AP.ndvi&&AP.ndvi.init)AP.ndvi.init();}
-if(viewId==='cacao'&&AP.cacaoInit)AP.cacaoInit();if(viewId==='tomate'&&AP.tomateInit)AP.tomateInit();if(viewId==='params'){if(AP.status&&AP.status.renderDetail){AP.status.renderDetail(document.getElementById('statusWidget'));}}
+if(viewId==='hevea'&&AP.heveaInit)AP.heveaInit();if(viewId==='plantain'&&AP.plantainInit)AP.plantainInit();if(viewId==='cacao'&&AP.cacaoInit)AP.cacaoInit();if(viewId==='tomate'&&AP.tomateInit)AP.tomateInit();if(viewId==='params'){if(AP.status&&AP.status.renderDetail){AP.status.renderDetail(document.getElementById('statusWidget'));}}
 if(viewId==='partner'){if(AP.partner&&AP.partner.renderDashboard){AP.partner.renderDashboard(document.getElementById('partnerDashboard'));}}
 if(viewId==='production'){window.scrollTo({top:0,behavior:'smooth'});}
 closeMobileMenu();setTimeout(refreshIcons,100);}

@@ -207,6 +207,7 @@ window.AgroPrix = window.AgroPrix || {};
 
     var el = document.getElementById('plantain-dashboard');
     if (!el) return;
+    if (!PRIX_PLANTAIN.length) { el.innerHTML = '<div style="padding:24px;text-align:center;color:#888;font-size:13px;">Chargement des prix…</div>'; return; }
 
     var nbParcelles = data.parcelles.length;
     var totalSurface = data.parcelles.reduce(function(s, p) { return s + (p.surface || 0); }, 0);
@@ -398,6 +399,7 @@ window.AgroPrix = window.AgroPrix || {};
   function renderMarche(data) {
     var el = document.getElementById('plantain-marche');
     if (!el) return;
+    if (!PRIX_PLANTAIN.length) { el.innerHTML = '<div style="padding:24px;text-align:center;color:#888;font-size:13px;">Chargement des prix…</div>'; return; }
 
     var prixActuel = PRIX_PLANTAIN[PRIX_PLANTAIN.length - 1];
     var prixPrec = PRIX_PLANTAIN[PRIX_PLANTAIN.length - 2];
@@ -918,6 +920,7 @@ window.AgroPrix = window.AgroPrix || {};
     }
     if (q.match(/prix|vendre|march|saison|quand/)) {
       var prixActuel = PRIX_PLANTAIN[PRIX_PLANTAIN.length - 1];
+      if (!prixActuel) return 'Les prix ne sont pas encore chargés. Réessayez dans un instant.';
       return '<b>Prix actuel :</b> ' + prixActuel.bordChamp + ' FCFA/kg bord champ, ' + prixActuel.detail + ' FCFA/kg detail (' + prixActuel.mois + ')<br>' +
         '<b>Saisonnalite :</b><br>' +
         '- <b>Haute saison</b> (jan-fev, oct-dec) : 150-200 FCFA/kg bord champ<br>' +
