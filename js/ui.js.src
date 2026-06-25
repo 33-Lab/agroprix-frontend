@@ -31,7 +31,7 @@
     // Pro (2)
     'financing': 2, 'gpsFinancement': 2,
     'scoring': 2, 'ndvi': 2,
-    'hevea': 2, 'plantain': 2,
+    'hevea': 2, 'plantain': 2, 'cacao': 2, 'tomate': 2,
     // Expert (3)
     'export': 3, 'conformite': 3
   };
@@ -116,6 +116,13 @@
     if (viewId === 'financing') { if (AP.financing && AP.financing.init) AP.financing.init(); }
     if (viewId === 'scoring') { if (AP.scoring && AP.scoring.render) AP.scoring.render(); }
     if (viewId === 'ndvi') { if (AP.ndvi && AP.ndvi.init) AP.ndvi.init(); }
+    // Modules cultures Pro — leur init peuple les sections de la vue. Sans cet
+    // appel, les vues s'affichaient vides (init défini mais jamais invoqué).
+    // NB : hevea/plantain ont le même besoin MAIS leur renderDashboard plante
+    // tant que les prix live ne sont pas chargés (lecture de prixActuel.* sur un
+    // tableau vide) — à corriger avant d'activer leur init (suivi documenté).
+    if (viewId === 'cacao' && AP.cacaoInit) AP.cacaoInit();
+    if (viewId === 'tomate' && AP.tomateInit) AP.tomateInit();
     if (viewId === 'params') {
       if (AP.status && AP.status.renderDetail) {
         AP.status.renderDetail(document.getElementById('statusWidget'));

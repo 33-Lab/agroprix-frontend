@@ -300,6 +300,7 @@ window.AgroPrix = window.AgroPrix || {};
     renderTabs();
     // Refactor 12/05 : charger les prix live en arrière-plan (plus de hardcoded)
     loadPrixTomateLive().then(function() {
+      renderDashboard(loadData());   // re-render : la carte prix se remplit
       if (typeof renderTomatePrixChart === 'function') renderTomatePrixChart();
     });
   };
@@ -409,11 +410,12 @@ window.AgroPrix = window.AgroPrix || {};
 
     var nbParcelles  = data.parcelles.length;
     var totalSurface = data.parcelles.reduce(function(s, p) { return s + (p.surface || 0); }, 0);
-    var prixActuel   = PRIX_TOMATE[PRIX_TOMATE.length - 1];
+    // Prix live (async) : peut être indisponible au 1er rendu.
+    var prixActuel   = PRIX_TOMATE.length > 0 ? PRIX_TOMATE[PRIX_TOMATE.length - 1] : null;
     var saisonInfo   = getSaisonPrix();
 
     var alertes = [];
-    if (alertePrixRentabilite()) {
+    if (prixActuel && alertePrixRentabilite()) {
       alertes.push({
         type: 'danger',
         text: 'Alerte rentabilité — Prix marché actuel (' + prixActuel.prix + ' FCFA/kg) inférieur au seuil de rentabilité estimé (' + SEUIL_RENTABILITE + ' FCFA/kg). Privilégiez la transformation ou le stockage.'
@@ -439,16 +441,20 @@ window.AgroPrix = window.AgroPrix || {};
       // Saisonnalité prix (mini graphique)
       '<div class="card" style="padding:14px;border-radius:14px;margin-bottom:12px;border-left:4px solid ' + saisonInfo.color + ';background:' + (saisonInfo.niveau === 'haut' ? '#F0FFF4' : saisonInfo.niveau === 'bas' ? '#FFF5F5' : '#FFFBF0') + ';">' +
         '<div style="font-size:13px;font-weight:700;color:' + saisonInfo.color + ';margin-bottom:2px;">' + saisonInfo.label + '</div>' +
-        '<div style="font-size:24px;font-weight:900;color:' + COLOR_DARK + ';margin-bottom:4px;">' + prixActuel.prix + ' <span style="font-size:13px;font-weight:500;">FCFA/kg</span></div>' +
-        '<div style="font-size:12px;color:#555;">' + saisonInfo.conseil + '</div>' +
-        '<div style="margin-top:8px;display:flex;align-items:flex-end;height:40px;gap:2px;">' +
-          PRIX_TOMATE.slice(-12).map(function(p) {
-            var minP = 100, maxP = 1500;
-            var h = Math.max(4, ((p.prix - minP) / (maxP - minP)) * 36);
-            var isLast = (p === prixActuel);
-            return '<div style="flex:1;height:' + h + 'px;background:' + (isLast ? COLOR : COLOR_LIGHT) + ';border-radius:2px 2px 0 0;" title="' + p.mois + ': ' + p.prix + ' FCFA/kg"></div>';
-          }).join('') +
-        '</div>' +
+        (prixActuel ?
+          '<div style="font-size:24px;font-weight:900;color:' + COLOR_DARK + ';margin-bottom:4px;">' + prixActuel.prix + ' <span style="font-size:13px;font-weight:500;">FCFA/kg</span></div>' +
+          '<div style="font-size:12px;color:#555;">' + saisonInfo.conseil + '</div>' +
+          '<div style="margin-top:8px;display:flex;align-items:flex-end;height:40px;gap:2px;">' +
+            PRIX_TOMATE.slice(-12).map(function(p) {
+              var minP = 100, maxP = 1500;
+              var h = Math.max(4, ((p.prix - minP) / (maxP - minP)) * 36);
+              var isLast = (p === prixActuel);
+              return '<div style="flex:1;height:' + h + 'px;background:' + (isLast ? COLOR : COLOR_LIGHT) + ';border-radius:2px 2px 0 0;" title="' + p.mois + ': ' + p.prix + ' FCFA/kg"></div>';
+            }).join('') +
+          '</div>'
+          :
+          '<div style="font-size:16px;font-weight:700;color:' + COLOR_DARK + ';">Chargement des prix live…</div>'
+        ) +
         '<div style="font-size:9px;color:#999;margin-top:2px;text-align:right;">12 derniers mois</div>' +
       '</div>' +
 

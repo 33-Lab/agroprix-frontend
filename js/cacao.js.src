@@ -244,6 +244,7 @@ window.AgroPrix = window.AgroPrix || {};
     // Charger les prix live en arrière-plan (refactor 12/05 : plus de hardcoded).
     // Quand les données arrivent, re-render le chart pour qu'il s'affiche.
     loadPrixCacaoLive().then(function() {
+      renderDashboard(loadData());   // re-render : la carte prix se remplit
       if (typeof renderCacaoPrixChart === 'function') renderCacaoPrixChart();
     });
   };
@@ -357,9 +358,10 @@ window.AgroPrix = window.AgroPrix || {};
 
     var nbParcelles  = data.parcelles.length;
     var totalSurface = data.parcelles.reduce(function(s, p) { return s + (p.surface || 0); }, 0);
-    var prixActuel   = PRIX_CACAO[PRIX_CACAO.length - 1];
-    var prixPrec     = PRIX_CACAO[PRIX_CACAO.length - 2];
-    var variation    = prixActuel.prix - prixPrec.prix;
+    // Prix live (chargés en async) : peuvent être indisponibles au 1er rendu.
+    var prixActuel   = PRIX_CACAO.length > 0 ? PRIX_CACAO[PRIX_CACAO.length - 1] : null;
+    var prixPrec     = PRIX_CACAO.length > 1 ? PRIX_CACAO[PRIX_CACAO.length - 2] : null;
+    var variation    = (prixActuel && prixPrec) ? prixActuel.prix - prixPrec.prix : 0;
     var arrow        = variation >= 0 ? '▲' : '▼';
     var phaseActuelle = getPhaseActuelle();
 
@@ -389,12 +391,17 @@ window.AgroPrix = window.AgroPrix || {};
         }).join('') + '</div>' : '') +
 
       '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;background:linear-gradient(135deg,' + COLOR_DARK + ',' + COLOR + ');color:#fff;">' +
-        '<div style="font-size:12px;opacity:0.8;margin-bottom:4px;">Prix cacao UEMOA fèves sèches — ' + prixActuel.mois + '</div>' +
-        '<div style="font-size:32px;font-weight:900;">' + prixActuel.prix.toLocaleString() + ' <span style="font-size:14px;font-weight:500;">FCFA/kg</span></div>' +
-        '<div style="font-size:13px;margin-top:4px;">' +
-          '<span style="color:' + (variation >= 0 ? '#FFE082' : '#FFCDD2') + ';font-weight:700;">' + arrow + ' ' + Math.abs(variation).toLocaleString() + ' FCFA</span> vs mois précédent' +
-        '</div>' +
-        '<div style="font-size:11px;opacity:0.7;margin-top:6px;">ICE Futures : ~' + prixActuel.iceUsd.toLocaleString() + ' USD/tonne · KOR 38-42% (Forastero CI)</div>' +
+        (prixActuel ?
+          '<div style="font-size:12px;opacity:0.8;margin-bottom:4px;">Prix cacao UEMOA fèves sèches — ' + prixActuel.mois + '</div>' +
+          '<div style="font-size:32px;font-weight:900;">' + prixActuel.prix.toLocaleString() + ' <span style="font-size:14px;font-weight:500;">FCFA/kg</span></div>' +
+          '<div style="font-size:13px;margin-top:4px;">' +
+            (prixPrec ? '<span style="color:' + (variation >= 0 ? '#FFE082' : '#FFCDD2') + ';font-weight:700;">' + arrow + ' ' + Math.abs(variation).toLocaleString() + ' FCFA</span> vs mois précédent' : 'Données WFP/HDX') +
+          '</div>' +
+          (prixActuel.iceUsd != null ? '<div style="font-size:11px;opacity:0.7;margin-top:6px;">ICE Futures : ~' + prixActuel.iceUsd.toLocaleString() + ' USD/tonne</div>' : '')
+        :
+          '<div style="font-size:12px;opacity:0.8;margin-bottom:4px;">Prix cacao UEMOA fèves sèches</div>' +
+          '<div style="font-size:18px;font-weight:700;">Chargement des prix live…</div>'
+        ) +
       '</div>' +
 
       '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;border-left:4px solid ' + COLOR + ';">' +
