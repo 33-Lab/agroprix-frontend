@@ -238,6 +238,8 @@
     <div class="nav-section-label">FILIERES <span class="pro-badge">PRO</span></div>
     <a id="navHevea" onclick="showView('hevea', this)"><span class="nav-icon"><i data-lucide="tree-pine" class="lc"></i></span> Hevea Pro</a>
     <a id="navPlantain" onclick="showView('plantain', this)"><span class="nav-icon"><i data-lucide="banana" class="lc"></i></span> Plantain Pro</a>
+    <a id="navCacao" onclick="showView('cacao', this)"><span class="nav-icon"><i data-lucide="bean" class="lc"></i></span> Cacao Pro</a>
+    <a id="navTomate" onclick="showView('tomate', this)"><span class="nav-icon"><i data-lucide="cherry" class="lc"></i></span> Tomate Pro</a>
 
     <!-- MARKET -->
     <div class="nav-section-label">MARKET</div>
@@ -1324,6 +1326,86 @@
       </div>
     </div>
 
+  <!-- ═══ VIEW: CACAO PRO ═══ -->
+    <div class="view-container" id="viewCacao" style="display:none;">
+      <div class="page-content">
+        <div class="card" style="padding:20px;margin-bottom:16px;background:linear-gradient(135deg,#4E342E,#5D2E8C);color:#fff;border-radius:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <h2 style="font-size:20px;font-weight:800;margin-bottom:4px;">Cacao Pro</h2>
+              <p style="font-size:12px;opacity:0.8;">Votre cacaoyere intelligente — prix live, journal, EUDR</p>
+            </div>
+            <div style="background:rgba(255,255,255,0.15);padding:6px 12px;border-radius:20px;font-size:10px;font-weight:700;">EUDR 2026</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:4px;margin-bottom:16px;background:#f0f0f0;border-radius:12px;padding:4px;">
+          <button class="cacao-tab active" data-tab="dashboard" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;background:#fff;color:#5D2E8C;">Dashboard</button>
+          <button class="cacao-tab" data-tab="journal" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#666;">Journal</button>
+          <button class="cacao-tab" data-tab="marche" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#666;">Marche</button>
+          <button class="cacao-tab" data-tab="dossier" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#666;">Mon Dossier</button>
+        </div>
+        <div id="cacao-dashboard" class="cacao-section" style="display:block;"></div>
+        <div id="cacao-journal" class="cacao-section" style="display:none;"></div>
+        <div id="cacao-marche" class="cacao-section" style="display:none;"></div>
+        <div id="cacao-dossier" class="cacao-section" style="display:none;"></div>
+      </div>
+      <button onclick="AgroPrix.cacaoToggleIA()" style="position:fixed;bottom:80px;right:16px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#4E342E,#5D2E8C);color:#fff;border:none;box-shadow:0 4px 16px rgba(93,46,140,0.4);font-size:22px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;"><i data-lucide="message-circle" class="lc"></i></button>
+      <div id="cacao-ia-panel" style="display:none;position:fixed;bottom:145px;right:16px;left:16px;max-width:400px;margin-left:auto;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);z-index:151;flex-direction:column;max-height:55vh;overflow:hidden;">
+        <div style="padding:14px 16px;background:linear-gradient(135deg,#4E342E,#5D2E8C);color:#fff;border-radius:16px 16px 0 0;">
+          <div style="font-size:14px;font-weight:700;">Assistant Agronomique Cacao</div>
+          <div style="font-size:10px;opacity:0.8;">Diagnostic photo (PlantNet) + conseils (rules-based / IA)</div>
+        </div>
+        <div id="cacao-ia-output" style="padding:12px 16px;overflow-y:auto;flex:1;max-height:200px;">
+          <div style="font-size:12px;color:#666;">Posez une question, ou diagnostiquez une maladie a partir d'une photo de cabosse/feuille.</div>
+        </div>
+        <div style="padding:10px 12px;border-top:1px solid #f0f0f0;display:flex;gap:8px;align-items:center;">
+          <button onclick="AgroPrix.cacaoDiagPhoto()" title="Diagnostic photo" style="flex:0 0 auto;padding:10px;background:#5D2E8C;color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;"><i data-lucide="camera" class="lc"></i></button>
+          <input type="text" id="cacao-ia-input" placeholder="Ex: Pourriture brune ?" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:13px;font-family:inherit;" onkeypress="if(event.key==='Enter')AgroPrix.cacaoAskIA()">
+          <button onclick="AgroPrix.cacaoAskIA()" style="flex:0 0 auto;padding:10px 14px;background:#5D2E8C;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Envoyer</button>
+        </div>
+      </div>
+    </div>
+
+  <!-- ═══ VIEW: TOMATE PRO ═══ -->
+    <div class="view-container" id="viewTomate" style="display:none;">
+      <div class="page-content">
+        <div class="card" style="padding:20px;margin-bottom:16px;background:linear-gradient(135deg,#C0392B,#E8862A);color:#fff;border-radius:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <h2 style="font-size:20px;font-weight:800;margin-bottom:4px;">Tomate Pro</h2>
+              <p style="font-size:12px;opacity:0.8;">Votre production maraichere — prix live, journal, conseils</p>
+            </div>
+            <div style="background:rgba(255,255,255,0.15);padding:6px 12px;border-radius:20px;font-size:10px;font-weight:700;">MARAICHAGE</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:4px;margin-bottom:16px;background:#f0f0f0;border-radius:12px;padding:4px;">
+          <button class="tomate-tab active" data-tab="dashboard" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;background:#fff;color:#C0392B;">Dashboard</button>
+          <button class="tomate-tab" data-tab="journal" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#666;">Journal</button>
+          <button class="tomate-tab" data-tab="marche" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#666;">Marche</button>
+          <button class="tomate-tab" data-tab="dossier" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;background:transparent;color:#666;">Mon Dossier</button>
+        </div>
+        <div id="tomate-dashboard" class="tomate-section" style="display:block;"></div>
+        <div id="tomate-journal" class="tomate-section" style="display:none;"></div>
+        <div id="tomate-marche" class="tomate-section" style="display:none;"></div>
+        <div id="tomate-dossier" class="tomate-section" style="display:none;"></div>
+      </div>
+      <button onclick="AgroPrix.tomateToggleIA()" style="position:fixed;bottom:80px;right:16px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#C0392B,#E8862A);color:#fff;border:none;box-shadow:0 4px 16px rgba(192,57,43,0.4);font-size:22px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;"><i data-lucide="message-circle" class="lc"></i></button>
+      <div id="tomate-ia-panel" style="display:none;position:fixed;bottom:145px;right:16px;left:16px;max-width:400px;margin-left:auto;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);z-index:151;flex-direction:column;max-height:55vh;overflow:hidden;">
+        <div style="padding:14px 16px;background:linear-gradient(135deg,#C0392B,#E8862A);color:#fff;border-radius:16px 16px 0 0;">
+          <div style="font-size:14px;font-weight:700;">Assistant Agronomique Tomate</div>
+          <div style="font-size:10px;opacity:0.8;">Diagnostic photo (PlantNet) + conseils (rules-based / IA)</div>
+        </div>
+        <div id="tomate-ia-output" style="padding:12px 16px;overflow-y:auto;flex:1;max-height:200px;">
+          <div style="font-size:12px;color:#666;">Posez une question, ou diagnostiquez une maladie a partir d'une photo de feuille/fruit.</div>
+        </div>
+        <div style="padding:10px 12px;border-top:1px solid #f0f0f0;display:flex;gap:8px;align-items:center;">
+          <button onclick="AgroPrix.tomateDiagPhoto()" title="Diagnostic photo" style="flex:0 0 auto;padding:10px;background:#C0392B;color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;"><i data-lucide="camera" class="lc"></i></button>
+          <input type="text" id="tomate-ia-input" placeholder="Ex: Mildiou ?" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:13px;font-family:inherit;" onkeypress="if(event.key==='Enter')AgroPrix.tomateAskIA()">
+          <button onclick="AgroPrix.tomateAskIA()" style="flex:0 0 auto;padding:10px 14px;background:#C0392B;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Envoyer</button>
+        </div>
+      </div>
+    </div>
+
   <!-- ═══ VIEW: PLUS (Hub navigation mobile) ═══ -->
     <div class="view-container" id="viewPlus" style="display:none;">
       <div class="page-content">
@@ -1454,7 +1536,7 @@ document.addEventListener('click',function(e){var m=document.getElementById('mor
 <script src="/js/data.js?v=6.6"></script>
 <script src="/js/data-sources.js?v=1.0"></script>
 <script src="/js/api.js"></script>
-<script src="/js/ui.js?v=6.12"></script>
+<script src="/js/ui.js?v=7.4"></script>
 <script src="/js/analysis.js?v=7.2"></script>
 <script src="/js/negoce.js?v=7.3"></script>
 <script src="/js/production.js?v=7.0"></script>
@@ -1468,6 +1550,8 @@ document.addEventListener('click',function(e){var m=document.getElementById('mor
 <script src="/js/carte.js?v=7.0"></script>
 <script src="/js/hevea.js?v=7.1"></script>
 <script src="/js/plantain.js?v=7.1"></script>
+<script src="/js/cacao.js?v=7.4"></script>
+<script src="/js/tomate.js?v=7.4"></script>
 <script src="/js/dashboard.js?v=6.11"></script>
 <script src="/js/auth.js?v=6.11"></script>
 <script src="/js/app.js?v=6.12"></script>
