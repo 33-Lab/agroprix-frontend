@@ -32,6 +32,7 @@ async function asAdmin(page) {
 test.describe('Modules Pro — rendu sans crash', () => {
   for (const m of PRO) {
     test(`${m.label} : la vue se rend et le dashboard se remplit`, async ({ page }) => {
+      test.slow(); // page load + init + fetch prix live : marge sur réseau prod lent
       const errors: string[] = [];
       page.on('pageerror', (err) => errors.push(String(err)));
 
