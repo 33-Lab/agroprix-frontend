@@ -199,7 +199,8 @@ window.AgroPrix = window.AgroPrix || {};
     buildMapAPI(country, marketsData, culture);
     buildRegionalChartAPI(compareData, culture);
     buildFactors(culture, cName, momChange);
-    buildNews(cultureName, cName, currentPrice, momChange);
+    buildNews(cultureName, cName, currentPrice, momChange, yoyChange, vol,
+      monthlyData[monthlyData.length - 1].month, monthlyData[monthlyData.length - 1].num_markets, true);
     buildRecommendationsAPI(country, culture, cultureName, cName, currentPrice, momChange, yoyChange, vol, forecast, AP.getBestSellMonth(data), data);
   }
 
@@ -263,7 +264,7 @@ window.AgroPrix = window.AgroPrix || {};
     buildMap(country, culture, currentPrice);
     buildFactors(culture, cName, momChange);
     buildRegionalChart(culture, period);
-    buildNews(cultureName, cName, currentPrice, momChange);
+    buildNews(cultureName, cName, currentPrice, momChange, yoyChange, vol, null, null, false);
     buildRecommendations(cultureName, cName, currentPrice, momChange, yoyChange, vol, forecast, AP.getBestSellMonth(allData), data);
   }
 
@@ -751,88 +752,57 @@ window.AgroPrix = window.AgroPrix || {};
     var isMaraicher = ['tomate', 'piment', 'oignon', 'gombo'].indexOf(culture) > -1;
     var mom = parseFloat(momChange);
 
+    // Facteurs d'influence G\u00c9N\u00c9RAUX (m\u00e9canismes structurels du march\u00e9), pas des
+    // mesures temps r\u00e9el. On a retir\u00e9 les chiffres/sources fabriqu\u00e9s (faux "-23%
+    // pluviom\u00e9trie NOAA", "stocks ONASA 12 400t", "Naira -8%", "Impact +X%") qui
+    // \u00e9taient un overclaim. Chaque carte explique POURQUOI le facteur compte ;
+    // le seul signal chiffr\u00e9 r\u00e9el affich\u00e9 est la variation de prix observ\u00e9e (mom).
+    var seasonCereal = 'Les prix suivent le calendrier cultural : tension en p\u00e9riode de soudure (avant r\u00e9colte), d\u00e9tente apr\u00e8s les r\u00e9coltes.';
+    var seasonMaraicher = 'Cultures mara\u00eech\u00e8res tr\u00e8s saisonni\u00e8res : l\'offre et les prix varient fortement entre saison s\u00e8che et saison des pluies.';
+    var seasonOther = 'Cycle saisonnier marqu\u00e9 : les prix suivent le calendrier cultural r\u00e9gional.';
+
     var factors = [
-      {
-        icon: '\ud83c\udf27\ufe0f', title: 'M\u00c9T\u00c9O & CLIMAT',
-        desc: 'Pluviom\u00e9trie cumul\u00e9e -23% vs normale dans la zone sah\u00e9lienne. Pr\u00e9visions NOAA : d\u00e9ficit probable avril-mai. Risque de semis tardifs et stress hydrique sur les cultures.',
-        impact: 'Impact : +8-15%',
-        severity: mom > 5 ? 'high' : 'medium',
-        impactClass: mom > 5 ? 'high' : 'medium'
-      },
-      {
-        icon: '\ud83d\udec3', title: 'FRONTI\u00c8RES & LOGISTIQUE',
-        desc: 'Temps de travers\u00e9e Cotonou-Niamey : 5,2 jours (+18%). Co\u00fbt fret routier en hausse de 12% sur le corridor. Files d\'attente aux postes-fronti\u00e8re.',
-        impact: 'Impact : +4-8%',
-        severity: 'medium',
-        impactClass: 'medium'
-      },
-      {
-        icon: '\ud83d\udcb1', title: 'CHANGE & DEVISES',
-        desc: 'Naira nig\u00e9rian : -8% sur 30j. Diff\u00e9rentiel de change favorable aux importations informelles depuis le Nigeria. Franc CFA stable (arrimage euro).',
-        impact: 'Impact : -3-5%',
-        severity: 'low',
-        impactClass: 'low'
-      },
-      {
-        icon: '\ud83d\udcc8', title: 'INFLATION G\u00c9N\u00c9RALE',
-        desc: 'Inflation alimentaire ' + cName + ' : 11,2% glissement annuel (vs 8,5% inflation g\u00e9n\u00e9rale). \u00c9nergie +14%. Pression sur pouvoir d\'achat des m\u00e9nages.',
-        impact: 'Impact : +5-8%',
-        severity: 'medium',
-        impactClass: 'medium'
-      },
-      {
-        icon: '\ud83d\udce6', title: 'STOCKS & R\u00c9SERVES',
-        desc: isCereal
-          ? 'Stocks ONASA/OPVN : 12 400t sur objectif 18 000t (-31%). R\u00e9approvisionnement non programm\u00e9 avant juin. Stocks commer\u00e7ants : niveau bas.'
-          : isMaraicher
-            ? 'Production mara\u00eech\u00e8re en baisse saisonni\u00e8re. Pertes post-r\u00e9colte estim\u00e9es \u00e0 30-40%. Conservation limit\u00e9e par manque de cha\u00eene du froid.'
-            : 'Stocks disponibles en baisse saisonni\u00e8re. Approvisionnement des march\u00e9s centraux sous pression. Pertes post-r\u00e9colte estim\u00e9es \u00e0 25%.',
-        impact: 'Impact : +6-12%',
-        severity: 'high',
-        impactClass: 'high'
-      },
-      {
-        icon: '\ud83c\udf10', title: 'G\u00c9OPOLITIQUE R\u00c9GIONALE',
-        desc: 'Alliance des \u00c9tats du Sahel (AES) : fronti\u00e8res partiellement ferm\u00e9es Niger-Nigeria. Sanctions CEDEAO lev\u00e9es mais flux commerciaux perturb\u00e9s.',
-        impact: 'Impact : +8-15%',
-        severity: 'high',
-        impactClass: 'high'
-      },
-      {
-        icon: '\ud83d\udcc5', title: 'SAISONNALIT\u00c9',
-        desc: isCereal
-          ? 'P\u00e9riode pr\u00e9-soudure (mars-avril). Historiquement : hausse progressive des c\u00e9r\u00e9ales. Pic attendu juillet-ao\u00fbt (+40 \u00e0 +80% vs post-r\u00e9colte).'
-          : isMaraicher
-            ? 'Fin de saison s\u00e8che, production en d\u00e9clin. Transition vers la saison des pluies favorable \u00e0 certaines cultures mara\u00eech\u00e8res.'
-            : 'Cycle saisonnier actif. Les prix suivent le calendrier cultural r\u00e9gional avec des variations de \u00b120-30% selon les p\u00e9riodes.',
-        impact: 'Impact : +10-25%',
-        severity: 'high',
-        impactClass: 'high'
-      },
-      {
-        icon: '\ud83d\udcdc', title: 'POLITIQUE COMMERCIALE',
-        desc: cName + ' : lev\u00e9e de l\'interdiction d\'export sur les c\u00e9r\u00e9ales (juin 2025). TEC CEDEAO appliqu\u00e9. Taxes \u00e0 l\'export variables selon produits.',
-        impact: 'Impact : -5-10%',
-        severity: 'medium',
-        impactClass: 'medium'
-      },
-      {
-        icon: '\ud83c\udfdb\ufe0f', title: 'POLITIQUE & R\u00c9GLEMENTATION',
-        desc: 'Subvention engrais ' + cName + ' : -15% vs 2024 (budget r\u00e9duit). Nouveau d\u00e9cret sur les stocks strat\u00e9giques en discussion. Programme semences certifi\u00e9es : couverture 23% des producteurs.',
-        impact: 'Impact : +3-6%',
-        severity: 'medium',
-        impactClass: 'medium'
-      }
+      { icon: '\ud83c\udf27\ufe0f', title: 'M\u00c9T\u00c9O & CLIMAT', tend: 'Variable',
+        desc: 'La pluviom\u00e9trie et les temp\u00e9ratures conditionnent les rendements. Un d\u00e9ficit hydrique r\u00e9duit l\'offre et tend \u00e0 pousser les prix \u00e0 la hausse.' },
+      { icon: '\ud83d\udec3', title: 'TRANSPORT & LOGISTIQUE', tend: 'Variable',
+        desc: 'Le co\u00fbt du fret et les d\u00e9lais aux fronti\u00e8res s\'ajoutent au prix rendu march\u00e9, surtout sur les corridors transfrontaliers (ex. Cotonou\u2013Niamey).' },
+      { icon: '\ud83d\udcb1', title: 'CHANGE & DEVISES', tend: 'Variable',
+        desc: 'Le franc CFA est arrim\u00e9 \u00e0 l\'euro (peg fixe). Les variations du naira nig\u00e9rian influencent les flux commerciaux informels transfrontaliers.' },
+      { icon: '\ud83d\udcc8', title: 'INFLATION & \u00c9NERGIE', tend: 'Haussier',
+        desc: 'L\'inflation alimentaire et le co\u00fbt de l\'\u00e9nergie/des intrants p\u00e8sent sur les prix nominaux et le pouvoir d\'achat des m\u00e9nages.' },
+      { icon: '\ud83d\udce6', title: 'STOCKS & R\u00c9SERVES', tend: 'Variable',
+        desc: isMaraicher
+          ? 'Le mara\u00eechage se conserve mal (pertes post-r\u00e9colte \u00e9lev\u00e9es, peu de cha\u00eene du froid) : l\'offre disponible varie vite.'
+          : 'Le niveau des stocks (publics et commer\u00e7ants) et les pertes post-r\u00e9colte d\u00e9terminent l\'offre disponible sur les march\u00e9s.' },
+      { icon: '\ud83c\udf10', title: 'POLITIQUE COMMERCIALE R\u00c9GIONALE', tend: 'Variable',
+        desc: 'Les d\u00e9cisions CEDEAO/AES (ouverture des fronti\u00e8res, interdictions ou lev\u00e9es d\'export, TEC) modulent les flux et donc l\'offre.' },
+      { icon: '\ud83d\udcc5', title: 'SAISONNALIT\u00c9', tend: 'Variable',
+        desc: isCereal ? seasonCereal : isMaraicher ? seasonMaraicher : seasonOther },
+      { icon: '\ud83c\udfdb\ufe0f', title: 'POLITIQUES PUBLIQUES', tend: 'Variable',
+        desc: 'Les subventions aux intrants, les programmes de semences certifi\u00e9es et les politiques de stockage influencent les co\u00fbts de production.' }
     ];
 
+    // Indice directionnel r\u00e9el : la variation de prix observ\u00e9e le mois \u00e9coul\u00e9.
+    var momTend = mom >= 2 ? 'Haussier' : mom <= -2 ? 'Baissier' : 'Stable';
+    var momCls = mom >= 2 ? 'high' : mom <= -2 ? 'low' : 'medium';
+    factors.unshift({
+      icon: '\ud83d\udcca', title: 'TENDANCE PRIX OBSERV\u00c9E', tend: momTend,
+      desc: 'Variation r\u00e9elle du prix de ' + cName + ' sur le dernier mois : '
+        + (mom >= 0 ? '+' : '') + mom.toFixed(1) + '% (donn\u00e9e WFP).',
+      real: true
+    });
+
+    function tendClass(t) { return t === 'Haussier' ? 'high' : t === 'Baissier' ? 'low' : 'medium'; }
+
     container.innerHTML = factors.map(function(f) {
-      return '<div class="factor-card severity-' + f.severity + '">'
+      var cls = f.real ? momCls : tendClass(f.tend);
+      return '<div class="factor-card severity-' + cls + '">'
         + '<div class="factor-header">'
         + '<span class="f-icon">' + f.icon + '</span>'
         + '<span class="f-title">' + f.title + '</span>'
         + '</div>'
         + '<div class="factor-desc">' + f.desc + '</div>'
-        + '<span class="factor-impact ' + f.impactClass + '">' + f.impact + '</span>'
+        + '<span class="factor-impact ' + cls + '">' + (f.real ? momTend + ' \u00b7 r\u00e9el' : f.tend) + '</span>'
         + '</div>';
     }).join('');
   }
@@ -840,58 +810,70 @@ window.AgroPrix = window.AgroPrix || {};
   // =========================================================================
   // buildNews — generate news feed items
   // =========================================================================
-  function buildNews(cultureName, cName, currentPrice, momChange) {
+  // Signaux de march\u00e9 \u2014 d\u00e9riv\u00e9s UNIQUEMENT des vraies valeurs calcul\u00e9es dans
+  // l'analyse (variation MoM/YoY, volatilit\u00e9, couverture march\u00e9s). Plus de fil
+  // d'actualit\u00e9 fabriqu\u00e9 (anciens items citaient faussement FEWS NET / CEDEAO /
+  // RESOGEST avec des horodatages fig\u00e9s "Il y a 2h" \u2014 overclaim supprim\u00e9).
+  function buildNews(cultureName, cName, currentPrice, momChange, yoyChange, vol, lastMonth, nbMarkets, isLive) {
     var container = document.getElementById('newsFeed');
     if (!container) return;
 
     var mom = parseFloat(momChange);
+    var yoy = parseFloat(yoyChange != null ? yoyChange : '0');
+    var v = parseFloat(vol != null ? vol : '0');
     var priceStr = currentPrice.toLocaleString('fr-FR');
-    var direction = mom >= 0 ? 'hausse' : 'baisse';
+    var moRef = lastMonth ? (' \u00b7 ' + lastMonth) : '';
+    // Source honn\u00eate : WFP/HDX en mode live, sinon estimation hors-ligne.
+    var live = isLive !== false;
+    var srcPrix = live ? ('AgroPrix \u00b7 donn\u00e9es WFP/HDX' + moRef) : 'AgroPrix \u00b7 estimation hors-ligne';
+    var srcSerie = live ? 'AgroPrix \u00b7 s\u00e9rie mensuelle WFP' : 'AgroPrix \u00b7 estimation hors-ligne';
+    function sgn(x) { return (x >= 0 ? '+' : '') + x.toFixed(1); }
 
-    var newsItems = [
-      {
-        dot: 'critical',
-        tag: 'ALERTE PRIX', tagClass: 'critical',
-        date: 'Il y a 2h',
-        text: cultureName + ' en ' + direction + ' de ' + Math.abs(mom).toFixed(1) + '% sur le march\u00e9 de ' + cName + '. Le prix atteint ' + priceStr + ' FCFA/kg, port\u00e9 par la demande pr\u00e9-soudure et les perturbations logistiques r\u00e9gionales.',
-        source: 'SIM / RESIMAO'
-      },
-      {
-        dot: 'warning',
-        tag: 'CLIMAT', tagClass: 'warning',
-        date: 'Il y a 5h',
-        text: 'D\u00e9ficit pluviom\u00e9trique confirm\u00e9 sur le Sahel central. NOAA et FEWS NET confirment un d\u00e9ficit de 23% des pr\u00e9cipitations. Risque accru de soudure difficile dans le corridor Niger-Burkina-Mali.',
-        source: 'FEWS NET / NOAA'
-      },
-      {
-        dot: 'positive',
-        tag: 'COMMERCE', tagClass: 'positive',
-        date: 'Il y a 8h',
-        text: 'CEDEAO : lev\u00e9e officielle des restrictions sur les exportations c\u00e9r\u00e9ali\u00e8res. Les \u00c9tats membres ont act\u00e9 la lev\u00e9e progressive des interdictions d\'export. Impact attendu sur les flux transfrontaliers d\u00e8s le prochain trimestre.',
-        source: 'Commission CEDEAO'
-      },
-      {
-        dot: 'critical',
-        tag: 'STOCKS', tagClass: 'critical',
-        date: 'Il y a 12h',
-        text: 'R\u00e9serves strat\u00e9giques \u00e0 69% de l\'objectif dans la zone UEMOA. Le RESOGEST signale des niveaux de stocks en de\u00e7\u00e0 des cibles dans 5 pays sur 8.',
-        source: 'RESOGEST / CILSS'
-      },
-      {
-        dot: 'warning',
-        tag: 'LOGISTIQUE', tagClass: 'warning',
-        date: 'Hier',
-        text: 'Co\u00fbts de transport : +12% sur le corridor Cotonou-Niamey. Hausse du fret routier li\u00e9e au prix du carburant et aux contr\u00f4les renforc\u00e9s. Temps de transit moyen pass\u00e9 \u00e0 5,2 jours.',
-        source: 'Conseil des Chargeurs'
-      }
-    ];
+    var items = [];
 
-    container.innerHTML = newsItems.map(function(n) {
+    // 1. Variation mensuelle r\u00e9elle
+    items.push({
+      dot: Math.abs(mom) >= 5 ? 'critical' : (mom >= 0 ? 'positive' : 'warning'),
+      tag: 'PRIX (1 MOIS)', tagClass: mom >= 0 ? 'positive' : 'warning',
+      text: cultureName + ' \u00e0 ' + cName + ' : ' + (mom >= 0 ? 'hausse' : 'baisse') + ' de '
+        + Math.abs(mom).toFixed(1) + '% sur un mois, \u00e0 ' + priceStr + ' FCFA/kg.',
+      source: srcPrix
+    });
+
+    // 2. Tendance annuelle r\u00e9elle (YoY)
+    items.push({
+      dot: yoy >= 0 ? 'positive' : 'warning',
+      tag: 'TENDANCE (12 MOIS)', tagClass: yoy >= 0 ? 'positive' : 'warning',
+      text: 'Variation sur 12 mois : ' + sgn(yoy) + '% pour ' + cultureName + ' \u00e0 ' + cName + '.',
+      source: srcSerie
+    });
+
+    // 3. Volatilit\u00e9 r\u00e9elle (calcul\u00e9e sur la s\u00e9rie)
+    var vLevel = v > 25 ? '\u00e9lev\u00e9e' : v > 15 ? 'moyenne' : 'faible';
+    items.push({
+      dot: v > 25 ? 'critical' : v > 15 ? 'warning' : 'positive',
+      tag: 'VOLATILIT\u00c9', tagClass: v > 25 ? 'critical' : 'warning',
+      text: 'Volatilit\u00e9 des prix : ' + v + '/100 (' + vLevel + '). '
+        + (v > 25 ? 'March\u00e9 instable \u2014 prudence sur le timing de vente.'
+          : v > 15 ? 'Fluctuations mod\u00e9r\u00e9es.' : 'March\u00e9 relativement stable.'),
+      source: 'AgroPrix \u00b7 calcul sur la s\u00e9rie'
+    });
+
+    // 4. Couverture march\u00e9s (si disponible)
+    if (nbMarkets) {
+      items.push({
+        dot: 'positive', tag: 'COUVERTURE', tagClass: 'positive',
+        text: 'Prix agr\u00e9g\u00e9 sur ' + nbMarkets + ' march\u00e9(s) suivi(s)'
+          + (lastMonth ? (', relev\u00e9 ' + lastMonth) : '') + '.',
+        source: 'AgroPrix \u00b7 WFP/HDX'
+      });
+    }
+
+    container.innerHTML = items.map(function(n) {
       return '<div class="news-item">'
         + '<div class="news-dot ' + n.dot + '"></div>'
         + '<div class="news-content">'
         + '<div class="news-tag ' + n.tagClass + '">' + n.tag + '</div>'
-        + '<div class="news-date">' + n.date + '</div>'
         + '<div class="news-text">' + n.text + '</div>'
         + '<div class="news-source">Source : ' + n.source + '</div>'
         + '</div></div>';
