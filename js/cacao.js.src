@@ -1145,7 +1145,7 @@ window.AgroPrix = window.AgroPrix || {};
       formData.append('culture', 'cacao');
 
       try {
-        var res = await fetch('/api/diagnosis/photo', {
+        var res = await fetch(AP.API_BASE + '/api/diagnosis/photo', {
           method: 'POST',
           credentials: 'include',
           body: formData
@@ -1218,7 +1218,7 @@ window.AgroPrix = window.AgroPrix || {};
     input.value = '';
 
     try {
-      var res = await fetch('/api/chat/agro', {
+      var res = await fetch(AP.API_BASE + '/api/chat/agro', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
