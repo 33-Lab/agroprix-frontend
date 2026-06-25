@@ -1154,14 +1154,74 @@ window.AgroPrix = window.AgroPrix || {};
   }
 
   // =========================================================================
+  // Rapports institutionnels (PDF / Excel) — backend /api/rapports
+  // =========================================================================
+  // Branche le module Rapports sur le vrai backend ReportLab/openpyxl
+  // (auparavant : aucun bouton, la vue "rapports" renvoyait juste vers Analyse).
+  // Reutilise les selecteurs pays + culture de la vue Analyse. Auth requise
+  // (cookie httpOnly) — d'ou credentials:'include'.
+  function downloadRapport(format) {
+    format = (format === 'excel') ? 'excel' : 'pdf';
+    var country = _val('countrySelect', 'benin');
+    var culture = _val('cultureSelect', 'mais');
+    // Nom DB = nom d'affichage sans accents ("Maïs" -> "Mais"), comme api.js.
+    var dbCommodity = (AP.cultureNames[culture] || culture)
+      .normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+    var btn = document.getElementById('rapportBtn-' + format);
+    var prevHtml = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Generation en cours...'; }
+
+    var url = AP.API_BASE + '/api/rapports/' + format
+      + '?country=' + encodeURIComponent(country)
+      + '&commodity=' + encodeURIComponent(dbCommodity);
+
+    function restore() {
+      if (btn) { btn.disabled = false; btn.innerHTML = prevHtml; if (window.lucide) try { window.lucide.createIcons(); } catch(e){} }
+    }
+
+    fetch(url, { method: 'GET', credentials: 'include' }).then(function(resp) {
+      if (resp.status === 401 || resp.status === 403) {
+        restore();
+        alert('Connectez-vous pour generer un rapport (PDF/Excel).');
+        return null;
+      }
+      if (!resp.ok) {
+        restore();
+        alert('Rapport indisponible (' + resp.status + '). Reessayez plus tard.');
+        return null;
+      }
+      return resp.blob();
+    }).then(function(blob) {
+      if (!blob) return;
+      if (blob.size === 0) { restore(); alert('Aucune donnee pour ' + dbCommodity + ' (' + country + ').'); return; }
+      var ext = (format === 'excel') ? 'xlsx' : 'pdf';
+      var fname = 'AgroPrix_Rapport_' + dbCommodity + '_' + new Date().toISOString().slice(0, 10) + '.' + ext;
+      var dlUrl = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = dlUrl; a.download = fname;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      setTimeout(function() { URL.revokeObjectURL(dlUrl); }, 4000);
+      restore();
+    }).catch(function(err) {
+      restore();
+      console.warn('[Rapports] download failed:', err);
+      alert('Rapport indisponible (reseau). Reessayez plus tard.');
+    });
+  }
+
+  // =========================================================================
   // Expose on AP namespace and as globals
   // =========================================================================
   AP.analysis = {
     launchAnalysis: launchAnalysis,
-    destroyCharts: destroyCharts
+    destroyCharts: destroyCharts,
+    downloadRapport: downloadRapport
   };
 
   // Global for onclick in HTML
   window.launchAnalysis = launchAnalysis;
+  window.downloadRapport = downloadRapport;
 
 })(window.AgroPrix);

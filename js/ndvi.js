@@ -9,11 +9,13 @@ syncParcelToBackend(idx).then(function(backendId){return fetchSentinelNDVI(backe
 alert('Aucune scene satellite claire recente (couverture nuageuse). Reessayez plus tard.');return;}
 var latest=stats[0];var ps=getParcels();ps[idx].realNDVI={mean:latest.mean,min:latest.min,max:latest.max,date:String(latest.datetime||'').split('T')[0],cloud:latest.cloud_cover,source:res.source||'sentinel-2'};ps[idx].realHistory=stats.map(function(s){return{date:String(s.datetime||'').split('T')[0],ndvi:Math.round((s.mean||0)*100)/100};}).reverse();saveParcels(ps);render();}).catch(function(e){if(btn){btn.disabled=false;btn.innerHTML='<i data-lucide="satellite" class="lc"></i> Analyser au satellite (reel)';if(window.lucide)try{window.lucide.createIcons();}catch(ex){}}
 if(String(e&&e.message)==='auth')alert('Connectez-vous pour lancer l\'analyse satellite reelle.');else alert('Analyse satellite indisponible : '+(e&&e.message?e.message:'erreur'));});}
-var DEMO_NDVI=[{date:'2025-10-01',ndvi:0.42},{date:'2025-10-15',ndvi:0.48},{date:'2025-11-01',ndvi:0.55},{date:'2025-11-15',ndvi:0.61},{date:'2025-12-01',ndvi:0.68},{date:'2025-12-15',ndvi:0.72},{date:'2026-01-01',ndvi:0.75},{date:'2026-01-15',ndvi:0.71},{date:'2026-02-01',ndvi:0.65},{date:'2026-02-15',ndvi:0.58},{date:'2026-03-01',ndvi:0.52},{date:'2026-03-15',ndvi:0.47},];var THRESHOLDS={excellent:0.7,good:0.5,moderate:0.3,stress:0.2};function getNDVIStatus(ndvi){if(ndvi>=THRESHOLDS.excellent)return{label:'Excellente',color:'#2D6A4F',bg:'#D8F3DC',emoji:'<span style="color:#2D6A4F;font-size:1em;">●</span>',advice:'Vegetation dense et saine. Conditions optimales.'};if(ndvi>=THRESHOLDS.good)return{label:'Bonne',color:'#40916C',bg:'#E8F5E9',emoji:'<span style="color:#FBBF24;font-size:1em;">●</span>',advice:'Vegetation en bon etat. Surveillez l\'irrigation.'};if(ndvi>=THRESHOLDS.moderate)return{label:'Moderee',color:'#E8862A',bg:'#FFF8E1',emoji:'<span style="color:#F97316;font-size:1em;">●</span>',advice:'Stress vegetal detecte. Verifiez l\'eau et les intrants.'};if(ndvi>=THRESHOLDS.stress)return{label:'Stress',color:'#e76f51',bg:'#FFF3E0',emoji:'<span style="color:#EF4444;font-size:1em;">●</span>',advice:'Stress severe ! Risque de perte de recolte. Action urgente.'};return{label:'Critique',color:'#c0392b',bg:'#FFEBEE',emoji:'<span style="color:#991B1B;font-size:1em;">●</span>',advice:'Parcelle en danger critique. Sol nu ou vegetation morte.'};}
+var THRESHOLDS={excellent:0.7,good:0.5,moderate:0.3,stress:0.2};function getNDVIStatus(ndvi){if(ndvi>=THRESHOLDS.excellent)return{label:'Excellente',color:'#2D6A4F',bg:'#D8F3DC',emoji:'<span style="color:#2D6A4F;font-size:1em;">●</span>',advice:'Vegetation dense et saine. Conditions optimales.'};if(ndvi>=THRESHOLDS.good)return{label:'Bonne',color:'#40916C',bg:'#E8F5E9',emoji:'<span style="color:#FBBF24;font-size:1em;">●</span>',advice:'Vegetation en bon etat. Surveillez l\'irrigation.'};if(ndvi>=THRESHOLDS.moderate)return{label:'Moderee',color:'#E8862A',bg:'#FFF8E1',emoji:'<span style="color:#F97316;font-size:1em;">●</span>',advice:'Stress vegetal detecte. Verifiez l\'eau et les intrants.'};if(ndvi>=THRESHOLDS.stress)return{label:'Stress',color:'#e76f51',bg:'#FFF3E0',emoji:'<span style="color:#EF4444;font-size:1em;">●</span>',advice:'Stress severe ! Risque de perte de recolte. Action urgente.'};return{label:'Critique',color:'#c0392b',bg:'#FFEBEE',emoji:'<span style="color:#991B1B;font-size:1em;">●</span>',advice:'Parcelle en danger critique. Sol nu ou vegetation morte.'};}
 function getParcels(){try{return JSON.parse(localStorage.getItem(PARCELS_KEY)||'[]');}catch(e){return[];}}
 function saveParcels(parcels){localStorage.setItem(PARCELS_KEY,JSON.stringify(parcels));}
-function addParcel(parcel){var parcels=getParcels();parcel.id='P'+Date.now();parcel.createdAt=new Date().toISOString();parcel.ndviHistory=generateDemoNDVI(parcel.culture);parcels.push(parcel);saveParcels(parcels);return parcel;}
-function generateDemoNDVI(culture){var base=DEMO_NDVI.slice();var variation=Math.random()*0.15-0.075;return base.map(function(d){var v=Math.max(0.05,Math.min(0.95,d.ndvi+variation+(Math.random()*0.06-0.03)));return{date:d.date,ndvi:parseFloat(v.toFixed(2))};});}
+function addParcel(parcel){var parcels=getParcels();parcel.id='P'+Date.now();parcel.createdAt=new Date().toISOString();parcel.realHistory=[];parcels.push(parcel);saveParcels(parcels);return parcel;}
+function ndviSeries(p){return(p&&p.realHistory&&p.realHistory.length)?p.realHistory:[];}
+function ndviLatest(p){if(p&&p.realNDVI&&typeof p.realNDVI.mean==='number'){return{ndvi:Math.round((p.realNDVI.mean||0)*100)/100,date:p.realNDVI.date||'',cloud:p.realNDVI.cloud};}
+return null;}
 function render(){var parcels=getParcels();var container=document.getElementById('ndviContent');if(!container)return;var html='<div style="text-align:center;margin-bottom:12px;">'
 +'<h3 style="margin:0 0 4px;color:var(--primary);">Sante Parcelle</h3>'
 +'<p style="font-size:12px;color:var(--text-light);">Suivi satellite des cultures (Planet PlanetScope 3m)</p>'
@@ -46,10 +48,10 @@ function renderEmptyState(){return'<div class="card" style="padding:32px;text-al
 +'<div style="font-size:22px;color:#EF4444;">●</div><div style="font-size:10px;font-weight:600;color:#e76f51;">Stress</div>'
 +'<div style="font-size:9px;color:#666;">NDVI < 0.3</div></div>'
 +'</div></div>';}
-function renderDashboard(parcels){var totalNDVI=0;var alertCount=0;parcels.forEach(function(p){var latest=p.realNDVI?p.realNDVI.mean:(p.ndviHistory&&p.ndviHistory.length>0?p.ndviHistory[p.ndviHistory.length-1].ndvi:0);totalNDVI+=latest;if(latest<THRESHOLDS.good)alertCount++;});var avgNDVI=parcels.length>0?(totalNDVI/parcels.length).toFixed(2):0;var avgStatus=getNDVIStatus(avgNDVI);var html='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">';html+='<div class="card" style="padding:12px;text-align:center;border-top:3px solid '+avgStatus.color+';">'
+function renderDashboard(parcels){var totalNDVI=0;var analyzedCount=0;var alertCount=0;parcels.forEach(function(p){var l=ndviLatest(p);if(!l)return;analyzedCount++;totalNDVI+=l.ndvi;if(l.ndvi<THRESHOLDS.good)alertCount++;});var hasData=analyzedCount>0;var avgNDVI=hasData?(totalNDVI/analyzedCount).toFixed(2):null;var avgStatus=hasData?getNDVIStatus(avgNDVI):{color:'#94a3b8',emoji:'',label:'Non analysé'};var html='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">';html+='<div class="card" style="padding:12px;text-align:center;border-top:3px solid '+avgStatus.color+';">'
 +'<div style="font-size:10px;color:var(--text-light);">NDVI moyen</div>'
-+'<div style="font-size:24px;font-weight:800;color:'+avgStatus.color+';">'+avgNDVI+'</div>'
-+'<div style="font-size:10px;font-weight:600;color:'+avgStatus.color+';">'+avgStatus.emoji+' '+avgStatus.label+'</div>'
++'<div style="font-size:24px;font-weight:800;color:'+avgStatus.color+';">'+(hasData?avgNDVI:'—')+'</div>'
++'<div style="font-size:10px;font-weight:600;color:'+avgStatus.color+';">'+(hasData?(avgStatus.emoji+' '+avgStatus.label):(analyzedCount+'/'+parcels.length+' analysées'))+'</div>'
 +'</div>';html+='<div class="card" style="padding:12px;text-align:center;border-top:3px solid var(--primary);">'
 +'<div style="font-size:10px;color:var(--text-light);">Parcelles</div>'
 +'<div style="font-size:24px;font-weight:800;color:var(--primary);">'+parcels.length+'</div>'
@@ -66,29 +68,32 @@ function renderDashboard(parcels){var totalNDVI=0;var alertCount=0;parcels.forEa
 +'<div style="font-size:11px;color:#2D6A4F;">Principe envisage : si le NDVI chute sous un seuil, l\'indemnisation serait declenchee sans expert terrain. Cette feature n\'est pas encore active.</div>'
 +'</div></div></div>';return html;}
 function renderParcelsList(parcels){var html='<div class="card" style="padding:16px;margin-bottom:12px;">'
-+'<div class="card-title"><span class="icon"><i data-lucide="map" class="lc"></i></span> Mes parcelles</div>';parcels.forEach(function(p,idx){var real=p.realNDVI;var hist=(real&&p.realHistory&&p.realHistory.length)?p.realHistory:(p.ndviHistory||[]);var latest=real?{ndvi:Math.round((real.mean||0)*100)/100,date:real.date}:(p.ndviHistory&&p.ndviHistory.length>0?p.ndviHistory[p.ndviHistory.length-1]:{ndvi:0,date:''});var status=getNDVIStatus(latest.ndvi);var sparkline=renderSparkline(hist,120,30);var measureLine=real?'<i data-lucide="satellite" class="lc"></i> Sentinel-2 reel · '+(real.date||'—')+' · nuages '+Math.round(real.cloud||0)+'%':'Derniere mesure : '+latest.date+' (demo)';html+='<div style="padding:12px;border-radius:10px;background:'+status.bg+';margin-bottom:10px;cursor:pointer;" '
++'<div class="card-title"><span class="icon"><i data-lucide="map" class="lc"></i></span> Mes parcelles</div>';parcels.forEach(function(p,idx){var latest=ndviLatest(p);var hist=ndviSeries(p);var bg=latest?getNDVIStatus(latest.ndvi).bg:'#F1F5F9';var headColor=latest?getNDVIStatus(latest.ndvi).color:'#64748b';html+='<div style="padding:12px;border-radius:10px;background:'+bg+';margin-bottom:10px;cursor:pointer;" '
 +'onclick="AgroPrix.ndvi.showDetail('+idx+')">'
 +'<div style="display:flex;justify-content:space-between;align-items:start;">'
 +'<div>'
 +'<div style="font-size:13px;font-weight:700;color:var(--text);"><i data-lucide="wheat" class="lc"></i> '+(p.name||'Parcelle '+(idx+1))+'</div>'
 +'<div style="font-size:11px;color:#666;">'+(p.culture||'—')+' · '+(p.surface||'—')+' ha · '+(p.location||'—')+'</div>'
-+'</div>'
-+'<div style="text-align:right;">'
++'</div>';if(latest){var status=getNDVIStatus(latest.ndvi);html+='<div style="text-align:right;">'
 +'<div style="font-size:18px;font-weight:800;color:'+status.color+';">'+latest.ndvi+'</div>'
 +'<div style="font-size:10px;font-weight:600;color:'+status.color+';">'+status.emoji+' '+status.label+'</div>'
 +'</div></div>'
 +'<div style="margin-top:8px;display:flex;align-items:center;gap:8px;">'
-+sparkline
-+'<div style="font-size:10px;color:'+(real?'#2D6A4F':'#999')+';font-weight:'+(real?'600':'400')+';">'+measureLine+'</div>'
++renderSparkline(hist,120,30)
++'<div style="font-size:10px;color:#2D6A4F;font-weight:600;"><i data-lucide="satellite" class="lc"></i> Sentinel-2 reel · '+(latest.date||'—')+' · nuages '+Math.round(latest.cloud||0)+'%</div>'
 +'</div>'
-+'<div style="font-size:11px;color:'+status.color+';margin-top:6px;font-style:italic;"><i data-lucide="lightbulb" class="lc"></i> '+status.advice+'</div>'
-+'<button id="sat-btn-'+idx+'" onclick="event.stopPropagation();AgroPrix.ndvi.analyzeSatellite('+idx+')" style="margin-top:8px;width:100%;padding:8px;border:1px solid var(--primary);background:#fff;color:var(--primary);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;"><i data-lucide="satellite" class="lc"></i> '+(real?'Reactualiser le satellite (reel)':'Analyser au satellite (reel)')+'</button>'
++'<div style="font-size:11px;color:'+status.color+';margin-top:6px;font-style:italic;"><i data-lucide="lightbulb" class="lc"></i> '+status.advice+'</div>';}else{html+='<div style="text-align:right;">'
++'<div style="font-size:13px;font-weight:700;color:#94a3b8;">—</div>'
++'<div style="font-size:10px;font-weight:600;color:#94a3b8;">Non analysée</div>'
++'</div></div>'
++'<div style="font-size:11px;color:#64748b;margin-top:8px;font-style:italic;"><i data-lucide="info" class="lc"></i> Aucune mesure satellite. Lancez l\'analyse pour obtenir un NDVI réel.</div>';}
+html+='<button id="sat-btn-'+idx+'" onclick="event.stopPropagation();AgroPrix.ndvi.analyzeSatellite('+idx+')" style="margin-top:8px;width:100%;padding:8px;border:1px solid var(--primary);background:#fff;color:var(--primary);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;"><i data-lucide="satellite" class="lc"></i> '+(latest?'Reactualiser le satellite (reel)':'Analyser au satellite (reel)')+'</button>'
 +'</div>';});html+='</div>';return html;}
 function renderSparkline(history,width,height){if(!history||history.length<2)return'';var maxNDVI=1.0;var minNDVI=0;var points=[];var step=width/(history.length-1);history.forEach(function(h,i){var x=i*step;var y=height-((h.ndvi-minNDVI)/(maxNDVI-minNDVI))*height;points.push(x.toFixed(1)+','+y.toFixed(1));});var lastNDVI=history[history.length-1].ndvi;var color=getNDVIStatus(lastNDVI).color;return'<svg width="'+width+'" height="'+height+'" style="flex-shrink:0;">'
 +'<polyline points="'+points.join(' ')+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
 +'<circle cx="'+points[points.length-1].split(',')[0]+'" cy="'+points[points.length-1].split(',')[1]+'" r="3" fill="'+color+'"/>'
 +'</svg>';}
-function showDetail(idx){var parcels=getParcels();var p=parcels[idx];if(!p)return;var container=document.getElementById('ndviContent');var latest=p.ndviHistory&&p.ndviHistory.length>0?p.ndviHistory[p.ndviHistory.length-1]:{ndvi:0,date:''};var status=getNDVIStatus(latest.ndvi);var html='<button class="action-btn" onclick="AgroPrix.ndvi.render()" style="font-size:12px;margin-bottom:16px;">← Retour</button>';html+='<div class="card" style="padding:16px;margin-bottom:16px;border-top:4px solid '+status.color+';">'
+function showDetail(idx){var parcels=getParcels();var p=parcels[idx];if(!p)return;var container=document.getElementById('ndviContent');var latest=ndviLatest(p);var series=ndviSeries(p);var status=latest?getNDVIStatus(latest.ndvi):{color:'#64748b',bg:'#F1F5F9',emoji:'',label:'Non analysée',advice:'Lancez une analyse satellite pour obtenir le NDVI réel.'};var html='<button class="action-btn" onclick="AgroPrix.ndvi.render()" style="font-size:12px;margin-bottom:16px;">← Retour</button>';html+='<div class="card" style="padding:16px;margin-bottom:16px;border-top:4px solid '+status.color+';">'
 +'<h3 style="margin:0 0 8px;"><i data-lucide="wheat" class="lc"></i> '+(p.name||'Parcelle')+'</h3>'
 +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">'
 +'<div style="background:var(--bg);padding:8px;border-radius:8px;"><div style="font-size:10px;color:#999;">Culture</div><div style="font-weight:700;">'+(p.culture||'—')+'</div></div>'
@@ -96,17 +101,17 @@ function showDetail(idx){var parcels=getParcels();var p=parcels[idx];if(!p)retur
 +'<div style="background:var(--bg);padding:8px;border-radius:8px;"><div style="font-size:10px;color:#999;">Localisation</div><div style="font-weight:700;">'+(p.location||'—')+'</div></div>'
 +'</div></div>';html+='<div class="card" style="padding:16px;margin-bottom:16px;text-align:center;">'
 +'<div style="font-size:11px;color:#999;margin-bottom:4px;">NDVI ACTUEL</div>'
-+'<div style="font-size:48px;font-weight:900;color:'+status.color+';">'+latest.ndvi+'</div>'
++'<div style="font-size:48px;font-weight:900;color:'+status.color+';">'+(latest?latest.ndvi:'—')+'</div>'
 +'<div style="font-size:14px;font-weight:700;color:'+status.color+';margin-bottom:8px;">'+status.emoji+' '+status.label+'</div>'
 +'<div style="font-size:12px;color:#666;">'+status.advice+'</div>'
-+'<div style="font-size:10px;color:#999;margin-top:4px;">Derniere mesure : '+latest.date+' (demo)</div>'
++(latest?'<div style="font-size:10px;color:#2D6A4F;font-weight:600;margin-top:4px;"><i data-lucide="satellite" class="lc"></i> Sentinel-2 reel · '+(latest.date||'—')+' · nuages '+Math.round(latest.cloud||0)+'%</div>':'<button onclick="AgroPrix.ndvi.analyzeSatellite('+idx+')" style="margin-top:8px;padding:8px 14px;border:1px solid var(--primary);background:var(--primary);color:#fff;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;"><i data-lucide="satellite" class="lc"></i> Analyser au satellite (reel)</button>')
 +'</div>';html+='<div class="card" style="padding:16px;margin-bottom:16px;">'
-+'<div class="card-title"><span class="icon"><i data-lucide="trending-up" class="lc"></i></span> Evolution NDVI (6 mois)</div>'
-+'<div style="display:flex;align-items:end;gap:3px;height:120px;margin-top:8px;">';(p.ndviHistory||[]).forEach(function(h){var barH=Math.max(4,Math.round(h.ndvi*110));var st=getNDVIStatus(h.ndvi);var shortDate=h.date.substring(5);html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;">'
++'<div class="card-title"><span class="icon"><i data-lucide="trending-up" class="lc"></i></span> Evolution NDVI (Sentinel-2)</div>';if(series.length>0){html+='<div style="display:flex;align-items:end;gap:3px;height:120px;margin-top:8px;">';series.forEach(function(h){var barH=Math.max(4,Math.round(h.ndvi*110));var st=getNDVIStatus(h.ndvi);var shortDate=(h.date||'').substring(5);html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;">'
 +'<div style="font-size:7px;color:#999;margin-bottom:2px;">'+h.ndvi+'</div>'
 +'<div style="width:100%;height:'+barH+'px;background:'+st.color+';border-radius:3px 3px 0 0;"></div>'
 +'<div style="font-size:7px;color:#999;margin-top:2px;writing-mode:vertical-lr;transform:rotate(180deg);height:30px;">'+shortDate+'</div>'
-+'</div>';});html+='</div></div>';html+='<div class="card" style="padding:12px;margin-bottom:16px;">'
++'</div>';});html+='</div>';}else{html+='<div style="font-size:12px;color:#94a3b8;text-align:center;padding:20px 8px;font-style:italic;">Aucune mesure satellite pour le moment. Lancez l\'analyse pour construire l\'historique NDVI.</div>';}
+html+='</div>';html+='<div class="card" style="padding:12px;margin-bottom:16px;">'
 +'<div class="card-title"><span class="icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Echelle NDVI</div>'
 +'<div style="display:flex;height:12px;border-radius:6px;overflow:hidden;margin:8px 0;">'
 +'<div style="flex:1;background:#c0392b;" title="Critique"></div>'
@@ -124,11 +129,11 @@ function showDetail(idx){var parcels=getParcels();var p=parcels[idx];if(!p)retur
 +'la parcelle serait potentiellement eligible a une indemnisation. Feature prevue en phase 2 (partenariat assureur a contractualiser).</p>'
 +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
 +'<div style="background:linear-gradient(180deg,#fff,#FAFCFB);padding:8px;border-radius:8px;"><div style="font-size:10px;color:#666;">Seuil alerte</div><div style="font-weight:700;color:#e76f51;">NDVI < 0.3</div></div>'
-+'<div style="background:linear-gradient(180deg,#fff,#FAFCFB);padding:8px;border-radius:8px;"><div style="font-size:10px;color:#666;">Statut actuel</div><div style="font-weight:700;color:'+(latest.ndvi>=0.3?'#2D6A4F':'#e76f51')+';">'+(latest.ndvi>=0.3?'Couvert':'ALERTE')+'</div></div>'
++'<div style="background:linear-gradient(180deg,#fff,#FAFCFB);padding:8px;border-radius:8px;"><div style="font-size:10px;color:#666;">Statut actuel</div><div style="font-weight:700;color:'+(!latest?'#94a3b8':(latest.ndvi>=0.3?'#2D6A4F':'#e76f51'))+';">'+(!latest?'Non analysée':(latest.ndvi>=0.3?'Couvert':'ALERTE'))+'</div></div>'
 +'</div></div>';html+='<div class="card" style="padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#E0F2FE,#DBEAFE);border:1px solid #1E40AF33;">'
 +'<div class="card-title" style="color:#1E40AF;"><span class="icon"><i data-lucide="satellite-dish" class="lc"></i></span> NDVI reel (Planet Insights)</div>'
 +'<div id="ndviBackendStatus-'+idx+'" style="font-size:12px;color:#1E3A8A;margin:8px 0;">'
-+(p.backendId?'Parcelle syncronisee backend (id #'+p.backendId+'). Cliquez ci-dessous pour charger la serie NDVI reelle calculee par le worker Phase 2b.':'Cette parcelle est locale (demo). Synchronisez-la vers le backend pour activer le suivi NDVI reel (Planet PSScene + zonal stats).')
++(p.backendId?'Parcelle syncronisee backend (id #'+p.backendId+'). Cliquez ci-dessous pour charger la serie NDVI reelle calculee par le worker Phase 2b.':'Cette parcelle est locale (non synchronisee). Synchronisez-la vers le backend pour activer le suivi NDVI reel (Sentinel-2 + zonal stats).')
 +'</div>'
 +'<div style="display:flex;gap:8px;flex-wrap:wrap;">'
 +(p.backendId?'<button class="btn-analyse" style="padding:8px 12px;font-size:12px;" onclick="AgroPrix.ndvi.loadBackendTimeseries('+idx+')"><i data-lucide="refresh-cw" class="lc"></i> Charger NDVI reel</button>':'<button class="btn-analyse" style="padding:8px 12px;font-size:12px;" onclick="AgroPrix.ndvi.syncToBackend('+idx+')"><i data-lucide="cloud-upload" class="lc"></i> Synchroniser vers backend</button>')
