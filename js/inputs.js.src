@@ -65,6 +65,34 @@
       .catch(function() { refPricesLoaded = true; });
   }
 
+  // Sync d'une saisie vers le backend (crowdsourcing). Non bloquant et best-effort :
+  // la saisie est toujours conservee en localStorage; si l'utilisateur est connecte,
+  // on la pousse aussi vers /api/inputs/prices/contribute (cookie httpOnly).
+  function syncContribution(entry) {
+    if (!AP.auth || !AP.auth.isLoggedIn || !AP.auth.isLoggedIn()) return Promise.resolve(false);
+    var base = (AP.API_BASE || '').replace(/\/$/, '');
+    return fetch(base + '/api/inputs/prices/contribute', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        country: entry.country,
+        product_id: entry.productId,
+        price: entry.price,
+        category: entry.category,
+        product_name: entry.productName,
+        unit: entry.unit,
+        market: entry.market,
+        supplier: entry.supplier,
+        observed_date: entry.date
+      }),
+      signal: AbortSignal.timeout(8000)
+    }).then(function(r) {
+      if (r && r.ok) { entry.synced = true; return true; }
+      return false;
+    }).catch(function() { return false; });
+  }
+
   // Table des prix de référence indicatifs pour la catégorie courante.
   function renderRefTable(cat) {
     if (!refPricesLoaded) return '<div style="font-size:11px;color:#999;margin-bottom:10px;">Chargement des prix de reference...</div>';
@@ -406,11 +434,15 @@
     };
 
     savePriceEntry(entry);
+    // Best-effort : pousse aussi la saisie vers le backend si connecte.
+    syncContribution(entry);
 
     // Show success
     var successEl = document.getElementById('inputSuccess');
     if (successEl) {
-      successEl.textContent = '<i data-lucide="check-circle" class="lc"></i> Prix enregistre ! ' + entry.productName + ' a ' + formatFCFA(price) + ' (' + entry.market + ')';
+      var loggedIn = AP.auth && AP.auth.isLoggedIn && AP.auth.isLoggedIn();
+      var suffix = loggedIn ? '' : ' (enregistre localement — connectez-vous pour le partager)';
+      successEl.textContent = '<i data-lucide="check-circle" class="lc"></i> Prix enregistre ! ' + entry.productName + ' a ' + formatFCFA(price) + ' (' + entry.market + ')' + suffix;
       successEl.style.display = 'block';
       setTimeout(function() { successEl.style.display = 'none'; }, 3000);
     }
