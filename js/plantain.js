@@ -564,7 +564,7 @@ window.AgroPrix = window.AgroPrix || {};
             '</div>' +
           '</div>';
         }).join('') +
-        '<button onclick="AgroPrix.plantainExportDossier()" style="width:100%;margin-top:14px;padding:12px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;" ' + (completude < 40 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>Generer mon dossier PDF</button>' +
+        '<button onclick="AgroPrix.plantainExportDossier()" style="width:100%;margin-top:14px;padding:12px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;" ' + (completude < 40 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>Telecharger mon dossier (.txt)</button>' +
       '</div>' +
 
       // Estimation revenus

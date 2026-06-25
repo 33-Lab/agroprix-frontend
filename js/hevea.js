@@ -538,7 +538,7 @@ window.AgroPrix = window.AgroPrix || {};
             '</div>' +
           '</div>';
         }).join('') +
-        '<button onclick="AgroPrix.heveaExportDossier()" style="width:100%;margin-top:14px;padding:12px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;" ' + (completude < 40 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>Generer mon dossier PDF</button>' +
+        '<button onclick="AgroPrix.heveaExportDossier()" style="width:100%;margin-top:14px;padding:12px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;" ' + (completude < 40 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>Telecharger mon dossier (.txt)</button>' +
       '</div>' +
 
       // EUDR declaration
@@ -551,7 +551,7 @@ window.AgroPrix = window.AgroPrix || {};
           '<div style="margin-bottom:4px;">• Date plantation renseignee : ' + data.parcelles.filter(function(p) { return p.datePlantation; }).length + '/' + data.parcelles.length + '</div>' +
           '<div>• Historique cultural : ' + (nbSaignees > 0 ? 'Oui (' + nbSaignees + ' entrees)' : 'Non') + '</div>' +
         '</div>' +
-        '<button onclick="AgroPrix.heveaExportEUDR()" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Exporter declaration EUDR (PDF)</button>' +
+        '<button onclick="AgroPrix.heveaExportEUDR()" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Exporter declaration EUDR (.txt)</button>' +
       '</div>' +
 
       // Estimation assurance

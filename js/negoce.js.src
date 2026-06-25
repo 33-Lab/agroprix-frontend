@@ -248,9 +248,13 @@
   // =========================================================================
   function init() {
     var country = getUserCountry();
-    var transactions  = transactionsByCountry[country]  || transactionsByCountry.benin;
+    var demo          = transactionsByCountry[country]  || transactionsByCountry.benin;
     var opportunities = opportunitiesByCountry[country] || opportunitiesByCountry.benin;
     var markets       = (AP.marketsByCountry && AP.marketsByCountry[country]) || [];
+
+    // Transactions de l'utilisateur (persistees localement) en premier, puis les
+    // exemples de reference. buildRows badge "EXEMPLE" celles qui ne sont pas userAdded.
+    var transactions = getUserTransactions(country).concat(demo);
 
     // Transactions
     var tbody = document.getElementById('transactionsBody');
@@ -319,12 +323,92 @@
     }
   }
 
-  function addTransaction() {
-    alert('Fonctionnalité disponible en version complète — Connectez-vous à AgroPrix Pro');
+  // =========================================================================
+  // Carnet personnel — persistance locale (localStorage)
+  // =========================================================================
+  // Les transactions de l'utilisateur sont stockees par pays. Pas de backend
+  // pour l'instant (aucun endpoint negoce cote serveur) : c'est un carnet local
+  // honnete, qui fonctionne reellement, plutot qu'un stub. Une synchro backend
+  // est une evolution possible (table + endpoint dedies).
+  var TX_KEY = 'agroprix_negoce_tx';
+
+  function getAllUserTransactions() {
+    try { return JSON.parse(localStorage.getItem(TX_KEY) || '{}'); } catch (e) { return {}; }
   }
 
-  AP.negoce = { init: init, addTransaction: addTransaction };
+  function getUserTransactions(country) {
+    var all = getAllUserTransactions();
+    return Array.isArray(all[country]) ? all[country] : [];
+  }
+
+  function persistUserTransaction(country, tx) {
+    var all = getAllUserTransactions();
+    if (!Array.isArray(all[country])) all[country] = [];
+    all[country].unshift(tx);
+    if (all[country].length > 200) all[country] = all[country].slice(0, 200);
+    localStorage.setItem(TX_KEY, JSON.stringify(all));
+  }
+
+  function addTransaction() {
+    // Toggle du formulaire d'ajout (plus d'alerte stub).
+    var form = document.getElementById('negoceAddForm');
+    if (!form) return;
+    var showing = form.style.display !== 'none';
+    form.style.display = showing ? 'none' : '';
+    if (!showing) {
+      var d = document.getElementById('negoceDate');
+      if (d && !d.value) d.value = new Date().toISOString().split('T')[0];
+      var msg = document.getElementById('negoceFormMsg');
+      if (msg) msg.textContent = '';
+      if (window.refreshIcons) refreshIcons();
+    }
+  }
+
+  function saveTransaction() {
+    var msg = document.getElementById('negoceFormMsg');
+    function setMsg(t, ok) { if (msg) { msg.textContent = t; msg.style.color = ok ? '#2D6A4F' : '#e76f51'; } }
+
+    var date    = (document.getElementById('negoceDate') || {}).value || new Date().toISOString().split('T')[0];
+    var culture = ((document.getElementById('negoceCulture') || {}).value || '').trim();
+    var marche  = ((document.getElementById('negoceMarche') || {}).value || '').trim();
+    var qty       = parseInt((document.getElementById('negoceQty') || {}).value, 10);
+    var prixAchat = parseInt((document.getElementById('negocePrixAchat') || {}).value, 10);
+    var prixVenteRaw = (document.getElementById('negocePrixVente') || {}).value;
+    var prixVente = prixVenteRaw === '' || prixVenteRaw == null ? null : parseInt(prixVenteRaw, 10);
+
+    if (!culture || !marche) { setMsg('Renseignez la culture et le marche.', false); return; }
+    if (isNaN(qty) || qty <= 0) { setMsg('Quantite invalide (kg, nombre positif).', false); return; }
+    if (isNaN(prixAchat) || prixAchat <= 0) { setMsg('Prix d\'achat invalide.', false); return; }
+    if (prixVente !== null && (isNaN(prixVente) || prixVente < 0)) { setMsg('Prix de vente invalide.', false); return; }
+
+    var tx = {
+      userAdded: true,
+      date: date,
+      culture: culture,
+      marche: marche,
+      qty: qty,
+      prixAchat: prixAchat,
+      prixVente: prixVente === null ? 0 : prixVente,
+      status: prixVente === null ? 'en_stock' : 'vendu'
+    };
+
+    persistUserTransaction(getUserCountry(), tx);
+    setMsg('Transaction enregistree.', true);
+
+    // Reset des champs (sauf date)
+    ['negoceCulture', 'negoceMarche', 'negoceQty', 'negocePrixAchat', 'negocePrixVente'].forEach(function(id) {
+      var el = document.getElementById(id); if (el) el.value = '';
+    });
+
+    // Re-render (table + stats), puis on masque le formulaire
+    init();
+    var form = document.getElementById('negoceAddForm');
+    setTimeout(function() { if (form) form.style.display = 'none'; }, 700);
+  }
+
+  AP.negoce = { init: init, addTransaction: addTransaction, saveTransaction: saveTransaction };
   window.addTransaction = addTransaction;
+  window.saveTransaction = saveTransaction;
   window.calculateTransport = calculateTransport;
 
 })(window.AgroPrix);

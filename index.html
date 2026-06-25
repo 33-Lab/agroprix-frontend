@@ -390,6 +390,16 @@
         </div>
       </div><!-- end section-teal -->
 
+      <!-- Rapports institutionnels (PDF / Excel) — backend /api/rapports -->
+      <div class="card" style="margin-bottom:16px;">
+        <div style="font-size:18px;font-weight:800;color:#333;margin-bottom:4px;"><i data-lucide="file-text" class="lc"></i> Rapports</div>
+        <div style="font-size:12px;color:#555;margin-bottom:12px;">Genere un rapport structure (prix historiques, moyennes mensuelles, comparaison UEMOA) pour la <b>culture</b> et le <b>pays</b> selectionnes ci-dessus. Reserve aux comptes connectes.</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn-analyse" id="rapportBtn-pdf" style="flex:1;min-width:140px;" onclick="downloadRapport('pdf')"><i data-lucide="file-down" class="lc"></i> Telecharger PDF</button>
+          <button class="btn-analyse" id="rapportBtn-excel" style="flex:1;min-width:140px;background:linear-gradient(135deg,#1a3a5c,#2d8a4e);" onclick="downloadRapport('excel')"><i data-lucide="sheet" class="lc"></i> Telecharger Excel</button>
+        </div>
+      </div>
+
       <!-- Loading -->
       <div class="loading-overlay" id="loadingOverlay">
         <div class="card">
@@ -500,6 +510,42 @@
           </div>
         </div>
         <div id="transportResults"></div>
+      </div>
+
+      <!-- Formulaire d'ajout d'une transaction personnelle (persistee en local) -->
+      <div class="card" id="negoceAddForm" style="margin-bottom:16px;display:none;">
+        <div style="font-size:18px;font-weight:800;color:#333;margin-bottom:12px;"><i data-lucide="plus-circle" class="lc"></i> Nouvelle transaction</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" id="negoceDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Culture</label>
+            <input type="text" id="negoceCulture" placeholder="Mais, Niebe, Cacao...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Marche</label>
+            <input type="text" id="negoceMarche" placeholder="Dantokpa, Glazoue...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Quantite (kg)</label>
+            <input type="number" id="negoceQty" min="1" step="1" placeholder="1000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Prix achat (FCFA/kg)</label>
+            <input type="number" id="negocePrixAchat" min="1" step="1" placeholder="245">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Prix vente (FCFA/kg) <span style="color:#999;font-weight:400;">— vide = en stock</span></label>
+            <input type="number" id="negocePrixVente" min="0" step="1" placeholder="(optionnel)">
+          </div>
+          <div class="form-group full" style="display:flex;gap:8px;">
+            <button class="btn-analyse" style="flex:1;" onclick="saveTransaction()"><i data-lucide="save" class="lc"></i> Enregistrer</button>
+            <button style="flex:0 0 auto;padding:0 16px;border:1px solid #ccc;background:#fff;border-radius:10px;cursor:pointer;" onclick="addTransaction()">Annuler</button>
+          </div>
+        </div>
+        <div id="negoceFormMsg" style="font-size:12px;margin-top:8px;"></div>
       </div>
 
       <button class="btn-analyse" style="width:100%;" onclick="addTransaction()"><i data-lucide="book-open" class="lc"></i> Ajouter une transaction</button>
@@ -1409,8 +1455,8 @@ document.addEventListener('click',function(e){var m=document.getElementById('mor
 <script src="/js/data-sources.js?v=1.0"></script>
 <script src="/js/api.js"></script>
 <script src="/js/ui.js?v=6.12"></script>
-<script src="/js/analysis.js?v=6.11"></script>
-<script src="/js/negoce.js?v=6.12"></script>
+<script src="/js/analysis.js?v=7.1"></script>
+<script src="/js/negoce.js?v=7.1"></script>
 <script src="/js/production.js?v=7.0"></script>
 <script src="/js/export.js?v=6.11"></script>
 <script src="/js/cgu.js?v=6.11"></script>
@@ -1418,10 +1464,10 @@ document.addEventListener('click',function(e){var m=document.getElementById('mor
 <script src="/js/marketplace.js?v=6.13"></script>
 <script src="/js/financing.js?v=6.11"></script>
 <script src="/js/scoring.js?v=6.12"></script>
-<script src="/js/ndvi.js?v=6.12"></script>
+<script src="/js/ndvi.js?v=7.1"></script>
 <script src="/js/carte.js?v=7.0"></script>
-<script src="/js/hevea.js?v=6.11"></script>
-<script src="/js/plantain.js?v=6.11"></script>
+<script src="/js/hevea.js?v=7.1"></script>
+<script src="/js/plantain.js?v=7.1"></script>
 <script src="/js/dashboard.js?v=6.11"></script>
 <script src="/js/auth.js?v=6.11"></script>
 <script src="/js/app.js?v=6.12"></script>

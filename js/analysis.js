@@ -134,4 +134,12 @@ function _forecastCard(label,price,pct){var pctNum=parseFloat(pct);var color=pct
 +'<div style="font-size:13px;color:'+color+'">'+(pctNum>=0?'+':'')+pct+'%</div>'
 +'</div>';}
 function _hexToRgba(hex,alpha){var r=parseInt(hex.slice(1,3),16);var g=parseInt(hex.slice(3,5),16);var b=parseInt(hex.slice(5,7),16);return'rgba('+r+','+g+','+b+','+alpha+')';}
-AP.analysis={launchAnalysis:launchAnalysis,destroyCharts:destroyCharts};window.launchAnalysis=launchAnalysis;})(window.AgroPrix);
+function downloadRapport(format){format=(format==='excel')?'excel':'pdf';var country=_val('countrySelect','benin');var culture=_val('cultureSelect','mais');var dbCommodity=(AP.cultureNames[culture]||culture).normalize('NFD').replace(/[̀-ͯ]/g,'');var btn=document.getElementById('rapportBtn-'+format);var prevHtml=btn?btn.innerHTML:'';if(btn){btn.disabled=true;btn.textContent='Generation en cours...';}
+var url=AP.API_BASE+'/api/rapports/'+format
++'?country='+encodeURIComponent(country)
++'&commodity='+encodeURIComponent(dbCommodity);function restore(){if(btn){btn.disabled=false;btn.innerHTML=prevHtml;if(window.lucide)try{window.lucide.createIcons();}catch(e){}}}
+fetch(url,{method:'GET',credentials:'include'}).then(function(resp){if(resp.status===401||resp.status===403){restore();alert('Connectez-vous pour generer un rapport (PDF/Excel).');return null;}
+if(!resp.ok){restore();alert('Rapport indisponible ('+resp.status+'). Reessayez plus tard.');return null;}
+return resp.blob();}).then(function(blob){if(!blob)return;if(blob.size===0){restore();alert('Aucune donnee pour '+dbCommodity+' ('+country+').');return;}
+var ext=(format==='excel')?'xlsx':'pdf';var fname='AgroPrix_Rapport_'+dbCommodity+'_'+new Date().toISOString().slice(0,10)+'.'+ext;var dlUrl=URL.createObjectURL(blob);var a=document.createElement('a');a.href=dlUrl;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(dlUrl);},4000);restore();}).catch(function(err){restore();console.warn('[Rapports] download failed:',err);alert('Rapport indisponible (reseau). Reessayez plus tard.');});}
+AP.analysis={launchAnalysis:launchAnalysis,destroyCharts:destroyCharts,downloadRapport:downloadRapport};window.launchAnalysis=launchAnalysis;window.downloadRapport=downloadRapport;})(window.AgroPrix);
