@@ -199,6 +199,7 @@ window.AgroPrix = window.AgroPrix || {};
     buildMapAPI(country, marketsData, culture);
     buildRegionalChartAPI(compareData, culture);
     buildFactors(culture, cName, momChange);
+    buildOfficialPrice(culture);
     buildNews(cultureName, cName, currentPrice, momChange, yoyChange, vol,
       monthlyData[monthlyData.length - 1].month, monthlyData[monthlyData.length - 1].num_markets, true);
     buildRecommendationsAPI(country, culture, cultureName, cName, currentPrice, momChange, yoyChange, vol, forecast, AP.getBestSellMonth(data), data);
@@ -264,6 +265,7 @@ window.AgroPrix = window.AgroPrix || {};
     buildMap(country, culture, currentPrice);
     buildFactors(culture, cName, momChange);
     buildRegionalChart(culture, period);
+    buildOfficialPrice(culture);
     buildNews(cultureName, cName, currentPrice, momChange, yoyChange, vol, null, null, false);
     buildRecommendations(cultureName, cName, currentPrice, momChange, yoyChange, vol, forecast, AP.getBestSellMonth(allData), data);
   }
@@ -810,6 +812,28 @@ window.AgroPrix = window.AgroPrix || {};
   // =========================================================================
   // buildNews — generate news feed items
   // =========================================================================
+  // Prix officiels GARANTIS bord-champ (fili\u00e8res r\u00e9gul\u00e9es C\u00f4te d'Ivoire). Ce
+  // sont des prix fix\u00e9s par l'\u00c9tat/CCC/CC \u2014 la r\u00e9f\u00e9rence r\u00e9elle pour le
+  // producteur, distincte de la moyenne march\u00e9 WFP. \u00c0 actualiser chaque campagne.
+  var OFFICIAL_PRICES = {
+    cacao:  { texte: '2 800 FCFA/kg (principale, oct.\u2013mars) \u00b7 1 200 FCFA/kg (interm\u00e9diaire, avril\u2013sept.)', campagne: '2025-2026', source: 'Conseil du Caf\u00e9-Cacao (CI)' },
+    cafe:   { texte: '1 700 FCFA/kg', campagne: '2025-2026', source: 'Conseil du Caf\u00e9-Cacao (CI)' },
+    cajou:  { texte: '400 FCFA/kg (prix plancher bord champ, noix brute)', campagne: '2026', source: 'Conseil Coton-Anacarde (CI)' }
+  };
+
+  function buildOfficialPrice(culture) {
+    var el = document.getElementById('officialPriceNote');
+    if (!el) return;
+    var off = OFFICIAL_PRICES[culture];
+    if (!off) { el.innerHTML = ''; return; }
+    el.innerHTML = '<div class="card" style="padding:14px;border-radius:14px;margin:0 0 8px;border-left:4px solid #2D6A4F;background:#F0FFF4;">'
+      + '<div style="font-size:12px;font-weight:700;color:#1B4332;margin-bottom:4px;"><i data-lucide="landmark" class="lc"></i> Prix officiel garanti \u2014 bord champ (C\u00f4te d\'Ivoire)</div>'
+      + '<div style="font-size:13px;color:#333;">Campagne ' + off.campagne + ' : <b>' + off.texte + '</b></div>'
+      + '<div style="font-size:10px;color:#888;margin-top:4px;">Source : ' + off.source + '. Le prix march\u00e9 (WFP) ci-dessus peut diff\u00e9rer du prix garanti au producteur.</div>'
+      + '</div>';
+    if (window.refreshIcons) refreshIcons();
+  }
+
   // Signaux de march\u00e9 \u2014 d\u00e9riv\u00e9s UNIQUEMENT des vraies valeurs calcul\u00e9es dans
   // l'analyse (variation MoM/YoY, volatilit\u00e9, couverture march\u00e9s). Plus de fil
   // d'actualit\u00e9 fabriqu\u00e9 (anciens items citaient faussement FEWS NET / CEDEAO /
