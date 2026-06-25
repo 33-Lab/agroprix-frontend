@@ -1518,9 +1518,12 @@ h4 { font-size: var(--font-size-md); }
   z-index: 9999;
   background: linear-gradient(135deg, var(--navy) 0%, #0d2137 50%, var(--primary-dark) 100%);
   display: flex;
-  align-items: center;
-  justify-content: center;
   padding: 20px;
+  /* Permet de défiler quand le formulaire (ex: Inscription) dépasse l'écran.
+     align-items:center coupait le haut/bas sans scroll — remplacé par margin:auto
+     sur le conteneur (centre quand l'espace le permet, défile sinon). */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .auth-container {
@@ -1530,6 +1533,7 @@ h4 { font-size: var(--font-size-md); }
   width: 100%;
   max-width: 420px;
   padding: 32px;
+  margin: auto;
 }
 
 .auth-header {
