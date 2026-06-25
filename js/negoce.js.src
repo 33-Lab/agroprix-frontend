@@ -252,9 +252,21 @@
     var opportunities = opportunitiesByCountry[country] || opportunitiesByCountry.benin;
     var markets       = (AP.marketsByCountry && AP.marketsByCountry[country]) || [];
 
-    // Transactions de l'utilisateur (persistees localement) en premier, puis les
-    // exemples de reference. buildRows badge "EXEMPLE" celles qui ne sont pas userAdded.
-    var transactions = getUserTransactions(country).concat(demo);
+    // Transactions de l'utilisateur en premier, puis les exemples de reference.
+    // buildRows badge "EXEMPLE" celles qui ne sont pas userAdded.
+    // Connecté : source = backend (chargé une fois, re-render au retour). Sinon : localStorage.
+    var userTxs;
+    if (negoceLoggedIn()) {
+      if (backendTx === null) {
+        loadBackendTransactions().then(function() { init(); });  // charge puis re-render
+        userTxs = getUserTransactions(country);                  // affichage immédiat en attendant
+      } else {
+        userTxs = backendTx;
+      }
+    } else {
+      userTxs = getUserTransactions(country);
+    }
+    var transactions = userTxs.concat(demo);
 
     // Transactions
     var tbody = document.getElementById('transactionsBody');
@@ -324,13 +336,17 @@
   }
 
   // =========================================================================
-  // Carnet personnel — persistance locale (localStorage)
+  // Carnet personnel — backend si connecté, localStorage en repli
   // =========================================================================
-  // Les transactions de l'utilisateur sont stockees par pays. Pas de backend
-  // pour l'instant (aucun endpoint negoce cote serveur) : c'est un carnet local
-  // honnete, qui fonctionne reellement, plutot qu'un stub. Une synchro backend
-  // est une evolution possible (table + endpoint dedies).
+  // Connecté : les transactions sont persistées côté serveur (table
+  // negoce_transactions, /api/negoce/transactions) → synchro multi-appareils.
+  // Déconnecté ou serveur indisponible : repli localStorage (offline-first).
   var TX_KEY = 'agroprix_negoce_tx';
+  var backendTx = null;   // cache des transactions backend (null = pas encore chargé)
+
+  function negoceLoggedIn() {
+    return !!(AP.auth && AP.auth.isLoggedIn && AP.auth.isLoggedIn());
+  }
 
   function getAllUserTransactions() {
     try { return JSON.parse(localStorage.getItem(TX_KEY) || '{}'); } catch (e) { return {}; }
@@ -347,6 +363,14 @@
     all[country].unshift(tx);
     if (all[country].length > 200) all[country] = all[country].slice(0, 200);
     localStorage.setItem(TX_KEY, JSON.stringify(all));
+  }
+
+  function loadBackendTransactions() {
+    var base = (AP.API_BASE || '').replace(/\/$/, '');
+    return fetch(base + '/api/negoce/transactions', { credentials: 'include', signal: AbortSignal.timeout(8000) })
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(d) { backendTx = (d && d.transactions) ? d.transactions : []; return backendTx; })
+      .catch(function() { if (backendTx === null) backendTx = []; return backendTx; });
   }
 
   function addTransaction() {
@@ -392,18 +416,47 @@
       status: prixVente === null ? 'en_stock' : 'vendu'
     };
 
-    persistUserTransaction(getUserCountry(), tx);
-    setMsg('Transaction enregistree.', true);
+    function finish(message) {
+      setMsg(message, true);
+      ['negoceCulture', 'negoceMarche', 'negoceQty', 'negocePrixAchat', 'negocePrixVente'].forEach(function(id) {
+        var el = document.getElementById(id); if (el) el.value = '';
+      });
+      init();
+      var form = document.getElementById('negoceAddForm');
+      setTimeout(function() { if (form) form.style.display = 'none'; }, 700);
+    }
 
-    // Reset des champs (sauf date)
-    ['negoceCulture', 'negoceMarche', 'negoceQty', 'negocePrixAchat', 'negocePrixVente'].forEach(function(id) {
-      var el = document.getElementById(id); if (el) el.value = '';
-    });
+    function saveLocalFallback(message) {
+      persistUserTransaction(getUserCountry(), tx);
+      finish(message);
+    }
 
-    // Re-render (table + stats), puis on masque le formulaire
-    init();
-    var form = document.getElementById('negoceAddForm');
-    setTimeout(function() { if (form) form.style.display = 'none'; }, 700);
+    if (negoceLoggedIn()) {
+      var base = (AP.API_BASE || '').replace(/\/$/, '');
+      fetch(base + '/api/negoce/transactions', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          country: getUserCountry(), culture: culture, marche: marche,
+          qty: qty, prix_achat: prixAchat,
+          prix_vente: prixVente, tx_date: date
+        }),
+        signal: AbortSignal.timeout(8000)
+      }).then(function(r) {
+        if (r.status === 201) {
+          loadBackendTransactions().then(function() { finish('Transaction enregistree (synchronisee).'); });
+        } else if (r.status === 400 || r.status === 422) {
+          setMsg('Saisie refusee par le serveur (verifiez les valeurs).', false);
+        } else {
+          saveLocalFallback('Enregistre localement (serveur indisponible).');
+        }
+      }).catch(function() {
+        saveLocalFallback('Enregistre localement (hors-ligne).');
+      });
+    } else {
+      saveLocalFallback('Transaction enregistree localement. Connectez-vous pour synchroniser.');
+    }
   }
 
   AP.negoce = { init: init, addTransaction: addTransaction, saveTransaction: saveTransaction };
