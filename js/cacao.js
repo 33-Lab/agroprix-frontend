@@ -1,4 +1,4 @@
-/*! AgroPrix cacao.js - generated from cacao.js.src on 2026-05-12 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix cacao.js - generated from cacao.js.src on 2026-06-25 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 window.AgroPrix=window.AgroPrix||{};(function(AP){'use strict';var STORAGE_KEY='agroprix_cacao';var COLOR='#5D2E8C';var COLOR_LIGHT='#F3E8FF';var COLOR_DARK='#3B1A5A';var initialized=false;var cacaoPrixChartInst=null;function loadData(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||defaultData();}
 catch(e){return defaultData();}}
 function saveData(d){localStorage.setItem(STORAGE_KEY,JSON.stringify(d));}

@@ -1,4 +1,4 @@
-/*! AgroPrix security.js - generated from security.js.src on 2026-04-18 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix security.js - generated from security.js.src on 2026-06-25 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(){'use strict';document.addEventListener('contextmenu',function(e){e.preventDefault();});document.addEventListener('keydown',function(e){if(e.key==='F12'){e.preventDefault();return false;}
 if(e.ctrlKey&&e.shiftKey&&(e.key==='I'||e.key==='i')){e.preventDefault();return false;}
 if(e.ctrlKey&&e.shiftKey&&(e.key==='J'||e.key==='j')){e.preventDefault();return false;}

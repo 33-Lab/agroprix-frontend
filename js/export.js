@@ -1,4 +1,4 @@
-/*! AgroPrix export.js - generated from export.js.src on 2026-04-18 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix export.js - generated from export.js.src on 2026-06-25 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){function init(){}
 function publishDemand(){alert('Publication de demande export : fonctionnalite prevue en phase 2.\n\n'
 +'En attendant, contactez-nous directement :\n'
