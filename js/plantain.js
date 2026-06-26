@@ -329,12 +329,12 @@ window.AgroPrix = window.AgroPrix || {};
                 '<div style="font-size:10px;color:#999;">' + (p.lat ? 'GPS: ' + p.lat.toFixed(4) + ', ' + p.lng.toFixed(4) : 'Pas de GPS') + '</div>' +
               '</div>' +
               '<div style="display:flex;gap:6px;">' +
-                '<button onclick="AgroPrix.plantainGeolocParcelle(' + i + ')" style="padding:6px 10px;background:#FFF3E0;border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Geolocaliser">📍</button>' +
-                '<button onclick="AgroPrix.plantainDeleteParcelle(' + i + ')" style="padding:6px 10px;background:#FFEBEE;border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Supprimer">✕</button>' +
+                '<button data-action="plantain-geoloc-parcelle" data-i="' + i + '" style="padding:6px 10px;background:#FFF3E0;border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Geolocaliser">📍</button>' +
+                '<button data-action="plantain-delete-parcelle" data-i="' + i + '" style="padding:6px 10px;background:#FFEBEE;border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Supprimer">✕</button>' +
               '</div>' +
             '</div>';
           }).join('') : '<p style="font-size:12px;color:#999;text-align:center;padding:12px;">Aucune parcelle enregistree</p>') +
-        '<button onclick="AgroPrix.plantainShowAddParcelle()" style="width:100%;margin-top:8px;padding:12px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">+ Ajouter une parcelle</button>' +
+        '<button data-action="plantain-show-add-parcelle" style="width:100%;margin-top:8px;padding:12px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">+ Ajouter une parcelle</button>' +
         '<div id="plantain-add-parcelle" style="display:none;margin-top:12px;padding:14px;background:#FFF8F0;border-radius:12px;"></div>' +
       '</div>' +
 
@@ -357,7 +357,7 @@ window.AgroPrix = window.AgroPrix || {};
             '<option value="">Normal</option><option value="sigatoka">Sigatoka visible</option><option value="charancon">Charancon detecte</option><option value="chute">Chute de plants</option><option value="maturite">Sur-maturite (pertes)</option>' +
           '</select></div>' +
         '</div>' +
-        '<button onclick="AgroPrix.plantainAddRecolte()" style="width:100%;padding:12px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la recolte</button>' +
+        '<button data-action="plantain-add-recolte" style="width:100%;padding:12px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la recolte</button>' +
 
         // Historique
         (data.journalRecolte.length > 0 ?
@@ -398,7 +398,7 @@ window.AgroPrix = window.AgroPrix || {};
           '<div><label style="font-size:11px;font-weight:600;">Prix achat bord champ</label>' +
           '<input type="number" id="plantain-transfo-prix" placeholder="150" min="0" value="' + PRIX_PLANTAIN[PRIX_PLANTAIN.length-1].bordChamp + '" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;"></div>' +
         '</div>' +
-        '<button onclick="AgroPrix.plantainSimulerTransfo()" style="width:100%;padding:12px;background:linear-gradient(135deg,#E8862A,#F5A623);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Simuler la marge</button>' +
+        '<button data-action="plantain-simuler-transfo" style="width:100%;padding:12px;background:linear-gradient(135deg,#E8862A,#F5A623);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Simuler la marge</button>' +
         '<div id="plantain-transfo-results" style="margin-top:10px;"></div>' +
       '</div>';
   }
@@ -481,7 +481,7 @@ window.AgroPrix = window.AgroPrix || {};
             '<option value="bord_champ">Bord champ</option><option value="marche_local">Marche local</option><option value="marche_gros">Marche de gros</option><option value="abidjan">Abidjan</option><option value="transformateur">Transformateur</option>' +
           '</select></div>' +
         '</div>' +
-        '<button onclick="AgroPrix.plantainAddVente()" style="width:100%;padding:12px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la vente</button>' +
+        '<button data-action="plantain-add-vente" style="width:100%;padding:12px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la vente</button>' +
 
         // Historique ventes
         (data.journalVente.length > 0 ?
@@ -580,7 +580,7 @@ window.AgroPrix = window.AgroPrix || {};
             '</div>' +
           '</div>';
         }).join('') +
-        '<button onclick="AgroPrix.plantainExportDossier()" style="width:100%;margin-top:14px;padding:12px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;" ' + (completude < 40 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>Telecharger mon dossier (.txt)</button>' +
+        '<button data-action="plantain-export-dossier" style="width:100%;margin-top:14px;padding:12px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;" ' + (completude < 40 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>Telecharger mon dossier (.txt)</button>' +
       '</div>' +
 
       // Estimation revenus
@@ -620,7 +620,7 @@ window.AgroPrix = window.AgroPrix || {};
             '<div style="font-size:22px;font-weight:800;color:#5B3A1A;">' + Math.round(totalSurface * 20000) + ' FCFA</div>' +
             '<div style="font-size:10px;color:#666;">Base: 20 000 FCFA/ha/an — ' + totalSurface.toFixed(1) + ' ha</div>' +
           '</div>' : '') +
-        '<button onclick="AgroPrix.plantainContactAssurance()" style="width:100%;padding:12px;background:linear-gradient(135deg,#E8862A,#F5A623);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Demander des infos assurance</button>' +
+        '<button data-action="plantain-contact-assurance" style="width:100%;padding:12px;background:linear-gradient(135deg,#E8862A,#F5A623);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Demander des infos assurance</button>' +
       '</div>' +
 
       // Annuaire
@@ -631,7 +631,7 @@ window.AgroPrix = window.AgroPrix || {};
           '<option value="">-- Choisir une zone --</option>' +
           ZONES_CI.map(function(z) { return '<option value="' + z + '">' + z + '</option>'; }).join('') +
         '</select>' +
-        '<button onclick="AgroPrix.plantainChercherTechniciens()" style="width:100%;padding:12px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Chercher</button>' +
+        '<button data-action="plantain-chercher-techniciens" style="width:100%;padding:12px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Chercher</button>' +
         '<div id="plantain-tech-results"></div>' +
       '</div>';
   }
@@ -670,7 +670,7 @@ window.AgroPrix = window.AgroPrix || {};
         '<div><label style="font-size:11px;font-weight:600;">Date plantation</label><input type="date" id="plantain-new-date" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:12px;"></div>' +
         '<div><label style="font-size:11px;font-weight:600;">Type</label><select id="plantain-new-type" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:12px;"><option value="rejets">Culture de rejets</option><option value="neuf">Nouvelle plantation</option></select></div>' +
       '</div>' +
-      '<button onclick="AgroPrix.plantainSaveParcelle()" style="width:100%;padding:10px;background:#5B3A1A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la parcelle</button>';
+      '<button data-action="plantain-save-parcelle" style="width:100%;padding:10px;background:#5B3A1A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la parcelle</button>';
   };
 
   AP.plantainSaveParcelle = function() {
@@ -863,8 +863,8 @@ window.AgroPrix = window.AgroPrix || {};
         '<div style="font-size:13px;font-weight:700;">' + t.nom + '</div>' +
         '<div style="font-size:11px;color:#666;">' + t.specialite + '</div>' +
         '<div style="display:flex;gap:8px;margin-top:8px;">' +
-          '<button onclick="window.open(\'tel:' + t.tel + '\')" style="flex:1;padding:8px;background:#5B3A1A;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">Appeler</button>' +
-          '<button onclick="AgroPrix.plantainDemanderDevis(\'' + t.nom.replace(/'/g, "\\'") + '\')" style="flex:1;padding:8px;background:#E8862A;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">Contacter</button>' +
+          '<button data-action="open-tel" data-tel="' + t.tel + '" style="flex:1;padding:8px;background:#5B3A1A;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">Appeler</button>' +
+          '<button data-action="plantain-demander-devis" data-nom="' + t.nom.replace(/"/g, '&quot;') + '" style="flex:1;padding:8px;background:#E8862A;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">Contacter</button>' +
         '</div>' +
       '</div>';
     }).join('') + '</div>';
@@ -979,5 +979,21 @@ window.AgroPrix = window.AgroPrix || {};
       'Posez-moi des questions sur : les varietes, la Sigatoka noire, le charancon, les prix, la transformation (chips, farine), les pertes post-recolte, la contre-saison, ou le credit.<br>' +
       '<b>Exemples :</b> "Quelle variete choisir ?", "Comment lutter contre la Sigatoka ?", "Quand vendre au meilleur prix ?"';
   }
+
+  // ── Délégation d'événements (CSP Phase 2) ──────────────────────────────────
+  // HTML généré : data-action au lieu de onclick ; routé par actions.js.
+  // data-i = index parcelle, data-nom = technicien ; "Appeler" = open-tel.
+  AP.actions = AP.actions || {};
+  AP.actions['plantain-geoloc-parcelle']     = function(el) { AP.plantainGeolocParcelle(parseInt(el.getAttribute('data-i'), 10)); };
+  AP.actions['plantain-delete-parcelle']     = function(el) { AP.plantainDeleteParcelle(parseInt(el.getAttribute('data-i'), 10)); };
+  AP.actions['plantain-show-add-parcelle']   = function() { AP.plantainShowAddParcelle(); };
+  AP.actions['plantain-save-parcelle']       = function() { AP.plantainSaveParcelle(); };
+  AP.actions['plantain-add-recolte']         = function() { AP.plantainAddRecolte(); };
+  AP.actions['plantain-simuler-transfo']     = function() { AP.plantainSimulerTransfo(); };
+  AP.actions['plantain-add-vente']           = function() { AP.plantainAddVente(); };
+  AP.actions['plantain-export-dossier']      = function() { AP.plantainExportDossier(); };
+  AP.actions['plantain-contact-assurance']   = function() { AP.plantainContactAssurance(); };
+  AP.actions['plantain-chercher-techniciens'] = function() { AP.plantainChercherTechniciens(); };
+  AP.actions['plantain-demander-devis']      = function(el) { AP.plantainDemanderDevis(el.getAttribute('data-nom')); };
 
 })(window.AgroPrix);
