@@ -47,13 +47,13 @@
   // localFcfaKg : prix officiel bord-champ CI (cohérent avec OFFICIAL_PRICES
   // de analysis.js — à garder synchronisé chaque campagne).
   var PRODUCTS = {
-    cacao:  { label: 'Cacao (fèves sèches)',          eudrKey: 'cacao', minT: 18, fob: [5000, 9000], hs: '1801', localFcfaKg: 2800, perissable: false,
+    cacao:  { label: 'Cacao (fèves sèches)',          eudrKey: 'cacao', minT: 18, fob: [5000, 9000], hs: '1801', perissable: false,
               pack: ['Sacs jute 62,5 kg', 'Humidité < 7,5 %', 'Fèves bien fermentées (test à la coupe)', 'Grade 1 / Grade 2 (norme ICCO)'] },
-    cafe:   { label: 'Café (vert / robusta)',          eudrKey: 'cafe',  minT: 18, fob: [3800, 5500], hs: '0901', localFcfaKg: 1700, perissable: false,
+    cafe:   { label: 'Café (vert / robusta)',          eudrKey: 'cafe',  minT: 18, fob: [3800, 5500], hs: '0901', perissable: false,
               pack: ['Sacs jute ou GrainPro 60 kg', 'Humidité 10-12 %', 'Tri par taille / défauts', 'Certificat d\'origine'] },
     hevea:  { label: 'Hévéa (caoutchouc naturel)',     eudrKey: 'hevea', minT: 20, fob: [1500, 2050], hs: '4001', localFcfaKg: null, perissable: false,
               pack: ['Balles palettisées (TSR 10/20 ou RSS)', 'Spécification technique conforme', 'Conteneur sec ventilé'] },
-    cajou:  { label: 'Cajou (noix brute / RCN)',       eudrKey: null,    minT: 18, fob: [900, 1450],  hs: '0801', localFcfaKg: 400,  perissable: false,
+    cajou:  { label: 'Cajou (noix brute / RCN)',       eudrKey: null,    minT: 18, fob: [900, 1450],  hs: '0801', perissable: false,
               pack: ['Sacs jute ~80 kg', 'Humidité < 10 %', 'KOR (rendement amande) ≥ 48 lbs', 'Nut count / calibrage'] },
     sesame: { label: 'Sésame (graine)',                eudrKey: null,    minT: 18, fob: [1200, 1750], hs: '1207', localFcfaKg: null, perissable: false,
               pack: ['Sacs PP 50 kg', 'Pureté ≥ 99 %', 'Humidité < 8 %', 'Grain trié (blanc / rougeâtre)'] },
@@ -164,6 +164,11 @@
   function fmt(n) { return Math.round(n).toLocaleString('fr-FR'); }
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
   function usdXof() { return (AP.FX && AP.FX.usd_xof) ? AP.FX.usd_xof : FX_FALLBACK.usd_xof; }
+  // Prix officiel bord-champ : source unique AP.PRICES (config.js), lu au runtime.
+  function officialFcfaKg(k) {
+    var o = AP.PRICES && AP.PRICES.OFFICIAL && AP.PRICES.OFFICIAL[k];
+    return (o && o.fcfaKg) ? o.fcfaKg : null;
+  }
 
   function fxDateLabel() {
     if (!AP.FX || !AP.FX.updated_at) return '';
@@ -310,7 +315,8 @@
       html += '<div style="border-top:1px solid #f0f0f0;padding-top:10px;margin-top:8px;">'
         + '<div style="font-size:13px;font-weight:700;color:#1B4332;">' + esc(p.label) + '</div>';
       html += '<div style="font-size:12px;color:#444;margin:4px 0;">FOB indicatif : <b>' + fmt(p.fob[0]) + '–' + fmt(p.fob[1]) + ' USD/t</b> <span style="color:#999;">(ordre de grandeur, à confirmer avec l\'acheteur — pas une cotation live)</span>';
-      if (p.localFcfaKg) html += '<br>Prix officiel bord-champ CI : <b>' + fmt(p.localFcfaKg) + ' FCFA/kg</b>.';
+      var lp = officialFcfaKg(k);
+      if (lp) html += '<br>Prix officiel bord-champ CI : <b>' + fmt(lp) + ' FCFA/kg</b>.';
       html += '</div>';
       html += '<div style="font-size:12px;color:#444;margin-top:4px;"><b>Emballage & qualité :</b><ul style="margin:4px 0 0;padding-left:18px;">'
         + p.pack.map(function(x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>';
@@ -356,8 +362,9 @@
       var qkg = state.qtyT * 1000;
       html += '<div style="border-top:1px solid #f0f0f0;padding-top:8px;margin-top:8px;">'
         + '<div style="font-size:13px;font-weight:700;color:#1B4332;">' + esc(p.label) + ' — ' + fmt(state.qtyT) + ' t</div>';
-      if (p.localFcfaKg) {
-        html += '<div style="font-size:13px;color:#1B4332;margin:2px 0;">Valeur au prix bord-champ garanti : <b>' + fmt(qkg * p.localFcfaKg) + ' FCFA</b> <span style="font-size:11px;color:#999;">(' + fmt(p.localFcfaKg) + ' FCFA/kg)</span></div>';
+      var lp = officialFcfaKg(k);
+      if (lp) {
+        html += '<div style="font-size:13px;color:#1B4332;margin:2px 0;">Valeur au prix bord-champ garanti : <b>' + fmt(qkg * lp) + ' FCFA</b> <span style="font-size:11px;color:#999;">(' + fmt(lp) + ' FCFA/kg)</span></div>';
       }
       var ux = usdXof();
       html += '<div style="font-size:12px;color:#444;">Référence export (FOB) : <b>' + fmt(p.fob[0]) + '–' + fmt(p.fob[1]) + ' USD/t</b> → brut <b>' + fmt(state.qtyT * p.fob[0]) + '–' + fmt(state.qtyT * p.fob[1]) + ' USD</b> ≈ <b>' + fmt(state.qtyT * p.fob[0] * ux) + '–' + fmt(state.qtyT * p.fob[1] * ux) + ' FCFA</b> <span style="color:#999;">(taux du jour, avant coûts ; cours mondial volatil).</span></div>'
