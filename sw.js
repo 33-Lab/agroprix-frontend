@@ -11,7 +11,7 @@
 // MAIS en parallèle revalide le réseau et met à jour le cache → la version
 // suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = 'v7.18.0';  // bump 26/06 : helper GPS réutilisable AP.captureParcelleGPS
+const CACHE_VERSION = 'v7.19.0';  // bump 26/06 : EUDR réel café (Assistant Export — géoloc + check + DDS)
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 
