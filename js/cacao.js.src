@@ -981,20 +981,19 @@ window.AgroPrix = window.AgroPrix || {};
   };
 
   AP.cacaoGeolocParcelle = function(index) {
-    if (!navigator.geolocation) { alert('Géolocalisation non disponible sur cet appareil.'); return; }
-    navigator.geolocation.getCurrentPosition(function(pos) {
+    AP.captureParcelleGPS(function(coord) {
       var data = loadData();
       if (data.parcelles[index]) {
-        data.parcelles[index].lat = pos.coords.latitude;
-        data.parcelles[index].lng = pos.coords.longitude;
+        data.parcelles[index].lat = coord.lat;
+        data.parcelles[index].lng = coord.lng;
         data.eudr = data.eudr || {};
         data.eudr.geolocDone = true;
         saveData(data);
         renderJournal(data);
         renderDashboard(data);
-        alert('Parcelle géolocalisée (EUDR ✓) : ' + pos.coords.latitude.toFixed(5) + ', ' + pos.coords.longitude.toFixed(5));
+        alert('Parcelle géolocalisée (EUDR ✓) : ' + coord.lat.toFixed(5) + ', ' + coord.lng.toFixed(5));
       }
-    }, function() { alert('Impossible d\'obtenir votre position. Vérifiez les autorisations GPS.'); });
+    });
   };
 
   AP.cacaoDeleteParcelle = function(index) {
