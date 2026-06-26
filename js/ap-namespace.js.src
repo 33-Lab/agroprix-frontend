@@ -110,4 +110,33 @@
     };
   }
 
+  // ── AP.captureParcelleGPS ────────────────────────────────────────────
+  // Capture la position GPS de l'appareil pour géolocaliser une parcelle
+  // (conformité EUDR). Factorise le code dupliqué entre les modules cultures
+  // (cacao, hévéa) ; réutilisable par toute future filière (café, soja…).
+  //   AP.captureParcelleGPS(function(coord){ /* coord.lat, coord.lng, coord.accuracy */ });
+  // Haute précision activée (utile pour l'EUDR). Ne throw jamais : alerte
+  // l'utilisateur si la géolocalisation est indisponible ou refusée.
+  if (!AP.captureParcelleGPS) {
+    AP.captureParcelleGPS = function(onSuccess, onError) {
+      if (!navigator.geolocation) {
+        alert('Géolocalisation non disponible sur cet appareil.');
+        if (typeof onError === 'function') onError('unsupported');
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        function(pos) {
+          if (typeof onSuccess === 'function') {
+            onSuccess({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy });
+          }
+        },
+        function() {
+          alert('Impossible d\'obtenir votre position. Vérifiez les autorisations GPS.');
+          if (typeof onError === 'function') onError('denied');
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      );
+    };
+  }
+
 })(typeof window !== 'undefined' ? window : this);

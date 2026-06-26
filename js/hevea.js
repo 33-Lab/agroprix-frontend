@@ -661,18 +661,17 @@ window.AgroPrix = window.AgroPrix || {};
   };
 
   AP.heveaGeolocParcelle = function(index) {
-    if (!navigator.geolocation) { alert('Geolocalisation non disponible sur cet appareil.'); return; }
-    navigator.geolocation.getCurrentPosition(function(pos) {
+    AP.captureParcelleGPS(function(coord) {
       var data = loadData();
       if (data.parcelles[index]) {
-        data.parcelles[index].lat = pos.coords.latitude;
-        data.parcelles[index].lng = pos.coords.longitude;
+        data.parcelles[index].lat = coord.lat;
+        data.parcelles[index].lng = coord.lng;
         saveData(data);
         renderJournal(data);
         renderDashboard(data);
-        alert('Parcelle geolocalisee : ' + pos.coords.latitude.toFixed(4) + ', ' + pos.coords.longitude.toFixed(4));
+        alert('Parcelle geolocalisee : ' + coord.lat.toFixed(4) + ', ' + coord.lng.toFixed(4));
       }
-    }, function() { alert('Impossible d\'obtenir votre position. Verifiez les autorisations GPS.'); });
+    });
   };
 
   AP.heveaDeleteParcelle = function(index) {
