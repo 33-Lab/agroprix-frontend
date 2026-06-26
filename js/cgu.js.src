@@ -76,7 +76,7 @@
       + '<div id="cguCrops" style="display:flex;flex-wrap:wrap;gap:4px;">';
     Object.keys(cultures).forEach(function(c) {
       var active = profile.crops && profile.crops.indexOf(c) >= 0;
-      html += '<button type="button" data-crop="' + c + '" onclick="AgroPrix.cgu.toggleCrop(this,\'' + c + '\')" '
+      html += '<button type="button" data-crop="' + c + '" data-action="cgu-toggle-crop" data-crop="' + c + '" '
         + 'style="padding:4px 10px;border-radius:14px;font-size:11px;font-weight:600;border:1px solid ' + (active ? '#2D6A4F' : '#ddd') + ';background:' + (active ? '#2D6A4F' : '#fff') + ';color:' + (active ? '#fff' : '#666') + ';cursor:pointer;">'
         + cultures[c] + '</button>';
     });
@@ -132,7 +132,7 @@
       + '</label>';
 
     // Submit
-    html += '<button id="cguSubmitBtn" onclick="AgroPrix.cgu.accept()" style="width:100%;padding:14px;background:linear-gradient(135deg,#2D6A4F,#40916c);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;opacity:0.5;" disabled>'
+    html += '<button id="cguSubmitBtn" data-action="cgu-accept" style="width:100%;padding:14px;background:linear-gradient(135deg,#2D6A4F,#40916c);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;opacity:0.5;" disabled>'
       + 'Valider et continuer</button>';
 
     html += '</div></div>';
@@ -272,5 +272,11 @@
     needsRevalidation: needsRevalidation,
     getProfileStats: getProfileStats
   };
+
+  // Délégation d'événements (CSP Phase 2). toggleCrop(btn, crop) → on passe
+  // l'élément cliqué (el) + data-crop. accept() ferme la modale CGU.
+  AP.actions = AP.actions || {};
+  AP.actions['cgu-toggle-crop'] = function(el) { toggleCrop(el, el.getAttribute('data-crop')); };
+  AP.actions['cgu-accept'] = function() { accept(); };
 
 })(window.AgroPrix);

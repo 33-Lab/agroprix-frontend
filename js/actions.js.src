@@ -51,6 +51,9 @@
     if (!view || typeof window.showView !== 'function') return;
     window.showView(view, el.getAttribute('data-nav') ? el : undefined);
     if (el.getAttribute('data-close-menu')) closeMoreMenu();
+    // data-close-modal="id" → masque cette modale après navigation.
+    var cm = el.getAttribute('data-close-modal');
+    if (cm) { var m = document.getElementById(cm); if (m) m.style.display = 'none'; }
   };
 
   // Menu « Plus » (anciennement bloc <script> inline dans index.html).
@@ -151,6 +154,11 @@
   AP.actions['open-tel'] = function(el) {
     var t = el.getAttribute('data-tel');
     if (t) window.open('tel:' + t);
+  };
+  // Retirer un élément du DOM (overlays, bannières) — générique.
+  AP.actions['remove-el'] = function(el) {
+    var t = document.getElementById(el.getAttribute('data-target'));
+    if (t) t.remove();
   };
 
   // Soumissions de formulaires (data-action-submit) — handleLogin/handleRegister
