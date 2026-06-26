@@ -215,7 +215,7 @@ window.AgroPrix = window.AgroPrix || {};
 
     // Alertes
     var alertes = [];
-    if (se < 40) alertes.push({ type: 'danger', text: 'Score EUDR insuffisant — Ajoutez la geolocalisation GPS de vos parcelles pour acceder au marche UE (deadline dec. 2026)' });
+    if (se < 40) alertes.push({ type: 'danger', text: 'Score EUDR insuffisant — Ajoutez la geolocalisation GPS de vos parcelles pour acceder au marche UE (application 30/12/2026 grands operateurs, 30/06/2027 PME)' });
     if (nbParcelles === 0) alertes.push({ type: 'warning', text: 'Aucune parcelle enregistree. Ajoutez votre premiere parcelle pour commencer.' });
     if (data.journalSaignee.length === 0 && nbParcelles > 0) alertes.push({ type: 'info', text: 'Commencez a enregistrer vos saignees pour ameliorer votre Score Plantation.' });
 
@@ -415,17 +415,25 @@ window.AgroPrix = window.AgroPrix || {};
       // Historique prix chart placeholder
       '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;">' +
         '<div style="font-size:15px;font-weight:700;margin-bottom:12px;">Historique prix APROMAC</div>' +
-        '<div style="display:flex;align-items:flex-end;height:120px;gap:4px;padding:0 4px;">' +
-          PRIX_APROMAC.map(function(p) {
-            var minP = 300, maxP = 500;
-            var h = Math.max(10, ((p.prix - minP) / (maxP - minP)) * 100);
-            var isLast = p === prixActuel;
-            return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;">' +
-              '<div style="font-size:9px;font-weight:700;color:' + (isLast ? '#1B4332' : '#999') + ';margin-bottom:2px;">' + p.prix + '</div>' +
-              '<div style="width:100%;height:' + h + 'px;background:' + (isLast ? '#2D6A4F' : '#D8F3DC') + ';border-radius:4px 4px 0 0;"></div>' +
-              '<div style="font-size:8px;color:#999;margin-top:3px;">' + p.mois.slice(5) + '</div>' +
-            '</div>';
-          }).join('') +
+        '<div style="display:flex;align-items:flex-end;height:120px;gap:3px;padding:0 4px;">' +
+          (function() {
+            // Échelle DYNAMIQUE (avant : 300-500 fixe → les prix > 500 débordaient
+            // du cadre). Labels espacés (1 sur ~6 + le dernier) pour éviter le
+            // chevauchement sur mobile.
+            var vals = PRIX_APROMAC.map(function(p) { return p.prix; });
+            var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), span = (hi - lo) || 1;
+            var n = PRIX_APROMAC.length, step = Math.max(1, Math.ceil(n / 6));
+            return PRIX_APROMAC.map(function(p, i) {
+              var h = Math.min(100, Math.max(8, ((p.prix - lo) / span) * 88 + 12));
+              var isLast = (i === n - 1);
+              var show = isLast || (i % step === 0);
+              return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;min-width:0;">' +
+                (show ? '<div style="font-size:8px;font-weight:700;color:' + (isLast ? '#1B4332' : '#999') + ';white-space:nowrap;">' + p.prix + '</div>' : '<div style="height:11px;"></div>') +
+                '<div style="width:100%;height:' + h + 'px;background:' + (isLast ? '#2D6A4F' : '#D8F3DC') + ';border-radius:3px 3px 0 0;"></div>' +
+                '<div style="font-size:7px;color:#999;margin-top:3px;height:9px;white-space:nowrap;">' + (show ? p.mois.slice(5) : '') + '</div>' +
+              '</div>';
+            }).join('');
+          })() +
         '</div>' +
       '</div>' +
 
@@ -553,7 +561,7 @@ window.AgroPrix = window.AgroPrix || {};
       // EUDR declaration
       '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;border-left:4px solid ' + scoreColor(se) + ';">' +
         '<div style="font-size:15px;font-weight:700;margin-bottom:4px;">Declaration EUDR</div>' +
-        '<div style="font-size:12px;color:#666;margin-bottom:12px;">Reglement europeen sur la deforestation — Deadline dec. 2026</div>' +
+        '<div style="font-size:12px;color:#666;margin-bottom:12px;">Reglement UE 2023/1115. Application : 30/12/2026 (grands operateurs) / 30/06/2027 (PME)</div>' +
         '<div style="font-size:24px;text-align:center;margin:12px 0;">' + eudrLabel(se) + '</div>' +
         '<div style="font-size:11px;color:#666;">' +
           '<div style="margin-bottom:4px;">• Parcelles geolocalisees : ' + data.parcelles.filter(function(p) { return p.lat; }).length + '/' + data.parcelles.length + '</div>' +
@@ -574,14 +582,14 @@ window.AgroPrix = window.AgroPrix || {};
       // Estimation assurance
       '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;">' +
         '<div style="font-size:15px;font-weight:700;margin-bottom:4px;">Assurance agricole</div>' +
-        '<div style="font-size:12px;color:#666;margin-bottom:12px;">Estimation indicative — Produits micro-assurance CI</div>' +
+        '<div style="font-size:12px;color:#666;margin-bottom:12px;">Estimation indicative (phase 2). L\'equipe AgroPrix collecte votre interet — pas encore de partenariat assureur ferme.</div>' +
         (totalSurface > 0 ?
           '<div style="background:#f8f9fa;border-radius:10px;padding:12px;margin-bottom:10px;">' +
             '<div style="font-size:12px;color:#999;">Prime estimee annuelle</div>' +
             '<div style="font-size:22px;font-weight:800;color:#1B4332;">' + Math.round(totalSurface * 25000) + ' FCFA</div>' +
             '<div style="font-size:10px;color:#666;">Base: 25 000 FCFA/ha/an — ' + totalSurface.toFixed(1) + ' ha</div>' +
           '</div>' : '') +
-        '<button onclick="AgroPrix.heveaContactAssurance()" style="width:100%;padding:12px;background:linear-gradient(135deg,#E8862A,#F5A623);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Etre contacte par un assureur</button>' +
+        '<button onclick="AgroPrix.heveaContactAssurance()" style="width:100%;padding:12px;background:linear-gradient(135deg,#E8862A,#F5A623);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Demander des infos assurance</button>' +
       '</div>' +
 
       // Annuaire techniciens

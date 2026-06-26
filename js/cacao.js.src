@@ -576,33 +576,34 @@ window.AgroPrix = window.AgroPrix || {};
   function renderMarche(data) {
     var el = document.getElementById('cacao-marche');
     if (!el) return;
-    // Prix live async : tant que la série n'est pas chargée, on évite le crash
-    // (lecture de PRIX_CACAO[..].prix sur tableau vide) et on affiche un état
-    // de chargement. L'onglet est re-rendu une fois les prix arrivés (cacaoInit).
-    if (PRIX_CACAO.length < 4) {
+    // Prix live async : si AUCUN prix encore chargé, état de chargement (re-render
+    // par cacaoInit à l'arrivée des prix). Les données CI peuvent être éparses
+    // (parfois 1 seul mois WFP) → on gère prixPrec/tendance/iceUsd de façon
+    // conditionnelle au lieu d'exiger 4 points (sinon l'onglet restait bloqué).
+    if (PRIX_CACAO.length < 1) {
       el.innerHTML = '<div style="padding:24px;text-align:center;color:#888;font-size:13px;">Chargement des prix marché…</div>';
       return;
     }
 
     var prixActuel = PRIX_CACAO[PRIX_CACAO.length - 1];
-    var prixPrec   = PRIX_CACAO[PRIX_CACAO.length - 2];
-    var variation  = prixActuel.prix - prixPrec.prix;
-    var arrow      = variation >= 0 ? '▲' : '▼';
+    var prixPrec   = PRIX_CACAO.length >= 2 ? PRIX_CACAO[PRIX_CACAO.length - 2] : null;
+    var variation  = prixPrec ? (prixActuel.prix - prixPrec.prix) : null;
+    var arrow      = (variation != null && variation >= 0) ? '▲' : '▼';
 
-    // Calcul tendance (3 derniers mois)
-    var tendance3m = prixActuel.prix - PRIX_CACAO[PRIX_CACAO.length - 4].prix;
-    var tendanceLabel = tendance3m >= 0 ? 'hausse sur 3 mois' : 'baisse sur 3 mois';
+    // Tendance 3 mois — seulement si on a ≥ 4 points.
+    var tendance3m = PRIX_CACAO.length >= 4 ? (prixActuel.prix - PRIX_CACAO[PRIX_CACAO.length - 4].prix) : null;
+    var tendanceLabel = tendance3m == null ? '' : (tendance3m >= 0 ? 'hausse sur 3 mois' : 'baisse sur 3 mois');
 
     el.innerHTML =
       '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;background:linear-gradient(135deg,' + COLOR_DARK + ',' + COLOR + ');color:#fff;">' +
-        '<div style="font-size:12px;opacity:0.8;margin-bottom:4px;">Prix cacao fèves sèches UEMOA — ' + prixActuel.mois + '</div>' +
+        '<div style="font-size:12px;opacity:0.8;margin-bottom:4px;">Prix marché fèves sèches (WFP) — ' + prixActuel.mois + '</div>' +
         '<div style="font-size:36px;font-weight:900;">' + prixActuel.prix.toLocaleString() + ' <span style="font-size:14px;font-weight:500;">FCFA/kg</span></div>' +
-        '<div style="font-size:13px;margin-top:4px;">' +
-          '<span style="color:' + (variation >= 0 ? '#FFE082' : '#FFCDD2') + ';font-weight:700;">' + arrow + ' ' + Math.abs(variation).toLocaleString() + ' FCFA</span> vs mois précédent' +
-        '</div>' +
-        '<div style="font-size:11px;opacity:0.7;margin-top:6px;">' +
-          'ICE Futures : ' + prixActuel.iceUsd.toLocaleString() + ' USD/t · ' + (tendance3m >= 0 ? '▲' : '▼') + ' ' + tendanceLabel +
-        '</div>' +
+        (variation != null ?
+          '<div style="font-size:13px;margin-top:4px;">' +
+            '<span style="color:' + (variation >= 0 ? '#FFE082' : '#FFCDD2') + ';font-weight:700;">' + arrow + ' ' + Math.abs(variation).toLocaleString() + ' FCFA</span> vs mois précédent' +
+          '</div>' : '') +
+        (tendance3m != null ?
+          '<div style="font-size:11px;opacity:0.7;margin-top:6px;">' + (tendance3m >= 0 ? '▲' : '▼') + ' ' + tendanceLabel + '</div>' : '') +
       '</div>' +
 
       '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;">' +
@@ -842,7 +843,7 @@ window.AgroPrix = window.AgroPrix || {};
 
       '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;">' +
         '<div style="font-size:15px;font-weight:700;margin-bottom:4px;">Conformité EUDR</div>' +
-        '<div style="font-size:12px;color:#666;margin-bottom:12px;">Règlement UE 2023/1115 — applicable depuis décembre 2024. Obligatoire pour exporter en Europe.</div>' +
+        '<div style="font-size:12px;color:#666;margin-bottom:12px;">Règlement UE 2023/1115. Application : 30/12/2026 (grands/moyens opérateurs) · 30/06/2027 (PME). Obligatoire pour exporter en Europe.</div>' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
           '<span style="font-size:13px;font-weight:700;">Score EUDR</span>' +
           '<span style="font-size:20px;font-weight:900;color:' + scoreColor(sEudr) + ';">' + sEudr + '/100</span>' +
