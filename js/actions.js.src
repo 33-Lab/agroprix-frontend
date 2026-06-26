@@ -147,6 +147,11 @@
     if (t) t.scrollIntoView({ behavior: 'smooth' });
   };
   AP.actions['reload'] = function() { window.location.reload(); };
+  // Composer un numéro (tel:) — générique, réutilisé par les modules.
+  AP.actions['open-tel'] = function(el) {
+    var t = el.getAttribute('data-tel');
+    if (t) window.open('tel:' + t);
+  };
 
   // Soumissions de formulaires (data-action-submit) — handleLogin/handleRegister
   // appellent eux-mêmes preventDefault().

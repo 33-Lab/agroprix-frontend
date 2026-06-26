@@ -492,12 +492,12 @@ window.AgroPrix = window.AgroPrix || {};
                 '</div>' +
               '</div>' +
               '<div style="display:flex;gap:6px;">' +
-                '<button onclick="AgroPrix.cacaoGeolocParcelle(' + i + ')" style="padding:6px 10px;background:' + COLOR_LIGHT + ';border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Géolocaliser">📍</button>' +
-                '<button onclick="AgroPrix.cacaoDeleteParcelle(' + i + ')" style="padding:6px 10px;background:#FFEBEE;border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Supprimer">✕</button>' +
+                '<button data-action="cacao-geoloc-parcelle" data-i="' + i + '" style="padding:6px 10px;background:' + COLOR_LIGHT + ';border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Géolocaliser">📍</button>' +
+                '<button data-action="cacao-delete-parcelle" data-i="' + i + '" style="padding:6px 10px;background:#FFEBEE;border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Supprimer">✕</button>' +
               '</div>' +
             '</div>';
           }).join('') : '<p style="font-size:12px;color:#999;text-align:center;padding:12px;">Aucune parcelle enregistrée</p>') +
-        '<button onclick="AgroPrix.cacaoShowAddParcelle()" style="width:100%;margin-top:8px;padding:12px;background:linear-gradient(135deg,' + COLOR_DARK + ',' + COLOR + ');color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">+ Ajouter une parcelle</button>' +
+        '<button data-action="cacao-show-add-parcelle" style="width:100%;margin-top:8px;padding:12px;background:linear-gradient(135deg,' + COLOR_DARK + ',' + COLOR + ');color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">+ Ajouter une parcelle</button>' +
         '<div id="cacao-add-parcelle" style="display:none;margin-top:12px;padding:14px;background:' + COLOR_LIGHT + ';border-radius:12px;"></div>' +
       '</div>' +
 
@@ -523,7 +523,7 @@ window.AgroPrix = window.AgroPrix || {};
         '</div>' +
         '<div style="margin-bottom:10px;"><label style="font-size:11px;font-weight:600;">Notes / Observations</label>' +
         '<input type="text" id="cacao-op-notes" placeholder="Ex: fermentation 6j, humidité finale 6.5%, cabosses pourries 3%" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;"></div>' +
-        '<button onclick="AgroPrix.cacaoAddOperation()" style="width:100%;padding:12px;background:linear-gradient(135deg,' + COLOR + ',#7B4FA8);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer l\'opération</button>' +
+        '<button data-action="cacao-add-operation" style="width:100%;padding:12px;background:linear-gradient(135deg,' + COLOR + ',#7B4FA8);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer l\'opération</button>' +
 
         (data.journalCulture.length > 0 ?
           '<div style="margin-top:14px;max-height:200px;overflow-y:auto;">' +
@@ -635,7 +635,7 @@ window.AgroPrix = window.AgroPrix || {};
             '<option value="subgrade">Sous-grade (humide/mal fermenté)</option>' +
           '</select></div>' +
         '</div>' +
-        '<button onclick="AgroPrix.cacaoAddVente()" style="width:100%;padding:12px;background:linear-gradient(135deg,' + COLOR + ',#7B4FA8);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la vente</button>' +
+        '<button data-action="cacao-add-vente" style="width:100%;padding:12px;background:linear-gradient(135deg,' + COLOR + ',#7B4FA8);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la vente</button>' +
 
         (data.journalVente.length > 0 ?
           '<div style="margin-top:14px;">' +
@@ -661,7 +661,7 @@ window.AgroPrix = window.AgroPrix || {};
           '<option value="Ghana">Ghana</option>' +
           '<option value="Togo">Togo</option>' +
         '</select>' +
-        '<button onclick="AgroPrix.cacaoChercherAcheteurs()" style="width:100%;padding:12px;background:linear-gradient(135deg,' + COLOR + ',#7B4FA8);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Voir les exportateurs</button>' +
+        '<button data-action="cacao-chercher-acheteurs" style="width:100%;padding:12px;background:linear-gradient(135deg,' + COLOR + ',#7B4FA8);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Voir les exportateurs</button>' +
         '<div id="cacao-exp-results"></div>' +
       '</div>' +
 
@@ -841,7 +841,7 @@ window.AgroPrix = window.AgroPrix || {};
             '</div>' +
           '</div>';
         }).join('') +
-        '<button onclick="AgroPrix.cacaoExportDossier()" ' + (completude < 40 ? 'disabled ' : '') + 'style="width:100%;margin-top:14px;padding:12px;background:linear-gradient(135deg,' + COLOR_DARK + ',' + COLOR + ');color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;' + (completude < 40 ? 'opacity:0.5;' : '') + '">Générer mon dossier</button>' +
+        '<button data-action="cacao-export-dossier" ' + (completude < 40 ? 'disabled ' : '') + 'style="width:100%;margin-top:14px;padding:12px;background:linear-gradient(135deg,' + COLOR_DARK + ',' + COLOR + ');color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;' + (completude < 40 ? 'opacity:0.5;' : '') + '">Générer mon dossier</button>' +
       '</div>' +
 
       '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;">' +
@@ -880,9 +880,9 @@ window.AgroPrix = window.AgroPrix || {};
         '<div style="margin-top:14px;border-top:1px solid #f0f0f0;padding-top:12px;">' +
           '<div style="font-size:12px;font-weight:700;color:#1B4332;margin-bottom:6px;"><i data-lucide="satellite" class="lc"></i> Analyse EUDR réelle (satellite)</div>' +
           '<div style="font-size:11px;color:#888;margin-bottom:8px;">Vérifie la déforestation post-2020 (Hansen GFC) et la proximité des aires protégées. Nécessite une connexion + au moins une parcelle géolocalisée.</div>' +
-          '<button onclick="AgroPrix.cacaoCheckEUDR()" style="width:100%;padding:10px;background:#1B4332;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;"><i data-lucide="play" class="lc"></i> Lancer l\'analyse EUDR réelle</button>' +
+          '<button data-action="cacao-check-eudr" style="width:100%;padding:10px;background:#1B4332;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;"><i data-lucide="play" class="lc"></i> Lancer l\'analyse EUDR réelle</button>' +
           '<div id="cacao-eudr-real" style="margin-top:10px;"></div>' +
-          '<button id="cacao-dds-btn" onclick="AgroPrix.cacaoExportDDS()" disabled style="width:100%;margin-top:8px;padding:10px;background:#fff;border:1px solid #1B4332;color:#1B4332;border-radius:10px;font-size:12px;font-weight:700;cursor:not-allowed;opacity:0.5;"><i data-lucide="file-check" class="lc"></i> Télécharger la déclaration signée (DDS)</button>' +
+          '<button id="cacao-dds-btn" data-action="cacao-export-dds" disabled style="width:100%;margin-top:8px;padding:10px;background:#fff;border:1px solid #1B4332;color:#1B4332;border-radius:10px;font-size:12px;font-weight:700;cursor:not-allowed;opacity:0.5;"><i data-lucide="file-check" class="lc"></i> Télécharger la déclaration signée (DDS)</button>' +
         '</div>' +
       '</div>' +
 
@@ -904,13 +904,13 @@ window.AgroPrix = window.AgroPrix || {};
           '<option value="">-- Choisir une zone --</option>' +
           ZONES_CACAO.map(function(z) { return '<option value="' + z + '">' + z + '</option>'; }).join('') +
         '</select>' +
-        '<button onclick="AgroPrix.cacaoChercherConseillers()" style="width:100%;padding:12px;background:linear-gradient(135deg,' + COLOR + ',#7B4FA8);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Chercher des techniciens</button>' +
+        '<button data-action="cacao-chercher-conseillers" style="width:100%;padding:12px;background:linear-gradient(135deg,' + COLOR + ',#7B4FA8);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Chercher des techniciens</button>' +
         '<div id="cacao-tech-results"></div>' +
       '</div>';
   }
 
   function eudrToggleBtn(key, label, val) {
-    return '<button onclick="AgroPrix.cacaoToggleEUDR(\'' + key + '\')" ' +
+    return '<button data-action="cacao-toggle-eudr" data-key="' + key + '" ' +
       'style="padding:10px;background:' + (val ? COLOR : '#f0f0f0') + ';color:' + (val ? '#fff' : '#666') + ';border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;">' +
       (val ? '✅ ' : '⬜ ') + label +
     '</button>';
@@ -959,7 +959,7 @@ window.AgroPrix = window.AgroPrix || {};
         '<div><label style="font-size:11px;font-weight:600;">Année plantation</label><input type="number" id="cacao-new-annee" placeholder="2018" min="1980" max="2026" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:12px;"></div>' +
         '<div><label style="font-size:11px;font-weight:600;">Nombre d\'arbres</label><input type="number" id="cacao-new-arbres" placeholder="400" min="1" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:12px;"></div>' +
       '</div>' +
-      '<button onclick="AgroPrix.cacaoSaveParcelle()" style="width:100%;padding:10px;background:' + COLOR + ';color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la parcelle</button>';
+      '<button data-action="cacao-save-parcelle" style="width:100%;padding:10px;background:' + COLOR + ';color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la parcelle</button>';
   };
 
   AP.cacaoSaveParcelle = function() {
@@ -1213,8 +1213,8 @@ window.AgroPrix = window.AgroPrix || {};
         '<div style="font-size:13px;font-weight:700;">' + c.nom + '</div>' +
         '<div style="font-size:11px;color:#666;">' + c.specialite + '</div>' +
         '<div style="display:flex;gap:8px;margin-top:8px;">' +
-          '<button onclick="window.open(\'tel:' + c.tel + '\')" style="flex:1;padding:8px;background:' + COLOR + ';color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">Appeler</button>' +
-          '<button onclick="AgroPrix.cacaoDemanderContact(\'' + c.nom.replace(/'/g, "\\'") + '\')" style="flex:1;padding:8px;background:#E8862A;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">Contacter</button>' +
+          '<button data-action="open-tel" data-tel="' + c.tel + '" style="flex:1;padding:8px;background:' + COLOR + ';color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">Appeler</button>' +
+          '<button data-action="cacao-demander-contact" data-nom="' + c.nom.replace(/"/g, '&quot;') + '" style="flex:1;padding:8px;background:#E8862A;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">Contacter</button>' +
         '</div>' +
       '</div>';
     }).join('') + '</div>';
@@ -1506,5 +1506,25 @@ window.AgroPrix = window.AgroPrix || {};
   AP.cacaoToggleIA  = toggleIA;
   AP.cacaoAskIA     = askIA;
   AP.cacaoDiagPhoto = AP.cacaoDiagPhoto; // déjà défini
+
+  // ── Délégation d'événements (CSP Phase 2) ──────────────────────────────────
+  // Le HTML généré ci-dessus utilise data-action au lieu de onclick inline ;
+  // un seul listener (js/actions.js) route vers ces handlers. Les arguments
+  // passent par data-* (data-i = index parcelle, data-key = critère EUDR,
+  // data-nom = nom du conseiller). Guard car ce module charge avant actions.js.
+  AP.actions = AP.actions || {};
+  AP.actions['cacao-geoloc-parcelle']      = function(el) { AP.cacaoGeolocParcelle(parseInt(el.getAttribute('data-i'), 10)); };
+  AP.actions['cacao-delete-parcelle']      = function(el) { AP.cacaoDeleteParcelle(parseInt(el.getAttribute('data-i'), 10)); };
+  AP.actions['cacao-show-add-parcelle']    = function() { AP.cacaoShowAddParcelle(); };
+  AP.actions['cacao-save-parcelle']        = function() { AP.cacaoSaveParcelle(); };
+  AP.actions['cacao-add-operation']        = function() { AP.cacaoAddOperation(); };
+  AP.actions['cacao-add-vente']            = function() { AP.cacaoAddVente(); };
+  AP.actions['cacao-chercher-acheteurs']   = function() { AP.cacaoChercherAcheteurs(); };
+  AP.actions['cacao-chercher-conseillers'] = function() { AP.cacaoChercherConseillers(); };
+  AP.actions['cacao-export-dossier']       = function() { AP.cacaoExportDossier(); };
+  AP.actions['cacao-check-eudr']           = function() { AP.cacaoCheckEUDR(); };
+  AP.actions['cacao-export-dds']           = function() { AP.cacaoExportDDS(); };
+  AP.actions['cacao-toggle-eudr']          = function(el) { AP.cacaoToggleEUDR(el.getAttribute('data-key')); };
+  AP.actions['cacao-demander-contact']     = function(el) { AP.cacaoDemanderContact(el.getAttribute('data-nom')); };
 
 })(window.AgroPrix);

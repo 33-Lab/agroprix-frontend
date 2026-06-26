@@ -137,4 +137,36 @@ test.describe('Navigation déléguée (data-action)', () => {
     await modal.locator('[data-action="modal-close"][data-modal="cgvModal"]').click();
     await expect(modal).toBeHidden();
   });
+
+  test('module Cacao Pro : 0 onclick inline rendu + action EUDR fonctionnelle', async ({ page }) => {
+    test.slow();
+    await page.setViewportSize({ width: 1280, height: 800 });
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await asAdmin(page);
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
+    test.skip(!(await hasAction(page, 'cacao-check-eudr')), 'module cacao délégué pas encore déployé sur la cible');
+
+    await page.locator('#navCacao').click();
+    await expect(page.locator('#viewCacao')).toBeVisible();
+    await page.waitForTimeout(2500); // init module + 1er rendu
+
+    // Rend tous les onglets (chacun génère du HTML qui contenait des onclick).
+    for (const tab of ['journal', 'marche', 'dossier', 'dashboard']) {
+      await page.evaluate((t) => (window as any).cacaoSwitchTab && (window as any).cacaoSwitchTab(t), tab);
+      await page.waitForTimeout(300);
+    }
+
+    // Aucun handler inline résiduel dans le DOM généré par le module.
+    expect(await page.locator('#viewCacao [onclick]').count()).toBe(0);
+
+    // Action déléguée fonctionnelle : toggle d'un critère EUDR (état local).
+    await page.evaluate(() => (window as any).cacaoSwitchTab('dossier'));
+    await page.waitForTimeout(400);
+    const toggle = page.locator('#viewCacao [data-action="cacao-toggle-eudr"]').first();
+    if (await toggle.count()) await toggle.click();
+
+    expect(errors, errors.join('\n')).toHaveLength(0);
+  });
 });
