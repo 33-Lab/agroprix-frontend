@@ -516,10 +516,21 @@
   // QR Traceability
   // =========================================================================
 
-  // Generate QR code URL (via Google Charts API - lightweight, no library needed)
+  // QR code généré LOCALEMENT (lib qrcode-generator) — la donnée de traçabilité
+  // ne sort PLUS du navigateur (auparavant envoyée à api.qrserver.com).
   function getQRUrl(data, size) {
     size = size || 200;
-    return 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size + '&data=' + encodeURIComponent(data);
+    try {
+      if (typeof qrcode === 'function') {
+        var qr = qrcode(0, 'M');          // type auto, correction d'erreur moyenne
+        qr.addData(String(data));
+        qr.make();
+        var n = qr.getModuleCount();
+        var cell = Math.max(2, Math.round(size / (n + 8)));
+        return qr.createDataURL(cell, 4); // data:image/gif;base64,... (local)
+      }
+    } catch (e) { /* lib indisponible -> pas de QR plutôt qu'un appel tiers */ }
+    return '';
   }
 
   // Build traceability data string for QR

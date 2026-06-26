@@ -1,4 +1,4 @@
-/*! AgroPrix marketplace.js - generated from marketplace.js.src on 2026-06-25 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix marketplace.js - generated from marketplace.js.src on 2026-06-26 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){'use strict';var currentTab='marche';var OFFERS_KEY='agroprix_marketplace_offers';var DEMANDS_KEY='agroprix_marketplace_demands';var API_BASE=(AP&&AP.API_BASE)?AP.API_BASE:'';function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function _authHeaders(){var h={'Content-Type':'application/json'};var legacy=localStorage.getItem('agroprix_token');if(legacy)h['Authorization']='Bearer '+legacy;return h;}
 function _fetchOpts(extra){var o=extra||{};o.credentials='include';return o;}
@@ -86,7 +86,8 @@ var successEl=document.getElementById('mpSuccess');if(successEl){successEl.textC
 setTimeout(function(){currentTab='marche';render();window.scrollTo(0,0);},1500);}
 function setTab(tabId){currentTab=tabId;render();window.scrollTo(0,0);}
 function init(){currentTab='marche';if(typeof syncFromBackend==='function'){syncFromBackend(render);}else{render();}}
-function getQRUrl(data,size){size=size||200;return'https://api.qrserver.com/v1/create-qr-code/?size='+size+'x'+size+'&data='+encodeURIComponent(data);}
+function getQRUrl(data,size){size=size||200;try{if(typeof qrcode==='function'){var qr=qrcode(0,'M');qr.addData(String(data));qr.make();var n=qr.getModuleCount();var cell=Math.max(2,Math.round(size/(n+8)));return qr.createDataURL(cell,4);}}catch(e){}
+return'';}
 function buildTraceData(item){var data={id:item.id,platform:'AgroPrix',type:item.type==='sell'?'VENTE':'ACHAT',product:item.cropName||item.crop,quantity:item.quantity+' '+(item.unit||'kg'),price:item.type==='sell'?(item.price+' FCFA/kg'):(item.maxPrice+' '+item.priceUnit),seller:item.seller||item.buyer||'—',market:item.market||'—',date:item.date?item.date.split('T')[0]:'—',country:getUserCountry(),verified:item.verified?'OUI':'NON',url:'https://agroprix.app/trace/'+item.id};return JSON.stringify(data);}
 function getTraceCode(itemId){try{return(JSON.parse(localStorage.getItem('agroprix_trace_codes')||'{}'))[itemId]||null;}
 catch(e){return null;}}
