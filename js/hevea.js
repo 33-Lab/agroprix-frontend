@@ -215,7 +215,7 @@ window.AgroPrix = window.AgroPrix || {};
 
     // Alertes
     var alertes = [];
-    if (se < 40) alertes.push({ type: 'danger', text: 'Score EUDR insuffisant — Ajoutez la geolocalisation GPS de vos parcelles pour acceder au marche UE (application 30/12/2026 grands operateurs, 30/06/2027 PME)' });
+    if (se < 40) alertes.push({ type: 'danger', text: 'Score EUDR insuffisant — Ajoutez la geolocalisation GPS de vos parcelles pour acceder au marche UE. ' + AP.EUDR.DATES_TEXT });
     if (nbParcelles === 0) alertes.push({ type: 'warning', text: 'Aucune parcelle enregistree. Ajoutez votre premiere parcelle pour commencer.' });
     if (data.journalSaignee.length === 0 && nbParcelles > 0) alertes.push({ type: 'info', text: 'Commencez a enregistrer vos saignees pour ameliorer votre Score Plantation.' });
 
@@ -561,7 +561,7 @@ window.AgroPrix = window.AgroPrix || {};
       // EUDR declaration
       '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;border-left:4px solid ' + scoreColor(se) + ';">' +
         '<div style="font-size:15px;font-weight:700;margin-bottom:4px;">Declaration EUDR</div>' +
-        '<div style="font-size:12px;color:#666;margin-bottom:12px;">Reglement UE 2023/1115. Application : 30/12/2026 (grands operateurs) / 30/06/2027 (PME)</div>' +
+        '<div style="font-size:12px;color:#666;margin-bottom:12px;">' + AP.EUDR.REGLEMENT + '. ' + AP.EUDR.DATES_TEXT + '</div>' +
         '<div style="font-size:24px;text-align:center;margin:12px 0;">' + eudrLabel(se) + '</div>' +
         '<div style="font-size:11px;color:#666;">' +
           '<div style="margin-bottom:4px;">• Parcelles geolocalisees : ' + data.parcelles.filter(function(p) { return p.lat; }).length + '/' + data.parcelles.length + '</div>' +
