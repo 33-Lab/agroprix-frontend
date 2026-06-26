@@ -553,7 +553,15 @@ window.AgroPrix = window.AgroPrix || {};
           '<div style="margin-bottom:4px;">• Date plantation renseignee : ' + data.parcelles.filter(function(p) { return p.datePlantation; }).length + '/' + data.parcelles.length + '</div>' +
           '<div>• Historique cultural : ' + (nbSaignees > 0 ? 'Oui (' + nbSaignees + ' entrees)' : 'Non') + '</div>' +
         '</div>' +
-        '<button onclick="AgroPrix.heveaExportEUDR()" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Exporter declaration EUDR (.txt)</button>' +
+        '<button onclick="AgroPrix.heveaExportEUDR()" style="width:100%;margin-top:12px;padding:10px;background:#fff;border:1px solid #2D6A4F;color:#2D6A4F;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;">Export auto-déclaration (.txt)</button>' +
+        // Analyse EUDR RÉELLE (moteur backend Hansen GFC + zones protégées WDPA)
+        '<div style="margin-top:14px;border-top:1px solid #f0f0f0;padding-top:12px;">' +
+          '<div style="font-size:12px;font-weight:700;color:#1B4332;margin-bottom:6px;"><i data-lucide="satellite" class="lc"></i> Analyse EUDR réelle (satellite)</div>' +
+          '<div style="font-size:11px;color:#888;margin-bottom:8px;">Vérifie la déforestation post-2020 (Hansen GFC) et la proximité des aires protégées. Nécessite une connexion + au moins une parcelle géolocalisée (bouton 📍).</div>' +
+          '<button onclick="AgroPrix.heveaCheckEUDR()" style="width:100%;padding:10px;background:#1B4332;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;"><i data-lucide="play" class="lc"></i> Lancer l\'analyse EUDR réelle</button>' +
+          '<div id="hevea-eudr-real" style="margin-top:10px;"></div>' +
+          '<button id="hevea-dds-btn" onclick="AgroPrix.heveaExportDDS()" disabled style="width:100%;margin-top:8px;padding:10px;background:#fff;border:1px solid #1B4332;color:#1B4332;border-radius:10px;font-size:12px;font-weight:700;cursor:not-allowed;opacity:0.5;"><i data-lucide="file-check" class="lc"></i> Télécharger la déclaration signée (DDS)</button>' +
+        '</div>' +
       '</div>' +
 
       // Estimation assurance
@@ -741,6 +749,79 @@ window.AgroPrix = window.AgroPrix || {};
     a.href = URL.createObjectURL(blob);
     a.download = 'AgroPrix_Dossier_Credit_Hevea_' + new Date().toISOString().slice(0, 10) + '.txt';
     a.click();
+  };
+
+  // =========================================================================
+  // EUDR RÉEL — moteur backend (Hansen GFC-2023 + zones protégées WDPA + DDS)
+  // =========================================================================
+  var _heveaEudrLastId = null;
+
+  AP.heveaCheckEUDR = function() {
+    var out = document.getElementById('hevea-eudr-real');
+    var ddsBtn = document.getElementById('hevea-dds-btn');
+    if (!AP.API_BASE) return;
+    var data = loadData();
+    var geoloc = (data.parcelles || []).filter(function(p) { return typeof p.lat === 'number' && typeof p.lng === 'number'; });
+    if (!geoloc.length) {
+      if (out) out.innerHTML = '<div style="font-size:12px;color:#e76f51;">Aucune parcelle géolocalisée. Utilisez le bouton 📍 sur une parcelle (onglet Journal) avant l\'analyse EUDR.</div>';
+      return;
+    }
+    if (out) out.innerHTML = '<div style="font-size:12px;color:#666;">Analyse satellite EUDR en cours (~10–20 s)…</div>';
+
+    function syncOne(p) {
+      if (p.backendId) return Promise.resolve(p.backendId);
+      return fetch(AP.API_BASE + '/api/parcelles/', {
+        method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nom: p.nom || 'Parcelle hévéa', culture: 'hevea', surface_ha: p.surface || null, lat: p.lat, lng: p.lng, pays: 'cote_divoire', region: p.zone || null, date_plantation: p.datePlantation || null })
+      }).then(function(r) {
+        if (r.status === 401) throw new Error('auth');
+        if (!r.ok) throw new Error('sync ' + r.status);
+        return r.json();
+      }).then(function(j) { p.backendId = j.id; saveData(data); return j.id; });
+    }
+    function checkOne(id) {
+      return fetch(AP.API_BASE + '/api/eudr/parcelle/' + id + '/check', { method: 'GET', credentials: 'include' })
+        .then(function(r) { if (r.status === 401) throw new Error('auth'); if (!r.ok) throw new Error('check ' + r.status); return r.json(); });
+    }
+
+    var results = [];
+    geoloc.reduce(function(chain, p) {
+      return chain.then(function() {
+        return syncOne(p).then(checkOne).then(function(res) { results.push({ p: p, res: res, id: p.backendId }); });
+      });
+    }, Promise.resolve()).then(function() {
+      _heveaEudrLastId = results.length ? results[results.length - 1].id : null;
+      var colorMap = { green: '#2D6A4F', amber: '#E8862A', red: '#D32F2F' };
+      var labelMap = { green: 'Conforme (risque négligeable)', amber: 'À vérifier', red: 'Non conforme — risque déforestation' };
+      var html = results.map(function(r) {
+        var st = r.res.status || 'amber';
+        var defo = r.res.deforestation && r.res.deforestation.loss_pct_post_2020_12_31;
+        var dist = r.res.protected_areas && r.res.protected_areas.closest_distance_km;
+        return '<div style="padding:10px;border-radius:10px;background:#F7F7F9;margin-bottom:8px;border-left:4px solid ' + (colorMap[st] || '#999') + ';">'
+          + '<div style="font-size:12px;font-weight:700;">' + (r.p.nom || 'Parcelle') + ' — <span style="color:' + (colorMap[st] || '#999') + ';">' + (labelMap[st] || st) + '</span></div>'
+          + '<div style="font-size:11px;color:#555;margin-top:3px;">Déforestation post-2020 : ' + (defo != null ? defo.toFixed(2) + '%' : 'n/d') + ' · Aire protégée la plus proche : ' + (dist != null ? dist.toFixed(1) + ' km' : 'n/d') + ' · Risque pays : ' + (r.res.country_risk || 'n/d') + '</div>'
+          + '</div>';
+      }).join('');
+      if (out) out.innerHTML = html + '<div style="font-size:10px;color:#888;margin-top:4px;">Source : Hansen GFC-2023 + WDPA (moteur EUDR AgroPrix).</div>';
+      if (ddsBtn && _heveaEudrLastId) { ddsBtn.disabled = false; ddsBtn.style.opacity = '1'; ddsBtn.style.cursor = 'pointer'; }
+      if (window.refreshIcons) refreshIcons();
+    }).catch(function(e) {
+      if (out) out.innerHTML = '<div style="font-size:12px;color:#e76f51;">' + (String(e.message) === 'auth' ? 'Connectez-vous pour lancer l\'analyse EUDR réelle.' : 'Analyse EUDR indisponible (' + e.message + ').') + '</div>';
+    });
+  };
+
+  AP.heveaExportDDS = function() {
+    if (!_heveaEudrLastId || !AP.API_BASE) { alert('Lancez d\'abord l\'analyse EUDR réelle.'); return; }
+    fetch(AP.API_BASE + '/api/eudr/parcelle/' + _heveaEudrLastId + '/dds', { method: 'GET', credentials: 'include' })
+      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function(dds) {
+        var blob = new Blob([JSON.stringify(dds, null, 2)], { type: 'application/json' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'AgroPrix_DDS_EUDR_' + (dds.dds_id || _heveaEudrLastId) + '.json';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      })
+      .catch(function(e) { alert('Export DDS impossible : ' + e.message); });
   };
 
   AP.heveaExportEUDR = function() {
