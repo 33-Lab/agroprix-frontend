@@ -331,7 +331,7 @@ window.AgroPrix = window.AgroPrix || {};
     });
   }
 
-  // Exposé pour les onglets inline onclick=""
+  // Exposé en global pour la navigation par onglets.
   window.tomateSwitchTab = function(target) {
     document.querySelectorAll('.tomate-tab').forEach(function(t) { t.classList.remove('active'); });
     var activeTab = document.querySelector('.tomate-tab[data-tab="' + target + '"]');
@@ -534,12 +534,12 @@ window.AgroPrix = window.AgroPrix || {};
                 '<div style="font-size:10px;color:#999;margin-top:2px;">' + (p.lat ? 'GPS: ' + p.lat.toFixed(4) + ', ' + p.lng.toFixed(4) : 'Pas de GPS') + '</div>' +
               '</div>' +
               '<div style="display:flex;gap:6px;">' +
-                '<button onclick="AgroPrix.tomateGeolocParcelle(' + i + ')" style="padding:6px 10px;background:' + COLOR_LIGHT + ';border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Géolocaliser">📍</button>' +
-                '<button onclick="AgroPrix.tomateDeleteParcelle(' + i + ')" style="padding:6px 10px;background:#FFEBEE;border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Supprimer">✕</button>' +
+                '<button data-action="tomate-geoloc-parcelle" data-i="' + i + '" style="padding:6px 10px;background:' + COLOR_LIGHT + ';border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Géolocaliser">📍</button>' +
+                '<button data-action="tomate-delete-parcelle" data-i="' + i + '" style="padding:6px 10px;background:#FFEBEE;border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Supprimer">✕</button>' +
               '</div>' +
             '</div>';
           }).join('') : '<p style="font-size:12px;color:#999;text-align:center;padding:12px;">Aucune parcelle enregistrée</p>') +
-        '<button onclick="AgroPrix.tomateShowAddParcelle()" style="width:100%;margin-top:8px;padding:12px;background:linear-gradient(135deg,' + COLOR_DARK + ',' + COLOR + ');color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">+ Ajouter une parcelle</button>' +
+        '<button data-action="tomate-show-add-parcelle" style="width:100%;margin-top:8px;padding:12px;background:linear-gradient(135deg,' + COLOR_DARK + ',' + COLOR + ');color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">+ Ajouter une parcelle</button>' +
         '<div id="tomate-add-parcelle" style="display:none;margin-top:12px;padding:14px;background:' + COLOR_LIGHT + ';border-radius:12px;"></div>' +
       '</div>' +
 
@@ -568,7 +568,7 @@ window.AgroPrix = window.AgroPrix || {};
         '</div>' +
         '<div style="margin-bottom:10px;"><label style="font-size:11px;font-weight:600;">Notes / Observations</label>' +
         '<input type="text" id="tomate-op-notes" placeholder="Ex: Épandage mancozèbe, mildiou débuté rang 3" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;"></div>' +
-        '<button onclick="AgroPrix.tomateAddOperation()" style="width:100%;padding:12px;background:linear-gradient(135deg,' + COLOR + ',#E74C3C);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer l\'opération</button>' +
+        '<button data-action="tomate-add-operation" style="width:100%;padding:12px;background:linear-gradient(135deg,' + COLOR + ',#E74C3C);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer l\'opération</button>' +
 
         (data.journalCulture.length > 0 ?
           '<div style="margin-top:14px;max-height:200px;overflow-y:auto;">' +
@@ -691,7 +691,7 @@ window.AgroPrix = window.AgroPrix || {};
             '<option value="export">Export sous-régional</option>' +
           '</select></div>' +
         '</div>' +
-        '<button onclick="AgroPrix.tomateAddVente()" style="width:100%;padding:12px;background:linear-gradient(135deg,' + COLOR + ',#E74C3C);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la vente</button>' +
+        '<button data-action="tomate-add-vente" style="width:100%;padding:12px;background:linear-gradient(135deg,' + COLOR + ',#E74C3C);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la vente</button>' +
 
         (data.journalVente.length > 0 ?
           '<div style="margin-top:14px;">' +
@@ -911,7 +911,7 @@ window.AgroPrix = window.AgroPrix || {};
             '</div>' +
           '</div>';
         }).join('') +
-        '<button onclick="AgroPrix.tomateExportDossier()" ' + (completude < 40 ? 'disabled ' : '') + 'style="width:100%;margin-top:14px;padding:12px;background:linear-gradient(135deg,' + COLOR_DARK + ',' + COLOR + ');color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;' + (completude < 40 ? 'opacity:0.5;' : '') + '">Générer mon dossier</button>' +
+        '<button data-action="tomate-export-dossier" ' + (completude < 40 ? 'disabled ' : '') + 'style="width:100%;margin-top:14px;padding:12px;background:linear-gradient(135deg,' + COLOR_DARK + ',' + COLOR + ');color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;' + (completude < 40 ? 'opacity:0.5;' : '') + '">Générer mon dossier</button>' +
       '</div>' +
 
       (totalSurface > 0 ?
@@ -935,7 +935,7 @@ window.AgroPrix = window.AgroPrix || {};
           '<option value="">-- Choisir une zone --</option>' +
           ZONES_TOMATE.map(function(z) { return '<option value="' + z + '">' + z + '</option>'; }).join('') +
         '</select>' +
-        '<button onclick="AgroPrix.tomateChercherConseillers()" style="width:100%;padding:12px;background:linear-gradient(135deg,' + COLOR + ',#E74C3C);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Chercher des conseillers</button>' +
+        '<button data-action="tomate-chercher-conseillers" style="width:100%;padding:12px;background:linear-gradient(135deg,' + COLOR + ',#E74C3C);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Chercher des conseillers</button>' +
         '<div id="tomate-tech-results"></div>' +
       '</div>';
   }
@@ -1011,7 +1011,7 @@ window.AgroPrix = window.AgroPrix || {};
           '<option value="argilo-limoneux">Argilo-limoneux</option>' +
         '</select></div>' +
       '</div>' +
-      '<button onclick="AgroPrix.tomateSaveParcelle()" style="width:100%;padding:10px;background:' + COLOR + ';color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la parcelle</button>';
+      '<button data-action="tomate-save-parcelle" style="width:100%;padding:10px;background:' + COLOR + ';color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la parcelle</button>';
   };
 
   AP.tomateSaveParcelle = function() {
@@ -1159,8 +1159,8 @@ window.AgroPrix = window.AgroPrix || {};
         '<div style="font-size:13px;font-weight:700;">' + c.nom + '</div>' +
         '<div style="font-size:11px;color:#666;">' + c.specialite + '</div>' +
         '<div style="display:flex;gap:8px;margin-top:8px;">' +
-          '<button onclick="window.open(\'tel:' + c.tel + '\')" style="flex:1;padding:8px;background:' + COLOR + ';color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">Appeler</button>' +
-          '<button onclick="AgroPrix.tomateDemanderContact(\'' + c.nom.replace(/'/g, "\\'") + '\')" style="flex:1;padding:8px;background:#E8862A;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">Contacter</button>' +
+          '<button data-action="open-tel" data-tel="' + c.tel + '" style="flex:1;padding:8px;background:' + COLOR + ';color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">Appeler</button>' +
+          '<button data-action="tomate-demander-contact" data-nom="' + c.nom.replace(/"/g, '&quot;') + '" style="flex:1;padding:8px;background:#E8862A;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">Contacter</button>' +
         '</div>' +
       '</div>';
     }).join('') + '</div>';
@@ -1484,5 +1484,19 @@ window.AgroPrix = window.AgroPrix || {};
   AP.tomateToggleIA  = toggleIA;
   AP.tomateAskIA     = askIA;
   AP.tomateDiagPhoto = diagPhoto;
+
+  // ── Délégation d'événements (CSP Phase 2) ──────────────────────────────────
+  // HTML généré : data-action au lieu de onclick ; routé par actions.js.
+  // data-i = index parcelle, data-nom = conseiller ; "Appeler" = open-tel.
+  AP.actions = AP.actions || {};
+  AP.actions['tomate-geoloc-parcelle']     = function(el) { AP.tomateGeolocParcelle(parseInt(el.getAttribute('data-i'), 10)); };
+  AP.actions['tomate-delete-parcelle']     = function(el) { AP.tomateDeleteParcelle(parseInt(el.getAttribute('data-i'), 10)); };
+  AP.actions['tomate-show-add-parcelle']   = function() { AP.tomateShowAddParcelle(); };
+  AP.actions['tomate-save-parcelle']       = function() { AP.tomateSaveParcelle(); };
+  AP.actions['tomate-add-operation']       = function() { AP.tomateAddOperation(); };
+  AP.actions['tomate-add-vente']           = function() { AP.tomateAddVente(); };
+  AP.actions['tomate-export-dossier']      = function() { AP.tomateExportDossier(); };
+  AP.actions['tomate-chercher-conseillers'] = function() { AP.tomateChercherConseillers(); };
+  AP.actions['tomate-demander-contact']    = function(el) { AP.tomateDemanderContact(el.getAttribute('data-nom')); };
 
 })(window.AgroPrix);
