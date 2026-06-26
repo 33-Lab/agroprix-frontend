@@ -11,7 +11,7 @@
 // MAIS en parallèle revalide le réseau et met à jour le cache → la version
 // suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = 'v7.21.0';  // bump 26/06 : CSP Phase 2 (1/n) — délégation data-action (nav index.html) + actions.js
+const CACHE_VERSION = 'v7.22.0';  // bump 26/06 : CSP Phase 2 (2/n) — index.html 100% sans handler inline (data-action)
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 

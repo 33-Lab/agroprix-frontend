@@ -83,4 +83,83 @@
   window.toggleMoreMenu = toggleMoreMenu;
   window.closeMoreMenu = closeMoreMenu;
 
+  // ── Actions globales : reste de la coquille index.html ──────────────────────
+
+  // Appels directs de fonctions globales sans argument (résolues au moment du
+  // clic → l'ordre de chargement des modules n'a pas d'importance).
+  var SIMPLE_GLOBALS = {
+    'logout': 'logout',
+    'demo-mode': 'demoMode',
+    'launch-analysis': 'launchAnalysis',
+    'calculate-transport': 'calculateTransport',
+    'save-transaction': 'saveTransaction',
+    'add-transaction': 'addTransaction',
+    'calculate-production': 'calculateProduction',
+    'load-carte-markets': 'loadCarteMarkets',
+    'export-my-data': 'exportMyData',
+    'delete-my-account': 'deleteMyAccount',
+    'simuler-potentiel': 'simulerPotentiel',
+    'chercher-techniciens': 'chercherTechniciens',
+    'update-markets': 'updateMarkets',
+    'toggle-custom-dates': 'toggleCustomDates'
+  };
+  Object.keys(SIMPLE_GLOBALS).forEach(function(action) {
+    AP.actions[action] = function() {
+      var fn = window[SIMPLE_GLOBALS[action]];
+      if (typeof fn === 'function') fn();
+    };
+  });
+
+  // Avec arguments (data-*) ou événement.
+  AP.actions['show-auth'] = function(el, ev) {
+    if (ev) ev.preventDefault(); // certains hôtes sont des <a href="#">
+    if (window.showAuthScreen) window.showAuthScreen(el.getAttribute('data-mode') || 'login');
+  };
+  AP.actions['toggle-all-markets'] = function(el) {
+    if (window.toggleAllMarkets) window.toggleAllMarkets(el.getAttribute('data-state') === 'true');
+  };
+  AP.actions['toggle-switch'] = function(el) {
+    if (window.toggleSwitch) window.toggleSwitch(el);
+  };
+  AP.actions['download-rapport'] = function(el) {
+    if (window.downloadRapport) window.downloadRapport(el.getAttribute('data-format'));
+  };
+  AP.actions['souscrire-plan'] = function(el) {
+    if (window.souscrirePlan) window.souscrirePlan(el.getAttribute('data-plan'), parseInt(el.getAttribute('data-montant'), 10));
+  };
+  AP.actions['cgu-force-show'] = function(el, ev) {
+    if (ev) ev.preventDefault();
+    if (AP.cgu && AP.cgu.forceShow) AP.cgu.forceShow();
+  };
+
+  // Modales génériques + utilitaires.
+  AP.actions['modal-open'] = function(el, ev) {
+    if (ev) ev.preventDefault(); // déclencheurs <a href="#">
+    var m = document.getElementById(el.getAttribute('data-modal'));
+    if (m) { m.style.display = 'flex'; m.style.alignItems = 'center'; m.style.justifyContent = 'center'; }
+  };
+  AP.actions['modal-close'] = function(el) {
+    var m = document.getElementById(el.getAttribute('data-modal'));
+    if (m) m.style.display = 'none';
+  };
+  AP.actions['scroll-to'] = function(el) {
+    var t = document.getElementById(el.getAttribute('data-target'));
+    if (t) t.scrollIntoView({ behavior: 'smooth' });
+  };
+  AP.actions['reload'] = function() { window.location.reload(); };
+
+  // Soumissions de formulaires (data-action-submit) — handleLogin/handleRegister
+  // appellent eux-mêmes preventDefault().
+  AP.actions['submit-login'] = function(el, ev) { if (window.handleLogin) window.handleLogin(ev); };
+  AP.actions['submit-register'] = function(el, ev) { if (window.handleRegister) window.handleRegister(ev); };
+
+  // Modules cultures : assistants IA (toggle / question / diagnostic photo).
+  // Méthodes AP.<culture><Action> définies par les modules ; guard si absente
+  // (hévéa/plantain n'ont pas de diagnostic photo).
+  ['hevea', 'plantain', 'cacao', 'tomate'].forEach(function(c) {
+    AP.actions[c + '-toggle-ia'] = function() { var f = AP[c + 'ToggleIA']; if (typeof f === 'function') f(); };
+    AP.actions[c + '-ask-ia'] = function() { var f = AP[c + 'AskIA']; if (typeof f === 'function') f(); };
+    AP.actions[c + '-diag-photo'] = function() { var f = AP[c + 'DiagPhoto']; if (typeof f === 'function') f(); };
+  });
+
 })(window.AgroPrix);

@@ -110,12 +110,12 @@
       <p>Intelligence des prix agricoles UEMOA</p>
     </div>
     <div class="auth-tabs">
-      <button class="auth-tab active" id="authTabLogin" onclick="showAuthScreen('login')">Connexion</button>
-      <button class="auth-tab" id="authTabRegister" onclick="showAuthScreen('register')">Inscription</button>
+      <button class="auth-tab active" id="authTabLogin" data-action="show-auth" data-mode="login">Connexion</button>
+      <button class="auth-tab" id="authTabRegister" data-action="show-auth" data-mode="register">Inscription</button>
     </div>
 
     <!-- Login Form -->
-    <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
+    <form class="auth-form" id="loginForm" data-action-submit="submit-login">
       <div class="form-group">
         <label class="form-label">Email</label>
         <input type="email" id="loginEmail" placeholder="votre@email.com" required>
@@ -128,12 +128,12 @@
       <button type="submit" class="btn-analyse" id="loginBtn" style="width:100%;margin-top:8px;">Se connecter</button>
       <div class="auth-link" style="margin-top:12px;text-align:center;">
         <span style="font-size:13px;color:var(--text-light);">Pas encore de compte ?</span>
-        <a href="#" onclick="showAuthScreen('register');return false;" style="font-size:13px;color:var(--green);font-weight:600;"> S'inscrire</a>
+        <a href="#" data-action="show-auth" data-mode="register" style="font-size:13px;color:var(--green);font-weight:600;"> S'inscrire</a>
       </div>
     </form>
 
     <!-- Register Form -->
-    <form class="auth-form" id="registerForm" style="display:none;" onsubmit="handleRegister(event)">
+    <form class="auth-form" id="registerForm" style="display:none;" data-action-submit="submit-register">
       <div class="form-group">
         <label class="form-label">Nom complet *</label>
         <input type="text" id="regName" placeholder="Votre nom" required>
@@ -175,13 +175,13 @@
       <button type="submit" class="btn-analyse" id="registerBtn" style="width:100%;margin-top:8px;">Creer mon compte</button>
       <div class="auth-link" style="margin-top:12px;text-align:center;">
         <span style="font-size:13px;color:var(--text-light);">Deja un compte ?</span>
-        <a href="#" onclick="showAuthScreen('login');return false;" style="font-size:13px;color:var(--green);font-weight:600;"> Se connecter</a>
+        <a href="#" data-action="show-auth" data-mode="login" style="font-size:13px;color:var(--green);font-weight:600;"> Se connecter</a>
       </div>
     </form>
 
     <!-- Demo Mode Button (V6) -->
     <div style="margin-top:20px;text-align:center;">
-      <button type="button" class="btn-demo-mode" onclick="demoMode()">
+      <button type="button" class="btn-demo-mode" data-action="demo-mode">
         Mode Demo — Explorer sans compte
       </button>
     </div>
@@ -250,7 +250,7 @@
     <div class="nav-separator"></div>
     <a id="navPartner" data-action="show-view" data-view="partner" data-nav="1"><span class="nav-icon"><i data-lucide="users" class="lc"></i></span> Espace Partenaire</a>
     <a id="navParams" data-action="show-view" data-view="params" data-nav="1"><span class="nav-icon"><i data-lucide="settings" class="lc"></i></span> Parametres</a>
-    <a onclick="logout()" style="color:#e76f51;"><span class="nav-icon"><i data-lucide="log-out" class="lc"></i></span> Deconnexion</a>
+    <a data-action="logout" style="color:#e76f51;"><span class="nav-icon"><i data-lucide="log-out" class="lc"></i></span> Deconnexion</a>
   </nav>
   <div class="sidebar-footer">
     <div class="user-info">
@@ -299,7 +299,7 @@
         <div class="form-grid">
           <div class="form-group">
             <label class="form-label">Pays</label>
-            <select id="countrySelect" onchange="updateMarkets()">
+            <select id="countrySelect" data-action-change="update-markets">
               <option value="benin">Benin</option>
               <option value="burkina_faso">Burkina Faso</option>
               <option value="cote_divoire">Cote d'Ivoire</option>
@@ -350,7 +350,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">Periode</label>
-            <select id="periodSelect" onchange="toggleCustomDates()">
+            <select id="periodSelect" data-action-change="toggle-custom-dates">
               <option value="12m">12 derniers mois</option>
               <option value="3y" selected>3 dernieres annees</option>
               <option value="5y">5 dernieres annees</option>
@@ -368,8 +368,8 @@
           </div>
           <div class="form-group full">
             <div class="markets-controls">
-              <button onclick="toggleAllMarkets(true)">Tout selectionner</button>
-              <button onclick="toggleAllMarkets(false)">Tout deselectionner</button>
+              <button data-action="toggle-all-markets" data-state="true">Tout selectionner</button>
+              <button data-action="toggle-all-markets" data-state="false">Tout deselectionner</button>
             </div>
             <div class="markets-grid" id="marketsGrid"></div>
           </div>
@@ -377,19 +377,19 @@
             <label class="form-label" style="margin-bottom:8px;">Options</label>
             <div class="toggle-row">
               <label><i data-lucide="trending-up" class="lc"></i> Comparer avec annee precedente</label>
-              <div class="toggle-switch active" id="togCompare" onclick="toggleSwitch(this)"></div>
+              <div class="toggle-switch active" id="togCompare" data-action="toggle-switch"></div>
             </div>
             <div class="toggle-row">
               <label><i data-lucide="trending-up" class="lc"></i> Projections tendancielles (J+30, J+90)</label>
-              <div class="toggle-switch active" id="togForecast" onclick="toggleSwitch(this)"></div>
+              <div class="toggle-switch active" id="togForecast" data-action="toggle-switch"></div>
             </div>
             <div class="toggle-row">
               <label><i data-lucide="cloud-rain" class="lc"></i> Donnees meteo</label>
-              <div class="toggle-switch active" id="togMeteo" onclick="toggleSwitch(this)"></div>
+              <div class="toggle-switch active" id="togMeteo" data-action="toggle-switch"></div>
             </div>
           </div>
           <div class="form-group full">
-            <button class="btn-analyse" onclick="launchAnalysis()" style="width:100%;font-size:15px;padding:14px;"><i data-lucide="search" class="lc"></i> Lancer l'analyse</button>
+            <button class="btn-analyse" data-action="launch-analysis" style="width:100%;font-size:15px;padding:14px;"><i data-lucide="search" class="lc"></i> Lancer l'analyse</button>
           </div>
         </div>
       </div><!-- end section-teal -->
@@ -399,8 +399,8 @@
         <div style="font-size:18px;font-weight:800;color:#333;margin-bottom:4px;"><i data-lucide="file-text" class="lc"></i> Rapports</div>
         <div style="font-size:12px;color:#555;margin-bottom:12px;">Genere un rapport structure (prix historiques, moyennes mensuelles, comparaison UEMOA) pour la <b>culture</b> et le <b>pays</b> selectionnes ci-dessus. Reserve aux comptes connectes.</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <button class="btn-analyse" id="rapportBtn-pdf" style="flex:1;min-width:140px;" onclick="downloadRapport('pdf')"><i data-lucide="file-down" class="lc"></i> Telecharger PDF</button>
-          <button class="btn-analyse" id="rapportBtn-excel" style="flex:1;min-width:140px;background:linear-gradient(135deg,#1a3a5c,#2d8a4e);" onclick="downloadRapport('excel')"><i data-lucide="sheet" class="lc"></i> Telecharger Excel</button>
+          <button class="btn-analyse" id="rapportBtn-pdf" style="flex:1;min-width:140px;" data-action="download-rapport" data-format="pdf"><i data-lucide="file-down" class="lc"></i> Telecharger PDF</button>
+          <button class="btn-analyse" id="rapportBtn-excel" style="flex:1;min-width:140px;background:linear-gradient(135deg,#1a3a5c,#2d8a4e);" data-action="download-rapport" data-format="excel"><i data-lucide="sheet" class="lc"></i> Telecharger Excel</button>
         </div>
       </div>
 
@@ -468,7 +468,7 @@
         <div class="action-bar">
           <button class="action-btn primary"><i data-lucide="file" class="lc"></i> Telecharger PDF</button>
           <button class="action-btn secondary"><i data-lucide="bar-chart-3" class="lc"></i> Exporter Excel</button>
-          <button class="action-btn outline" onclick="document.getElementById('formCard').scrollIntoView({behavior:'smooth'})"><i data-lucide="refresh-cw" class="lc"></i> Nouvelle analyse</button>
+          <button class="action-btn outline" data-action="scroll-to" data-target="formCard"><i data-lucide="refresh-cw" class="lc"></i> Nouvelle analyse</button>
         </div>
       </div>
     </div>
@@ -516,7 +516,7 @@
             <input type="number" id="transportPrix" value="245" min="1">
           </div>
           <div class="form-group full">
-            <button class="btn-analyse" style="width:100%;" onclick="calculateTransport()"><i data-lucide="calculator" class="lc"></i> Calculer la marge nette</button>
+            <button class="btn-analyse" style="width:100%;" data-action="calculate-transport"><i data-lucide="calculator" class="lc"></i> Calculer la marge nette</button>
           </div>
         </div>
         <div id="transportResults"></div>
@@ -551,14 +551,14 @@
             <input type="number" id="negocePrixVente" min="0" step="1" placeholder="(optionnel)">
           </div>
           <div class="form-group full" style="display:flex;gap:8px;">
-            <button class="btn-analyse" style="flex:1;" onclick="saveTransaction()"><i data-lucide="save" class="lc"></i> Enregistrer</button>
-            <button style="flex:0 0 auto;padding:0 16px;border:1px solid #ccc;background:#fff;border-radius:10px;cursor:pointer;" onclick="addTransaction()">Annuler</button>
+            <button class="btn-analyse" style="flex:1;" data-action="save-transaction"><i data-lucide="save" class="lc"></i> Enregistrer</button>
+            <button style="flex:0 0 auto;padding:0 16px;border:1px solid #ccc;background:#fff;border-radius:10px;cursor:pointer;" data-action="add-transaction">Annuler</button>
           </div>
         </div>
         <div id="negoceFormMsg" style="font-size:12px;margin-top:8px;"></div>
       </div>
 
-      <button class="btn-analyse" style="width:100%;" onclick="addTransaction()"><i data-lucide="book-open" class="lc"></i> Ajouter une transaction</button>
+      <button class="btn-analyse" style="width:100%;" data-action="add-transaction"><i data-lucide="book-open" class="lc"></i> Ajouter une transaction</button>
     </div>
 
     <!-- ═══ VIEW: PRODUCTION ═══ -->
@@ -673,7 +673,7 @@
             </select>
           </div>
           <div class="form-group">
-            <button class="btn-analyse" onclick="calculateProduction()"><i data-lucide="calculator" class="lc"></i> Calculer</button>
+            <button class="btn-analyse" data-action="calculate-production"><i data-lucide="calculator" class="lc"></i> Calculer</button>
           </div>
         </div>
       </div>
@@ -818,11 +818,11 @@
             <option value="togo">Togo</option>
             <option value="guinee_bissau">Guinée-Bissau</option>
           </select>
-          <button onclick="loadCarteMarkets()" class="btn-analyse" style="padding:8px 16px;font-size:13px;">
+          <button data-action="load-carte-markets" class="btn-analyse" style="padding:8px 16px;font-size:13px;">
             <i data-lucide="refresh-cw" class="lc" style="width:14px;height:14px;"></i> Actualiser
           </button>
           <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
-            <input type="checkbox" id="carteParcelles" onchange="loadCarteMarkets()" checked style="accent-color:var(--green);">
+            <input type="checkbox" id="carteParcelles" data-action-change="load-carte-markets" checked style="accent-color:var(--green);">
             Afficher mes parcelles
           </label>
           <span id="carteStatus" style="font-size:12px;color:var(--text-light);"></span>
@@ -878,7 +878,7 @@
           <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Conseil basique</div>
           <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Meteo</div>
         </div>
-        <button onclick="souscrirePlan('Starter', 990)" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#E8862A,#F0A050);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Choisir Starter</button>
+        <button data-action="souscrire-plan" data-plan="Starter" data-montant="990" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#E8862A,#F0A050);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Choisir Starter</button>
       </div>
 
       <!-- Plan Pro (recommande) -->
@@ -896,7 +896,7 @@
           <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> GPS Financement</div>
           <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Score Profil Producteur</div>
         </div>
-        <button onclick="souscrirePlan('Pro', 2900)" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Choisir Pro</button>
+        <button data-action="souscrire-plan" data-plan="Pro" data-montant="2900" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Choisir Pro</button>
       </div>
 
       <!-- Plan Expert -->
@@ -914,7 +914,7 @@
           <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Marketplace prioritaire</div>
           <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Alertes temps reel</div>
         </div>
-        <button onclick="souscrirePlan('Expert', 14900)" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#D4A017,#E8C030);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Choisir Expert</button>
+        <button data-action="souscrire-plan" data-plan="Expert" data-montant="14900" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#D4A017,#E8C030);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Choisir Expert</button>
       </div>
 
       <!-- Separator: Modules specialises -->
@@ -1077,9 +1077,9 @@
       <div class="card">
         <div class="card-title"><span class="icon"><i data-lucide="file-text" class="lc"></i></span> Legal</div>
         <div style="padding:8px 0;">
-          <p style="margin-bottom:8px;"><a href="#" onclick="AgroPrix.cgu.forceShow();return false;" style="font-size:13px;color:var(--primary);font-weight:600;"><i data-lucide="clipboard-list" class="lc"></i> Conditions Generales d'Utilisation (CGU)</a></p>
-          <p style="margin-bottom:8px;"><a href="#" onclick="var m=document.getElementById('cgvModal');m.style.display='flex';m.style.alignItems='center';m.style.justifyContent='center';return false;" style="font-size:13px;color:var(--primary);font-weight:600;"><i data-lucide="file" class="lc"></i> Conditions Generales de Vente (CGV)</a></p>
-          <p><a href="#" onclick="var m=document.getElementById('privacyModal');m.style.display='flex';m.style.alignItems='center';m.style.justifyContent='center';return false;" style="font-size:13px;color:var(--primary);font-weight:600;"><i data-lucide="lock" class="lc"></i> Politique de confidentialite</a></p>
+          <p style="margin-bottom:8px;"><a href="#" data-action="cgu-force-show" style="font-size:13px;color:var(--primary);font-weight:600;"><i data-lucide="clipboard-list" class="lc"></i> Conditions Generales d'Utilisation (CGU)</a></p>
+          <p style="margin-bottom:8px;"><a href="#" data-action="modal-open" data-modal="cgvModal" style="font-size:13px;color:var(--primary);font-weight:600;"><i data-lucide="file" class="lc"></i> Conditions Generales de Vente (CGV)</a></p>
+          <p><a href="#" data-action="modal-open" data-modal="privacyModal" style="font-size:13px;color:var(--primary);font-weight:600;"><i data-lucide="lock" class="lc"></i> Politique de confidentialite</a></p>
         </div>
       </div>
 
@@ -1088,7 +1088,7 @@
         <div style="background:#fff;border-radius:20px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;padding:24px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
             <h2 style="font-size:18px;font-weight:800;color:#1B4332;"><i data-lucide="file" class="lc"></i> Conditions Generales de Vente</h2>
-            <button onclick="document.getElementById('cgvModal').style.display='none'" style="background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
+            <button data-action="modal-close" data-modal="cgvModal" style="background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
           </div>
           <div style="font-size:13px;color:#333;line-height:1.8;">
             <p><strong>Article 1 — Objet</strong><br>Les presentes Conditions Generales de Vente (CGV) regissent les relations contractuelles entre 33 Lab SARL ("AgroPrix") et ses clients ("Utilisateurs") pour l'acces aux services payants de la plateforme AgroPrix.</p>
@@ -1110,7 +1110,7 @@
         <div style="background:#fff;border-radius:20px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;padding:24px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
             <h2 style="font-size:18px;font-weight:800;color:#1B4332;"><i data-lucide="lock" class="lc"></i> Politique de Confidentialite</h2>
-            <button onclick="document.getElementById('privacyModal').style.display='none'" style="background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
+            <button data-action="modal-close" data-modal="privacyModal" style="background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
           </div>
           <div style="font-size:13px;color:#333;line-height:1.8;">
             <p><strong>1. Donnees collectees</strong><br>Nous collectons : nom, email, telephone, pays, cultures pratiquees, superficie, donnees de prix saisies, donnees de transactions marketplace, localisation GPS des parcelles (avec consentement).</p>
@@ -1169,13 +1169,13 @@
         <div class="card-title"><span class="icon"><i data-lucide="shield" class="lc"></i></span> Mes donnees (RGPD)</div>
         <p style="font-size:12px;color:var(--text-light);margin-bottom:12px;">Telechargez l'ensemble de vos donnees, ou supprimez definitivement votre compte.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn-analyse" style="flex:1;min-width:160px;" onclick="exportMyData()"><i data-lucide="download" class="lc"></i> Exporter mes donnees</button>
-          <button style="flex:1;min-width:160px;padding:12px;border:1px solid #e76f51;background:#fff;color:#e76f51;border-radius:10px;font-weight:700;cursor:pointer;" onclick="deleteMyAccount()"><i data-lucide="trash-2" class="lc"></i> Supprimer mon compte</button>
+          <button class="btn-analyse" style="flex:1;min-width:160px;" data-action="export-my-data"><i data-lucide="download" class="lc"></i> Exporter mes donnees</button>
+          <button style="flex:1;min-width:160px;padding:12px;border:1px solid #e76f51;background:#fff;color:#e76f51;border-radius:10px;font-weight:700;cursor:pointer;" data-action="delete-my-account"><i data-lucide="trash-2" class="lc"></i> Supprimer mon compte</button>
         </div>
         <div id="rgpdMsg" style="font-size:12px;margin-top:8px;"></div>
       </div>
 
-      <button class="btn-analyse" style="max-width:320px;background:var(--alert);" onclick="logout()"><i data-lucide="log-out" class="lc"></i> Se deconnecter</button>
+      <button class="btn-analyse" style="max-width:320px;background:var(--alert);" data-action="logout"><i data-lucide="log-out" class="lc"></i> Se deconnecter</button>
     </div>
 
   <!-- ═══ VIEW: PARTNER (Ambassadeur Commercial) ═══ -->
@@ -1238,7 +1238,7 @@
             </select>
           </div>
 
-          <button onclick="simulerPotentiel()" style="width:100%;padding:14px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;">
+          <button data-action="simuler-potentiel" style="width:100%;padding:14px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;">
             <i data-lucide="search" class="lc"></i> Analyser le potentiel de ma parcelle
           </button>
 
@@ -1249,7 +1249,7 @@
           <div class="card-title" style="font-size:16px;font-weight:700;"><i data-lucide="user-check" class="lc"></i> Trouver un technicien dans ma zone</div>
           <p style="font-size:12px;color:var(--text-light);margin-bottom:12px;">Des techniciens agricoles qualifies peuvent vous accompagner dans la mise en valeur de votre terrain.</p>
           <div id="techniciensList"></div>
-          <button onclick="chercherTechniciens()" style="width:100%;padding:14px;background:linear-gradient(135deg,#E8862A,#F5A623);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;">
+          <button data-action="chercher-techniciens" style="width:100%;padding:14px;background:linear-gradient(135deg,#E8862A,#F5A623);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;">
             <i data-lucide="phone" class="lc"></i> Voir les techniciens disponibles
           </button>
         </div>
@@ -1286,7 +1286,7 @@
       </div>
 
       <!-- Assistant IA flottant -->
-      <button onclick="AgroPrix.heveaToggleIA()" style="position:fixed;bottom:80px;right:16px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;box-shadow:0 4px 16px rgba(45,106,79,0.4);font-size:22px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;"><i data-lucide="message-circle" class="lc"></i></button>
+      <button data-action="hevea-toggle-ia" style="position:fixed;bottom:80px;right:16px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;box-shadow:0 4px 16px rgba(45,106,79,0.4);font-size:22px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;"><i data-lucide="message-circle" class="lc"></i></button>
 
       <!-- Panel IA -->
       <div id="hevea-ia-panel" style="display:none;position:fixed;bottom:145px;right:16px;left:16px;max-width:400px;margin-left:auto;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);z-index:151;flex-direction:column;max-height:50vh;overflow:hidden;">
@@ -1298,8 +1298,8 @@
           <div style="font-size:12px;color:#666;">Posez une question sur votre exploitation heveicole...</div>
         </div>
         <div style="padding:10px 12px;border-top:1px solid #f0f0f0;display:flex;gap:8px;">
-          <input type="text" id="hevea-ia-input" placeholder="Ex: Quel clone choisir ?" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:13px;font-family:inherit;" onkeypress="if(event.key==='Enter')AgroPrix.heveaAskIA()">
-          <button onclick="AgroPrix.heveaAskIA()" style="padding:10px 16px;background:#2D6A4F;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Envoyer</button>
+          <input type="text" id="hevea-ia-input" placeholder="Ex: Quel clone choisir ?" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:13px;font-family:inherit;" data-action-enter="hevea-ask-ia">
+          <button data-action="hevea-ask-ia" style="padding:10px 16px;background:#2D6A4F;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Envoyer</button>
         </div>
       </div>
     </div>
@@ -1333,7 +1333,7 @@
       </div>
 
       <!-- Assistant IA flottant -->
-      <button onclick="AgroPrix.plantainToggleIA()" style="position:fixed;bottom:80px;right:16px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;box-shadow:0 4px 16px rgba(91,58,26,0.4);font-size:22px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;"><i data-lucide="message-circle" class="lc"></i></button>
+      <button data-action="plantain-toggle-ia" style="position:fixed;bottom:80px;right:16px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;box-shadow:0 4px 16px rgba(91,58,26,0.4);font-size:22px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;"><i data-lucide="message-circle" class="lc"></i></button>
 
       <!-- Panel IA -->
       <div id="plantain-ia-panel" style="display:none;position:fixed;bottom:145px;right:16px;left:16px;max-width:400px;margin-left:auto;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);z-index:151;flex-direction:column;max-height:50vh;overflow:hidden;">
@@ -1345,8 +1345,8 @@
           <div style="font-size:12px;color:#666;">Posez une question sur votre exploitation de plantain...</div>
         </div>
         <div style="padding:10px 12px;border-top:1px solid #f0f0f0;display:flex;gap:8px;">
-          <input type="text" id="plantain-ia-input" placeholder="Ex: Comment lutter contre la Sigatoka ?" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:13px;font-family:inherit;" onkeypress="if(event.key==='Enter')AgroPrix.plantainAskIA()">
-          <button onclick="AgroPrix.plantainAskIA()" style="padding:10px 16px;background:#5B3A1A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Envoyer</button>
+          <input type="text" id="plantain-ia-input" placeholder="Ex: Comment lutter contre la Sigatoka ?" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:13px;font-family:inherit;" data-action-enter="plantain-ask-ia">
+          <button data-action="plantain-ask-ia" style="padding:10px 16px;background:#5B3A1A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Envoyer</button>
         </div>
       </div>
     </div>
@@ -1374,7 +1374,7 @@
         <div id="cacao-marche" class="cacao-section" style="display:none;"></div>
         <div id="cacao-dossier" class="cacao-section" style="display:none;"></div>
       </div>
-      <button onclick="AgroPrix.cacaoToggleIA()" style="position:fixed;bottom:80px;right:16px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#4E342E,#5D2E8C);color:#fff;border:none;box-shadow:0 4px 16px rgba(93,46,140,0.4);font-size:22px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;"><i data-lucide="message-circle" class="lc"></i></button>
+      <button data-action="cacao-toggle-ia" style="position:fixed;bottom:80px;right:16px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#4E342E,#5D2E8C);color:#fff;border:none;box-shadow:0 4px 16px rgba(93,46,140,0.4);font-size:22px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;"><i data-lucide="message-circle" class="lc"></i></button>
       <div id="cacao-ia-panel" style="display:none;position:fixed;bottom:145px;right:16px;left:16px;max-width:400px;margin-left:auto;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);z-index:151;flex-direction:column;max-height:55vh;overflow:hidden;">
         <div style="padding:14px 16px;background:linear-gradient(135deg,#4E342E,#5D2E8C);color:#fff;border-radius:16px 16px 0 0;">
           <div style="font-size:14px;font-weight:700;">Assistant Agronomique Cacao</div>
@@ -1384,9 +1384,9 @@
           <div style="font-size:12px;color:#666;">Posez une question, ou diagnostiquez une maladie a partir d'une photo de cabosse/feuille.</div>
         </div>
         <div style="padding:10px 12px;border-top:1px solid #f0f0f0;display:flex;gap:8px;align-items:center;">
-          <button onclick="AgroPrix.cacaoDiagPhoto()" title="Diagnostic photo" style="flex:0 0 auto;padding:10px;background:#5D2E8C;color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;"><i data-lucide="camera" class="lc"></i></button>
-          <input type="text" id="cacao-ia-input" placeholder="Ex: Pourriture brune ?" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:13px;font-family:inherit;" onkeypress="if(event.key==='Enter')AgroPrix.cacaoAskIA()">
-          <button onclick="AgroPrix.cacaoAskIA()" style="flex:0 0 auto;padding:10px 14px;background:#5D2E8C;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Envoyer</button>
+          <button data-action="cacao-diag-photo" title="Diagnostic photo" style="flex:0 0 auto;padding:10px;background:#5D2E8C;color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;"><i data-lucide="camera" class="lc"></i></button>
+          <input type="text" id="cacao-ia-input" placeholder="Ex: Pourriture brune ?" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:13px;font-family:inherit;" data-action-enter="cacao-ask-ia">
+          <button data-action="cacao-ask-ia" style="flex:0 0 auto;padding:10px 14px;background:#5D2E8C;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Envoyer</button>
         </div>
       </div>
     </div>
@@ -1414,7 +1414,7 @@
         <div id="tomate-marche" class="tomate-section" style="display:none;"></div>
         <div id="tomate-dossier" class="tomate-section" style="display:none;"></div>
       </div>
-      <button onclick="AgroPrix.tomateToggleIA()" style="position:fixed;bottom:80px;right:16px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#C0392B,#E8862A);color:#fff;border:none;box-shadow:0 4px 16px rgba(192,57,43,0.4);font-size:22px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;"><i data-lucide="message-circle" class="lc"></i></button>
+      <button data-action="tomate-toggle-ia" style="position:fixed;bottom:80px;right:16px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#C0392B,#E8862A);color:#fff;border:none;box-shadow:0 4px 16px rgba(192,57,43,0.4);font-size:22px;cursor:pointer;z-index:150;display:flex;align-items:center;justify-content:center;"><i data-lucide="message-circle" class="lc"></i></button>
       <div id="tomate-ia-panel" style="display:none;position:fixed;bottom:145px;right:16px;left:16px;max-width:400px;margin-left:auto;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.15);z-index:151;flex-direction:column;max-height:55vh;overflow:hidden;">
         <div style="padding:14px 16px;background:linear-gradient(135deg,#C0392B,#E8862A);color:#fff;border-radius:16px 16px 0 0;">
           <div style="font-size:14px;font-weight:700;">Assistant Agronomique Tomate</div>
@@ -1424,9 +1424,9 @@
           <div style="font-size:12px;color:#666;">Posez une question, ou diagnostiquez une maladie a partir d'une photo de feuille/fruit.</div>
         </div>
         <div style="padding:10px 12px;border-top:1px solid #f0f0f0;display:flex;gap:8px;align-items:center;">
-          <button onclick="AgroPrix.tomateDiagPhoto()" title="Diagnostic photo" style="flex:0 0 auto;padding:10px;background:#C0392B;color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;"><i data-lucide="camera" class="lc"></i></button>
-          <input type="text" id="tomate-ia-input" placeholder="Ex: Mildiou ?" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:13px;font-family:inherit;" onkeypress="if(event.key==='Enter')AgroPrix.tomateAskIA()">
-          <button onclick="AgroPrix.tomateAskIA()" style="flex:0 0 auto;padding:10px 14px;background:#C0392B;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Envoyer</button>
+          <button data-action="tomate-diag-photo" title="Diagnostic photo" style="flex:0 0 auto;padding:10px;background:#C0392B;color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;"><i data-lucide="camera" class="lc"></i></button>
+          <input type="text" id="tomate-ia-input" placeholder="Ex: Mildiou ?" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:13px;font-family:inherit;" data-action-enter="tomate-ask-ia">
+          <button data-action="tomate-ask-ia" style="flex:0 0 auto;padding:10px 14px;background:#C0392B;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Envoyer</button>
         </div>
       </div>
     </div>
@@ -1594,7 +1594,7 @@
 <script src="/js/dashboard.js?v=6.11"></script>
 <script src="/js/auth.js?v=7.11"></script>
 <script src="/js/app.js?v=7.15"></script>
-<script src="/js/actions.js?v=7.20"></script>
+<script src="/js/actions.js?v=7.22"></script>
 
 <!-- ═══ ERROR BOUNDARY + OFFLINE + MONITORING (Prompt Master) ═══ -->
 
@@ -1609,7 +1609,7 @@
   <h1 style="font-size:22px;font-weight:800;color:#1B4332;margin-bottom:8px;">Oups ! Un petit grain de sable...</h1>
   <p style="font-size:14px;color:#666;max-width:400px;margin-bottom:24px;">L'application a rencontre une erreur inattendue. Nos ingenieurs (33 Lab) ont ete prevenus automatiquement.</p>
   <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
-    <button onclick="window.location.reload()" style="padding:12px 24px;background:#1B4332;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;"><i data-lucide="refresh-cw" class="lc"></i> Recharger l'application</button>
+    <button data-action="reload" style="padding:12px 24px;background:#1B4332;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;"><i data-lucide="refresh-cw" class="lc"></i> Recharger l'application</button>
     <a href="https://wa.me/22996816868" target="_blank" style="padding:12px 24px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;"><i data-lucide="message-circle" class="lc" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> Contacter le support</a>
   </div>
   <div style="margin-top:24px;font-size:11px;color:#999;" id="errorDebugInfo"></div>

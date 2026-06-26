@@ -100,4 +100,38 @@ test.describe('Navigation déléguée (data-action)', () => {
     await expect(page.locator('#viewFinancing')).toBeVisible();
     await expect(moreMenu).toBeHidden();
   });
+
+  test('toggle-switch (data-action sur élément non-nav) bascule la classe', async ({ page }) => {
+    test.slow();
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await asAdmin(page);
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
+    test.skip(!(await hasDelegation(page)), 'délégation data-action pas encore déployée sur la cible');
+
+    // Vue Analyse (par défaut) : #togCompare démarre actif → un clic le désactive.
+    const tog = page.locator('#togCompare');
+    await expect(tog).toHaveClass(/active/);
+    await tog.click();
+    await expect(tog).not.toHaveClass(/active/);
+  });
+
+  test('modale CGV : ouvre (modal-open) puis ferme (modal-close)', async ({ page }) => {
+    test.slow();
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await asAdmin(page);
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
+    test.skip(!(await hasDelegation(page)), 'délégation data-action pas encore déployée sur la cible');
+
+    // Les liens CGV/Privacy sont dans la vue Paramètres.
+    await page.locator('#navParams').click();
+    await expect(page.locator('#viewParams')).toBeVisible();
+
+    const modal = page.locator('#cgvModal');
+    await page.locator('[data-action="modal-open"][data-modal="cgvModal"]').click();
+    await expect(modal).toBeVisible();
+    await modal.locator('[data-action="modal-close"][data-modal="cgvModal"]').click();
+    await expect(modal).toBeHidden();
+  });
 });
