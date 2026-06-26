@@ -11,10 +11,37 @@
   'use strict';
 
   var USER_KEY = 'agroprix_user';
-  // Flag: si le localStorage contient encore un ancien token (migration), on
-  // l'envoie une fois en Authorization header pour que le backend re-pose le
-  // cookie, puis on le supprime.
+  // Token de session, stocké pour le fallback Bearer. Le cookie httpOnly reste
+  // la voie préférée, MAIS comme backend (railway.app) et frontend
+  // (app.agroprix.app) sont sur des domaines différents, ce cookie est TIERS et
+  // bloqué par Safari/iOS/Brave/Firefox → déconnexions. Le token en Bearer
+  // contourne ce blocage. Risque XSS atténué par la CSP durcie (H5).
   var LEGACY_TOKEN_KEY = 'agroprix_token';
+
+  // ── Intercepteur fetch global : injecte Authorization: Bearer sur TOUTES les
+  // requêtes vers le backend (pas seulement authFetch), pour que les modules qui
+  // utilisent fetch() directement (diagnostic photo, EUDR, négoce, intrants,
+  // scoring, ndvi…) s'authentifient même quand le cookie tiers est bloqué.
+  (function installBearerInterceptor() {
+    if (typeof window === 'undefined' || window.__agpxFetchPatched || typeof window.fetch !== 'function') return;
+    window.__agpxFetchPatched = true;
+    var _fetch = window.fetch.bind(window);
+    window.fetch = function(input, init) {
+      try {
+        var url = (typeof input === 'string') ? input : (input && input.url) || '';
+        var base = (AP && AP.API_BASE) || '';
+        var token = localStorage.getItem(LEGACY_TOKEN_KEY);
+        if (token && base && url.indexOf(base) === 0) {
+          init = init || {};
+          var headers = new Headers((init && init.headers) || {});
+          if (!headers.has('Authorization')) headers.set('Authorization', 'Bearer ' + token);
+          init.headers = headers;
+          if (!init.credentials) init.credentials = 'include';
+        }
+      } catch (e) { /* ne jamais casser un fetch à cause de l'intercepteur */ }
+      return _fetch(input, init);
+    };
+  })();
 
   // =========================================================================
   // Session management (cookie-based — token invisible cote JS)
@@ -96,8 +123,9 @@
       if (!r.ok) return r.json().then(function(e) { throw e; });
       return r.json();
     }).then(function(data) {
-      // Le backend a pose le cookie httpOnly ; on garde juste le profil en cache.
-      localStorage.removeItem(LEGACY_TOKEN_KEY);
+      // Cookie httpOnly posé + token stocké pour fallback Bearer (cf. login).
+      if (data && data.access_token) localStorage.setItem(LEGACY_TOKEN_KEY, data.access_token);
+      else localStorage.removeItem(LEGACY_TOKEN_KEY);
       saveSession(data.utilisateur);
       return data;
     });
@@ -111,7 +139,10 @@
       if (!r.ok) return r.json().then(function(e) { throw e; });
       return r.json();
     }).then(function(data) {
-      localStorage.removeItem(LEGACY_TOKEN_KEY);
+      // Stocke le token pour le fallback Bearer (cookie tiers bloqué sur
+      // Safari/iOS/mobile car backend et frontend sur des domaines différents).
+      if (data && data.access_token) localStorage.setItem(LEGACY_TOKEN_KEY, data.access_token);
+      else localStorage.removeItem(LEGACY_TOKEN_KEY);
       saveSession(data.utilisateur);
       return data;
     });
