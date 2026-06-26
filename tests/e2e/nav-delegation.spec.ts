@@ -170,6 +170,37 @@ test.describe('Navigation déléguée (data-action)', () => {
     expect(errors, errors.join('\n')).toHaveLength(0);
   });
 
+  test('module Hévéa Pro : 0 onclick inline rendu + action fonctionnelle', async ({ page }) => {
+    test.slow();
+    await page.setViewportSize({ width: 1280, height: 800 });
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(String(e)));
+    await asAdmin(page);
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
+    test.skip(!(await hasAction(page, 'hevea-check-eudr')), 'module hévéa délégué pas encore déployé sur la cible');
+
+    await page.locator('#navHevea').click();
+    await expect(page.locator('#viewHevea')).toBeVisible();
+    await page.waitForTimeout(2500);
+
+    // Rend tous les onglets (.hevea-tab pilotés par addEventListener) ; on
+    // termine sur 'journal' (qui contient le bouton d'ajout de parcelle).
+    for (const tab of ['marche', 'dossier', 'dashboard', 'journal']) {
+      const t = page.locator(`#viewHevea .hevea-tab[data-tab="${tab}"]`);
+      if (await t.count()) { await t.first().click(); await page.waitForTimeout(300); }
+    }
+
+    // Aucun handler inline résiduel dans le DOM généré par le module.
+    expect(await page.locator('#viewHevea [onclick]').count()).toBe(0);
+
+    // Action déléguée locale : afficher le formulaire d'ajout de parcelle.
+    const addBtn = page.locator('#viewHevea [data-action="hevea-show-add-parcelle"]:visible').first();
+    if (await addBtn.count()) await addBtn.click();
+
+    expect(errors, errors.join('\n')).toHaveLength(0);
+  });
+
   test('petits modules : actions enregistrées + toggle CGU fonctionnel', async ({ page }) => {
     test.slow();
     await page.setViewportSize({ width: 1280, height: 800 });

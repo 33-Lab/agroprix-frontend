@@ -318,12 +318,12 @@ window.AgroPrix = window.AgroPrix || {};
                 '<div style="font-size:10px;color:#999;">' + (p.lat ? 'GPS: ' + p.lat.toFixed(4) + ', ' + p.lng.toFixed(4) : 'Pas de GPS') + '</div>' +
               '</div>' +
               '<div style="display:flex;gap:6px;">' +
-                '<button onclick="AgroPrix.heveaGeolocParcelle(' + i + ')" style="padding:6px 10px;background:#E8F5E9;border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Geolocaliser">📍</button>' +
-                '<button onclick="AgroPrix.heveaDeleteParcelle(' + i + ')" style="padding:6px 10px;background:#FFEBEE;border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Supprimer">✕</button>' +
+                '<button data-action="hevea-geoloc-parcelle" data-i="' + i + '" style="padding:6px 10px;background:#E8F5E9;border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Geolocaliser">📍</button>' +
+                '<button data-action="hevea-delete-parcelle" data-i="' + i + '" style="padding:6px 10px;background:#FFEBEE;border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Supprimer">✕</button>' +
               '</div>' +
             '</div>';
           }).join('') : '<p style="font-size:12px;color:#999;text-align:center;padding:12px;">Aucune parcelle enregistree</p>') +
-        '<button onclick="AgroPrix.heveaShowAddParcelle()" style="width:100%;margin-top:8px;padding:12px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">+ Ajouter une parcelle</button>' +
+        '<button data-action="hevea-show-add-parcelle" style="width:100%;margin-top:8px;padding:12px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">+ Ajouter une parcelle</button>' +
         '<div id="hevea-add-parcelle" style="display:none;margin-top:12px;padding:14px;background:#f0f7f3;border-radius:12px;"></div>' +
       '</div>' +
 
@@ -346,7 +346,7 @@ window.AgroPrix = window.AgroPrix || {};
             '<option value="">Normal</option><option value="faible">Production faible</option><option value="tpd">Encoche seche (TPD)</option><option value="fomes">Suspicion Fomes</option><option value="pluie">Pluie/annulation</option>' +
           '</select></div>' +
         '</div>' +
-        '<button onclick="AgroPrix.heveaAddSaignee()" style="width:100%;padding:12px;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la saignee</button>' +
+        '<button data-action="hevea-add-saignee" style="width:100%;padding:12px;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la saignee</button>' +
 
         // Historique
         (data.journalSaignee.length > 0 ?
@@ -453,7 +453,7 @@ window.AgroPrix = window.AgroPrix || {};
           '<div><label style="font-size:11px;font-weight:600;">Acheteur</label>' +
           '<input type="text" id="hevea-pesee-acheteur" placeholder="Nom acheteur" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;"></div>' +
         '</div>' +
-        '<button onclick="AgroPrix.heveaAddPesee()" style="width:100%;padding:12px;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la pesee</button>' +
+        '<button data-action="hevea-add-pesee" style="width:100%;padding:12px;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la pesee</button>' +
 
         // Historique pesee
         (data.journalPesee.length > 0 ?
@@ -555,7 +555,7 @@ window.AgroPrix = window.AgroPrix || {};
             '</div>' +
           '</div>';
         }).join('') +
-        '<button onclick="AgroPrix.heveaExportDossier()" style="width:100%;margin-top:14px;padding:12px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;" ' + (completude < 40 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>Telecharger mon dossier (.txt)</button>' +
+        '<button data-action="hevea-export-dossier" style="width:100%;margin-top:14px;padding:12px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;" ' + (completude < 40 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>Telecharger mon dossier (.txt)</button>' +
       '</div>' +
 
       // EUDR declaration
@@ -568,14 +568,14 @@ window.AgroPrix = window.AgroPrix || {};
           '<div style="margin-bottom:4px;">• Date plantation renseignee : ' + data.parcelles.filter(function(p) { return p.datePlantation; }).length + '/' + data.parcelles.length + '</div>' +
           '<div>• Historique cultural : ' + (nbSaignees > 0 ? 'Oui (' + nbSaignees + ' entrees)' : 'Non') + '</div>' +
         '</div>' +
-        '<button onclick="AgroPrix.heveaExportEUDR()" style="width:100%;margin-top:12px;padding:10px;background:#fff;border:1px solid #2D6A4F;color:#2D6A4F;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;">Export auto-déclaration (.txt)</button>' +
+        '<button data-action="hevea-export-eudr" style="width:100%;margin-top:12px;padding:10px;background:#fff;border:1px solid #2D6A4F;color:#2D6A4F;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;">Export auto-déclaration (.txt)</button>' +
         // Analyse EUDR RÉELLE (moteur backend Hansen GFC + zones protégées WDPA)
         '<div style="margin-top:14px;border-top:1px solid #f0f0f0;padding-top:12px;">' +
           '<div style="font-size:12px;font-weight:700;color:#1B4332;margin-bottom:6px;"><i data-lucide="satellite" class="lc"></i> Analyse EUDR réelle (satellite)</div>' +
           '<div style="font-size:11px;color:#888;margin-bottom:8px;">Vérifie la déforestation post-2020 (Hansen GFC) et la proximité des aires protégées. Nécessite une connexion + au moins une parcelle géolocalisée (bouton 📍).</div>' +
-          '<button onclick="AgroPrix.heveaCheckEUDR()" style="width:100%;padding:10px;background:#1B4332;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;"><i data-lucide="play" class="lc"></i> Lancer l\'analyse EUDR réelle</button>' +
+          '<button data-action="hevea-check-eudr" style="width:100%;padding:10px;background:#1B4332;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;"><i data-lucide="play" class="lc"></i> Lancer l\'analyse EUDR réelle</button>' +
           '<div id="hevea-eudr-real" style="margin-top:10px;"></div>' +
-          '<button id="hevea-dds-btn" onclick="AgroPrix.heveaExportDDS()" disabled style="width:100%;margin-top:8px;padding:10px;background:#fff;border:1px solid #1B4332;color:#1B4332;border-radius:10px;font-size:12px;font-weight:700;cursor:not-allowed;opacity:0.5;"><i data-lucide="file-check" class="lc"></i> Télécharger la déclaration signée (DDS)</button>' +
+          '<button id="hevea-dds-btn" data-action="hevea-export-dds" disabled style="width:100%;margin-top:8px;padding:10px;background:#fff;border:1px solid #1B4332;color:#1B4332;border-radius:10px;font-size:12px;font-weight:700;cursor:not-allowed;opacity:0.5;"><i data-lucide="file-check" class="lc"></i> Télécharger la déclaration signée (DDS)</button>' +
         '</div>' +
       '</div>' +
 
@@ -589,7 +589,7 @@ window.AgroPrix = window.AgroPrix || {};
             '<div style="font-size:22px;font-weight:800;color:#1B4332;">' + Math.round(totalSurface * 25000) + ' FCFA</div>' +
             '<div style="font-size:10px;color:#666;">Base: 25 000 FCFA/ha/an — ' + totalSurface.toFixed(1) + ' ha</div>' +
           '</div>' : '') +
-        '<button onclick="AgroPrix.heveaContactAssurance()" style="width:100%;padding:12px;background:linear-gradient(135deg,#E8862A,#F5A623);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Demander des infos assurance</button>' +
+        '<button data-action="hevea-contact-assurance" style="width:100%;padding:12px;background:linear-gradient(135deg,#E8862A,#F5A623);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Demander des infos assurance</button>' +
       '</div>' +
 
       // Annuaire techniciens
@@ -600,7 +600,7 @@ window.AgroPrix = window.AgroPrix || {};
           '<option value="">-- Choisir une zone --</option>' +
           ZONES_CI.map(function(z) { return '<option value="' + z + '">' + z + '</option>'; }).join('') +
         '</select>' +
-        '<button onclick="AgroPrix.heveaChercherTechniciens()" style="width:100%;padding:12px;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Chercher des techniciens</button>' +
+        '<button data-action="hevea-chercher-techniciens" style="width:100%;padding:12px;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Chercher des techniciens</button>' +
         '<div id="hevea-tech-results"></div>' +
       '</div>';
   }
@@ -639,7 +639,7 @@ window.AgroPrix = window.AgroPrix || {};
         '<div><label style="font-size:11px;font-weight:600;">Date plantation</label><input type="date" id="hevea-new-date" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:12px;"></div>' +
         '<div><label style="font-size:11px;font-weight:600;">Stade</label><select id="hevea-new-stade" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:12px;"><option value="immature">Immature</option><option value="production">En production</option></select></div>' +
       '</div>' +
-      '<button onclick="AgroPrix.heveaSaveParcelle()" style="width:100%;padding:10px;background:#2D6A4F;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la parcelle</button>';
+      '<button data-action="hevea-save-parcelle" style="width:100%;padding:10px;background:#2D6A4F;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer la parcelle</button>';
   };
 
   AP.heveaSaveParcelle = function() {
@@ -888,8 +888,8 @@ window.AgroPrix = window.AgroPrix || {};
         '<div style="font-size:13px;font-weight:700;">' + t.nom + '</div>' +
         '<div style="font-size:11px;color:#666;">' + t.specialite + '</div>' +
         '<div style="display:flex;gap:8px;margin-top:8px;">' +
-          '<button onclick="window.open(\'tel:' + t.tel + '\')" style="flex:1;padding:8px;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">Appeler</button>' +
-          '<button onclick="AgroPrix.heveaDemanderDevis(\'' + t.nom.replace(/'/g, "\\'") + '\')" style="flex:1;padding:8px;background:#E8862A;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">Demander un devis</button>' +
+          '<button data-action="open-tel" data-tel="' + t.tel + '" style="flex:1;padding:8px;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">Appeler</button>' +
+          '<button data-action="hevea-demander-devis" data-nom="' + t.nom.replace(/"/g, '&quot;') + '" style="flex:1;padding:8px;background:#E8862A;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">Demander un devis</button>' +
         '</div>' +
       '</div>';
     }).join('') + '</div>';
@@ -988,5 +988,25 @@ window.AgroPrix = window.AgroPrix || {};
       'Posez-moi des questions sur : les clones, la saignee, les maladies (Fomes, TPD), le prix APROMAC, l\'EUDR, le credit, ou la gestion de votre plantation.<br>' +
       '<b>Exemples :</b> "Quel clone choisir ?", "Mon arbre a une encoche seche", "Comment ameliorer mon Score EUDR ?"';
   }
+
+  // ── Délégation d'événements (CSP Phase 2) ──────────────────────────────────
+  // HTML généré : data-action au lieu de onclick inline ; routé par actions.js.
+  // Args via data-* : data-i = index parcelle, data-nom = nom technicien.
+  // Le bouton "Appeler" utilise l'action générique open-tel (data-tel).
+  // Guard car ce module charge avant actions.js.
+  AP.actions = AP.actions || {};
+  AP.actions['hevea-geoloc-parcelle']     = function(el) { AP.heveaGeolocParcelle(parseInt(el.getAttribute('data-i'), 10)); };
+  AP.actions['hevea-delete-parcelle']     = function(el) { AP.heveaDeleteParcelle(parseInt(el.getAttribute('data-i'), 10)); };
+  AP.actions['hevea-show-add-parcelle']   = function() { AP.heveaShowAddParcelle(); };
+  AP.actions['hevea-save-parcelle']       = function() { AP.heveaSaveParcelle(); };
+  AP.actions['hevea-add-saignee']         = function() { AP.heveaAddSaignee(); };
+  AP.actions['hevea-add-pesee']           = function() { AP.heveaAddPesee(); };
+  AP.actions['hevea-export-dossier']      = function() { AP.heveaExportDossier(); };
+  AP.actions['hevea-export-eudr']         = function() { AP.heveaExportEUDR(); };
+  AP.actions['hevea-check-eudr']          = function() { AP.heveaCheckEUDR(); };
+  AP.actions['hevea-export-dds']          = function() { AP.heveaExportDDS(); };
+  AP.actions['hevea-contact-assurance']   = function() { AP.heveaContactAssurance(); };
+  AP.actions['hevea-chercher-techniciens'] = function() { AP.heveaChercherTechniciens(); };
+  AP.actions['hevea-demander-devis']      = function(el) { AP.heveaDemanderDevis(el.getAttribute('data-nom')); };
 
 })(window.AgroPrix);
