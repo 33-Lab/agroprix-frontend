@@ -11,6 +11,11 @@
       AP.api.checkAPI();
     }
 
+    // Taux de change : MAJ au démarrage (utilisé par l'assistant export)
+    if (AP.fx && AP.fx.load) {
+      AP.fx.load();
+    }
+
     // Initialize markets grid for default country
     if (AP.ui && AP.ui.updateMarkets) {
       AP.ui.updateMarkets();
