@@ -11,7 +11,7 @@
 // MAIS en parallèle revalide le réseau et met à jour le cache → la version
 // suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = 'v7.13.0';  // bump 26/06 : harmonisation EUDR (source unique AP.EUDR + note vue Analyse)
+const CACHE_VERSION = 'v7.14.0';  // bump 26/06 : Assistant Export (wizard faisabilité/EUDR/prix/aide)
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 

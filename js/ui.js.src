@@ -32,8 +32,10 @@
     'financing': 2, 'gpsFinancement': 2,
     'scoring': 2, 'ndvi': 2,
     'hevea': 2, 'plantain': 2, 'cacao': 2, 'tomate': 2,
+    // Assistant Export : gratuit (acquisition — aide le producteur à se lancer)
+    'export': 0,
     // Expert (3)
-    'export': 3, 'conformite': 3
+    'conformite': 3
   };
 
   var PLAN_LABELS = {
