@@ -43,3 +43,26 @@ test('aucun data-action orphelin (tout est enregistré dans AP.actions)', () => 
   // garde-fou : on doit bien trouver des actions (sinon regex cassée)
   expect(used.size).toBeGreaterThan(20);
 });
+
+test('CSP durcie : pas de unsafe-inline (script-src), pas de JS inline', () => {
+  const root = path.resolve(__dirname, '..', '..');
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+
+  // script-src ne doit plus contenir 'unsafe-inline' (style-src le garde encore).
+  const scriptSrc = (html.match(/script-src[^;]*/) || [''])[0];
+  expect(scriptSrc, 'script-src introuvable').toContain("'self'");
+  expect(scriptSrc, "script-src ne doit plus avoir 'unsafe-inline'").not.toContain('unsafe-inline');
+  expect(scriptSrc, "script-src ne doit pas avoir 'unsafe-eval'").not.toContain('unsafe-eval');
+
+  // Aucun handler d'événement inline ni bloc <script> inline.
+  const files = [path.join(root, 'index.html'),
+    ...fs.readdirSync(path.join(root, 'js')).filter((f) => f.endsWith('.js')).map((f) => path.join(root, 'js', f))];
+  const reHandler = /\son(?:click|change|submit|input|keypress|keydown|keyup|focus|blur|error|load|mouseover|mouseout|mousedown|mouseup)="/g;
+  for (const fp of files) {
+    const t = fs.readFileSync(fp, 'utf8');
+    const hits = t.match(reHandler) || [];
+    expect(hits, `handlers inline dans ${path.basename(fp)}: ${hits.join(' ')}`).toHaveLength(0);
+  }
+  // Pas de <script> inline (sans src) dans index.html.
+  expect(html.match(/<script>/g) || [], 'bloc <script> inline dans index.html').toHaveLength(0);
+});

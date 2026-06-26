@@ -11,7 +11,7 @@
 // MAIS en parallèle revalide le réseau et met à jour le cache → la version
 // suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = "v7.28.0";  // bump 26/06 : CSP Phase 2 (8/n) — ndvi/marketplace/financing/export/inputs en data-action
+const CACHE_VERSION = "v7.29.0";  // bump 26/06 : CSP Phase 2 FINALE — retrait de unsafe-inline (script-src)
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 

@@ -42,6 +42,18 @@
     run('data-action-enter', ev);
   });
 
+  // Fallback image : une <img data-img-fallback> qui échoue à charger est
+  // masquée et son frère suivant (placeholder) est affiché. Remplace
+  // onerror="…" inline (bloqué par la CSP). L'événement 'error' ne bouillonne
+  // pas → écoute en phase capture.
+  document.addEventListener('error', function(ev) {
+    var el = ev.target;
+    if (el && el.tagName === 'IMG' && el.hasAttribute('data-img-fallback')) {
+      el.style.display = 'none';
+      if (el.nextElementSibling) el.nextElementSibling.style.display = 'flex';
+    }
+  }, true);
+
   // ── Actions globales : coquille de l'app (navigation + menus) ───────────────
 
   // Navigation. data-nav="1" → lien de nav : on transmet l'élément à showView
