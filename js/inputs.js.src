@@ -184,7 +184,7 @@
       { id: 'compare', label: '<i data-lucide="zap" class="lc"></i> Comparer', icon: '' }
     ].forEach(function(t) {
       var active = currentTab === t.id;
-      html += '<button onclick="AgroPrix.inputs.setTab(\'' + t.id + '\')" style="flex:1;padding:10px;font-size:13px;font-weight:' + (active ? '700' : '500') + ';color:' + (active ? 'var(--green)' : 'var(--text-light)') + ';background:none;border:none;border-bottom:' + (active ? '3px solid var(--green)' : '3px solid transparent') + ';cursor:pointer;font-family:inherit;">' + t.label + '</button>';
+      html += '<button data-action="inputs-set-tab" data-tab="' + t.id + '" style="flex:1;padding:10px;font-size:13px;font-weight:' + (active ? '700' : '500') + ';color:' + (active ? 'var(--green)' : 'var(--text-light)') + ';background:none;border:none;border-bottom:' + (active ? '3px solid var(--green)' : '3px solid transparent') + ';cursor:pointer;font-family:inherit;">' + t.label + '</button>';
     });
     html += '</div>';
 
@@ -207,7 +207,7 @@
     html += '<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">';
     catalog.categories.forEach(function(cat) {
       var active = currentCategory === cat.id;
-      html += '<button onclick="AgroPrix.inputs.setCategory(\'' + cat.id + '\')" style="padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid ' + (active ? 'var(--green)' : 'var(--border)') + ';background:' + (active ? 'var(--green)' : '#fff') + ';color:' + (active ? '#fff' : 'var(--text)') + ';cursor:pointer;font-family:inherit;">' + cat.emoji + ' ' + cat.name + '</button>';
+      html += '<button data-action="inputs-set-category" data-cat="' + cat.id + '" style="padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid ' + (active ? 'var(--green)' : 'var(--border)') + ';background:' + (active ? 'var(--green)' : '#fff') + ';color:' + (active ? '#fff' : 'var(--text)') + ';cursor:pointer;font-family:inherit;">' + cat.emoji + ' ' + cat.name + '</button>';
     });
     html += '</div>';
 
@@ -260,7 +260,7 @@
       + '</div>';
 
     // Submit
-    html += '<button class="btn-analyse" style="width:100%;font-size:14px;padding:12px;" onclick="AgroPrix.inputs.submitPrice()">'
+    html += '<button class="btn-analyse" style="width:100%;font-size:14px;padding:12px;" data-action="inputs-submit-price">'
       + '<i data-lucide="save" class="lc"></i> Enregistrer ce prix</button>';
 
     // Success message placeholder
@@ -518,5 +518,12 @@
     setTab: setTab,
     submitPrice: submitPrice
   };
+
+
+  // ── Délégation d'événements (CSP Phase 2). data-tab/-cat. ───────────────────
+  AP.actions = AP.actions || {};
+  AP.actions['inputs-set-tab']      = function(el) { AP.inputs.setTab(el.getAttribute('data-tab')); };
+  AP.actions['inputs-set-category'] = function(el) { AP.inputs.setCategory(el.getAttribute('data-cat')); };
+  AP.actions['inputs-submit-price'] = function() { AP.inputs.submitPrice(); };
 
 })(window.AgroPrix);

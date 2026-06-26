@@ -22,7 +22,7 @@ test('aucun data-action orphelin (tout est enregistré dans AP.actions)', () => 
 
   const used = new Set<string>();
   const reg = new Set<string>();
-  const reUsed = /data-action(?:-change|-submit|-enter)?="([a-z0-9-]+)"/g;
+  const reUsed = /data-action(?:-change|-submit|-enter|-input)?="([a-z0-9-]+)"/g;
   const reReg = /AP\.actions\[['"]([a-z0-9-]+)['"]\]\s*=/g;
 
   for (const fp of files) {

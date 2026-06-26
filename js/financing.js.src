@@ -235,7 +235,7 @@
       + '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">';
     cultures.forEach(function(c) {
       var selected = fProfile.crops.indexOf(c) >= 0;
-      html += '<button type="button" class="crop-btn' + (selected ? ' active' : '') + '" data-crop="' + c + '" onclick="AgroPrix.financing.toggleCrop(\'' + c + '\')" '
+      html += '<button type="button" class="crop-btn' + (selected ? ' active' : '') + '" data-crop="' + c + '" data-action="fin-toggle-crop" data-crop="' + c + '" '
         + 'style="padding:6px 12px;border-radius:16px;font-size:12px;font-weight:600;border:1.5px solid ' + (selected ? 'var(--green)' : 'var(--border)') + ';background:' + (selected ? 'var(--green)' : '#fff') + ';color:' + (selected ? '#fff' : 'var(--text)') + ';cursor:pointer;">'
         + (AP.cultureNames[c] || c) + '</button>';
     });
@@ -293,12 +293,12 @@
       + '<label class="form-label" style="font-weight:600;">Montant recherche (FCFA)</label>'
       + '<div style="display:flex;align-items:center;gap:12px;">'
       + '<input type="range" id="finAmount" min="100000" max="500000000" step="100000" value="' + fProfile.amountNeeded + '" '
-      + 'style="flex:1;" oninput="document.getElementById(\'finAmountLabel\').textContent=AgroPrix.financing.formatAmount(this.value)">'
+      + 'style="flex:1;" data-action-input="fin-amount-input">'
       + '<span id="finAmountLabel" style="font-size:14px;font-weight:700;color:var(--green);min-width:80px;">' + formatFCFA(fProfile.amountNeeded) + ' FCFA</span>'
       + '</div></div>';
 
     // Submit
-    html += '<button class="btn-analyse" style="width:100%;font-size:15px;padding:14px;" onclick="AgroPrix.financing.search()">'
+    html += '<button class="btn-analyse" style="width:100%;font-size:15px;padding:14px;" data-action="fin-search">'
       + '<i data-lucide="search" class="lc"></i> Trouver mes financements</button>';
 
     html += '</div>'; // card
@@ -316,7 +316,7 @@
       + '<h3 style="margin:0;color:var(--primary);">Resultats — ' + countryName + '</h3>'
       + '<p style="font-size:13px;color:var(--text-light);margin:4px 0 0;">' + matchResults.length + ' financement(s) trouve(s)</p>'
       + '</div>'
-      + '<button class="action-btn" onclick="AgroPrix.financing.backToForm()" style="font-size:12px;">← Modifier</button>'
+      + '<button class="action-btn" data-action="fin-back-to-form" style="font-size:12px;">← Modifier</button>'
       + '</div>';
 
     // Advices
@@ -338,7 +338,7 @@
         + '</div>';
     } else {
       matchResults.forEach(function(r, idx) {
-        html += '<div class="card" style="padding:14px;margin-bottom:12px;cursor:pointer;border-left:4px solid ' + getScoreColor(r.score) + ';" onclick="AgroPrix.financing.showDetail(' + idx + ')">'
+        html += '<div class="card" style="padding:14px;margin-bottom:12px;cursor:pointer;border-left:4px solid ' + getScoreColor(r.score) + ';" data-action="fin-show-detail" data-idx="' + idx + '">'
           + '<div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px;">'
           + '<div>'
           + '<div style="font-size:11px;color:var(--text-light);">' + r.institution.emoji + ' ' + (r.institution.type === 'bank' ? 'Banque' : r.institution.type === 'mfi' ? 'Microfinance' : r.institution.type === 'fund' ? 'Fonds public' : 'Cooperative') + '</div>'
@@ -370,7 +370,7 @@
     if (!r) return;
     selectedInstitution = r;
 
-    var html = '<button class="action-btn" onclick="AgroPrix.financing.backToResults()" style="font-size:12px;margin-bottom:16px;">← Retour aux resultats</button>';
+    var html = '<button class="action-btn" data-action="fin-back-to-results" style="font-size:12px;margin-bottom:16px;">← Retour aux resultats</button>';
 
     // Header
     html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
@@ -563,5 +563,15 @@
     backToResults: backToResults,
     formatAmount: formatAmount
   };
+
+
+  // ── Délégation d'événements (CSP Phase 2). data-crop/-idx ; input → label. ──
+  AP.actions = AP.actions || {};
+  AP.actions['fin-toggle-crop']     = function(el) { AP.financing.toggleCrop(el.getAttribute('data-crop')); };
+  AP.actions['fin-search']          = function() { AP.financing.search(); };
+  AP.actions['fin-back-to-form']    = function() { AP.financing.backToForm(); };
+  AP.actions['fin-back-to-results'] = function() { AP.financing.backToResults(); };
+  AP.actions['fin-show-detail']     = function(el) { AP.financing.showDetail(parseInt(el.getAttribute('data-idx'), 10)); };
+  AP.actions['fin-amount-input']    = function(el) { var l = document.getElementById('finAmountLabel'); if (l) l.textContent = AP.financing.formatAmount(el.value); };
 
 })(window.AgroPrix);
