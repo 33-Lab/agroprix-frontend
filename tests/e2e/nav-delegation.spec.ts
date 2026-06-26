@@ -169,4 +169,30 @@ test.describe('Navigation déléguée (data-action)', () => {
 
     expect(errors, errors.join('\n')).toHaveLength(0);
   });
+
+  test('petits modules : actions enregistrées + toggle CGU fonctionnel', async ({ page }) => {
+    test.slow();
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await asAdmin(page);
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
+    test.skip(!(await hasAction(page, 'cgu-toggle-crop')), 'petits modules délégués pas encore déployés sur la cible');
+
+    // Toutes les actions des petits modules sont enregistrées (= câblées).
+    const registered = await page.evaluate(() => {
+      const a = (window as any).AgroPrix.actions;
+      return ['negoce-delete', 'scoring-pick-institution', 'cgu-toggle-crop', 'cgu-accept', 'remove-el']
+        .every((n) => typeof a[n] === 'function');
+    });
+    expect(registered).toBeTruthy();
+
+    // Fonctionnel : ouvre la modale CGU et bascule une filière (cgu-toggle-crop).
+    await page.evaluate(() => (window as any).AgroPrix.cgu.forceShow());
+    const crop = page.locator('#cguModal [data-action="cgu-toggle-crop"]').first();
+    await expect(crop).toBeVisible();
+    const before = await crop.evaluate((el) => (el as HTMLElement).style.background);
+    await crop.click();
+    const after = await crop.evaluate((el) => (el as HTMLElement).style.background);
+    expect(after).not.toBe(before); // le toggle a changé le style → handler exécuté
+  });
 });

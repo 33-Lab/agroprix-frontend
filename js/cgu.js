@@ -1,4 +1,4 @@
-/*! AgroPrix cgu.js - generated from cgu.js.src on 2026-06-25 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix cgu.js - generated from cgu.js.src on 2026-06-26 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){'use strict';var CGU_KEY='agroprix_cgu_accepted';var PROFILE_KEY='agroprix_farmer_profile';var PROFILE_HISTORY_KEY='agroprix_profile_history';var CGU_INTERVAL_DAYS=90;var CGU_VERSION='1.0.0';function needsRevalidation(){var cguData=getCguData();if(!cguData||!cguData.acceptedAt)return true;var daysSince=Math.floor((Date.now()-new Date(cguData.acceptedAt).getTime())/86400000);return daysSince>=CGU_INTERVAL_DAYS||cguData.version!==CGU_VERSION;}
 function getCguData(){try{return JSON.parse(localStorage.getItem(CGU_KEY));}catch(e){return null;}}
 function getProfile(){try{return JSON.parse(localStorage.getItem(PROFILE_KEY))||{};}catch(e){return{};}}
@@ -11,7 +11,7 @@ function showCguModal(){if(document.getElementById('cguModal'))return;var profil
 +'<label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Pays</label>'
 +'<select id="cguCountry" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-family:inherit;">';Object.keys(countries).forEach(function(k){var sel=(profile.country===k)?' selected':'';html+='<option value="'+k+'"'+sel+'>'+countries[k].flag+' '+countries[k].name+'</option>';});html+='</select></div>';html+='<div style="margin-bottom:12px;">'
 +'<label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Cultures pratiquees</label>'
-+'<div id="cguCrops" style="display:flex;flex-wrap:wrap;gap:4px;">';Object.keys(cultures).forEach(function(c){var active=profile.crops&&profile.crops.indexOf(c)>=0;html+='<button type="button" data-crop="'+c+'" onclick="AgroPrix.cgu.toggleCrop(this,\''+c+'\')" '
++'<div id="cguCrops" style="display:flex;flex-wrap:wrap;gap:4px;">';Object.keys(cultures).forEach(function(c){var active=profile.crops&&profile.crops.indexOf(c)>=0;html+='<button type="button" data-crop="'+c+'" data-action="cgu-toggle-crop" data-crop="'+c+'" '
 +'style="padding:4px 10px;border-radius:14px;font-size:11px;font-weight:600;border:1px solid '+(active?'#2D6A4F':'#ddd')+';background:'+(active?'#2D6A4F':'#fff')+';color:'+(active?'#fff':'#666')+';cursor:pointer;">'
 +cultures[c]+'</button>';});html+='</div></div>';html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">'
 +'<div><label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Superficie (ha)</label>'
@@ -47,7 +47,7 @@ function showCguModal(){if(document.getElementById('cguModal'))return;var profil
 +'</div>';html+='<label style="display:flex;align-items:start;gap:8px;margin-bottom:16px;cursor:pointer;">'
 +'<input type="checkbox" id="cguAccept" style="width:18px;height:18px;margin-top:2px;">'
 +'<span style="font-size:12px;color:#333;">J\'accepte les Conditions Generales d\'Utilisation et la collecte de mes donnees telles que decrites ci-dessus.</span>'
-+'</label>';html+='<button id="cguSubmitBtn" onclick="AgroPrix.cgu.accept()" style="width:100%;padding:14px;background:linear-gradient(135deg,#2D6A4F,#40916c);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;opacity:0.5;" disabled>'
++'</label>';html+='<button id="cguSubmitBtn" data-action="cgu-accept" style="width:100%;padding:14px;background:linear-gradient(135deg,#2D6A4F,#40916c);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;opacity:0.5;" disabled>'
 +'Valider et continuer</button>';html+='</div></div>';modal.innerHTML=html;document.body.appendChild(modal);var acceptBox=document.getElementById('cguAccept');var submitBtn=document.getElementById('cguSubmitBtn');if(acceptBox&&submitBtn){acceptBox.addEventListener('change',function(){submitBtn.disabled=!acceptBox.checked;submitBtn.style.opacity=acceptBox.checked?'1':'0.5';});}
 modal._selectedCrops=(profile.crops||[]).slice();}
 function toggleCrop(btn,crop){var modal=document.getElementById('cguModal');if(!modal)return;var crops=modal._selectedCrops||[];var idx=crops.indexOf(crop);if(idx>=0){crops.splice(idx,1);}else{crops.push(crop);}
@@ -58,4 +58,4 @@ function checkOnStartup(){setTimeout(function(){var user=AP.auth?AP.auth.getUser
 function forceShow(){showCguModal();}
 function getProfileStats(){var history=[];try{history=JSON.parse(localStorage.getItem(PROFILE_HISTORY_KEY)||'[]');}catch(e){}
 var profile=getProfile();var cguData=getCguData();return{profileComplete:!!(profile.country&&profile.crops&&profile.crops.length>0&&profile.farmSize),profileVersions:history.length,lastUpdate:history.length>0?history[history.length-1].timestamp:null,cguVersion:cguData?cguData.version:null,cguAcceptedAt:cguData?cguData.acceptedAt:null,daysSinceAcceptance:cguData?Math.floor((Date.now()-new Date(cguData.acceptedAt).getTime())/86400000):null};}
-AP.cgu={checkOnStartup:checkOnStartup,forceShow:forceShow,toggleCrop:toggleCrop,accept:accept,needsRevalidation:needsRevalidation,getProfileStats:getProfileStats};})(window.AgroPrix);
+AP.cgu={checkOnStartup:checkOnStartup,forceShow:forceShow,toggleCrop:toggleCrop,accept:accept,needsRevalidation:needsRevalidation,getProfileStats:getProfileStats};AP.actions=AP.actions||{};AP.actions['cgu-toggle-crop']=function(el){toggleCrop(el,el.getAttribute('data-crop'));};AP.actions['cgu-accept']=function(){accept();};})(window.AgroPrix);

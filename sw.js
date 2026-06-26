@@ -11,7 +11,7 @@
 // MAIS en parallèle revalide le réseau et met à jour le cache → la version
 // suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = 'v7.24.0';  // bump 26/06 : CSP Phase 2 (4/n) — module cacao migré en data-action
+const CACHE_VERSION = 'v7.25.0';  // bump 26/06 : CSP Phase 2 (5/n) — petits modules (negoce/scoring/dashboard/cgu/app/ui) en data-action
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 

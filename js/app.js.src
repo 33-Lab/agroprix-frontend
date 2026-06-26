@@ -340,7 +340,7 @@ window.souscrirePlan = function(plan, montant) {
     + '<strong>Paiement en ligne non encore active</strong><br>Mobile Money et carte bancaire seront disponibles prochainement. En attendant, souscrivez directement via WhatsApp ci-dessous.'
     + '</div>'
     + '<a href="https://wa.me/22960000000?text=Je veux souscrire au Plan ' + plan + ' (' + fmt + ' FCFA/mois)" target="_blank" style="display:block;width:100%;padding:14px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:10px;"><i data-lucide="message-circle" class="lc" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> Payer via WhatsApp</a>'
-    + '<button onclick="document.getElementById(\'paymentOverlay\').remove()" style="width:100%;padding:12px;background:none;border:1px solid #ddd;border-radius:12px;font-size:14px;color:#999;cursor:pointer;">Fermer</button>'
+    + '<button data-action="remove-el" data-target="paymentOverlay" style="width:100%;padding:12px;background:none;border:1px solid #ddd;border-radius:12px;font-size:14px;color:#999;cursor:pointer;">Fermer</button>'
     + '</div>';
   document.body.appendChild(overlay);
 };
@@ -390,7 +390,7 @@ function onFedapaySuccess(plan, montant, response) {
     +   '<div id="payStatus" style="margin-top:16px;padding:12px;background:#FEF3C7;border-radius:12px;font-size:13px;color:#92400E;line-height:1.5;">'
     +     'Nous attendons la confirmation de FedaPay (webhook). Cela prend habituellement quelques secondes.'
     +   '</div>'
-    +   '<button id="payCloseBtn" onclick="document.getElementById(\'paymentActivationOverlay\').remove()" style="width:100%;margin-top:16px;padding:14px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;">OK, continuer</button>'
+    +   '<button id="payCloseBtn" data-action="remove-el" data-target="paymentActivationOverlay" style="width:100%;margin-top:16px;padding:14px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;">OK, continuer</button>'
     + '</div>'
     + '<style>@keyframes spin{to{transform:rotate(360deg)}}</style>';
   document.body.appendChild(overlay);

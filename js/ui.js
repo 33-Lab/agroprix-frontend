@@ -5,9 +5,9 @@ modal.innerHTML='<div style="background:#fff;border-radius:20px;padding:28px;max
 +'<div style="font-size:48px;margin-bottom:8px;"><i data-lucide="lock" style="width:48px;height:48px;color:#E8862A;display:inline-block;"></i></div>'
 +'<h3 style="margin:0 0 8px;color:#1B4332;font-size:20px;">Module Réservé</h3>'
 +'<p style="font-size:14px;color:#666;margin:0 0 20px;">Ce module nécessite le <strong style="color:#2D6A4F;">'+planLabel+'</strong>.</p>'
-+'<button onclick="showView(\'offres\');document.getElementById(\'upgradeModal\').style.display=\'none\';" style="width:100%;padding:14px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;">'
++'<button data-action="show-view" data-view="offres" data-close-modal="upgradeModal" style="width:100%;padding:14px;background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;">'
 +'<i data-lucide="trending-up" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> Voir nos offres</button>'
-+'<button onclick="document.getElementById(\'upgradeModal\').style.display=\'none\';" style="width:100%;padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:12px;font-size:14px;cursor:pointer;">Annuler</button>'
++'<button data-action="modal-close" data-modal="upgradeModal" style="width:100%;padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:12px;font-size:14px;cursor:pointer;">Annuler</button>'
 +'</div>';modal.style.display='flex';if(window.lucide){try{var mNodes=Array.prototype.slice.call(modal.querySelectorAll('[data-lucide]'));if(mNodes.length)window.lucide.createIcons({nodes:mNodes});}catch(e){}}}
 function showView(viewId,el){var minLevel=VIEW_MIN_PLAN[viewId];if(minLevel===undefined)minLevel=0;var userLevel=getUserPlanLevel();if(userLevel<minLevel){showUpgradeModal(minLevel);return;}
 document.querySelectorAll('.view-container').forEach(function(v){v.classList.remove('show');v.style.display='none';});var targetId=AP.viewIdMap[viewId]||'viewAnalyse';var target=document.getElementById(targetId);if(target){target.classList.add('show');target.style.display='block';}

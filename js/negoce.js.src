@@ -167,7 +167,7 @@
       var paF  = t.prixAchat.toLocaleString('fr-FR');
       var isUserAdded = t.userAdded === true;
       // Lien de suppression pour les transactions backend de l'utilisateur (avec id).
-      var delLink = (isUserAdded && t.id) ? ' <a onclick="deleteNegoceTransaction(' + t.id + ')" style="color:#e76f51;cursor:pointer;font-size:12px;font-weight:700;" title="Supprimer">×</a>' : '';
+      var delLink = (isUserAdded && t.id) ? ' <a data-action="negoce-delete" data-id="' + t.id + '" style="color:#e76f51;cursor:pointer;font-size:12px;font-weight:700;" title="Supprimer">×</a>' : '';
       var dateCell = (isUserAdded ? '' : exempleBadge) + t.date + delLink;
       if (t.status === 'en_stock') {
         rows += '<tr><td>' + dateCell + '</td><td>' + t.culture + '</td><td>' + t.marche + '</td>'
@@ -478,5 +478,9 @@
   window.saveTransaction = saveTransaction;
   window.deleteNegoceTransaction = deleteNegoceTransaction;
   window.calculateTransport = calculateTransport;
+
+  // Délégation d'événements (CSP Phase 2) — data-id = id transaction.
+  AP.actions = AP.actions || {};
+  AP.actions['negoce-delete'] = function(el) { deleteNegoceTransaction(parseInt(el.getAttribute('data-id'), 10)); };
 
 })(window.AgroPrix);
