@@ -11,7 +11,7 @@
 // MAIS en parallèle revalide le réseau et met à jour le cache → la version
 // suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = 'v6.13.0';  // bump 12/05 : retrait fichier statique prix obsolète
+const CACHE_VERSION = 'v7.8.0';  // bump 25/06 : index.html network-first (modules Pro non visibles si index caché)
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 
@@ -132,6 +132,17 @@ self.addEventListener('fetch', function(event) {
     return;
   }
 
+  // 2bis. Navigation (document index.html) → Network-first.
+  //    Indispensable : index.html n'est PAS versionné. En Stale-While-Revalidate
+  //    l'utilisateur voyait l'ANCIEN index au chargement (puis le neuf seulement
+  //    au 2e reload) → les nouveaux modules/nav (ex. Cacao/Tomate Pro) restaient
+  //    invisibles. Network-first sert toujours le dernier index quand en ligne,
+  //    avec fallback cache hors-ligne.
+  if (request.mode === 'navigate' || url.pathname === '/' || url.pathname === '/index.html') {
+    event.respondWith(networkFirstNavigation(request));
+    return;
+  }
+
   // 3. Assets versionnés ?v=X et assets locaux non versionnés → Stale-While-Revalidate.
   //    Retourne le cache instantanément (perf) MAIS revalide en parallèle (fraîcheur).
   //    Garantit qu'aucun utilisateur ne reste bloqué sur une vieille version d'un .js
@@ -148,6 +159,28 @@ function networkFirstWithFallback(request) {
       JSON.stringify({ error: 'Hors ligne — reconnectez-vous pour obtenir les données en temps réel.', offline: true }),
       { status: 503, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } }
     );
+  });
+}
+
+// ============================================================
+// Stratégie : Network-first pour la navigation (index.html)
+// Sert toujours le dernier index quand en ligne (sinon les changements
+// structurels non versionnés — nav, vues — n'apparaissent qu'au 2e reload).
+// Fallback cache si hors-ligne.
+// ============================================================
+function networkFirstNavigation(request) {
+  return fetch(request).then(function(response) {
+    if (response && response.status === 200) {
+      var copy = response.clone();
+      caches.open(CACHE_NAME).then(function(cache) {
+        cache.put('/index.html', copy);
+      });
+    }
+    return response;
+  }).catch(function() {
+    return caches.match('/index.html').then(function(cached) {
+      return cached || caches.match(request) || new Response('', { status: 503 });
+    });
   });
 }
 
