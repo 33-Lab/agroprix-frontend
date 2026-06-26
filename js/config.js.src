@@ -19,6 +19,29 @@ window.AgroPrix = window.AgroPrix || {};
   // /api/prices comme source unique.
   AP.HDX_API_KEY = '';
 
+  // ─── EUDR — Source unique (Reglement UE 2023/1115 sur la deforestation) ───
+  // Centralise n° de reglement, dates d'application et messages reutilises par
+  // les modules (cacao, hevea) et la vue Analyse, pour eviter la duplication et
+  // la derive des libelles. Verifie sur sources officielles (juin 2026) :
+  //   - Reglement (UE) 2023/1115 (texte de base) ; report adopte par le
+  //     Reglement (UE) 2025/2650 (dec. 2025) => application repoussee a fin 2026.
+  //   - 30/12/2026 grands/moyens operateurs · 30/06/2027 micro/PME + personnes
+  //     physiques. S'applique aux produits places sur le marche UE ET exportes.
+  // COMMODITIES = les 7 produits reglementaires (texte de reference uniquement).
+  // COMMODITIES_AGROPRIX = ceux reellement outilles dans l'app (note + analyse).
+  AP.EUDR = {
+    REGLEMENT: 'Règlement UE 2023/1115',
+    REPORT: 'Règlement UE 2025/2650',
+    DATE_GRANDS: '30/12/2026',
+    DATE_PME: '30/06/2027',
+    DATES_TEXT: 'Application : 30/12/2026 (grands/moyens opérateurs) · 30/06/2027 (PME)',
+    COMMODITIES: ['cacao', 'cafe', 'hevea', 'soja', 'palmier', 'bois', 'bovins'],
+    COMMODITIES_AGROPRIX: ['cacao', 'cafe', 'hevea'],
+    PRODUITS_TEXT: '7 produits concernés : cacao, café, hévéa, soja, huile de palme, bois, bovins.',
+    MSG_EXPORT: 'Obligatoire pour exporter vers l\'Union européenne : l\'acheteur européen exige la géolocalisation GPS de vos parcelles et la preuve d\'absence de déforestation après le 31/12/2020 (déclaration de diligence, DDS).',
+    MSG_UEMOA: 'Pays UEMOA = niveau de risque « standard » → diligence raisonnée simplifiée (géolocalisation + déclaration de non-déforestation, sans évaluation de risque complète) : un atout commercial vs les pays à haut risque.'
+  };
+
   // Month names in French
   AP.MONTHS = ['Jan', 'F\u00e9v', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Ao\u00fb', 'Sep', 'Oct', 'Nov', 'D\u00e9c'];
   AP.MONTHS_FULL = ['Janvier', 'F\u00e9vrier', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Ao\u00fbt', 'Septembre', 'Octobre', 'Novembre', 'D\u00e9cembre'];

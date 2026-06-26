@@ -383,7 +383,7 @@ window.AgroPrix = window.AgroPrix || {};
       alertes.push({ type: 'warning', text: 'Aucune parcelle cacaoyère enregistrée. Ajoutez votre première parcelle pour démarrer le suivi EUDR.' });
     }
     if (sEudr < 50) {
-      alertes.push({ type: 'warning', text: 'Score EUDR insuffisant (' + sEudr + '/100). Le Règlement UE 2023/1115 est applicable. Géolocalisez vos parcelles pour accéder aux marchés européens.' });
+      alertes.push({ type: 'warning', text: 'Score EUDR insuffisant (' + sEudr + '/100). Le ' + AP.EUDR.REGLEMENT + ' est applicable. Géolocalisez vos parcelles pour accéder aux marchés européens.' });
     }
 
     el.innerHTML =
@@ -462,7 +462,7 @@ window.AgroPrix = window.AgroPrix || {};
   function getNextAction(data, sEudr) {
     if (data.parcelles.length === 0) return 'Ajoutez votre première parcelle dans l\'onglet <b>Journal</b> pour démarrer le suivi.';
     var hasGps = data.parcelles.some(function(p) { return p.lat && p.lng; });
-    if (!hasGps) return 'Géolocalisez votre parcelle — obligatoire pour la conformité <b>EUDR</b> (Règlement UE 2023/1115).';
+    if (!hasGps) return 'Géolocalisez votre parcelle — obligatoire pour la conformité <b>EUDR</b> (' + AP.EUDR.REGLEMENT + ').';
     if (data.journalCulture.length === 0) return 'Enregistrez votre première opération (taille, traitement, récolte) dans l\'onglet <b>Journal</b>.';
     if (data.journalVente.length === 0) return 'Enregistrez votre première vente dans l\'onglet <b>Marché</b> pour suivre vos revenus et votre traçabilité.';
     if (sEudr < 60) return 'Complétez votre dossier <b>EUDR</b> dans Mon Dossier — requis pour vendre en Europe.';
@@ -843,7 +843,7 @@ window.AgroPrix = window.AgroPrix || {};
 
       '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;">' +
         '<div style="font-size:15px;font-weight:700;margin-bottom:4px;">Conformité EUDR</div>' +
-        '<div style="font-size:12px;color:#666;margin-bottom:12px;">Règlement UE 2023/1115. Application : 30/12/2026 (grands/moyens opérateurs) · 30/06/2027 (PME). Obligatoire pour exporter en Europe.</div>' +
+        '<div style="font-size:12px;color:#666;margin-bottom:12px;">' + AP.EUDR.REGLEMENT + '. ' + AP.EUDR.DATES_TEXT + '. Obligatoire pour exporter en Europe.</div>' +
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
           '<span style="font-size:13px;font-weight:700;">Score EUDR</span>' +
           '<span style="font-size:20px;font-weight:900;color:' + scoreColor(sEudr) + ';">' + sEudr + '/100</span>' +

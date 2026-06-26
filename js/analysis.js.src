@@ -200,6 +200,7 @@ window.AgroPrix = window.AgroPrix || {};
     buildRegionalChartAPI(compareData, culture);
     buildFactors(culture, cName, momChange);
     buildOfficialPrice(culture);
+    buildEudrNote(culture);
     buildNews(cultureName, cName, currentPrice, momChange, yoyChange, vol,
       monthlyData[monthlyData.length - 1].month, monthlyData[monthlyData.length - 1].num_markets, true);
     buildRecommendationsAPI(country, culture, cultureName, cName, currentPrice, momChange, yoyChange, vol, forecast, AP.getBestSellMonth(data), data);
@@ -266,6 +267,7 @@ window.AgroPrix = window.AgroPrix || {};
     buildFactors(culture, cName, momChange);
     buildRegionalChart(culture, period);
     buildOfficialPrice(culture);
+    buildEudrNote(culture);
     buildNews(cultureName, cName, currentPrice, momChange, yoyChange, vol, null, null, false);
     buildRecommendations(cultureName, cName, currentPrice, momChange, yoyChange, vol, forecast, AP.getBestSellMonth(allData), data);
   }
@@ -830,6 +832,23 @@ window.AgroPrix = window.AgroPrix || {};
       + '<div style="font-size:12px;font-weight:700;color:#1B4332;margin-bottom:4px;"><i data-lucide="landmark" class="lc"></i> Prix officiel garanti \u2014 bord champ (C\u00f4te d\'Ivoire)</div>'
       + '<div style="font-size:13px;color:#333;">Campagne ' + off.campagne + ' : <b>' + off.texte + '</b></div>'
       + '<div style="font-size:10px;color:#888;margin-top:4px;">Source : ' + off.source + '. Le prix march\u00e9 (WFP) ci-dessus peut diff\u00e9rer du prix garanti au producteur.</div>'
+      + '</div>';
+    if (window.refreshIcons) refreshIcons();
+  }
+
+  // Note EUDR \u2014 affich\u00e9e uniquement pour les fili\u00e8res concern\u00e9es ET outill\u00e9es
+  // par AgroPrix (cacao, caf\u00e9, h\u00e9v\u00e9a). Valorise l'angle EXPORT vers l'UE et
+  // l'argument commercial \u00ab UEMOA = risque standard \u2192 diligence simplifi\u00e9e \u00bb.
+  // Tous les libell\u00e9s viennent de la source unique AP.EUDR (config.js).
+  function buildEudrNote(culture) {
+    var el = document.getElementById('eudrNote');
+    if (!el) return;
+    if (!AP.EUDR || AP.EUDR.COMMODITIES_AGROPRIX.indexOf(culture) < 0) { el.innerHTML = ''; return; }
+    el.innerHTML = '<div class="card" style="padding:14px;border-radius:14px;margin:0 0 8px;border-left:4px solid #1B4332;background:#F0FFF4;">'
+      + '<div style="font-size:12px;font-weight:700;color:#1B4332;margin-bottom:6px;"><i data-lucide="globe" class="lc"></i> Export vers l\'Europe \u2014 Conformit\u00e9 EUDR</div>'
+      + '<div style="font-size:12px;color:#333;line-height:1.5;margin-bottom:6px;">' + AP.EUDR.MSG_EXPORT + '</div>'
+      + '<div style="font-size:12px;color:#1B4332;background:rgba(45,106,79,.08);border-radius:8px;padding:8px;margin-bottom:6px;line-height:1.5;"><b>Atout UEMOA :</b> ' + AP.EUDR.MSG_UEMOA + '</div>'
+      + '<div style="font-size:10px;color:#888;">' + AP.EUDR.REGLEMENT + ' \u00b7 ' + AP.EUDR.DATES_TEXT + '.</div>'
       + '</div>';
     if (window.refreshIcons) refreshIcons();
   }
