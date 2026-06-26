@@ -42,6 +42,22 @@ window.AgroPrix = window.AgroPrix || {};
     MSG_UEMOA: 'Pays UEMOA = niveau de risque « standard » → diligence raisonnée simplifiée (géolocalisation + déclaration de non-déforestation, sans évaluation de risque complète) : un atout commercial vs les pays à haut risque.'
   };
 
+  // ─── PRIX OFFICIELS GARANTIS — Source unique (bord champ, Côte d'Ivoire) ───
+  // Prix fixés par l'État / Conseil du Café-Cacao / Conseil Coton-Anacarde.
+  // Source de vérité réutilisée par analysis.js (OFFICIAL_PRICES), export.js
+  // (Assistant Export) et cacao.js (PRIX_OFFICIEL_CCC) — au lieu de dupliquer
+  // les mêmes chiffres dans 3 fichiers. À ACTUALISER CHAQUE CAMPAGNE.
+  AP.PRICES = {
+    CAMPAGNE: '2025-2026',
+    OFFICIAL: {
+      cacao: { fcfaKg: 2800, principale: 2800, intermediaire: 1200, campagne: '2025-2026',
+               texte: '2 800 FCFA/kg (principale, oct.–mars) · 1 200 FCFA/kg (intermédiaire, avril–sept.)',
+               source: 'Conseil du Café-Cacao (CI)' },
+      cafe:  { fcfaKg: 1700, campagne: '2025-2026', texte: '1 700 FCFA/kg', source: 'Conseil du Café-Cacao (CI)' },
+      cajou: { fcfaKg: 400,  campagne: '2026', texte: '400 FCFA/kg (prix plancher bord champ, noix brute)', source: 'Conseil Coton-Anacarde (CI)' }
+    }
+  };
+
   // Month names in French
   AP.MONTHS = ['Jan', 'F\u00e9v', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Ao\u00fb', 'Sep', 'Oct', 'Nov', 'D\u00e9c'];
   AP.MONTHS_FULL = ['Janvier', 'F\u00e9vrier', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Ao\u00fbt', 'Septembre', 'Octobre', 'Novembre', 'D\u00e9cembre'];

@@ -48,7 +48,7 @@ container.innerHTML=factors.map(function(f){var cls=f.real?momCls:tendClass(f.te
 +'<div class="factor-desc">'+f.desc+'</div>'
 +'<span class="factor-impact '+cls+'">'+(f.real?momTend+' \u00b7 r\u00e9el':f.tend)+'</span>'
 +'</div>';}).join('');}
-var OFFICIAL_PRICES={cacao:{texte:'2 800 FCFA/kg (principale, oct.\u2013mars) \u00b7 1 200 FCFA/kg (interm\u00e9diaire, avril\u2013sept.)',campagne:'2025-2026',source:'Conseil du Caf\u00e9-Cacao (CI)'},cafe:{texte:'1 700 FCFA/kg',campagne:'2025-2026',source:'Conseil du Caf\u00e9-Cacao (CI)'},cajou:{texte:'400 FCFA/kg (prix plancher bord champ, noix brute)',campagne:'2026',source:'Conseil Coton-Anacarde (CI)'}};function buildOfficialPrice(culture){var el=document.getElementById('officialPriceNote');if(!el)return;var off=OFFICIAL_PRICES[culture];if(!off){el.innerHTML='';return;}
+var OFFICIAL_PRICES=(AP.PRICES&&AP.PRICES.OFFICIAL)||{};function buildOfficialPrice(culture){var el=document.getElementById('officialPriceNote');if(!el)return;var off=OFFICIAL_PRICES[culture];if(!off){el.innerHTML='';return;}
 el.innerHTML='<div class="card" style="padding:14px;border-radius:14px;margin:0 0 8px;border-left:4px solid #2D6A4F;background:#F0FFF4;">'
 +'<div style="font-size:12px;font-weight:700;color:#1B4332;margin-bottom:4px;"><i data-lucide="landmark" class="lc"></i> Prix officiel garanti \u2014 bord champ (C\u00f4te d\'Ivoire)</div>'
 +'<div style="font-size:13px;color:#333;">Campagne '+off.campagne+' : <b>'+off.texte+'</b></div>'

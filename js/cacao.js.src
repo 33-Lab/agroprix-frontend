@@ -92,7 +92,10 @@ window.AgroPrix = window.AgroPrix || {};
   // Prix officiel GARANTI bord-champ fixé par le Conseil du Café-Cacao (CI).
   // Régulé par campagne — c'est le prix de référence réel pour le producteur,
   // distinct de la moyenne marché WFP. À actualiser à chaque campagne (source CCC).
-  var PRIX_OFFICIEL_CCC = { principale: 2800, intermediaire: 1200, campagne: '2025-2026' };
+  // Prix officiel garanti CCC : source unique AP.PRICES (config.js), repli local.
+  var PRIX_OFFICIEL_CCC = (AP.PRICES && AP.PRICES.OFFICIAL && AP.PRICES.OFFICIAL.cacao)
+    ? { principale: AP.PRICES.OFFICIAL.cacao.principale, intermediaire: AP.PRICES.OFFICIAL.cacao.intermediaire, campagne: AP.PRICES.OFFICIAL.cacao.campagne }
+    : { principale: 2800, intermediaire: 1200, campagne: '2025-2026' };
   var PRIX_CACAO = [];
   var PRIX_CACAO_LOADING = false;
   var PRIX_CACAO_ERROR = null;

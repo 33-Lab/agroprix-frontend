@@ -814,14 +814,9 @@ window.AgroPrix = window.AgroPrix || {};
   // =========================================================================
   // buildNews — generate news feed items
   // =========================================================================
-  // Prix officiels GARANTIS bord-champ (fili\u00e8res r\u00e9gul\u00e9es C\u00f4te d'Ivoire). Ce
-  // sont des prix fix\u00e9s par l'\u00c9tat/CCC/CC \u2014 la r\u00e9f\u00e9rence r\u00e9elle pour le
-  // producteur, distincte de la moyenne march\u00e9 WFP. \u00c0 actualiser chaque campagne.
-  var OFFICIAL_PRICES = {
-    cacao:  { texte: '2 800 FCFA/kg (principale, oct.\u2013mars) \u00b7 1 200 FCFA/kg (interm\u00e9diaire, avril\u2013sept.)', campagne: '2025-2026', source: 'Conseil du Caf\u00e9-Cacao (CI)' },
-    cafe:   { texte: '1 700 FCFA/kg', campagne: '2025-2026', source: 'Conseil du Caf\u00e9-Cacao (CI)' },
-    cajou:  { texte: '400 FCFA/kg (prix plancher bord champ, noix brute)', campagne: '2026', source: 'Conseil Coton-Anacarde (CI)' }
-  };
+  // Prix officiels GARANTIS bord-champ : source unique AP.PRICES (config.js).
+  // (anciennement dupliqu\u00e9 ici ; centralis\u00e9 pour \u00e9viter la d\u00e9rive entre fichiers.)
+  var OFFICIAL_PRICES = (AP.PRICES && AP.PRICES.OFFICIAL) || {};
 
   function buildOfficialPrice(culture) {
     var el = document.getElementById('officialPriceNote');
