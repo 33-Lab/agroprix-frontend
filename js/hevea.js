@@ -827,13 +827,12 @@ window.AgroPrix = window.AgroPrix || {};
 
   AP.heveaExportDDS = function() {
     if (!_heveaEudrLastId || !AP.API_BASE) { alert('Lancez d\'abord l\'analyse EUDR réelle.'); return; }
-    fetch(AP.API_BASE + '/api/eudr/parcelle/' + _heveaEudrLastId + '/dds', { method: 'GET', credentials: 'include' })
-      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .then(function(dds) {
-        var blob = new Blob([JSON.stringify(dds, null, 2)], { type: 'application/json' });
+    fetch(AP.API_BASE + '/api/eudr/parcelle/' + _heveaEudrLastId + '/dds.pdf', { method: 'GET', credentials: 'include' })
+      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.blob(); })
+      .then(function(blob) {
         var a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'AgroPrix_DDS_EUDR_' + (dds.dds_id || _heveaEudrLastId) + '.json';
+        a.download = 'AgroPrix_DDS_EUDR_' + _heveaEudrLastId + '.pdf';
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
       })
       .catch(function(e) { alert('Export DDS impossible : ' + e.message); });
