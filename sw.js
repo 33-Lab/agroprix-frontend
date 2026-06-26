@@ -11,7 +11,7 @@
 // MAIS en parallèle revalide le réseau et met à jour le cache → la version
 // suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = 'v7.20.0';  // bump 26/06 : CSP durcie — retrait de 'unsafe-eval' (script-src)
+const CACHE_VERSION = 'v7.21.0';  // bump 26/06 : CSP Phase 2 (1/n) — délégation data-action (nav index.html) + actions.js
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 
@@ -31,6 +31,7 @@ const STATIC_ASSETS = [
   '/js/auth.js',
   '/js/ui.js',
   '/js/app.js',
+  '/js/actions.js',
   // JS modules
   '/js/analysis.js',
   '/js/negoce.js',

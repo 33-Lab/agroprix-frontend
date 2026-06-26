@@ -1,0 +1,86 @@
+// AgroPrix — Délégation d'événements (CSP Phase 2)
+//
+// Remplace progressivement les handlers inline (onclick="…", onchange="…",
+// onsubmit="…", onkeypress="…") par une délégation centralisée : les éléments
+// portent un attribut data-action (+ data-* pour les arguments) et un unique
+// listener au niveau du document route vers AP.actions[nom](el, ev).
+//
+// Objectif : pouvoir retirer 'unsafe-inline' du script-src (durcissement CSP,
+// défense en profondeur anti-XSS). La migration se fait module par module ;
+// tant que des handlers inline subsistent, ils continuent de fonctionner
+// (le 'unsafe-inline' n'est retiré qu'à la toute dernière étape).
+//
+// Conventions d'attributs (un par type d'événement, pour éviter qu'un clic sur
+// un <select> ne déclenche aussi son handler de change) :
+//   data-action         → click
+//   data-action-change  → change
+//   data-action-submit  → submit
+//   data-action-enter   → keypress (touche Entrée uniquement)
+// Les arguments passent par d'autres data-* lus dans le handler via el.dataset.
+
+(function(AP) {
+  'use strict';
+  AP.actions = AP.actions || {};
+
+  // Remonte au premier ancêtre porteur de l'attribut et exécute l'action.
+  function run(attr, ev) {
+    var t = ev.target;
+    if (!t || !t.closest) return;
+    var el = t.closest('[' + attr + ']');
+    if (!el) return;
+    var name = el.getAttribute(attr);
+    var fn = AP.actions[name];
+    if (typeof fn === 'function') fn(el, ev);
+  }
+
+  document.addEventListener('click', function(ev) { run('data-action', ev); });
+  document.addEventListener('change', function(ev) { run('data-action-change', ev); });
+  document.addEventListener('submit', function(ev) { run('data-action-submit', ev); });
+  document.addEventListener('keypress', function(ev) {
+    if (ev.key !== 'Enter' && ev.keyCode !== 13) return;
+    run('data-action-enter', ev);
+  });
+
+  // ── Actions globales : coquille de l'app (navigation + menus) ───────────────
+
+  // Navigation. data-nav="1" → lien de nav : on transmet l'élément à showView
+  // pour le surlignage .active (réplique l'ancien showView('x', this)).
+  // data-close-menu="1" → ferme aussi le menu « Plus » après navigation.
+  AP.actions['show-view'] = function(el) {
+    var view = el.getAttribute('data-view');
+    if (!view || typeof window.showView !== 'function') return;
+    window.showView(view, el.getAttribute('data-nav') ? el : undefined);
+    if (el.getAttribute('data-close-menu')) closeMoreMenu();
+  };
+
+  // Menu « Plus » (anciennement bloc <script> inline dans index.html).
+  function toggleMoreMenu() {
+    var m = document.getElementById('moreMenu');
+    if (!m) return;
+    var open = m.style.display && m.style.display !== 'none';
+    m.style.display = open ? 'none' : 'block';
+  }
+  function closeMoreMenu() {
+    var m = document.getElementById('moreMenu');
+    if (m) m.style.display = 'none';
+  }
+  AP.actions['toggle-more-menu'] = function() { toggleMoreMenu(); };
+  AP.actions['close-more-menu'] = function() { closeMoreMenu(); };
+  AP.actions['toggle-mobile-menu'] = function() { if (window.toggleMobileMenu) window.toggleMobileMenu(); };
+  AP.actions['close-mobile-menu'] = function() { if (window.closeMobileMenu) window.closeMobileMenu(); };
+
+  // Ferme le menu « Plus » au clic en dehors (réplique l'ancien listener inline).
+  document.addEventListener('click', function(e) {
+    var m = document.getElementById('moreMenu');
+    var b = document.getElementById('moreBtn');
+    if (m && m.style.display && m.style.display !== 'none' && b &&
+        !m.contains(e.target) && !b.contains(e.target)) {
+      m.style.display = 'none';
+    }
+  });
+
+  // Compat : exposer pour tout appel résiduel éventuel (autres modules).
+  window.toggleMoreMenu = toggleMoreMenu;
+  window.closeMoreMenu = closeMoreMenu;
+
+})(window.AgroPrix);

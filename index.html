@@ -196,8 +196,8 @@
 <div id="appContainer">
 
 <!-- ═══ SIDEBAR (Desktop) ═══ -->
-<button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Ouvrir le menu" aria-expanded="false"><span></span></button>
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileMenu()"></div>
+<button class="hamburger-btn" id="hamburgerBtn" data-action="toggle-mobile-menu" aria-label="Ouvrir le menu" aria-expanded="false"><span></span></button>
+<div class="sidebar-overlay" id="sidebarOverlay" data-action="close-mobile-menu"></div>
 
 <aside class="sidebar" id="sidebarEl" role="complementary" aria-label="Menu latéral">
   <div class="sidebar-logo">
@@ -207,49 +207,49 @@
   <nav class="sidebar-nav" role="navigation" aria-label="Navigation principale desktop">
     <!-- ANALYSE -->
     <div class="nav-section-label">ANALYSE</div>
-    <a class="active" id="navAnalyse" onclick="showView('analyse', this)"><span class="nav-icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Nouvelle analyse</a>
-    <a id="navHistorique" onclick="showView('historique', this)"><span class="nav-icon"><i data-lucide="trending-up" class="lc"></i></span> Historique</a>
-    <a id="navCarte" onclick="showView('carte', this)"><span class="nav-icon"><i data-lucide="map" class="lc"></i></span> Carte</a>
+    <a class="active" id="navAnalyse" data-action="show-view" data-view="analyse" data-nav="1"><span class="nav-icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Nouvelle analyse</a>
+    <a id="navHistorique" data-action="show-view" data-view="historique" data-nav="1"><span class="nav-icon"><i data-lucide="trending-up" class="lc"></i></span> Historique</a>
+    <a id="navCarte" data-action="show-view" data-view="carte" data-nav="1"><span class="nav-icon"><i data-lucide="map" class="lc"></i></span> Carte</a>
 
     <!-- NEGOCE -->
     <div class="nav-section-label">NEGOCE <span class="pro-badge">PRO</span></div>
-    <a id="navNegoce" onclick="showView('negoce', this)"><span class="nav-icon"><i data-lucide="book-open" class="lc"></i></span> Carnet de negoce</a>
-    <a id="navOpportunites" onclick="showView('opportunites', this)"><span class="nav-icon"><i data-lucide="target" class="lc"></i></span> Opportunites</a>
+    <a id="navNegoce" data-action="show-view" data-view="negoce" data-nav="1"><span class="nav-icon"><i data-lucide="book-open" class="lc"></i></span> Carnet de negoce</a>
+    <a id="navOpportunites" data-action="show-view" data-view="opportunites" data-nav="1"><span class="nav-icon"><i data-lucide="target" class="lc"></i></span> Opportunites</a>
 
     <!-- PRODUCTION -->
     <div class="nav-section-label">PRODUCTION <span class="pro-badge">PRO</span></div>
-    <a id="navProduction" onclick="showView('production', this)"><span class="nav-icon"><i data-lucide="sprout" class="lc"></i></span> Assistant Production</a>
-    <a id="navConseils" onclick="showView('conseilsProducteur', this)"><span class="nav-icon"><i data-lucide="clipboard-list" class="lc"></i></span> Conseils <span class="lock-icon"><i data-lucide="lock" class="lc"></i></span></a>
+    <a id="navProduction" data-action="show-view" data-view="production" data-nav="1"><span class="nav-icon"><i data-lucide="sprout" class="lc"></i></span> Assistant Production</a>
+    <a id="navConseils" data-action="show-view" data-view="conseilsProducteur" data-nav="1"><span class="nav-icon"><i data-lucide="clipboard-list" class="lc"></i></span> Conseils <span class="lock-icon"><i data-lucide="lock" class="lc"></i></span></a>
 
     <!-- EXPORT -->
     <div class="nav-section-label">EXPORT <span class="premium-badge">PREMIUM</span></div>
-    <a id="navExport" onclick="showView('export', this)"><span class="nav-icon"><i data-lucide="ship" class="lc"></i></span> Tableau Export</a>
-    <a id="navConformite" onclick="showView('conformite', this)"><span class="nav-icon"><i data-lucide="check-circle" class="lc"></i></span> Conformite <span class="lock-icon"><i data-lucide="lock" class="lc"></i></span></a>
+    <a id="navExport" data-action="show-view" data-view="export" data-nav="1"><span class="nav-icon"><i data-lucide="ship" class="lc"></i></span> Tableau Export</a>
+    <a id="navConformite" data-action="show-view" data-view="conformite" data-nav="1"><span class="nav-icon"><i data-lucide="check-circle" class="lc"></i></span> Conformite <span class="lock-icon"><i data-lucide="lock" class="lc"></i></span></a>
 
     <!-- INTRANTS -->
     <div class="nav-section-label">INTRANTS <span class="new-badge">NOUVEAU</span></div>
-    <a id="navInputs" onclick="showView('inputs', this)"><span class="nav-icon"><i data-lucide="flask-conical" class="lc"></i></span> Prix Intrants</a>
+    <a id="navInputs" data-action="show-view" data-view="inputs" data-nav="1"><span class="nav-icon"><i data-lucide="flask-conical" class="lc"></i></span> Prix Intrants</a>
 
     <!-- FINANCEMENT -->
     <div class="nav-section-label">FINANCEMENT <span class="new-badge">NOUVEAU</span></div>
-    <a id="navFinancing" onclick="showView('financing', this)"><span class="nav-icon"><i data-lucide="coins" class="lc"></i></span> GPS Financement</a>
-    <a id="navNdvi" onclick="showView('ndvi', this)"><span class="nav-icon"><i data-lucide="satellite" class="lc"></i></span> Sante Parcelle</a>
-    <a id="navScoring" onclick="showView('scoring', this)"><span class="nav-icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Mon Score Profil</a>
+    <a id="navFinancing" data-action="show-view" data-view="financing" data-nav="1"><span class="nav-icon"><i data-lucide="coins" class="lc"></i></span> GPS Financement</a>
+    <a id="navNdvi" data-action="show-view" data-view="ndvi" data-nav="1"><span class="nav-icon"><i data-lucide="satellite" class="lc"></i></span> Sante Parcelle</a>
+    <a id="navScoring" data-action="show-view" data-view="scoring" data-nav="1"><span class="nav-icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Mon Score Profil</a>
 
     <!-- FILIERES -->
     <div class="nav-section-label">FILIERES <span class="pro-badge">PRO</span></div>
-    <a id="navHevea" onclick="showView('hevea', this)"><span class="nav-icon"><i data-lucide="tree-pine" class="lc"></i></span> Hevea Pro</a>
-    <a id="navPlantain" onclick="showView('plantain', this)"><span class="nav-icon"><i data-lucide="banana" class="lc"></i></span> Plantain Pro</a>
-    <a id="navCacao" onclick="showView('cacao', this)"><span class="nav-icon"><i data-lucide="bean" class="lc"></i></span> Cacao Pro</a>
-    <a id="navTomate" onclick="showView('tomate', this)"><span class="nav-icon"><i data-lucide="cherry" class="lc"></i></span> Tomate Pro</a>
+    <a id="navHevea" data-action="show-view" data-view="hevea" data-nav="1"><span class="nav-icon"><i data-lucide="tree-pine" class="lc"></i></span> Hevea Pro</a>
+    <a id="navPlantain" data-action="show-view" data-view="plantain" data-nav="1"><span class="nav-icon"><i data-lucide="banana" class="lc"></i></span> Plantain Pro</a>
+    <a id="navCacao" data-action="show-view" data-view="cacao" data-nav="1"><span class="nav-icon"><i data-lucide="bean" class="lc"></i></span> Cacao Pro</a>
+    <a id="navTomate" data-action="show-view" data-view="tomate" data-nav="1"><span class="nav-icon"><i data-lucide="cherry" class="lc"></i></span> Tomate Pro</a>
 
     <!-- MARKET -->
     <div class="nav-section-label">MARKET</div>
-    <a id="navMarket" onclick="showView('market', this)"><span class="nav-icon"><i data-lucide="handshake" class="lc"></i></span> Offres & Demandes</a>
+    <a id="navMarket" data-action="show-view" data-view="market" data-nav="1"><span class="nav-icon"><i data-lucide="handshake" class="lc"></i></span> Offres & Demandes</a>
 
     <div class="nav-separator"></div>
-    <a id="navPartner" onclick="showView('partner', this)"><span class="nav-icon"><i data-lucide="users" class="lc"></i></span> Espace Partenaire</a>
-    <a id="navParams" onclick="showView('params', this)"><span class="nav-icon"><i data-lucide="settings" class="lc"></i></span> Parametres</a>
+    <a id="navPartner" data-action="show-view" data-view="partner" data-nav="1"><span class="nav-icon"><i data-lucide="users" class="lc"></i></span> Espace Partenaire</a>
+    <a id="navParams" data-action="show-view" data-view="params" data-nav="1"><span class="nav-icon"><i data-lucide="settings" class="lc"></i></span> Parametres</a>
     <a onclick="logout()" style="color:#e76f51;"><span class="nav-icon"><i data-lucide="log-out" class="lc"></i></span> Deconnexion</a>
   </nav>
   <div class="sidebar-footer">
@@ -797,7 +797,7 @@
           <div class="empty-icon"><i data-lucide="bar-chart-3" class="lc"></i></div>
           <h3>Aucune analyse precedente</h3>
           <p style="font-size:13px;">Lancez une premiere analyse pour voir vos resultats ici.</p>
-          <button class="btn-analyse" style="margin-top:16px;" onclick="showView('analyse')"><i data-lucide="search" class="lc"></i> Lancer une analyse</button>
+          <button class="btn-analyse" style="margin-top:16px;" data-action="show-view" data-view="analyse"><i data-lucide="search" class="lc"></i> Lancer une analyse</button>
         </div>
       </div>
     </div>
@@ -934,7 +934,7 @@
           <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Guide maladies (Cercosporiose)</div>
           <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Prix saisonniers plantain</div>
         </div>
-        <button onclick="showView('plantain')" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Acceder a Plantain Pro</button>
+        <button data-action="show-view" data-view="plantain" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#5B3A1A,#8B6914);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Acceder a Plantain Pro</button>
       </div>
 
       <!-- Plan Hevea Pro -->
@@ -951,7 +951,7 @@
           <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Guide maladies (Fomes, TPD)</div>
           <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Calculateur rendement par clone</div>
         </div>
-        <button onclick="showView('hevea')" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Acceder a Hevea Pro</button>
+        <button data-action="show-view" data-view="hevea" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#2D6A4F,#40916C);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Acceder a Hevea Pro</button>
       </div>
 
       <!-- Plan Cacao Pro -->
@@ -968,7 +968,7 @@
           <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Dossier EUDR + parcelles GPS</div>
           <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Journal & calendrier cultural</div>
         </div>
-        <button onclick="showView('cacao')" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#4E342E,#5D2E8C);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Acceder a Cacao Pro</button>
+        <button data-action="show-view" data-view="cacao" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#4E342E,#5D2E8C);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Acceder a Cacao Pro</button>
       </div>
 
       <!-- Plan Tomate Pro -->
@@ -985,7 +985,7 @@
           <div style="padding:6px 0;border-bottom:1px solid #f0f0f0;"><i data-lucide="check-circle" class="lc"></i> Guide TYLCV / mildiou + calendrier</div>
           <div style="padding:6px 0;"><i data-lucide="check-circle" class="lc"></i> Seuil de rentabilite & transformation</div>
         </div>
-        <button onclick="showView('tomate')" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#C0392B,#E8862A);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Acceder a Tomate Pro</button>
+        <button data-action="show-view" data-view="tomate" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#C0392B,#E8862A);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">Acceder a Tomate Pro</button>
       </div>
 
       <!-- BD (guides) -->
@@ -1439,62 +1439,62 @@
           <p style="font-size:13px;opacity:0.8;">Accedez a tous les modules AgroPrix</p>
         </div>
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
-          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('financing')">
+          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" data-action="show-view" data-view="financing">
             <div style="font-size:32px;margin-bottom:8px;"><i data-lucide="coins" class="lc"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">GPS Financement</div>
             <div style="font-size:11px;color:var(--text-light);">90+ institutions</div>
           </div>
-          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('scoring')">
+          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" data-action="show-view" data-view="scoring">
             <div style="font-size:32px;margin-bottom:8px;"><i data-lucide="bar-chart-3" class="lc"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Mon Score Profil</div>
             <div style="font-size:11px;color:var(--text-light);">Indicateur 0-1000</div>
           </div>
-          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('ndvi')">
+          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" data-action="show-view" data-view="ndvi">
             <div style="font-size:32px;margin-bottom:8px;"><i data-lucide="satellite" class="lc"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Sante Parcelle</div>
             <div style="font-size:11px;color:var(--text-light);">NDVI Satellite</div>
           </div>
-          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('market')">
+          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" data-action="show-view" data-view="market">
             <div style="font-size:32px;margin-bottom:8px;"><i data-lucide="store" class="lc"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Place de Marche</div>
             <div style="font-size:11px;color:var(--text-light);">Offres & Demandes</div>
           </div>
-          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('inputs')">
+          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" data-action="show-view" data-view="inputs">
             <div style="font-size:32px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;"><i data-lucide="leaf" class="lc" style="width:32px;height:32px;color:#2D6A4F;"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Prix Intrants</div>
             <div style="font-size:11px;color:var(--text-light);">Engrais, semences</div>
           </div>
-          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('offres')">
+          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" data-action="show-view" data-view="offres">
             <div style="font-size:32px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;"><i data-lucide="gem" class="lc" style="width:32px;height:32px;color:#E8862A;"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Nos Offres</div>
             <div style="font-size:11px;color:var(--text-light);">Plans & Tarifs</div>
           </div>
-          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('hevea')">
+          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" data-action="show-view" data-view="hevea">
             <div style="font-size:32px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;"><i data-lucide="tree-pine" class="lc" style="width:32px;height:32px;color:#2D6A4F;"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Hevea Pro</div>
             <div style="font-size:11px;color:var(--text-light);">EUDR + Saignee + Prix</div>
           </div>
-          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('plantain')">
+          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" data-action="show-view" data-view="plantain">
             <div style="font-size:32px;margin-bottom:8px;">🍌</div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Plantain Pro</div>
             <div style="font-size:11px;color:var(--text-light);">Recolte + Marche + Conseil expert</div>
           </div>
-          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('cacao')">
+          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" data-action="show-view" data-view="cacao">
             <div style="font-size:32px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;"><i data-lucide="bean" class="lc" style="width:32px;height:32px;color:#5D2E8C;"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Cacao Pro</div>
             <div style="font-size:11px;color:var(--text-light);">EUDR + Diagnostic photo + Prix</div>
           </div>
-          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('tomate')">
+          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" data-action="show-view" data-view="tomate">
             <div style="font-size:32px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;"><i data-lucide="cherry" class="lc" style="width:32px;height:32px;color:#C0392B;"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Tomate Pro</div>
             <div style="font-size:11px;color:var(--text-light);">Maraichage + Diagnostic photo + Prix</div>
           </div>
-          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('proprietaire')">
+          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" data-action="show-view" data-view="proprietaire">
             <div style="font-size:32px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;"><i data-lucide="home" class="lc" style="width:32px;height:32px;color:#1B4332;"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Proprietaire</div>
             <div style="font-size:11px;color:var(--text-light);">Valoriser ma terre</div>
           </div>
-          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" onclick="showView('params')">
+          <div class="card" style="padding:16px;text-align:center;cursor:pointer;border-radius:14px;" data-action="show-view" data-view="params">
             <div style="font-size:32px;margin-bottom:8px;"><i data-lucide="settings" class="lc"></i></div>
             <div style="font-size:13px;font-weight:700;color:var(--text);">Parametres</div>
             <div style="font-size:11px;color:var(--text-light);">Profil & compte</div>
@@ -1508,64 +1508,60 @@
 
 <!-- ═══ BOTTOM NAV (Mobile - V6: 5 tabs) ═══ -->
 <nav class="bottom-nav" id="bottomNav" role="navigation" aria-label="Navigation principale">
-  <a class="active" onclick="showView('analyse', this)" aria-label="Analyse des prix"><span><i data-lucide="bar-chart-3" class="lc"></i></span><span>Analyse</span></a>
-  <a onclick="showView('negoce', this)" aria-label="Carnet de négoce"><span><i data-lucide="book-open" class="lc"></i></span><span>Negoce</span></a>
-  <a onclick="showView('market', this)" aria-label="Place de marché"><span><i data-lucide="handshake" class="lc"></i></span><span>Marche</span></a>
-  <a onclick="showView('production', this)" aria-label="Conseils production"><span><i data-lucide="sprout" class="lc"></i></span><span>Produc.</span></a>
-  <a onclick="toggleMoreMenu()" id="moreBtn" aria-label="Plus de modules" aria-haspopup="true"><span>⊕</span><span>Plus</span></a>
+  <a class="active" data-action="show-view" data-view="analyse" data-nav="1" aria-label="Analyse des prix"><span><i data-lucide="bar-chart-3" class="lc"></i></span><span>Analyse</span></a>
+  <a data-action="show-view" data-view="negoce" data-nav="1" aria-label="Carnet de négoce"><span><i data-lucide="book-open" class="lc"></i></span><span>Negoce</span></a>
+  <a data-action="show-view" data-view="market" data-nav="1" aria-label="Place de marché"><span><i data-lucide="handshake" class="lc"></i></span><span>Marche</span></a>
+  <a data-action="show-view" data-view="production" data-nav="1" aria-label="Conseils production"><span><i data-lucide="sprout" class="lc"></i></span><span>Produc.</span></a>
+  <a data-action="toggle-more-menu" id="moreBtn" aria-label="Plus de modules" aria-haspopup="true"><span>⊕</span><span>Plus</span></a>
 </nav>
 
 <!-- More Menu Popup -->
 <div id="moreMenu" style="display:none;position:fixed;bottom:70px;right:8px;left:8px;background:#fff;border-radius:20px;box-shadow:0 -4px 20px rgba(0,0,0,0.15);padding:16px;z-index:200;">
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-    <div style="text-align:center;cursor:pointer;" onclick="showView('financing');closeMoreMenu()">
+    <div style="text-align:center;cursor:pointer;" data-action="show-view" data-view="financing" data-close-menu="1">
       <div style="width:50px;height:50px;border-radius:14px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="coins" class="lc"></i></div>
       <div style="font-size:11px;font-weight:600;">Finance</div>
     </div>
-    <div style="text-align:center;cursor:pointer;" onclick="showView('scoring');closeMoreMenu()">
+    <div style="text-align:center;cursor:pointer;" data-action="show-view" data-view="scoring" data-close-menu="1">
       <div style="width:50px;height:50px;border-radius:14px;background:#FFF3E0;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="bar-chart-3" class="lc"></i></div>
       <div style="font-size:11px;font-weight:600;">Score Profil</div>
     </div>
-    <div style="text-align:center;cursor:pointer;" onclick="showView('ndvi');closeMoreMenu()">
+    <div style="text-align:center;cursor:pointer;" data-action="show-view" data-view="ndvi" data-close-menu="1">
       <div style="width:50px;height:50px;border-radius:14px;background:#E0F2F1;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="satellite" class="lc"></i></div>
       <div style="font-size:11px;font-weight:600;">NDVI</div>
     </div>
-    <div style="text-align:center;cursor:pointer;" onclick="showView('inputs');closeMoreMenu()">
+    <div style="text-align:center;cursor:pointer;" data-action="show-view" data-view="inputs" data-close-menu="1">
       <div style="width:50px;height:50px;border-radius:14px;background:#F3E5F5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="flask-conical" class="lc"></i></div>
       <div style="font-size:11px;font-weight:600;">Intrants</div>
     </div>
-    <div style="text-align:center;cursor:pointer;" onclick="showView('hevea');closeMoreMenu()">
+    <div style="text-align:center;cursor:pointer;" data-action="show-view" data-view="hevea" data-close-menu="1">
       <div style="width:50px;height:50px;border-radius:14px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="tree-pine" class="lc" style="width:24px;height:24px;color:#2D6A4F;"></i></div>
       <div style="font-size:11px;font-weight:600;">Hevea Pro</div>
     </div>
-    <div style="text-align:center;cursor:pointer;" onclick="showView('plantain');closeMoreMenu()">
+    <div style="text-align:center;cursor:pointer;" data-action="show-view" data-view="plantain" data-close-menu="1">
       <div style="width:50px;height:50px;border-radius:14px;background:#FFF3E0;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;">🍌</div>
       <div style="font-size:11px;font-weight:600;">Plantain Pro</div>
     </div>
-    <div style="text-align:center;cursor:pointer;" onclick="showView('cacao');closeMoreMenu()">
+    <div style="text-align:center;cursor:pointer;" data-action="show-view" data-view="cacao" data-close-menu="1">
       <div style="width:50px;height:50px;border-radius:14px;background:#F3E8FF;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="bean" class="lc" style="width:24px;height:24px;color:#5D2E8C;"></i></div>
       <div style="font-size:11px;font-weight:600;">Cacao Pro</div>
     </div>
-    <div style="text-align:center;cursor:pointer;" onclick="showView('tomate');closeMoreMenu()">
+    <div style="text-align:center;cursor:pointer;" data-action="show-view" data-view="tomate" data-close-menu="1">
       <div style="width:50px;height:50px;border-radius:14px;background:#FFEBEE;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="cherry" class="lc" style="width:24px;height:24px;color:#C0392B;"></i></div>
       <div style="font-size:11px;font-weight:600;">Tomate Pro</div>
     </div>
-    <div style="text-align:center;cursor:pointer;" onclick="showView('export');closeMoreMenu()">
+    <div style="text-align:center;cursor:pointer;" data-action="show-view" data-view="export" data-close-menu="1">
       <div style="width:50px;height:50px;border-radius:14px;background:#E3F2FD;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="ship" class="lc"></i></div>
       <div style="font-size:11px;font-weight:600;">Export</div>
     </div>
-    <div style="text-align:center;cursor:pointer;" onclick="showView('params');closeMoreMenu()">
+    <div style="text-align:center;cursor:pointer;" data-action="show-view" data-view="params" data-close-menu="1">
       <div style="width:50px;height:50px;border-radius:14px;background:#F5F5F5;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;font-size:22px;"><i data-lucide="settings" class="lc"></i></div>
       <div style="font-size:11px;font-weight:600;">Parametres</div>
     </div>
   </div>
 </div>
 
-<script>
-function toggleMoreMenu(){var m=document.getElementById('moreMenu');m.style.display=m.style.display==='none'?'block':'none';}
-function closeMoreMenu(){document.getElementById('moreMenu').style.display='none';}
-document.addEventListener('click',function(e){var m=document.getElementById('moreMenu');var b=document.getElementById('moreBtn');if(m&&m.style.display!=='none'&&!m.contains(e.target)&&!b.contains(e.target))m.style.display='none';});
-</script>
+<!-- Menu « Plus » : logique déplacée dans js/actions.js (délégation, CSP Phase 2) -->
 
 </div><!-- /#appContainer -->
 
@@ -1598,6 +1594,7 @@ document.addEventListener('click',function(e){var m=document.getElementById('mor
 <script src="/js/dashboard.js?v=6.11"></script>
 <script src="/js/auth.js?v=7.11"></script>
 <script src="/js/app.js?v=7.15"></script>
+<script src="/js/actions.js?v=7.20"></script>
 
 <!-- ═══ ERROR BOUNDARY + OFFLINE + MONITORING (Prompt Master) ═══ -->
 
