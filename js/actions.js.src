@@ -36,6 +36,7 @@
   document.addEventListener('click', function(ev) { run('data-action', ev); });
   document.addEventListener('change', function(ev) { run('data-action-change', ev); });
   document.addEventListener('submit', function(ev) { run('data-action-submit', ev); });
+  document.addEventListener('input', function(ev) { run('data-action-input', ev); });
   document.addEventListener('keypress', function(ev) {
     if (ev.key !== 'Enter' && ev.keyCode !== 13) return;
     run('data-action-enter', ev);
@@ -159,6 +160,10 @@
   AP.actions['remove-el'] = function(el) {
     var t = document.getElementById(el.getAttribute('data-target'));
     if (t) t.remove();
+  };
+  // Surligner l'élément cliqué (bordure verte) — sélection visuelle générique.
+  AP.actions['highlight-border'] = function(el) {
+    el.style.borderColor = 'var(--green)';
   };
 
   // Soumissions de formulaires (data-action-submit) — handleLogin/handleRegister

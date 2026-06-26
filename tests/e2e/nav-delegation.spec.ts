@@ -252,6 +252,43 @@ test.describe('Navigation déléguée (data-action)', () => {
     expect(errors, errors.join('\n')).toHaveLength(0);
   });
 
+  test('modules features (ndvi/marketplace/financing/export/inputs) : 0 onclick inline rendu', async ({ page }) => {
+    test.slow();
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await asAdmin(page);
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
+    test.skip(!(await hasAction(page, 'ndvi-render')), 'modules features délégués pas encore déployés sur la cible');
+
+    const views = [
+      ['#navNdvi', '#viewNdvi'], ['#navMarket', '#viewMarket'],
+      ['#navFinancing', '#viewFinancing'], ['#navExport', '#viewExport'],
+      ['#navInputs', '#viewInputs'],
+    ];
+    for (const [nav, view] of views) {
+      await page.locator(nav).click();
+      await expect(page.locator(view)).toBeVisible();
+      await page.waitForTimeout(1200); // init + rendu du module
+      expect(await page.locator(`${view} [onclick]`).count(), `onclick inline dans ${view}`).toBe(0);
+    }
+  });
+
+  test('Assistant Export : action analyse déléguée (validation cliente)', async ({ page }) => {
+    test.slow();
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await asAdmin(page);
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
+    test.skip(!(await hasAction(page, 'export-analyse')), 'export délégué pas encore déployé sur la cible');
+
+    await page.locator('#navExport').click();
+    await expect(page.locator('#viewExport')).toBeVisible();
+    await page.waitForTimeout(1500);
+    // "Analyser mon projet" sans produit/destination → message de validation.
+    await page.locator('#viewExport [data-action="export-analyse"]').first().click();
+    await expect(page.locator('#exportAssistantResults')).toContainText(/produit|destination/i);
+  });
+
   test('petits modules : actions enregistrées + toggle CGU fonctionnel', async ({ page }) => {
     test.slow();
     await page.setViewportSize({ width: 1280, height: 800 });
