@@ -11,7 +11,7 @@
 // MAIS en parallèle revalide le réseau et met à jour le cache → la version
 // suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = 'v7.16.0';  // bump 26/06 : AP.PRICES (prix officiels centralisés)
+const CACHE_VERSION = 'v7.17.0';  // bump 26/06 : DDS EUDR téléchargée en PDF (cacao/hévéa)
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 
