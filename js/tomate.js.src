@@ -300,7 +300,12 @@ window.AgroPrix = window.AgroPrix || {};
     renderTabs();
     // Refactor 12/05 : charger les prix live en arrière-plan (plus de hardcoded)
     loadPrixTomateLive().then(function() {
-      renderDashboard(loadData());   // re-render : la carte prix se remplit
+      var d = loadData();
+      renderDashboard(d);   // re-render : la carte prix se remplit
+      // Re-render aussi l'onglet ACTIF (Marché/Journal) sinon il reste sur "Chargement…".
+      var active = document.querySelector('.tomate-tab.active');
+      var tab = (active && active.dataset) ? active.dataset.tab : 'dashboard';
+      if (tab && tab !== 'dashboard') window.tomateSwitchTab(tab);
       if (typeof renderTomatePrixChart === 'function') renderTomatePrixChart();
     });
   };
@@ -606,6 +611,12 @@ window.AgroPrix = window.AgroPrix || {};
   function renderMarche(data) {
     var el = document.getElementById('tomate-marche');
     if (!el) return;
+    // Prix live async : évite le crash sur tableau vide + état de chargement
+    // (l'onglet est re-rendu une fois les prix arrivés, cf. tomateInit).
+    if (PRIX_TOMATE.length < 2) {
+      el.innerHTML = '<div style="padding:24px;text-align:center;color:#888;font-size:13px;">Chargement des prix marché…</div>';
+      return;
+    }
 
     var prixActuel = PRIX_TOMATE[PRIX_TOMATE.length - 1];
     var prixPrec   = PRIX_TOMATE[PRIX_TOMATE.length - 2];
