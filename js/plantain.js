@@ -109,7 +109,15 @@ window.AgroPrix = window.AgroPrix || {};
     renderTabs();
     // Refactor 12/05 : prix live BDD
     loadPrixPlantainLive().then(function() {
-      if (typeof renderDashboard === 'function') renderDashboard(loadData());
+      // Re-render le dashboard ET l'onglet actif (sinon Marché/Journal restent
+      // bloqués sur "Chargement…").
+      var d = loadData();
+      renderDashboard(d);
+      var active = document.querySelector('.plantain-tab.active');
+      var tab = (active && active.dataset) ? active.dataset.tab : 'dashboard';
+      if (tab === 'journal') renderJournal(d);
+      else if (tab === 'marche') renderMarche(d);
+      else if (tab === 'dossier') renderDossier(d);
     });
   };
 

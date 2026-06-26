@@ -248,7 +248,13 @@ window.AgroPrix = window.AgroPrix || {};
     // Charger les prix live en arrière-plan (refactor 12/05 : plus de hardcoded).
     // Quand les données arrivent, re-render le chart pour qu'il s'affiche.
     loadPrixCacaoLive().then(function() {
-      renderDashboard(loadData());   // re-render : la carte prix se remplit
+      var d = loadData();
+      renderDashboard(d);   // re-render : la carte prix se remplit
+      // Re-render aussi l'onglet ACTIF (sinon Marché/Journal/Dossier restent
+      // bloqués sur "Chargement…" si l'utilisateur a changé d'onglet avant l'arrivée des prix).
+      var active = document.querySelector('.cacao-tab.active');
+      var tab = (active && active.dataset) ? active.dataset.tab : 'dashboard';
+      if (tab && tab !== 'dashboard') window.cacaoSwitchTab(tab);
       if (typeof renderCacaoPrixChart === 'function') renderCacaoPrixChart();
     });
   };
@@ -570,6 +576,13 @@ window.AgroPrix = window.AgroPrix || {};
   function renderMarche(data) {
     var el = document.getElementById('cacao-marche');
     if (!el) return;
+    // Prix live async : tant que la série n'est pas chargée, on évite le crash
+    // (lecture de PRIX_CACAO[..].prix sur tableau vide) et on affiche un état
+    // de chargement. L'onglet est re-rendu une fois les prix arrivés (cacaoInit).
+    if (PRIX_CACAO.length < 4) {
+      el.innerHTML = '<div style="padding:24px;text-align:center;color:#888;font-size:13px;">Chargement des prix marché…</div>';
+      return;
+    }
 
     var prixActuel = PRIX_CACAO[PRIX_CACAO.length - 1];
     var prixPrec   = PRIX_CACAO[PRIX_CACAO.length - 2];
