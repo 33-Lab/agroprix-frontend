@@ -30,7 +30,7 @@
     onerror="console.log('[AgroPrix] Plausible not loaded (OK in dev)')"></script>
 
   <!-- Sentry Browser SDK (observabilite erreurs prod). No-op tant que SENTRY_DSN est vide. -->
-  <script src="https://browser.sentry-cdn.com/7.114.0/bundle.tracing.min.js" crossorigin="anonymous"></script>
+  <script src="https://browser.sentry-cdn.com/7.114.0/bundle.tracing.min.js" integrity="sha384-VGOED8oYoKLeSbW9BVK2QFx5AQXeuWMsJkBEvgezuHu0VArI9gbvCuJYSpm6RcXT" crossorigin="anonymous"></script>
   <script>
     (function() {
       // DSN du projet Sentry "agroprix-frontend" (org 33lab, region DE).
@@ -82,12 +82,12 @@
   <!-- Fonts & Libraries -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
 
   <!-- Lucide Icons (SVG professionnelles) -->
-  <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js" integrity="sha384-prOTt12iGU6/k2uoXJ3az4BWS2qoxykgxJb6pjfmRK7MYOMnMe7bWWBMPZqxwVks" crossorigin="anonymous"></script>
 
   <!-- FedaPay — Paiement Mobile Money (MTN MoMo, Moov, Carte) -->
   <script src="https://cdn.fedapay.com/checkout.js?v=1.1.7"></script>
@@ -1596,7 +1596,7 @@ document.addEventListener('click',function(e){var m=document.getElementById('mor
 <!-- ═══ SCRIPTS ═══ -->
 <!-- ap-namespace.js doit être chargé EN PREMIER (FE-B1) — initialise window.AgroPrix.{ui,api,data,utils} -->
 <script src="/js/ap-namespace.js?v=1.0"></script>
-<script src="/js/security.js"></script>
+<script src="/js/security.js?v=7.11"></script>
 <script src="/js/config.js?v=6.8"></script>
 <script src="/js/status.js?v=1.0"></script>
 <script src="/js/partner.js?v=1.0"></script>
