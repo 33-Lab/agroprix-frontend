@@ -151,7 +151,9 @@
   var COUTS_NOTE = 'L\'écart entre le prix FOB et votre prix bord-champ couvre : transport intérieur, manutention portuaire, taxes / droits de sortie, certification & traçabilité, financement et marge de l\'exportateur (souvent 150-400 USD/t). Le fret maritime est à la charge de l\'acheteur (Incoterm FOB).';
 
   // ─── État ─────────────────────────────────────────────────────────────────
-  var state = { products: [], destKey: null, qtyT: null };
+  // eudrIds : id backend de la dernière parcelle EUDR analysée, par produit
+  // (clé PRODUCTS) → réutilisé pour le téléchargement de la DDS.
+  var state = { products: [], destKey: null, qtyT: null, eudrIds: {} };
 
   function isEudr(p) { return !!(AP.EUDR && p.eudrKey && AP.EUDR.COMMODITIES.indexOf(p.eudrKey) >= 0); }
   function findDest(key) {
@@ -283,6 +285,7 @@
       if (dest.group.isEU) {
         if (isEudr(p)) {
           html += badge('eudr', '<b>EUDR applicable</b> (' + esc(AP.EUDR.REGLEMENT) + '). ' + esc(AP.EUDR.MSG_EXPORT) + ' <span style="color:#1B4332;">' + esc(AP.EUDR.MSG_UEMOA) + '</span>');
+          html += eudrRealPanel(k, p);
         } else {
           html += badge('info', 'EUDR non applicable à ce produit. Restent les normes UE générales (SPS phytosanitaire, limites de résidus, étiquetage).');
         }
@@ -392,6 +395,85 @@
     return html;
   }
 
+  // ─── EUDR réel (satellite) — filières EUDR sans module Pro (ex. café) ───────
+  // Le café n'a pas de module dédié (contrairement à Cacao Pro / Hévéa Pro) :
+  // c'est l'Assistant Export qui lui offre la vérification EUDR réelle. Flux :
+  //   1. AP.captureParcelleGPS() → position de l'appareil (haute précision) ;
+  //   2. POST /api/parcelles (culture = produit) → crée la parcelle côté backend ;
+  //   3. GET /api/eudr/parcelle/{id}/check → check Hansen GFC-2023 + WDPA ;
+  //   4. GET /api/eudr/parcelle/{id}/dds.pdf → déclaration de diligence signée.
+  // Mêmes endpoints que Cacao Pro / Hévéa Pro → générique (café, et tout produit
+  // EUDR du wizard). Nécessite d'être connecté (parcelles isolées par utilisateur).
+  var EUDR_PAYS_DEFAUT = 'cote_divoire';
+
+  function eudrRealPanel(k, p) {
+    var nom = esc(p.label.split(' ')[0].toLowerCase());
+    return '<div style="border-top:1px solid #eee;margin-top:8px;padding-top:8px;">'
+      + '<div style="font-size:12px;font-weight:700;color:#1B4332;margin-bottom:4px;"><i data-lucide="satellite" class="lc"></i> Vérification EUDR réelle (satellite)</div>'
+      + '<div style="font-size:11px;color:#888;margin-bottom:8px;">Géolocalisez votre parcelle ' + nom + ' : l\'analyse vérifie la déforestation post-2020 (Hansen GFC) et la proximité des aires protégées (WDPA), puis génère votre déclaration de diligence (DDS). Nécessite d\'être connecté + le GPS de l\'appareil (sur place).</div>'
+      + '<button onclick="AgroPrix.exportModule.geolocEudr(\'' + k + '\')" style="width:100%;padding:10px;background:#1B4332;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;"><i data-lucide="map-pin" class="lc"></i> Géolocaliser ma parcelle &amp; analyser</button>'
+      + '<div id="exp-eudr-' + k + '" style="margin-top:8px;"></div>'
+      + '<button id="exp-dds-' + k + '" onclick="AgroPrix.exportModule.exportDds(\'' + k + '\')" disabled style="width:100%;margin-top:8px;padding:10px;background:#fff;border:1px solid #1B4332;color:#1B4332;border-radius:10px;font-size:12px;font-weight:700;cursor:not-allowed;opacity:.5;"><i data-lucide="file-check" class="lc"></i> Télécharger la déclaration signée (DDS)</button>'
+      + '</div>';
+  }
+
+  function eudrResultHtml(res, name) {
+    var colorMap = { green: '#2D6A4F', amber: '#E8862A', red: '#D32F2F' };
+    var labelMap = { green: 'Conforme (risque négligeable)', amber: 'À vérifier', red: 'Non conforme — risque déforestation' };
+    var st = res.status || 'amber';
+    var defo = res.deforestation && res.deforestation.loss_pct_post_2020_12_31;
+    var dist = res.protected_areas && res.protected_areas.closest_distance_km;
+    return '<div style="padding:10px;border-radius:10px;background:#F7F7F9;border-left:4px solid ' + (colorMap[st] || '#999') + ';">'
+      + '<div style="font-size:12px;font-weight:700;">' + esc(name) + ' — <span style="color:' + (colorMap[st] || '#999') + ';">' + (labelMap[st] || st) + '</span></div>'
+      + '<div style="font-size:11px;color:#555;margin-top:3px;">Déforestation post-2020 : ' + (defo != null ? defo.toFixed(2) + '%' : 'n/d') + ' · Aire protégée la plus proche : ' + (dist != null ? dist.toFixed(1) + ' km' : 'n/d') + ' · Risque pays : ' + esc(res.country_risk || 'n/d') + '</div>'
+      + '<div style="font-size:10px;color:#888;margin-top:4px;">Source : Hansen GFC-2023 + WDPA (moteur EUDR AgroPrix).</div>'
+      + '</div>';
+  }
+
+  function geolocEudr(k) {
+    var p = PRODUCTS[k];
+    var out = document.getElementById('exp-eudr-' + k);
+    if (!p || !AP.API_BASE) return;
+    if (out) out.innerHTML = '<div style="font-size:12px;color:#666;">Obtention de votre position GPS…</div>';
+    AP.captureParcelleGPS(function(coord) {
+      if (out) out.innerHTML = '<div style="font-size:12px;color:#666;">Analyse satellite EUDR en cours (~10–20 s)…</div>';
+      fetch(AP.API_BASE + '/api/parcelles/', {
+        method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nom: 'Parcelle ' + p.label, culture: p.eudrKey, lat: coord.lat, lng: coord.lng, pays: EUDR_PAYS_DEFAUT })
+      }).then(function(r) {
+        if (r.status === 401) throw new Error('auth');
+        if (!r.ok) throw new Error('parcelle ' + r.status);
+        return r.json();
+      }).then(function(j) {
+        var id = j.id;
+        return fetch(AP.API_BASE + '/api/eudr/parcelle/' + id + '/check', { method: 'GET', credentials: 'include' })
+          .then(function(r) { if (r.status === 401) throw new Error('auth'); if (!r.ok) throw new Error('check ' + r.status); return r.json(); })
+          .then(function(res) { return { id: id, res: res }; });
+      }).then(function(o) {
+        state.eudrIds[k] = o.id;
+        if (out) out.innerHTML = eudrResultHtml(o.res, p.label);
+        var dds = document.getElementById('exp-dds-' + k);
+        if (dds) { dds.disabled = false; dds.style.opacity = '1'; dds.style.cursor = 'pointer'; }
+        if (window.refreshIcons) refreshIcons();
+      }).catch(function(e) {
+        if (out) out.innerHTML = '<div style="font-size:12px;color:#e76f51;">' + (String(e.message) === 'auth' ? 'Connectez-vous pour lancer l\'analyse EUDR réelle.' : 'Analyse EUDR indisponible (' + e.message + ').') + '</div>';
+      });
+    });
+  }
+
+  function exportDds(k) {
+    var id = state.eudrIds[k];
+    if (!id || !AP.API_BASE) { alert('Lancez d\'abord l\'analyse EUDR réelle.'); return; }
+    fetch(AP.API_BASE + '/api/eudr/parcelle/' + id + '/dds.pdf', { method: 'GET', credentials: 'include' })
+      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.blob(); })
+      .then(function(blob) {
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'AgroPrix_DDS_EUDR_' + id + '.pdf';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      }).catch(function(e) { alert('Export DDS impossible : ' + e.message); });
+  }
+
   // Petits badges colorés réutilisables
   function badge(kind, text) {
     var map = {
@@ -409,7 +491,7 @@
     alert('Pour être accompagné sur votre projet d\'export, contactez AgroPrix :\n- Email : contact@agroprix.app\n- WhatsApp : +229 0190 5000');
   }
 
-  AP.exportModule = { init: init, analyse: analyse, publishDemand: publishDemand };
+  AP.exportModule = { init: init, analyse: analyse, publishDemand: publishDemand, geolocEudr: geolocEudr, exportDds: exportDds };
   AP.fx = { load: loadFx, get: function() { return AP.FX; } };
   window.publishDemand = publishDemand;
 
