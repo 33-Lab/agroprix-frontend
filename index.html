@@ -686,40 +686,11 @@
       <div class="hero-card" style="margin:16px;margin-bottom:0;">
         <div style="font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:1px;">Tableau export</div>
         <div style="font-size:20px;font-weight:800;margin-top:4px;"><i data-lucide="ship" class="lc"></i> Commerce international</div>
-        <div style="font-size:12px;opacity:0.8;margin-top:4px;">Prix FOB, taux de change, fret et fenetres d'export</div>
+        <div style="font-size:12px;opacity:0.8;margin-top:4px;">Assistant export : faisabilite, conformite EUDR, prix et accompagnement</div>
       </div>
-      <div style="padding:0 16px;">
-      <div class="kpi-grid" style="margin-top:16px;">
-        <div class="kpi-card"><div class="kpi-value">1 250</div><div class="kpi-label">Cajou WW320 FOB (USD/t)</div></div>
-        <div class="kpi-card"><div class="kpi-value">598.5</div><div class="kpi-label">USD / XOF <span class="price-up">+0.3%</span></div></div>
-        <div class="kpi-card"><div class="kpi-value">1 850</div><div class="kpi-label">Conteneur 20' Cotonou (USD)</div></div>
-        <div class="kpi-card"><div class="kpi-value" style="color:var(--gold);">Avr-Mai</div><div class="kpi-label">Prochaine fenetre (Cajou, Sesame)</div></div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="icon"><i data-lucide="globe-2" class="lc"></i></span> Prix Internationaux vs Locaux</div>
-        <div style="overflow-x:auto;">
-          <table class="data-table">
-            <thead><tr><th>Produit</th><th>Prix local</th><th>Prix FOB</th><th>Cours mondial</th><th>Ecart</th><th>Tendance</th></tr></thead>
-            <tbody>
-              <tr><td>Cajou (WW320)</td><td>425</td><td>1 350 USD/t</td><td>1 480 USD/t</td><td class="positive">+9.6%</td><td><span class="trend-badge hausse">hausse</span></td></tr>
-              <tr><td>Cacao</td><td>1 200</td><td>2 900 USD/t</td><td>3 100 USD/t</td><td class="positive">+6.9%</td><td><span class="trend-badge baisse">baisse</span></td></tr>
-              <tr><td>Cafe</td><td>1 700</td><td>4 200 USD/t</td><td>4 850 USD/t</td><td class="positive">+15.5%</td><td><span class="trend-badge hausse">hausse</span></td></tr>
-              <tr><td>Coton fibre</td><td>310</td><td>1 620 USD/t</td><td>1 680 USD/t</td><td class="positive">+3.7%</td><td><span class="trend-badge stable">stable</span></td></tr>
-              <tr><td>Sesame</td><td>535</td><td>1 520 USD/t</td><td>1 680 USD/t</td><td class="positive">+10.5%</td><td><span class="trend-badge hausse">hausse</span></td></tr>
-              <tr><td>Caoutchouc</td><td>478</td><td>1 970 USD/t</td><td>1 970 USD/t</td><td class="positive">SICOM</td><td><span class="trend-badge hausse">hausse</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span class="icon"><i data-lucide="arrow-left-right" class="lc"></i></span> Taux de Change</div>
-        <div class="currency-grid">
-          <div class="currency-card"><div class="cc-pair">USD / XOF</div><div class="cc-rate">598.5</div><div class="cc-trend up">+0.3%</div></div>
-          <div class="currency-card"><div class="cc-pair">EUR / XOF</div><div class="cc-rate">655.957</div><div class="cc-trend">Fixe</div></div>
-          <div class="currency-card"><div class="cc-pair">NGN / XOF</div><div class="cc-rate">0.387</div><div class="cc-trend down">-2.1%</div></div>
-        </div>
-      </div>
-    </div><!-- end padding -->
+      <div style="padding:16px;">
+        <div id="exportAssistantRoot"></div>
+      </div><!-- end padding -->
     </div>
 
     <!-- ═══ VIEW: CONSEILS (Lock) ═══ -->
@@ -1608,11 +1579,11 @@ document.addEventListener('click',function(e){var m=document.getElementById('mor
 <script src="/js/data.js?v=6.6"></script>
 <script src="/js/data-sources.js?v=1.0"></script>
 <script src="/js/api.js"></script>
-<script src="/js/ui.js?v=7.5"></script>
+<script src="/js/ui.js?v=7.14"></script>
 <script src="/js/analysis.js?v=7.13"></script>
 <script src="/js/negoce.js?v=7.6"></script>
 <script src="/js/production.js?v=7.0"></script>
-<script src="/js/export.js?v=6.11"></script>
+<script src="/js/export.js?v=7.14"></script>
 <script src="/js/cgu.js?v=6.11"></script>
 <script src="/js/inputs.js?v=7.3"></script>
 <script src="/js/marketplace.js?v=7.11"></script>
