@@ -36,12 +36,15 @@ async function asAdmin(page) {
   });
 }
 
-// Vrai si le dispatcher de délégation est présent sur la page courante.
-async function hasDelegation(page): Promise<boolean> {
+// Vrai si l'action déléguée demandée est enregistrée sur la page courante.
+// Garde fin (par action) : la CI cible la prod et les actions arrivent par
+// vagues de PR ; chaque test ne s'exécute que si SON action est déjà déployée.
+async function hasAction(page, name: string): Promise<boolean> {
   return page.evaluate(
-    () => !!(window as any).AgroPrix
+    (n) => !!(window as any).AgroPrix
       && typeof (window as any).AgroPrix.actions === 'object'
-      && typeof (window as any).AgroPrix.actions['show-view'] === 'function',
+      && typeof (window as any).AgroPrix.actions[n] === 'function',
+    name,
   );
 }
 
@@ -53,7 +56,7 @@ test.describe('Navigation déléguée (data-action)', () => {
     await asAdmin(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2500);
-    const hasActions = await hasDelegation(page);
+    const hasActions = await hasAction(page, 'show-view');
     // La CI cible la prod ; tant que la délégation n'y est pas déployée, on skip
     // (la couverture s'active automatiquement après merge + déploiement).
     test.skip(!hasActions, 'délégation data-action pas encore déployée sur la cible');
@@ -66,7 +69,7 @@ test.describe('Navigation déléguée (data-action)', () => {
     await asAdmin(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2000);
-    test.skip(!(await hasDelegation(page)), 'délégation data-action pas encore déployée sur la cible');
+    test.skip(!(await hasAction(page, 'show-view')), 'délégation data-action pas encore déployée sur la cible');
 
     // Négoce → viewNegoce
     await page.locator('#navNegoce').click();
@@ -88,7 +91,7 @@ test.describe('Navigation déléguée (data-action)', () => {
     await asAdmin(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2000);
-    test.skip(!(await hasDelegation(page)), 'délégation data-action pas encore déployée sur la cible');
+    test.skip(!(await hasAction(page, 'show-view')), 'délégation data-action pas encore déployée sur la cible');
 
     const moreMenu = page.locator('#moreMenu');
     // Ouvre
@@ -107,7 +110,7 @@ test.describe('Navigation déléguée (data-action)', () => {
     await asAdmin(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2000);
-    test.skip(!(await hasDelegation(page)), 'délégation data-action pas encore déployée sur la cible');
+    test.skip(!(await hasAction(page, 'toggle-switch')), 'action toggle-switch pas encore déployée sur la cible');
 
     // Vue Analyse (par défaut) : #togCompare démarre actif → un clic le désactive.
     const tog = page.locator('#togCompare');
@@ -122,7 +125,7 @@ test.describe('Navigation déléguée (data-action)', () => {
     await asAdmin(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2000);
-    test.skip(!(await hasDelegation(page)), 'délégation data-action pas encore déployée sur la cible');
+    test.skip(!(await hasAction(page, 'modal-open')), 'action modal-open pas encore déployée sur la cible');
 
     // Les liens CGV/Privacy sont dans la vue Paramètres.
     await page.locator('#navParams').click();
