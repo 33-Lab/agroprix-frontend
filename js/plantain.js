@@ -436,19 +436,25 @@ window.AgroPrix = window.AgroPrix || {};
       // Historique prix
       '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;">' +
         '<div style="font-size:15px;font-weight:700;margin-bottom:12px;">Historique prix plantain</div>' +
-        '<div style="display:flex;align-items:flex-end;height:120px;gap:4px;padding:0 4px;">' +
-          PRIX_PLANTAIN.map(function(p) {
-            var minP = 50, maxP = 250;
-            var h = Math.max(10, ((p.bordChamp - minP) / (maxP - minP)) * 100);
-            var isLast = p === prixActuel;
-            var barColor = p.saison === 'haute' ? '#E8862A' : p.saison === 'basse' ? '#FFCC80' : '#FFE0B2';
-            if (isLast) barColor = '#5B3A1A';
-            return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;">' +
-              '<div style="font-size:9px;font-weight:700;color:' + (isLast ? '#5B3A1A' : '#999') + ';margin-bottom:2px;">' + p.bordChamp + '</div>' +
-              '<div style="width:100%;height:' + h + 'px;background:' + barColor + ';border-radius:4px 4px 0 0;"></div>' +
-              '<div style="font-size:8px;color:#999;margin-top:3px;">' + p.mois.slice(5) + '</div>' +
-            '</div>';
-          }).join('') +
+        '<div style="display:flex;align-items:flex-end;height:120px;gap:3px;padding:0 4px;">' +
+          (function() {
+            // Échelle DYNAMIQUE (avant 50-250 fixe → débordement) + labels espacés.
+            var vals = PRIX_PLANTAIN.map(function(p) { return p.bordChamp; });
+            var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), span = (hi - lo) || 1;
+            var n = PRIX_PLANTAIN.length, step = Math.max(1, Math.ceil(n / 6));
+            return PRIX_PLANTAIN.map(function(p, i) {
+              var h = Math.min(100, Math.max(8, ((p.bordChamp - lo) / span) * 88 + 12));
+              var isLast = (i === n - 1);
+              var show = isLast || (i % step === 0);
+              var barColor = p.saison === 'haute' ? '#E8862A' : p.saison === 'basse' ? '#FFCC80' : '#FFE0B2';
+              if (isLast) barColor = '#5B3A1A';
+              return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;min-width:0;">' +
+                (show ? '<div style="font-size:8px;font-weight:700;color:' + (isLast ? '#5B3A1A' : '#999') + ';white-space:nowrap;">' + p.bordChamp + '</div>' : '<div style="height:11px;"></div>') +
+                '<div style="width:100%;height:' + h + 'px;background:' + barColor + ';border-radius:3px 3px 0 0;"></div>' +
+                '<div style="font-size:7px;color:#999;margin-top:3px;height:9px;white-space:nowrap;">' + (show ? p.mois.slice(5) : '') + '</div>' +
+              '</div>';
+            }).join('');
+          })() +
         '</div>' +
         '<div style="display:flex;gap:12px;margin-top:8px;font-size:10px;justify-content:center;">' +
           '<span style="display:flex;align-items:center;gap:3px;"><span style="width:10px;height:10px;background:#E8862A;border-radius:2px;"></span> Haute saison</span>' +
@@ -607,14 +613,14 @@ window.AgroPrix = window.AgroPrix || {};
       // Assurance
       '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;">' +
         '<div style="font-size:15px;font-weight:700;margin-bottom:4px;">Assurance agricole</div>' +
-        '<div style="font-size:12px;color:#666;margin-bottom:12px;">Estimation indicative — Produits micro-assurance CI</div>' +
+        '<div style="font-size:12px;color:#666;margin-bottom:12px;">Estimation indicative (phase 2). L\'equipe AgroPrix collecte votre interet — pas encore de partenariat assureur ferme.</div>' +
         (totalSurface > 0 ?
           '<div style="background:#f8f9fa;border-radius:10px;padding:12px;margin-bottom:10px;">' +
             '<div style="font-size:12px;color:#999;">Prime estimee annuelle</div>' +
             '<div style="font-size:22px;font-weight:800;color:#5B3A1A;">' + Math.round(totalSurface * 20000) + ' FCFA</div>' +
             '<div style="font-size:10px;color:#666;">Base: 20 000 FCFA/ha/an — ' + totalSurface.toFixed(1) + ' ha</div>' +
           '</div>' : '') +
-        '<button onclick="AgroPrix.plantainContactAssurance()" style="width:100%;padding:12px;background:linear-gradient(135deg,#E8862A,#F5A623);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Etre contacte par un assureur</button>' +
+        '<button onclick="AgroPrix.plantainContactAssurance()" style="width:100%;padding:12px;background:linear-gradient(135deg,#E8862A,#F5A623);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Demander des infos assurance</button>' +
       '</div>' +
 
       // Annuaire
