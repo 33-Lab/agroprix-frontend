@@ -11,7 +11,7 @@
 // MAIS en parallèle revalide le réseau et met à jour le cache → la version
 // suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = 'v7.22.0';  // bump 26/06 : CSP Phase 2 (2/n) — index.html 100% sans handler inline (data-action)
+const CACHE_VERSION = 'v7.23.0';  // bump 26/06 : CSP Phase 2 (3/n) — blocs <script> inline d'index.html externalisés
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 
@@ -32,6 +32,8 @@ const STATIC_ASSETS = [
   '/js/ui.js',
   '/js/app.js',
   '/js/actions.js',
+  '/js/boot-sentry.js',
+  '/js/error-boundary.js',
   // JS modules
   '/js/analysis.js',
   '/js/negoce.js',
