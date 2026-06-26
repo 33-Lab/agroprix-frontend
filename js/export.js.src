@@ -14,6 +14,31 @@
 (function(AP) {
   'use strict';
 
+  // ─── Taux de change — MAJ au démarrage (Phase A) ──────────────────────────
+  // Récupéré via le backend /api/fx (cache 6 h côté serveur ; source
+  // open.er-api.com sans clé). EUR/XOF = peg fixe 655,957. Repli : dernier
+  // cache localStorage, sinon constante prudente. AP.FX est dispo dès le boot.
+  var FX_FALLBACK = { usd_xof: 600, eur_xof: 655.957, source: 'estimation', updated_at: null, live: false };
+  AP.FX = AP.FX || FX_FALLBACK;
+  try {
+    var _fxc = JSON.parse(localStorage.getItem('agroprix_fx') || 'null');
+    if (_fxc && _fxc.usd_xof) AP.FX = _fxc;
+  } catch (e) {}
+
+  function loadFx() {
+    var base = AP.API_BASE || '';
+    return fetch(base + '/api/fx')
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d && d.usd_xof) {
+          AP.FX = { usd_xof: d.usd_xof, eur_xof: d.eur_xof || 655.957, source: d.source || 'live', updated_at: d.updated_at || null, live: true };
+          try { localStorage.setItem('agroprix_fx', JSON.stringify(AP.FX)); } catch (e) {}
+          updateFxCard();
+        }
+      })
+      .catch(function() { /* on garde le repli */ });
+  }
+
   // ─── Données curées (indicatives — voir étiquetage transparence) ──────────
   // Volume minimum = réalité de l'export direct : 1 conteneur 20' ≈ 18-25 t
   // (cacao/café/hévéa). En dessous → passer par une coopérative/exportateur.
@@ -47,30 +72,45 @@
 
   // Destinations groupées. isEU pilote l'applicabilité EUDR (avec AP.EUDR).
   var DESTINATIONS = [
-    { group: 'Union européenne (EUDR applicable)', isEU: true, items: [
+    { group: 'Union européenne (EUDR applicable)', isEU: true, freightZone: 'europe', items: [
       { key: 'ue', label: 'Union européenne (général)' },
       { key: 'fr', label: 'France' }, { key: 'nl', label: 'Pays-Bas' },
       { key: 'de', label: 'Allemagne' }, { key: 'be', label: 'Belgique' },
       { key: 'es', label: 'Espagne' }, { key: 'it', label: 'Italie' }
     ]},
-    { group: 'CEDEAO (échanges régionaux)', isEU: false, regime: 'cedeao', items: [
+    { group: 'CEDEAO (échanges régionaux)', isEU: false, regime: 'cedeao', freightZone: 'regional', items: [
       { key: 'ng', label: 'Nigéria' }, { key: 'gh', label: 'Ghana' },
       { key: 'sn', label: 'Sénégal' }, { key: 'bf', label: 'Burkina Faso' },
       { key: 'tg', label: 'Togo' }
     ]},
-    { group: 'Maghreb', isEU: false, regime: 'autre', items: [
+    { group: 'Maghreb', isEU: false, regime: 'autre', freightZone: 'maghreb', items: [
       { key: 'ma', label: 'Maroc' }, { key: 'dz', label: 'Algérie' }, { key: 'tn', label: 'Tunisie' }
     ]},
-    { group: 'Moyen-Orient', isEU: false, regime: 'autre', items: [
+    { group: 'Moyen-Orient', isEU: false, regime: 'autre', freightZone: 'moyen_orient', items: [
       { key: 'ae', label: 'Émirats arabes unis' }, { key: 'sa', label: 'Arabie saoudite' }
     ]},
-    { group: 'Asie', isEU: false, regime: 'autre', items: [
+    { group: 'Asie', isEU: false, regime: 'autre', freightZone: 'asie', items: [
       { key: 'in', label: 'Inde' }, { key: 'vn', label: 'Vietnam' }, { key: 'cn', label: 'Chine' }
     ]},
-    { group: 'Amérique du Nord', isEU: false, regime: 'autre', items: [
+    { group: 'Amérique du Nord', isEU: false, regime: 'autre', freightZone: 'amerique', items: [
       { key: 'us', label: 'États-Unis' }, { key: 'ca', label: 'Canada' }
     ]}
   ];
+
+  // ─── Fret maritime indicatif (Phase B) ────────────────────────────────────
+  // Fourchettes USD par conteneur 20' au départ des ports UEMOA (Abidjan,
+  // San Pedro, Cotonou, Lomé). ESTIMATION — il n'existe pas d'API gratuite de
+  // taux de fret pour ces routes (les indices FBX/Drewry sont payants et
+  // couvrent surtout l'Asie→Europe). À actualiser périodiquement (cf. FREIGHT_MAJ).
+  var FREIGHT_MAJ = 'juin 2026';
+  var FREIGHT = {
+    europe:       { c20: [1500, 2800], note: 'Ports UEMOA → Europe du Nord (Rotterdam, Anvers, Le Havre).' },
+    regional:     { c20: [300, 1000],  note: 'CEDEAO — souvent par route/cabotage, pas toujours conteneur maritime.' },
+    maghreb:      { c20: [1200, 2200], note: 'Vers Maroc / Algérie / Tunisie.' },
+    moyen_orient: { c20: [1800, 3000], note: 'Vers le Golfe (Jebel Ali…).' },
+    asie:         { c20: [1500, 3000], note: 'Vers Inde / Vietnam / Chine (transbordement fréquent).' },
+    amerique:     { c20: [2500, 4500], note: 'Vers côte Est USA / Canada.' }
+  };
 
   // Conditions par régime de destination (résumé curé + renvoi source officielle).
   var REGIME_CONDITIONS = {
@@ -123,12 +163,32 @@
   }
   function fmt(n) { return Math.round(n).toLocaleString('fr-FR'); }
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function usdXof() { return (AP.FX && AP.FX.usd_xof) ? AP.FX.usd_xof : FX_FALLBACK.usd_xof; }
+
+  function fxDateLabel() {
+    if (!AP.FX || !AP.FX.updated_at) return '';
+    try { return ' · MAJ ' + new Date(AP.FX.updated_at).toLocaleDateString('fr-FR'); } catch (e) { return ''; }
+  }
+  function fxCardHtml() {
+    var f = AP.FX || FX_FALLBACK;
+    return '<div class="card" style="padding:12px 16px;border-radius:14px;margin-bottom:12px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;">'
+      + '<div style="font-size:12px;font-weight:700;color:#1B4332;"><i data-lucide="arrow-left-right" class="lc"></i> Taux du jour</div>'
+      + '<div style="font-size:13px;color:#333;">1 USD = <b>' + (f.usd_xof ? fmt(f.usd_xof) : '—') + ' FCFA</b></div>'
+      + '<div style="font-size:13px;color:#333;">1 EUR = <b>655,957 FCFA</b> <span style="font-size:10px;color:#999;">(peg fixe)</span></div>'
+      + '<div style="font-size:10px;color:#999;margin-left:auto;">' + (f.live ? 'Live · source ' + esc(f.source || '') + fxDateLabel() : 'Estimation hors-ligne') + '</div>'
+      + '</div>';
+  }
+  function updateFxCard() {
+    var el = document.getElementById('exportFxCard');
+    if (el) { el.innerHTML = fxCardHtml(); if (window.refreshIcons) refreshIcons(); }
+  }
 
   // ─── Rendu : formulaire ─────────────────────────────────────────────────────
   function init() {
     var root = document.getElementById('exportAssistantRoot');
     if (!root) return;
     renderForm(root);
+    loadFx(); // rafraîchit le taux du jour à l'ouverture (cache serveur 6h)
     if (window.refreshIcons) refreshIcons();
   }
 
@@ -145,7 +205,8 @@
     }).join('');
 
     root.innerHTML =
-      '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;">'
+      '<div id="exportFxCard">' + fxCardHtml() + '</div>'
+      + '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;">'
       + '<div style="font-size:15px;font-weight:700;margin-bottom:4px;">1 · Mon projet d\'export</div>'
       + '<div style="font-size:11px;color:#888;margin-bottom:12px;">Renseignez votre produit, la destination et la quantité. L\'assistant évalue la faisabilité, les conditions et un ordre de grandeur de revenu.</div>'
       + '<div style="font-size:12px;font-weight:600;color:#1B4332;margin-bottom:6px;">Produit(s) à exporter</div>'
@@ -257,6 +318,18 @@
       html += '</div>';
     });
 
+    // Fret indicatif (Phase B)
+    var fz = dest.group.freightZone;
+    var fr = fz ? FREIGHT[fz] : null;
+    if (fr) {
+      var ux = usdXof();
+      html += '<div style="border-top:1px solid #f0f0f0;padding-top:10px;margin-top:10px;">'
+        + '<div style="font-size:12px;font-weight:600;color:#1B4332;margin-bottom:4px;"><i data-lucide="ship" class="lc"></i> Fret maritime indicatif (conteneur 20\')</div>'
+        + '<div style="font-size:12px;color:#444;"><b>' + fmt(fr.c20[0]) + '–' + fmt(fr.c20[1]) + ' USD</b> ≈ <b>' + fmt(fr.c20[0] * ux) + '–' + fmt(fr.c20[1] * ux) + ' FCFA</b> par conteneur'
+        + '<div style="font-size:11px;color:#888;margin-top:2px;">' + esc(fr.note) + ' Estimation (MAJ ' + esc(FREIGHT_MAJ) + ', hors surcharges) — confirmez avec un transitaire. En Incoterm FOB, le fret est à la charge de l\'acheteur.</div>'
+        + '</div></div>';
+    }
+
     // Outils officiels
     html += '<div style="border-top:1px solid #f0f0f0;padding-top:10px;margin-top:10px;">'
       + '<div style="font-size:12px;font-weight:600;color:#1B4332;margin-bottom:6px;">Tarifs & normes exactes par pays — outils officiels</div>'
@@ -286,7 +359,8 @@
       if (p.localFcfaKg) {
         html += '<div style="font-size:13px;color:#1B4332;margin:2px 0;">Valeur au prix bord-champ garanti : <b>' + fmt(qkg * p.localFcfaKg) + ' FCFA</b> <span style="font-size:11px;color:#999;">(' + fmt(p.localFcfaKg) + ' FCFA/kg)</span></div>';
       }
-      html += '<div style="font-size:12px;color:#444;">Référence export (FOB) : <b>' + fmt(p.fob[0]) + '–' + fmt(p.fob[1]) + ' USD/t</b> → ordre de grandeur <b>' + fmt(state.qtyT * p.fob[0]) + '–' + fmt(state.qtyT * p.fob[1]) + ' USD</b> <span style="color:#999;">brut, avant coûts. Cours mondial volatil — vérifiez le cours du jour.</span></div>'
+      var ux = usdXof();
+      html += '<div style="font-size:12px;color:#444;">Référence export (FOB) : <b>' + fmt(p.fob[0]) + '–' + fmt(p.fob[1]) + ' USD/t</b> → brut <b>' + fmt(state.qtyT * p.fob[0]) + '–' + fmt(state.qtyT * p.fob[1]) + ' USD</b> ≈ <b>' + fmt(state.qtyT * p.fob[0] * ux) + '–' + fmt(state.qtyT * p.fob[1] * ux) + ' FCFA</b> <span style="color:#999;">(taux du jour, avant coûts ; cours mondial volatil).</span></div>'
         + '</div>';
     });
 
@@ -329,6 +403,7 @@
   }
 
   AP.exportModule = { init: init, analyse: analyse, publishDemand: publishDemand };
+  AP.fx = { load: loadFx, get: function() { return AP.FX; } };
   window.publishDemand = publishDemand;
 
 })(window.AgroPrix);
