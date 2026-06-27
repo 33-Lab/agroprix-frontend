@@ -221,12 +221,9 @@ test.describe('Navigation déléguée (data-action)', () => {
     expect(await page.locator('#viewPlantain [onclick]').count()).toBe(0);
     const addBtn = page.locator('#viewPlantain [data-action="plantain-show-add-parcelle"]:visible').first();
     if (await addBtn.count()) await addBtn.click();
-    // En local (sans backend) les prix ne chargent pas → l'onglet transfo lève
-    // une erreur pré-existante (PRIX_PLANTAIN vide → .bordChamp), hors scope CSP
-    // et absente en prod (prix chargés). On l'ignore pour ne valider que la
-    // délégation. (Suivi : ajouter le guard "prix en chargement" comme les autres modules.)
-    const real = errors.filter((e) => !/bordChamp/.test(e));
-    expect(real, real.join('\n')).toHaveLength(0);
+    // Plus aucune erreur tolérée : le crash hors-ligne de l'onglet transfo
+    // (PRIX_PLANTAIN vide → .bordChamp) est désormais gardé comme les autres modules.
+    expect(errors, errors.join('\n')).toHaveLength(0);
   });
 
   test('module Tomate Pro : 0 onclick inline rendu + action fonctionnelle', async ({ page }) => {
