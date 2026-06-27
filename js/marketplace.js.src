@@ -26,6 +26,31 @@
     return kg >= 1000 ? (Math.round(kg / 100) / 10) + ' t' : Math.round(kg) + ' kg';
   }
 
+  // Publication (M3) : famille sélectionnée + référentiel produits par famille.
+  var _formCategory = 'cultures';
+  var FAM_LABELS = { cultures: 'Cultures', intrants: 'Intrants', equipements: 'Équipements', services: 'Services' };
+  var PRODUCTS = {
+    intrants: { engrais_npk: 'Engrais NPK', engrais_uree: 'Urée', engrais_dap: 'DAP', compost: 'Compost', semences_mais: 'Semences maïs', semences_riz: 'Semences riz', semences_maraichage: 'Semences maraîchage', herbicide: 'Herbicide', insecticide: 'Insecticide', fongicide: 'Fongicide' },
+    equipements: { tracteur: 'Tracteur', motoculteur: 'Motoculteur', pulverisateur: 'Pulvérisateur', kit_irrigation: "Kit d'irrigation", batteuse: 'Batteuse', sechoir: 'Séchoir', sacs_stockage: 'Sacs de stockage' },
+    services: { labour: 'Labour', transport: 'Transport', stockage: 'Stockage', conseil_agronomique: 'Conseil agronomique', main_oeuvre: "Main d'œuvre", location_materiel: 'Location de matériel' }
+  };
+  function _productsFor(cat) {
+    return cat === 'cultures' ? (AP.cultureNames || {}) : (PRODUCTS[cat] || {});
+  }
+  var UNIT_KG = { kg: 1, tonnes: 1000, sacs: 50, paniers: 25 };
+
+  // Upload photo via URL signée Supabase (non bloquant : null si non configuré/échec).
+  function _uploadPhoto(file) {
+    return fetch(_apiBase() + '/api/marketplace/photos/sign', {
+      method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: file.name, content_type: file.type })
+    }).then(function(r) { return r.ok ? r.json() : null; }).then(function(s) {
+      if (!s || !s.configured || !s.upload_url) return null;
+      return fetch(s.upload_url, { method: 'PUT', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file })
+        .then(function(up) { return up.ok ? s.public_url : null; });
+    }).catch(function() { return null; });
+  }
+
   // Échappement HTML — anti-XSS : OBLIGATOIRE pour toute donnée backend/utilisateur
   // (nom vendeur, produit, marché, description…) injectée via innerHTML.
   function esc(s) {
@@ -331,19 +356,28 @@
   function renderForm(type) {
     var isSell = type === 'sell';
     var markets = getMarkets();
-    var cultures = AP.cultureNames || {};
+    var products = _productsFor(_formCategory);
     var html = '';
 
     html += '<div class="card" style="padding:16px;">'
       + '<div class="card-title"><span class="icon">' + (isSell ? '<i data-lucide="package" class="lc"></i>' : '<i data-lucide="shopping-cart" class="lc"></i>') + '</span> ' + (isSell ? 'Publier une offre de vente' : 'Publier une demande d\'achat') + '</div>'
       + '<p style="font-size:12px;color:var(--text-light);margin-bottom:12px;">' + (isSell ? 'Proposez vos produits aux acheteurs.' : 'Decrivez ce que vous recherchez.') + '</p>';
 
-    // Culture
+    // Famille (chips)
+    html += '<div class="form-group" style="margin-bottom:10px;"><label class="form-label" style="font-weight:600;">Famille</label>'
+      + '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;">';
+    Object.keys(FAM_LABELS).forEach(function(cat) {
+      var on = (_formCategory === cat);
+      html += '<button data-action="mkt-form-fam" data-value="' + cat + '" data-type="' + type + '" style="padding:6px 11px;border-radius:18px;border:1px solid ' + (on ? '#2D6A4F' : '#ccc') + ';background:' + (on ? '#2D6A4F' : '#fff') + ';color:' + (on ? '#fff' : '#555') + ';font-size:11px;font-weight:600;cursor:pointer;">' + FAM_LABELS[cat] + '</button>';
+    });
+    html += '</div></div>';
+
+    // Produit (selon famille)
     html += '<div class="form-group" style="margin-bottom:12px;">'
       + '<label class="form-label" style="font-weight:600;">Produit</label>'
       + '<select id="mpCrop" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;">';
-    Object.keys(cultures).forEach(function(k) {
-      html += '<option value="' + k + '">' + cultures[k] + '</option>';
+    Object.keys(products).forEach(function(k) {
+      html += '<option value="' + k + '">' + products[k] + '</option>';
     });
     html += '</select></div>';
 
@@ -369,21 +403,26 @@
     markets.forEach(function(m) { html += '<option value="' + m.name + '">' + m.name + '</option>'; });
     html += '<option value="Autre">Autre</option></select></div>';
 
+    // Date de livraison (demande uniquement)
+    if (!isSell) {
+      html += '<div class="form-group" style="margin-bottom:12px;">'
+        + '<label class="form-label" style="font-weight:600;">Date de livraison souhaitee</label>'
+        + '<input type="date" id="mpDeliveryDate" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;"></div>';
+    }
+
     // Description
     html += '<div class="form-group" style="margin-bottom:12px;">'
       + '<label class="form-label" style="font-weight:600;">Description</label>'
       + '<textarea id="mpDescription" rows="3" placeholder="' + (isSell ? 'Qualite, disponibilite, conditions...' : 'Specifications, deadline, conditions...') + '" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;resize:vertical;"></textarea>'
       + '</div>';
 
-    // Contact
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">'
-      + '<div class="form-group"><label class="form-label" style="font-weight:600;">' + (isSell ? 'Votre nom / entreprise' : 'Votre nom / entreprise') + '</label>'
-      + '<input type="text" id="mpContact" value="' + getUserName() + '" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;"></div>'
-      + '<div class="form-group"><label class="form-label" style="font-weight:600;">Telephone</label>'
-      + '<input type="tel" id="mpPhone" placeholder="+XXX XX XX XX XX" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;"></div></div>';
+    // Photo (optionnelle)
+    html += '<div class="form-group" style="margin-bottom:16px;">'
+      + '<label class="form-label" style="font-weight:600;"><i data-lucide="camera" class="lc" style="width:14px;height:14px;vertical-align:-2px;"></i> Photo (optionnelle)</label>'
+      + '<input type="file" id="mpPhoto" accept="image/*" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:12px;"></div>';
 
     // Submit
-    html += '<button class="btn-analyse" style="width:100%;font-size:14px;padding:12px;" data-action="mkt-publish" data-type="' + type + '">'
+    html += '<button class="btn-analyse" id="mpPublishBtn" style="width:100%;font-size:14px;padding:12px;" data-action="mkt-publish" data-type="' + type + '">'
       + '<i data-lucide="megaphone" class="lc"></i> Publier ' + (isSell ? 'l\'offre' : 'la demande') + '</button>';
 
     html += '<div id="mpSuccess" style="display:none;margin-top:12px;padding:10px;background:#d1fae5;border-radius:8px;text-align:center;font-size:13px;color:#1B4332;font-weight:600;"></div>';
@@ -456,66 +495,54 @@
     var priceEl = document.getElementById('mpPrice');
     var marketEl = document.getElementById('mpMarket');
     var descEl = document.getElementById('mpDescription');
-    var contactEl = document.getElementById('mpContact');
-    var phoneEl = document.getElementById('mpPhone');
+    var deliveryEl = document.getElementById('mpDeliveryDate');
+    var photoEl = document.getElementById('mpPhoto');
 
     if (!cropEl || !qtyEl || !priceEl || !qtyEl.value || !priceEl.value) {
       alert('Veuillez remplir les champs obligatoires (produit, quantite, prix).');
       return;
     }
 
-    var cultures = AP.cultureNames || {};
-    var cropName = cultures[cropEl.value] || cropEl.value;
+    var unit = unitEl ? unitEl.value : 'tonnes';
+    var qtyKg = parseFloat(qtyEl.value) * (UNIT_KG[unit] || 1);
+    var body = {
+      listing_type: type === 'sell' ? 'offre' : 'demande',
+      category: _formCategory,
+      culture: cropEl.value,
+      quantity_kg: qtyKg,
+      unit_price_fcfa: parseFloat(priceEl.value),
+      country_iso3: _userIso3() || 'BEN',
+      region: marketEl ? marketEl.value : null,
+      market_name: marketEl ? marketEl.value : null,
+      description: descEl ? descEl.value.trim() : '',
+      delivery_date: (type === 'buy' && deliveryEl && deliveryEl.value) ? deliveryEl.value : null,
+      photos: []
+    };
 
-    if (type === 'sell') {
-      var offer = {
-        id: generateId(),
-        type: 'sell',
-        crop: cropEl.value,
-        cropName: cropName,
-        quantity: parseFloat(qtyEl.value),
-        unit: unitEl ? unitEl.value : 'tonnes',
-        price: parseInt(priceEl.value),
-        priceUnit: 'FCFA/kg',
-        market: marketEl ? marketEl.value : '',
-        description: descEl ? descEl.value.trim() : '',
-        seller: contactEl ? contactEl.value.trim() : getUserName(),
-        phone: phoneEl ? phoneEl.value.trim() : '',
-        date: new Date().toISOString(),
-        status: 'active'
-      };
-      saveOffer(offer);
-    } else {
-      var demand = {
-        id: generateId(),
-        type: 'buy',
-        crop: cropEl.value,
-        cropName: cropName,
-        quantity: parseFloat(qtyEl.value),
-        unit: unitEl ? unitEl.value : 'tonnes',
-        maxPrice: parseInt(priceEl.value),
-        priceUnit: 'FCFA/kg',
-        market: marketEl ? marketEl.value : '',
-        description: descEl ? descEl.value.trim() : '',
-        buyer: contactEl ? contactEl.value.trim() : getUserName(),
-        phone: phoneEl ? phoneEl.value.trim() : '',
-        date: new Date().toISOString(),
-        status: 'active',
-        verified: false
-      };
-      saveDemand(demand);
-    }
+    var btn = document.getElementById('mpPublishBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Publication…'; }
 
-    // Show success
-    var successEl = document.getElementById('mpSuccess');
-    if (successEl) {
-      successEl.textContent = '<i data-lucide="check-circle" class="lc"></i> Annonce publiee ! ' + cropName + ' — ' + (type === 'sell' ? 'offre de vente' : 'demande d\'achat');
-      successEl.style.display = 'block';
-      setTimeout(function() { successEl.style.display = 'none'; }, 3000);
-    }
-
-    // Switch to marche tab after short delay
-    setTimeout(function() { currentTab = 'marche'; render(); window.scrollTo(0, 0); }, 1500);
+    var file = (photoEl && photoEl.files && photoEl.files[0]) ? photoEl.files[0] : null;
+    var step = file ? _uploadPhoto(file) : Promise.resolve(null);
+    step.then(function(url) {
+      if (url) body.photos = [url];
+      return fetch(_apiBase() + '/api/marketplace/listings', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+    }).then(function(r) {
+      if (r.status === 401 || r.status === 403) { alert('Connectez-vous pour publier une annonce.'); return null; }
+      if (!r.ok) return r.text().then(function(t) { throw new Error(t); });
+      return r.json();
+    }).then(function(d) {
+      if (!d) { if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="megaphone" class="lc"></i> Publier'; if (window.lucide) try { window.lucide.createIcons(); } catch (e) {} } return; }
+      alert('Annonce publiee !' + (file && !body.photos.length ? '\n(Photo non envoyee : stockage non configure.)' : ''));
+      currentTab = 'marche'; render(); window.scrollTo(0, 0);
+    }).catch(function(e) {
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="megaphone" class="lc"></i> Publier'; if (window.lucide) try { window.lucide.createIcons(); } catch (ex) {} }
+      alert('Publication impossible : ' + (e && e.message ? String(e.message).slice(0, 120) : 'erreur'));
+    });
   }
 
   function setTab(tabId) {
@@ -817,5 +844,6 @@
   AP.actions['mkt-cat-country']     = function() { _catCountry = _catCountry ? '' : _userIso3(); render(); };
   AP.actions['mkt-cat-search']      = function() { var i = document.getElementById('mktSearch'); _catFilters.q = i ? i.value : ''; render(); };
   AP.actions['mkt-contact']         = function(el) { contactListing(el.getAttribute('data-id')); };
+  AP.actions['mkt-form-fam']        = function(el) { _formCategory = el.getAttribute('data-value') || 'cultures'; render(); };
 
 })(window.AgroPrix);
