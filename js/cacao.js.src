@@ -891,9 +891,9 @@ window.AgroPrix = window.AgroPrix || {};
           '<div style="font-size:15px;font-weight:700;margin-bottom:4px;">Estimation revenu campagne</div>' +
           '<div style="font-size:12px;color:#666;margin-bottom:12px;">Projections à partir des rendements moyens UEMOA</div>' +
           '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">' +
-            revenueBox('Forastero', totalSurface * 500, PRIX_CACAO[PRIX_CACAO.length-1].prix) +
-            revenueBox('Hybride CNRA', totalSurface * 1000, PRIX_CACAO[PRIX_CACAO.length-1].prix) +
-            revenueBox('CCN51', totalSurface * 1600, PRIX_CACAO[PRIX_CACAO.length-1].prix) +
+            revenueBox('Forastero', totalSurface * 500, (PRIX_CACAO.length ? PRIX_CACAO[PRIX_CACAO.length-1].prix : 0)) +
+            revenueBox('Hybride CNRA', totalSurface * 1000, (PRIX_CACAO.length ? PRIX_CACAO[PRIX_CACAO.length-1].prix : 0)) +
+            revenueBox('CCN51', totalSurface * 1600, (PRIX_CACAO.length ? PRIX_CACAO[PRIX_CACAO.length-1].prix : 0)) +
           '</div>' +
         '</div>' : '') +
 
@@ -1437,6 +1437,7 @@ window.AgroPrix = window.AgroPrix || {};
 
     // Prix et marché
     if (q.match(/prix|vendre|march[eé]|cours|fcfa|eudr|export|eur[eo]pe/)) {
+      if (!prixActuel) return 'Les prix du cacao ne sont pas encore chargés. Réessayez dans un instant.';
       return '<b>Prix marché cacao UEMOA actuel :</b> ' + prixActuel.prix.toLocaleString() + ' FCFA/kg (' + prixActuel.mois + ')<br>' +
         '<b>Contexte :</b> Pic historique 2024-2025 (crise mondiale, déficit production). Tendance actuelle à la baisse depuis mars 2025.<br>' +
         '<b>ICE Futures :</b> ~' + prixActuel.iceUsd.toLocaleString() + ' USD/tonne.<br>' +
