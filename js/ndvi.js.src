@@ -80,22 +80,33 @@
     syncParcelToBackend(idx).then(function(backendId) {
       return fetchSentinelNDVI(backendId);
     }).then(function(res) {
-      var stats = (res && res.stats) ? res.stats : [];
-      if (!stats.length) {
+      res = res || {};
+      // Contrat backend (masquage nuages SCL + garde-fou qualite) :
+      //   status: 'ok' | 'low_quality' | 'no_scene', analysable: bool,
+      //   best: {mean,min,max,datetime,cloud_cover,valid_fraction}|null,
+      //   reasons: [..], next_steps: [..]
+      var best = res.best || null;
+      var analysable = (res.analysable === true) && best
+        && best.mean !== null && best.mean !== undefined;
+      if (!analysable) {
         if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="satellite" class="lc"></i> Reessayer l\'analyse satellite'; if (window.lucide) try { window.lucide.createIcons(); } catch(e){} }
-        alert('Aucune scene satellite claire recente (couverture nuageuse). Reessayez plus tard.');
+        showSatelliteIssue(idx, res);
         return;
       }
-      var latest = stats[0];
       var ps = getParcels();
       ps[idx].realNDVI = {
-        mean: latest.mean, min: latest.min, max: latest.max,
-        date: String(latest.datetime || '').split('T')[0],
-        cloud: latest.cloud_cover, source: res.source || 'sentinel-2'
+        mean: best.mean, min: best.min, max: best.max,
+        date: String(best.datetime || '').split('T')[0],
+        cloud: best.cloud_cover,
+        validFraction: best.valid_fraction,
+        source: res.source || 'sentinel-2'
       };
-      ps[idx].realHistory = stats.map(function(s) {
+      ps[idx].realHistory = (res.stats || []).filter(function(s) {
+        return s && s.mean !== null && s.mean !== undefined;
+      }).map(function(s) {
         return { date: String(s.datetime || '').split('T')[0], ndvi: Math.round((s.mean || 0) * 100) / 100 };
       }).reverse();
+      ps[idx].realIssue = null;
       saveParcels(ps);
       render();
     }).catch(function(e) {
@@ -103,6 +114,27 @@
       if (String(e && e.message) === 'auth') alert('Connectez-vous pour lancer l\'analyse satellite reelle.');
       else alert('Analyse satellite indisponible : ' + (e && e.message ? e.message : 'erreur'));
     });
+  }
+
+  // Analyse impossible/non fiable : on NE stocke PAS de NDVI bidon. On mémorise les
+  // raisons + la marche à suivre renvoyées par le backend, affichées sur la parcelle.
+  function showSatelliteIssue(idx, res) {
+    var reasons = (res && res.reasons) || [];
+    var steps = (res && res.next_steps) || [];
+    var ps = getParcels();
+    if (ps[idx]) {
+      ps[idx].realIssue = {
+        status: res.status || 'low_quality',
+        reasons: reasons,
+        next_steps: steps,
+        at: String(res.computed_at || '').split('T')[0]
+      };
+      saveParcels(ps);
+      render();
+    }
+    var msg = (reasons.length ? reasons.join('\n') : 'Analyse satellite indisponible pour le moment.')
+      + (steps.length ? '\n\nQue faire :\n• ' + steps.join('\n• ') : '');
+    alert(msg);
   }
 
   // NDVI thresholds
@@ -156,7 +188,7 @@
   // Dernière mesure réelle, ou null si la parcelle n'a pas encore été analysée.
   function ndviLatest(p) {
     if (p && p.realNDVI && typeof p.realNDVI.mean === 'number') {
-      return { ndvi: Math.round((p.realNDVI.mean || 0) * 100) / 100, date: p.realNDVI.date || '', cloud: p.realNDVI.cloud };
+      return { ndvi: Math.round((p.realNDVI.mean || 0) * 100) / 100, date: p.realNDVI.date || '', cloud: p.realNDVI.cloud, validFraction: p.realNDVI.validFraction };
     }
     return null;
   }
@@ -282,8 +314,8 @@
     parcels.forEach(function(p, idx) {
       var latest = ndviLatest(p);          // null tant qu'aucune analyse réelle
       var hist = ndviSeries(p);
-      var bg = latest ? getNDVIStatus(latest.ndvi).bg : '#F1F5F9';
-      var headColor = latest ? getNDVIStatus(latest.ndvi).color : '#64748b';
+      var bg = latest ? getNDVIStatus(latest.ndvi).bg : (p.realIssue ? '#FEF3C7' : '#F1F5F9');
+      var headColor = latest ? getNDVIStatus(latest.ndvi).color : (p.realIssue ? '#92400E' : '#64748b');
 
       html += '<div style="padding:12px;border-radius:10px;background:' + bg + ';margin-bottom:10px;cursor:pointer;" '
         + 'data-action="ndvi-show-detail" data-idx="' + idx + '">'
@@ -301,9 +333,17 @@
           + '</div></div>'
           + '<div style="margin-top:8px;display:flex;align-items:center;gap:8px;">'
           + renderSparkline(hist, 120, 30)
-          + '<div style="font-size:10px;color:#2D6A4F;font-weight:600;"><i data-lucide="satellite" class="lc"></i> Sentinel-2 reel · ' + (latest.date || '—') + ' · nuages ' + Math.round(latest.cloud || 0) + '%</div>'
+          + '<div style="font-size:10px;color:#2D6A4F;font-weight:600;"><i data-lucide="satellite" class="lc"></i> Sentinel-2 reel · ' + (latest.date || '—') + ' · nuages ' + Math.round(latest.cloud || 0) + '%' + (latest.validFraction != null ? ' · fiabilite ' + Math.round(latest.validFraction * 100) + '%' : '') + '</div>'
           + '</div>'
           + '<div style="font-size:11px;color:' + status.color + ';margin-top:6px;font-style:italic;"><i data-lucide="lightbulb" class="lc"></i> ' + status.advice + '</div>';
+      } else if (p.realIssue) {
+        var iss = p.realIssue;
+        html += '<div style="text-align:right;">'
+          + '<div style="font-size:18px;font-weight:800;color:#92400E;">—</div>'
+          + '<div style="font-size:10px;font-weight:600;color:#92400E;"><span style="color:#E8862A;">●</span> Non analysé</div>'
+          + '</div></div>'
+          + '<div style="font-size:11px;color:#92400E;margin-top:8px;"><i data-lucide="cloud-off" class="lc"></i> ' + ((iss.reasons && iss.reasons[0]) || 'Analyse satellite non disponible.') + '</div>'
+          + ((iss.next_steps && iss.next_steps.length) ? '<div style="font-size:11px;color:#92400E;margin-top:6px;background:#fff;border-radius:8px;padding:8px;"><div style="font-weight:700;margin-bottom:4px;"><i data-lucide="info" class="lc"></i> Que faire pour obtenir l\'analyse :</div><ul style="margin:0;padding-left:16px;">' + iss.next_steps.map(function(s) { return '<li>' + s + '</li>'; }).join('') + '</ul></div>' : '');
       } else {
         html += '<div style="text-align:right;">'
           + '<div style="font-size:13px;font-weight:700;color:#94a3b8;">—</div>'
@@ -312,7 +352,7 @@
           + '<div style="font-size:11px;color:#64748b;margin-top:8px;font-style:italic;"><i data-lucide="info" class="lc"></i> Aucune mesure satellite. Lancez l\'analyse pour obtenir un NDVI réel.</div>';
       }
 
-      html += '<button id="sat-btn-' + idx + '" data-action="ndvi-analyze-satellite" data-idx="' + idx + '" style="margin-top:8px;width:100%;padding:8px;border:1px solid var(--primary);background:#fff;color:var(--primary);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;"><i data-lucide="satellite" class="lc"></i> ' + (latest ? 'Reactualiser le satellite (reel)' : 'Analyser au satellite (reel)') + '</button>'
+      html += '<button id="sat-btn-' + idx + '" data-action="ndvi-analyze-satellite" data-idx="' + idx + '" style="margin-top:8px;width:100%;padding:8px;border:1px solid var(--primary);background:#fff;color:var(--primary);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;"><i data-lucide="satellite" class="lc"></i> ' + (latest ? 'Reactualiser le satellite (reel)' : (p.realIssue ? 'Reessayer l\'analyse satellite' : 'Analyser au satellite (reel)')) + '</button>'
         + '</div>';
     });
 
