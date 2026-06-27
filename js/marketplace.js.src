@@ -10,6 +10,22 @@
   var DEMANDS_KEY = 'agroprix_marketplace_demands';
   var API_BASE = (AP && AP.API_BASE) ? AP.API_BASE : '';
 
+  // Catalogue (M2) : filtres + pays courant pour /api/marketplace/listings.
+  var _catFilters = { category: '', type: '', q: '' };
+  var _catCountry = '';
+  function _apiBase() { return AP.API_BASE || ''; }
+  function _userIso3() {
+    try { return (AP.countryMeta[getUserCountry()] || {}).iso3 || ''; } catch (e) { return ''; }
+  }
+  function _productName(l) {
+    var k = l.culture || '';
+    return (AP.cultureNames && AP.cultureNames[k]) ? AP.cultureNames[k] : String(k).replace(/_/g, ' ');
+  }
+  function _qtyLabel(kg) {
+    if (kg == null) return '';
+    return kg >= 1000 ? (Math.round(kg / 100) / 10) + ' t' : Math.round(kg) + ' kg';
+  }
+
   // Échappement HTML — anti-XSS : OBLIGATOIRE pour toute donnée backend/utilisateur
   // (nom vendeur, produit, marché, description…) injectée via innerHTML.
   function esc(s) {
@@ -222,80 +238,91 @@
 
     var container = document.getElementById('marketplaceContent');
     if (container) container.innerHTML = html;
+    if (currentTab === 'marche') loadCatalogue();
   }
 
   // =========================================================================
   // Tab: Marche (all offers + demands)
   // =========================================================================
   function renderMarche() {
-    var offers = getOffers().filter(function(o) { return o.status === 'active'; });
-    var demands = getDemands().filter(function(d) { return d.status === 'active'; });
-    var matches = findMatches();
-    var totalMatchRate = (offers.length + demands.length) > 0 ? Math.round(matches.length / Math.max(offers.length, demands.length) * 100) : 0;
-    var html = '';
-    var cropEmojis = { mais: '🌽', cajou: '🥜', soja: '🫘', riz: '<i data-lucide="wheat" class="lc"></i>', tomate: '🍅', oignon: '🧅', manioc: '🥔', arachide: '🥜', niebe: '🫘', igname: '🍠', coton: '🌿', cafe: '☕', cacao: '🍫', mil: '<i data-lucide="wheat" class="lc"></i>', sorgho: '<i data-lucide="wheat" class="lc"></i>' };
-
-    // Header Place de Marche
-    html += '<div style="background:linear-gradient(135deg,#1B4332,#2D6A4F);border-radius:20px;padding:20px;color:#fff;margin-bottom:16px;text-align:center;">';
-    html += '<div style="font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:2px;">PLACE DE MARCHE</div>';
-    html += '<div style="font-size:20px;font-weight:800;margin-top:4px;"><i data-lucide="store" class="lc"></i> Offres & Demandes</div>';
-    html += '</div>';
-
-    // Annonces style guide
-    var all = [];
-    offers.forEach(function(o) { all.push(Object.assign({ _type: 'sell' }, o)); });
-    demands.forEach(function(d) { all.push(Object.assign({ _type: 'buy' }, d)); });
-    all.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
-
-    if (all.length === 0) {
-      html += '<div class="card" style="padding:32px;text-align:center;">'
-        + '<div style="font-size:48px;margin-bottom:12px;"><i data-lucide="store" class="lc"></i></div>'
-        + '<h3 style="color:#666;">Aucune annonce</h3>'
-        + '<p style="font-size:13px;color:#999;">Soyez le premier a publier une offre ou une demande!</p>'
-        + '</div>';
-      return html;
+    function chip(action, val, label, active) {
+      return '<button data-action="' + action + '" data-value="' + val + '" style="padding:6px 12px;border-radius:20px;border:1px solid ' + (active ? '#2D6A4F' : '#ccc') + ';background:' + (active ? '#2D6A4F' : '#fff') + ';color:' + (active ? '#fff' : '#555') + ';font-size:11px;font-weight:600;cursor:pointer;">' + label + '</button>';
     }
-
-    all.forEach(function(item) {
-      var isSell = item._type === 'sell';
-      var emoji = cropEmojis[item.crop] || '<i data-lucide="wheat" class="lc" style="width:20px;height:20px;"></i>';
-      var phone = item.phone || '+XXX XX XX XX XX';
-
-      html += '<div class="card" style="margin-bottom:14px;padding:20px;">';
-
-      // Product info (style guide: emoji + nom + quantite + lieu + prix)
-      html += '<div style="font-size:18px;font-weight:800;color:#333;">'
-        + emoji + ' <strong>' + esc(item.cropName) + '</strong> — ' + esc(item.quantity) + ' ' + esc(item.unit || 'tonnes')
-        + '</div>';
-      html += '<div style="font-size:15px;color:#333;margin-top:4px;">— ' + esc(item.market || 'Non precise') + '</div>';
-      html += '<div style="font-size:15px;color:#333;margin-top:2px;">— ' + (isSell ? formatFCFA(item.price) + '/kg' : esc(item.maxPrice) + ' ' + esc(item.priceUnit)) + '</div>';
-
-      if (item.description) {
-        html += '<div style="font-size:13px;color:#666;margin-top:8px;font-style:italic;">' + esc(item.description) + '</div>';
-      }
-
-      // Contact info
-      html += '<div style="font-size:12px;color:#999;margin-top:8px;">'
-        + esc(isSell ? item.seller : item.buyer) + ' · ' + timeAgo(item.date);
-      if (item.verified) html += ' · <span style="background:#D8F3DC;color:#2D6A4F;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">Verifie</span>';
-      html += '</div>';
-
-      // WhatsApp button (style guide)
-      html += '<a href="https://wa.me/' + phone.replace(/[^0-9+]/g, '') + '?text=Bonjour%2C%20je%20suis%20interesse%20par%20votre%20offre%20' + encodeURIComponent(item.cropName) + '%20sur%20AgroPrix" target="_blank" style="display:block;margin-top:12px;padding:12px;background:#25D366;color:#fff;border-radius:12px;text-align:center;font-size:14px;font-weight:700;text-decoration:none;">'
-        + '<i data-lucide="message-circle" class="lc" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> CONTACTER VIA WHATSAPP</a>';
-
-      // QR button
-      html += '<button data-action="mkt-show-qr" data-id="' + item.id + '" style="display:block;width:100%;margin-top:8px;padding:10px;font-size:12px;font-weight:600;border:1.5px solid #2D6A4F;color:#2D6A4F;background:#fff;border-radius:12px;cursor:pointer;"><i data-lucide="smartphone" class="lc"></i> QR Tracabilite</button>';
-
-      html += '</div>';
-    });
-
-    // Stats bar (style guide: X OFFRES · X DEMANDES · X% MISE EN RELATION)
-    html += '<div style="text-align:center;padding:16px;font-size:13px;font-weight:700;color:#666;letter-spacing:0.5px;">'
-      + offers.length + ' OFFRES · ' + demands.length + ' DEMANDES · ' + totalMatchRate + '% MISE EN RELATION'
-      + '</div>';
-
+    var fams = [['', 'Tout'], ['cultures', 'Cultures'], ['intrants', 'Intrants'], ['equipements', 'Équip.'], ['services', 'Services']];
+    var types = [['', 'Tout'], ['offre', 'Offres'], ['demande', 'Demandes']];
+    var html = '<div style="background:linear-gradient(135deg,#1B4332,#2D6A4F);border-radius:18px;padding:16px;color:#fff;margin-bottom:14px;text-align:center;">'
+      + '<div style="font-size:18px;font-weight:800;"><i data-lucide="store" class="lc"></i> Place de Marché</div>'
+      + '<div style="font-size:11px;opacity:0.85;">Catalogue — offres &amp; demandes</div></div>';
+    html += '<div style="display:flex;gap:6px;margin-bottom:10px;">'
+      + '<input id="mktSearch" type="text" placeholder="Rechercher un produit…" value="' + esc(_catFilters.q) + '" style="flex:1;padding:9px 12px;border:1px solid #E0E0E0;border-radius:10px;font-size:13px;">'
+      + '<button data-action="mkt-cat-search" style="padding:9px 14px;background:#2D6A4F;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;"><i data-lucide="search" class="lc"></i></button></div>';
+    html += '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;">' + fams.map(function(f) { return chip('mkt-cat-fam', f[0], f[1], _catFilters.category === f[0]); }).join('') + '</div>';
+    html += '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">' + types.map(function(t) { return chip('mkt-cat-type', t[0], t[1], _catFilters.type === t[0]); }).join('')
+      + chip('mkt-cat-country', 'toggle', (_catCountry ? 'Mon pays' : 'Tous pays'), !!_catCountry) + '</div>';
+    html += '<div id="mktCatalog"></div>';
     return html;
+  }
+
+  function _catCard(l) {
+    var isSell = l.listing_type === 'offre';
+    var typeBadge = '<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px;background:' + (isSell ? '#EAF3DE;color:#27500A' : '#FAEEDA;color:#854F0B') + ';">' + (isSell ? 'Offre' : 'Demande') + '</span>';
+    var verified = l.seller_verified ? '<span style="font-size:9px;background:#D8F3DC;color:#1B4332;padding:2px 6px;border-radius:6px;font-weight:700;">✓ Vérifié</span>' : '';
+    var loc = esc(l.market_name || l.region || l.country_iso3 || '—');
+    var deliv = (!isSell && l.delivery_date) ? ('<div style="font-size:10px;color:#E8862A;margin-top:2px;">Livraison : ' + esc(l.delivery_date) + '</div>') : '';
+    var desc = l.description ? ('<div style="font-size:12px;color:#666;margin-top:6px;">' + esc(String(l.description).slice(0, 120)) + '</div>') : '';
+    return '<div class="card" style="margin-bottom:12px;padding:14px;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:start;">'
+      + '<div><div style="font-size:15px;font-weight:800;color:#333;"><i data-lucide="wheat" class="lc" style="width:16px;height:16px;vertical-align:-2px;"></i> ' + esc(_productName(l)) + '</div>'
+      + '<div style="font-size:11px;color:#888;margin-top:2px;">' + _qtyLabel(l.quantity_kg) + ' · ' + loc + '</div></div>'
+      + '<div style="text-align:right;">' + typeBadge + '<div style="font-size:14px;font-weight:800;color:#2D6A4F;margin-top:4px;">' + formatFCFA(l.unit_price_fcfa) + '/kg</div></div>'
+      + '</div>' + deliv + desc
+      + (verified ? ('<div style="margin-top:6px;">' + verified + '</div>') : '')
+      + '<button data-action="mkt-contact" data-id="' + l.id + '" style="display:block;width:100%;margin-top:10px;padding:10px;background:#25D366;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;"><i data-lucide="message-circle" class="lc" style="width:15px;height:15px;vertical-align:-2px;"></i> Contacter</button>'
+      + '</div>';
+  }
+
+  function loadCatalogue() {
+    var box = document.getElementById('mktCatalog');
+    if (!box) return;
+    box.innerHTML = '<div style="text-align:center;padding:24px;color:#999;font-size:13px;">Chargement du catalogue…</div>';
+    var qs = ['limit=100'];
+    if (_catFilters.category) qs.push('category=' + encodeURIComponent(_catFilters.category));
+    if (_catFilters.type) qs.push('type=' + encodeURIComponent(_catFilters.type));
+    if (_catCountry) qs.push('country=' + encodeURIComponent(_catCountry));
+    fetch(_apiBase() + '/api/marketplace/listings?' + qs.join('&'), { credentials: 'include' })
+      .then(function(r) { return r.ok ? r.json() : { listings: [] }; })
+      .then(function(d) {
+        var items = (d && d.listings) || [];
+        var q = (_catFilters.q || '').toLowerCase().trim();
+        if (q) items = items.filter(function(l) {
+          return (_productName(l) + ' ' + (l.market_name || '') + ' ' + (l.region || '') + ' ' + (l.description || '')).toLowerCase().indexOf(q) >= 0;
+        });
+        if (!items.length) {
+          box.innerHTML = '<div class="card" style="padding:28px;text-align:center;"><div style="font-size:40px;"><i data-lucide="store" class="lc"></i></div><h3 style="color:#666;">Aucune annonce</h3><p style="font-size:12px;color:#999;">Ajustez vos filtres ou publiez la première annonce.</p></div>';
+        } else {
+          box.innerHTML = items.map(_catCard).join('') + '<div style="text-align:center;padding:12px;font-size:12px;color:#999;">' + items.length + ' annonce(s)</div>';
+        }
+        if (window.lucide) { try { window.lucide.createIcons(); } catch (e) {} }
+      })
+      .catch(function() {
+        box.innerHTML = '<div class="card" style="padding:20px;text-align:center;color:#999;font-size:13px;">Catalogue indisponible. Réessayez.</div>';
+      });
+  }
+
+  function contactListing(id) {
+    fetch(_apiBase() + '/api/marketplace/listings/' + id + '/contact', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: null })
+    }).then(function(r) {
+      if (r.status === 401 || r.status === 403) { alert('Connectez-vous pour contacter cette annonce.'); return null; }
+      if (!r.ok) throw new Error('http');
+      return r.json();
+    }).then(function(d) {
+      if (!d) return;
+      if (d.duplicate) alert('Vous avez déjà envoyé une demande pour cette annonce.');
+      else alert('Demande de contact envoyée ! Vous serez mis en relation dès acceptation.');
+    }).catch(function() { alert('Impossible d\'envoyer la demande pour le moment.'); });
   }
 
   // =========================================================================
@@ -785,5 +812,10 @@
   AP.actions['mkt-init']            = function() { AP.marketplace.init(); };
   AP.actions['mkt-process-payment'] = function(el) { AP.marketplace.processPayment(el.getAttribute('data-id')); };
   AP.actions['mkt-share-qr']        = function(el) { AP.marketplace.shareQR(el.getAttribute('data-id')); };
+  AP.actions['mkt-cat-fam']         = function(el) { _catFilters.category = el.getAttribute('data-value') || ''; render(); };
+  AP.actions['mkt-cat-type']        = function(el) { _catFilters.type = el.getAttribute('data-value') || ''; render(); };
+  AP.actions['mkt-cat-country']     = function() { _catCountry = _catCountry ? '' : _userIso3(); render(); };
+  AP.actions['mkt-cat-search']      = function() { var i = document.getElementById('mktSearch'); _catFilters.q = i ? i.value : ''; render(); };
+  AP.actions['mkt-contact']         = function(el) { contactListing(el.getAttribute('data-id')); };
 
 })(window.AgroPrix);
