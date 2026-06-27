@@ -105,6 +105,7 @@
   // clic → l'ordre de chargement des modules n'a pas d'importance).
   var SIMPLE_GLOBALS = {
     'logout': 'logout',
+    'logout-all': 'logoutAll',
     'demo-mode': 'demoMode',
     'launch-analysis': 'launchAnalysis',
     'calculate-transport': 'calculateTransport',

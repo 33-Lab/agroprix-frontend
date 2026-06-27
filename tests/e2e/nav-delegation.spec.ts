@@ -138,6 +138,29 @@ test.describe('Navigation déléguée (data-action)', () => {
     await expect(modal).toBeHidden();
   });
 
+  test('Sécurité : "déconnecter tous mes appareils" appelle /logout-all', async ({ page }) => {
+    test.slow();
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await asAdmin(page);
+    let called = false;
+    await page.route('**/api/auth/logout-all', (route) => {
+      called = true;
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
+    });
+    page.on('dialog', (d) => d.accept()); // confirm() + alert()
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
+    test.skip(!(await hasAction(page, 'logout-all')), 'action logout-all pas encore déployée sur la cible');
+
+    await page.locator('#navParams').click();
+    await expect(page.locator('#viewParams')).toBeVisible();
+    const btn = page.locator('#viewParams [data-action="logout-all"]');
+    await expect(btn).toBeVisible();
+    await btn.click();
+    // robuste au timing (serveur local lent en parallèle) : on attend l'appel.
+    await expect.poll(() => called, { timeout: 5000 }).toBeTruthy();
+  });
+
   test('module Cacao Pro : 0 onclick inline rendu + action EUDR fonctionnelle', async ({ page }) => {
     test.slow();
     await page.setViewportSize({ width: 1280, height: 800 });
