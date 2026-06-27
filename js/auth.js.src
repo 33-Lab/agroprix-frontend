@@ -171,6 +171,21 @@
       });
   }
 
+  // Deconnecte TOUS les appareils/sessions (incremente token_version cote backend
+  // -> tous les JWT existants deviennent invalides). Utile en cas de perte/vol
+  // d'appareil ou de soupcon de compromission.
+  function logoutAll() {
+    if (!confirm('Deconnecter TOUS vos appareils ? Vous devrez vous reconnecter partout.')) return;
+    authFetch('/api/auth/logout-all', { method: 'POST' })
+      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); })
+      .catch(function() { /* best-effort : on purge quand meme le cache local */ })
+      .finally(function() {
+        clearSession();
+        showAuthScreen('login');
+        alert('Toutes vos sessions ont ete deconnectees.');
+      });
+  }
+
   // =========================================================================
   // UI Updates
   // =========================================================================
@@ -367,6 +382,7 @@
     login: login,
     register: register,
     logout: logout,
+    logoutAll: logoutAll,
     fetchProfile: fetchProfile,
     initAuth: initAuth,
     showAuthScreen: showAuthScreen,
@@ -426,6 +442,7 @@
   }
 
   window.logout = logout;
+  window.logoutAll = logoutAll;
   window.exportMyData = exportMyData;
   window.deleteMyAccount = deleteMyAccount;
 
