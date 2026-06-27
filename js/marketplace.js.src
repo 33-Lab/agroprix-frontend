@@ -271,7 +271,7 @@
     if (container) container.innerHTML = html;
     if (currentTab === 'marche') loadCatalogue();
     else if (currentTab === 'notifs') loadNotifs();
-    else if (currentTab === 'mes-transactions') loadVerifStatus();
+    else if (currentTab === 'mes-transactions') { loadVerifStatus(); loadHistory(); }
   }
 
   // =========================================================================
@@ -581,54 +581,48 @@
   // Tab: Mes annonces
   // =========================================================================
   function renderMesAnnonces() {
-    var offers = getOffers();
-    var demands = getDemands();
-    var userName = getUserName();
-    var html = _verifCard();
+    return _verifCard() + '<div id="mktHistory"></div>';
+  }
 
-    var myOffers = offers.filter(function(o) { return o.seller === userName; });
-    var myDemands = demands.filter(function(d) { return d.buyer === userName; });
+  var _LISTING_STATUS = { active: ['Active', '#27500A', '#EAF3DE'], sold: ['Vendu', '#1B4332', '#D8F3DC'], pending_payment: ['En cours', '#854F0B', '#FAEEDA'], cancelled: ['Annulée', '#999', '#F1F1F0'], expired: ['Expirée', '#999', '#F1F1F0'] };
+  var _REQ_STATUS = { pending: ['En attente', '#854F0B', '#FAEEDA'], accepted: ['Acceptée', '#1B4332', '#D8F3DC'], refused: ['Refusée', '#999', '#F1F1F0'] };
 
-    if (myOffers.length === 0 && myDemands.length === 0) {
-      html += '<div class="card" style="padding:32px;text-align:center;">'
-        + '<div style="font-size:48px;margin-bottom:12px;"><i data-lucide="clipboard-list" class="lc"></i></div>'
-        + '<h3 style="color:var(--text-light);">Aucune annonce</h3>'
-        + '<p style="font-size:13px;color:var(--text-muted);">Publiez une offre ou une demande pour la retrouver ici.</p>'
-        + '</div>';
-      return html;
-    }
+  function _histListingCard(l) {
+    var st = _LISTING_STATUS[l.status] || [l.status, '#666', '#F1F1F0'];
+    var isSell = l.listing_type === 'offre';
+    return '<div class="card" style="margin-bottom:8px;padding:11px;"><div style="display:flex;justify-content:space-between;align-items:center;">'
+      + '<div><span style="font-size:12px;font-weight:700;color:#333;">' + esc(_productName(l)) + '</span> <span style="font-size:10px;color:#888;">· ' + _qtyLabel(l.quantity_kg) + ' · ' + (isSell ? 'Vente' : 'Achat') + '</span></div>'
+      + '<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px;background:' + st[2] + ';color:' + st[1] + ';">' + st[0] + '</span></div>'
+      + '<div style="font-size:10px;color:#999;margin-top:3px;">' + formatFCFA(l.unit_price_fcfa) + '/kg' + (l.market_name ? (' · ' + esc(l.market_name)) : '') + '</div></div>';
+  }
 
-    if (myOffers.length > 0) {
-      html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
-        + '<div class="card-title"><span class="icon"><i data-lucide="package" class="lc"></i></span> Mes offres de vente (' + myOffers.length + ')</div>';
-      myOffers.forEach(function(o) {
-        html += '<div style="padding:8px 0;border-bottom:1px solid var(--border);">'
-          + '<div style="display:flex;justify-content:space-between;align-items:center;">'
-          + '<div><strong>' + esc(o.quantity) + esc(o.unit) + ' ' + esc(o.cropName) + '</strong> — ' + esc(o.market) + '</div>'
-          + '<span style="font-size:13px;font-weight:700;color:var(--green);">' + formatFCFA(o.price) + '/kg</span>'
-          + '</div>'
-          + '<div style="font-size:11px;color:var(--text-light);margin-top:2px;">' + timeAgo(o.date) + ' — ' + (o.status === 'active' ? '<span style="color:#10B981;">●</span> Active' : '<span style="color:#9CA3AF;">●</span> Terminee') + '</div>'
-          + '</div>';
-      });
-      html += '</div>';
-    }
+  function _histRequestCard(n) {
+    var st = _REQ_STATUS[n.status] || [n.status, '#666', '#F1F1F0'];
+    var l = n.listing || {};
+    var prod = l.culture ? _productName({ culture: l.culture }) : '—';
+    return '<div class="card" style="margin-bottom:8px;padding:11px;"><div style="display:flex;justify-content:space-between;align-items:center;">'
+      + '<div style="font-size:12px;color:#333;"><b>' + esc(prod) + '</b> <span style="font-size:10px;color:#888;">· ' + esc(n.counterparty_name || '—') + '</span></div>'
+      + '<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px;background:' + st[2] + ';color:' + st[1] + ';">' + st[0] + '</span></div>'
+      + (n.created_at ? ('<div style="font-size:10px;color:#999;margin-top:3px;">' + timeAgo(n.created_at) + '</div>') : '') + '</div>';
+  }
 
-    if (myDemands.length > 0) {
-      html += '<div class="card" style="padding:16px;">'
-        + '<div class="card-title"><span class="icon"><i data-lucide="shopping-cart" class="lc"></i></span> Mes demandes d\'achat (' + myDemands.length + ')</div>';
-      myDemands.forEach(function(d) {
-        html += '<div style="padding:8px 0;border-bottom:1px solid var(--border);">'
-          + '<div style="display:flex;justify-content:space-between;align-items:center;">'
-          + '<div><strong>' + esc(d.quantity) + esc(d.unit) + ' ' + esc(d.cropName) + '</strong> — ' + esc(d.market) + '</div>'
-          + '<span style="font-size:13px;font-weight:700;color:var(--blue,#3b82f6);">Max ' + esc(d.maxPrice) + ' ' + esc(d.priceUnit) + '</span>'
-          + '</div>'
-          + '<div style="font-size:11px;color:var(--text-light);margin-top:2px;">' + timeAgo(d.date) + ' — ' + (d.status === 'active' ? '<span style="color:#10B981;">●</span> Active' : '<span style="color:#9CA3AF;">●</span> Terminee') + '</div>'
-          + '</div>';
-      });
-      html += '</div>';
-    }
-
-    return html;
+  function loadHistory() {
+    var box = document.getElementById('mktHistory');
+    if (!box) return;
+    box.innerHTML = '<div style="text-align:center;padding:20px;color:#999;font-size:13px;">Chargement…</div>';
+    Promise.all([
+      fetch(_apiBase() + '/api/marketplace/me/listings', { credentials: 'include' }).then(function(r) { return r.ok ? r.json() : { listings: [] }; }).catch(function() { return { listings: [] }; }),
+      fetch(_apiBase() + '/api/marketplace/me/contact-requests?direction=sent', { credentials: 'include' }).then(function(r) { return r.ok ? r.json() : { requests: [] }; }).catch(function() { return { requests: [] }; })
+    ]).then(function(res) {
+      var listings = (res[0] && res[0].listings) || [];
+      var sent = (res[1] && res[1].requests) || [];
+      var html = '<div style="font-size:12px;font-weight:700;color:#333;margin:4px 0 8px;"><i data-lucide="package" class="lc" style="width:14px;height:14px;vertical-align:-2px;"></i> Mes annonces (' + listings.length + ')</div>';
+      html += listings.length ? listings.map(_histListingCard).join('') : '<div style="font-size:11px;color:#999;margin-bottom:6px;">Aucune annonce publiée.</div>';
+      html += '<div style="font-size:12px;font-weight:700;color:#333;margin:14px 0 8px;"><i data-lucide="send" class="lc" style="width:14px;height:14px;vertical-align:-2px;"></i> Mes demandes de contact (' + sent.length + ')</div>';
+      html += sent.length ? sent.map(_histRequestCard).join('') : '<div style="font-size:11px;color:#999;">Aucune demande envoyée.</div>';
+      box.innerHTML = html;
+      if (window.lucide) { try { window.lucide.createIcons(); } catch (e) {} }
+    });
   }
 
   // =========================================================================
