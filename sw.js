@@ -11,7 +11,7 @@
 // MAIS en parallèle revalide le réseau et met à jour le cache → la version
 // suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = "v7.35.0";  // bump 27/06 : portail institution L4-L6 (espace banque/assureur + bouton "Demander un financement")
+const CACHE_VERSION = "v7.36.0";  // bump 27/06 : fix thème intermittent — CSS versionnés (styles.css?v=7.36 + design-premium.css?v=7.36) anti-stale
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 

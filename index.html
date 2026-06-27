@@ -61,8 +61,13 @@
   <script src="https://cdn.fedapay.com/checkout.js?v=1.1.7"></script>
 
   <!-- App Styles -->
-  <link rel="stylesheet" href="/css/styles.css?v=6.12">
-  <link rel="stylesheet" href="/css/design-premium.css">
+  <!-- CSS versionnés (cache-bust déterministe). design-premium.css est une
+       surcouche "premium" en !important par-dessus styles.css ; si une version
+       périmée/non versionnée était servie par le SW (stale-while-revalidate),
+       la surcouche manquait au 1er paint → l'app s'affichait avec le thème de
+       base "coloré" au lieu du vert. Bumper ces ?v à chaque changement CSS. -->
+  <link rel="stylesheet" href="/css/styles.css?v=7.36">
+  <link rel="stylesheet" href="/css/design-premium.css?v=7.36">
   <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
