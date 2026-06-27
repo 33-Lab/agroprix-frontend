@@ -21,11 +21,12 @@ function ndviLatest(p){if(p&&p.realNDVI&&typeof p.realNDVI.mean==='number'){retu
 return null;}
 function render(){var parcels=getParcels();var container=document.getElementById('ndviContent');if(!container)return;var html='<div style="text-align:center;margin-bottom:12px;">'
 +'<h3 style="margin:0 0 4px;color:var(--primary);">Sante Parcelle</h3>'
-+'<p style="font-size:12px;color:var(--text-light);">Suivi satellite des cultures (Planet PlanetScope 3m)</p>'
++'<p style="font-size:12px;color:var(--text-light);">Suivi satellite des cultures (NDVI Sentinel-2 reel, ESA/Copernicus)</p>'
 +'</div>'
 +'<div style="background:#FEF3C7;border-left:4px solid #E8862A;padding:10px 12px;border-radius:8px;margin-bottom:14px;font-size:12px;color:#92400E;line-height:1.4;">'
-+'<strong><i data-lucide="info" class="lc" style="width:14px;height:14px;vertical-align:-2px;"></i> NDVI satellite reel disponible</strong><br>'
-+'Les valeurs affichees sont <em>simulees par defaut</em>. Sur chaque parcelle, cliquez '
++'<strong><i data-lucide="info" class="lc" style="width:14px;height:14px;vertical-align:-2px;"></i> NDVI satellite reel a la demande</strong><br>'
++'Aucune valeur n\'est affichee tant que l\'analyse n\'est pas lancee : chaque parcelle reste '
++'<em>Non analysee</em> par defaut (pas de NDVI simule). Sur une parcelle, cliquez '
 +'<strong>Analyser au satellite (reel)</strong> pour calculer un NDVI <strong>Sentinel-2 reel</strong> '
 +'(ESA/Copernicus, gratuit, ~10s). Necessite d\'etre connecte.'
 +'</div>';if(parcels.length===0){html+=renderEmptyState();}else{html+=renderDashboard(parcels);html+=renderParcelsList(parcels);}
