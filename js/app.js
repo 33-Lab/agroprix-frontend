@@ -1,4 +1,4 @@
-/*! AgroPrix app.js - generated from app.js.src on 2026-06-26 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix app.js - generated from app.js.src on 2026-06-27 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){'use strict';function init(){if(AP.api&&AP.api.checkAPI){AP.api.checkAPI();}
 if(AP.fx&&AP.fx.load){AP.fx.load();}
 if(AP.ui&&AP.ui.updateMarkets){AP.ui.updateMarkets();}

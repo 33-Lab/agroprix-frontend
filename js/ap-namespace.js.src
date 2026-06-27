@@ -45,7 +45,7 @@
   // Mise à jour manuelle au déploiement (futur : injection automatique
   // par build_js.py via un placeholder).
   if (!AP.version) {
-    AP.version = 'v6.7-2026-05-07';
+    AP.version = 'v7.0.0-2026-06-27';
   }
 
   // ── AP.utils.report ──────────────────────────────────────────────────
@@ -138,5 +138,14 @@
       );
     };
   }
+
+  // ── Alias global window.AP ──────────────────────────────────────────
+  // Tous les modules utilisent `var AP = window.AgroPrix;` dans leur IIFE,
+  // mais window.AP n'existait pas en tant que global. Tout code en dehors
+  // d'une IIFE (console dev, handlers dynamiques, modules tiers) qui
+  // tente AP.production.calculate() échoue avec "AP is not defined".
+  // On expose l'alias une seule fois, ici, après l'initialisation du
+  // namespace complet.
+  global.AP = AP;
 
 })(typeof window !== 'undefined' ? window : this);

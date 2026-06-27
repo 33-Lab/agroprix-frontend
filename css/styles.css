@@ -92,7 +92,7 @@ body {
   font-size: var(--font-size-base);
   line-height: 1.5;
   color: var(--text);
-  background-color: var(--bg);
+  background-color: #F8F9FA;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -2942,8 +2942,8 @@ button, .btn-analyse {
    Applied AFTER all existing styles (cascade override)
    ========================================================================== */
 
-/* ── Background plus doux ── */
-body { background: #f0f2f5; }
+/* ── Background plus doux (unifié avec design-premium.css) ── */
+body { background: #F8F9FA; }
 
 /* ── Sidebar: gradient + meilleur espacement ── */
 .sidebar {

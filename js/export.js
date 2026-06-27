@@ -1,4 +1,4 @@
-/*! AgroPrix export.js - generated from export.js.src on 2026-06-26 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix export.js - generated from export.js.src on 2026-06-27 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){'use strict';var FX_FALLBACK={usd_xof:600,eur_xof:655.957,source:'estimation',updated_at:null,live:false};AP.FX=AP.FX||FX_FALLBACK;try{var _fxc=JSON.parse(localStorage.getItem('agroprix_fx')||'null');if(_fxc&&_fxc.usd_xof)AP.FX=_fxc;}catch(e){}
 function loadFx(){var base=AP.API_BASE||'';return fetch(base+'/api/fx').then(function(r){return r.json();}).then(function(d){if(d&&d.usd_xof){AP.FX={usd_xof:d.usd_xof,eur_xof:d.eur_xof||655.957,source:d.source||'live',updated_at:d.updated_at||null,live:true};try{localStorage.setItem('agroprix_fx',JSON.stringify(AP.FX));}catch(e){}
 updateFxCard();}}).catch(function(){});}

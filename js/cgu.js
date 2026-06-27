@@ -1,4 +1,4 @@
-/*! AgroPrix cgu.js - generated from cgu.js.src on 2026-06-26 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix cgu.js - generated from cgu.js.src on 2026-06-27 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){'use strict';var CGU_KEY='agroprix_cgu_accepted';var PROFILE_KEY='agroprix_farmer_profile';var PROFILE_HISTORY_KEY='agroprix_profile_history';var CGU_INTERVAL_DAYS=90;var CGU_VERSION='1.0.0';function needsRevalidation(){var cguData=getCguData();if(!cguData||!cguData.acceptedAt)return true;var daysSince=Math.floor((Date.now()-new Date(cguData.acceptedAt).getTime())/86400000);return daysSince>=CGU_INTERVAL_DAYS||cguData.version!==CGU_VERSION;}
 function getCguData(){try{return JSON.parse(localStorage.getItem(CGU_KEY));}catch(e){return null;}}
 function getProfile(){try{return JSON.parse(localStorage.getItem(PROFILE_KEY))||{};}catch(e){return{};}}

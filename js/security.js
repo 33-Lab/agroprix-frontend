@@ -1,4 +1,4 @@
-/*! AgroPrix security.js - generated from security.js.src on 2026-06-26 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix security.js - generated from security.js.src on 2026-06-27 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(){'use strict';try{console.log('%c⚠ ATTENTION','color:red;font-size:22px;font-weight:bold;');console.log('%cNe collez jamais de code ici. Si quelqu\'un vous le demande, c\'est une arnaque.','color:#e76f51;font-size:13px;');}catch(e){}
 var SESSION_TIMEOUT=8*60*60*1000;var timeoutTimer=null;function resetSessionTimer(){if(timeoutTimer)clearTimeout(timeoutTimer);timeoutTimer=setTimeout(function(){try{localStorage.removeItem('agroprix_user');localStorage.removeItem('agroprix_token');}catch(e){}
 alert('Session expirée après une longue inactivité. Veuillez vous reconnecter.');location.reload();},SESSION_TIMEOUT);}

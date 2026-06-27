@@ -1,4 +1,4 @@
-/*! AgroPrix dashboard.js - generated from dashboard.js.src on 2026-06-26 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix dashboard.js - generated from dashboard.js.src on 2026-06-27 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){'use strict';function getUserName(){var user=AP.auth?AP.auth.getUser():null;return(user&&(user.nom||user.name))||'Producteur';}
 function getUserCountry(){var user=AP.auth?AP.auth.getUser():null;return(user&&(user.pays||user.country))||'benin';}
 function getGreeting(){var h=new Date().getHours();if(h<12)return'Bonjour';if(h<18)return'Bon apres-midi';return'Bonsoir';}
