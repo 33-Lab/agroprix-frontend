@@ -44,8 +44,10 @@
   var UNIT_KG = { kg: 1, tonnes: 1000, sacs: 50, paniers: 25 };
 
   // Upload photo via URL signée Supabase (non bloquant : null si non configuré/échec).
-  function _uploadPhoto(file) {
-    return fetch(_apiBase() + '/api/marketplace/photos/sign', {
+  // signPath = endpoint de signature (marketplace par défaut ; '/api/trace/photos/sign'
+  // pour les photos de traçabilité — même bucket, dossier séparé côté backend).
+  function _uploadPhoto(file, signPath) {
+    return fetch(_apiBase() + (signPath || '/api/marketplace/photos/sign'), {
       method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ filename: file.name, content_type: file.type })
     }).then(function(r) { return r.ok ? r.json() : null; }).then(function(s) {
@@ -790,6 +792,59 @@
     if (img) { img.src = getQRUrl(viewUrl, 250); img.style.display = 'inline-block'; }
     if (msg) msg.style.display = 'none';
     if (cap) cap.innerHTML = 'Scannez pour ouvrir la page de tracabilite publique<br>Code : <b>' + code + '</b>';
+    loadTracePhotos(code);
+  }
+
+  // --- Photos de traçabilité (Supabase) ------------------------------------
+  function renderTraceThumbs(photos) {
+    var box = document.getElementById('tracePhotosThumbs');
+    if (!box) return;
+    box.innerHTML = (photos || []).map(function(p) {
+      return '<a href="' + esc(p) + '" target="_blank" rel="noopener">'
+        + '<img src="' + esc(p) + '" alt="Photo du lot" loading="lazy" '
+        + 'style="width:100%;height:70px;object-fit:cover;border-radius:8px;"></a>';
+    }).join('');
+  }
+
+  function loadTracePhotos(code) {
+    fetch(_apiBase() + '/api/trace/' + code, { credentials: 'include' })
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(rec) { if (rec && rec.photos) renderTraceThumbs(rec.photos); })
+      .catch(function() {});
+  }
+
+  // Ajoute une photo au lot tracé : assure le code (le crée si besoin) -> upload
+  // Supabase via /api/trace/photos/sign -> attache l'URL publique au lot.
+  function addTracePhoto(itemId, file) {
+    if (!file) return;
+    var msg = document.getElementById('tracePhotoMsg');
+    if (msg) { msg.style.color = 'var(--text-light)'; msg.textContent = 'Envoi de la photo…'; }
+    var existing = getTraceCode(itemId);
+    var ensureCode = existing ? Promise.resolve(existing) : (function() {
+      var item = getOffers().find(function(o) { return o.id === itemId; })
+        || getDemands().find(function(d) { return d.id === itemId; });
+      if (!item) return Promise.resolve(null);
+      return createTraceForItem(item).then(function(res) {
+        if (res && res.code) { setTraceCode(itemId, res.code); return res.code; }
+        return null;
+      });
+    })();
+    ensureCode.then(function(code) {
+      if (!code) { if (msg) msg.textContent = 'Connecte-toi pour ajouter une photo.'; return; }
+      return _uploadPhoto(file, '/api/trace/photos/sign').then(function(url) {
+        if (!url) { if (msg) msg.textContent = 'Stockage photo non disponible (Supabase non configure).'; return; }
+        return fetch(_apiBase() + '/api/trace/' + code + '/photos', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: url })
+        }).then(function(r) { return r.ok ? r.json() : null; }).then(function(rec) {
+          if (rec && rec.photos) {
+            renderTraceThumbs(rec.photos);
+            if (msg) { msg.style.color = '#2D6A4F'; msg.textContent = '✓ Photo ajoutee (visible sur la page publique).'; }
+          } else if (msg) { msg.style.color = '#b91c1c'; msg.textContent = 'Ajout impossible.'; }
+        });
+      });
+    }).catch(function() { if (msg) { msg.style.color = '#b91c1c'; msg.textContent = 'Erreur lors de l\'envoi.'; } });
   }
   function ensureRealTraceQR(item) {
     var cached = getTraceCode(item.id);
@@ -855,6 +910,17 @@
     });
 
     html += '</div></div>';
+
+    // Photos du lot (Supabase Storage) — apparaissent aussi sur la page publique
+    // scannée. Dégrade proprement si Supabase non configuré (message d'info).
+    html += '<div class="card" style="padding:16px;margin-bottom:16px;">'
+      + '<div class="card-title"><span class="icon"><i data-lucide="camera" class="lc"></i></span> Photos du lot</div>'
+      + '<div id="tracePhotosThumbs" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;"></div>'
+      + '<label style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid var(--primary);color:var(--primary);background:#fff;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">'
+      + '<i data-lucide="image-plus" class="lc"></i> Ajouter une photo'
+      + '<input type="file" accept="image/*" style="display:none;" data-action-change="trace-photo-pick" data-item="' + esc(item.id) + '"></label>'
+      + '<div id="tracePhotoMsg" style="font-size:11px;color:var(--text-light);margin-top:6px;">Une photo du lot renforce la confiance de l\'acheteur sur la page publique.</div>'
+      + '</div>';
 
     // Conformity info
     html += '<div class="card" style="padding:14px;margin-bottom:16px;background:linear-gradient(135deg,#D8F3DC,#B7E4C7);border:1px solid #2D6A4F33;">'
@@ -967,7 +1033,8 @@
     publish: publish,
     showQR: showQR,
     shareQR: shareQR,
-    processPayment: processPayment
+    processPayment: processPayment,
+    addTracePhoto: addTracePhoto
   };
 
 
@@ -979,6 +1046,7 @@
   AP.actions['mkt-init']            = function() { AP.marketplace.init(); };
   AP.actions['mkt-process-payment'] = function(el) { AP.marketplace.processPayment(el.getAttribute('data-id')); };
   AP.actions['mkt-share-qr']        = function(el) { AP.marketplace.shareQR(el.getAttribute('data-id')); };
+  AP.actions['trace-photo-pick']    = function(el) { if (el.files && el.files[0]) AP.marketplace.addTracePhoto(el.getAttribute('data-item'), el.files[0]); };
   AP.actions['mkt-cat-fam']         = function(el) { _catFilters.category = el.getAttribute('data-value') || ''; render(); };
   AP.actions['mkt-cat-type']        = function(el) { _catFilters.type = el.getAttribute('data-value') || ''; render(); };
   AP.actions['mkt-cat-country']     = function() { _catCountry = _catCountry ? '' : _userIso3(); render(); };
