@@ -399,6 +399,7 @@ window.AgroPrix = window.AgroPrix || {};
   }
 
   function alertePrixRentabilite() {
+    if (!PRIX_TOMATE.length) return false;
     var prixActuel = PRIX_TOMATE[PRIX_TOMATE.length - 1].prix;
     return prixActuel < SEUIL_RENTABILITE;
   }
@@ -919,9 +920,9 @@ window.AgroPrix = window.AgroPrix || {};
           '<div style="font-size:15px;font-weight:700;margin-bottom:4px;">Estimation revenu campagne</div>' +
           '<div style="font-size:12px;color:#666;margin-bottom:12px;">Projections sur ' + totalSurface.toFixed(2) + ' ha — rendements UEMOA</div>' +
           '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">' +
-            revenueBox('Extensif', totalSurface * 18000, PRIX_TOMATE[PRIX_TOMATE.length-1].prix) +
-            revenueBox('Semi-intensif', totalSurface * 30000, PRIX_TOMATE[PRIX_TOMATE.length-1].prix) +
-            revenueBox('Intensif', totalSurface * 45000, PRIX_TOMATE[PRIX_TOMATE.length-1].prix) +
+            revenueBox('Extensif', totalSurface * 18000, (PRIX_TOMATE.length ? PRIX_TOMATE[PRIX_TOMATE.length-1].prix : 0)) +
+            revenueBox('Semi-intensif', totalSurface * 30000, (PRIX_TOMATE.length ? PRIX_TOMATE[PRIX_TOMATE.length-1].prix : 0)) +
+            revenueBox('Intensif', totalSurface * 45000, (PRIX_TOMATE.length ? PRIX_TOMATE[PRIX_TOMATE.length-1].prix : 0)) +
           '</div>' +
           '<div style="font-size:11px;color:#555;background:' + COLOR_LIGHT + ';padding:10px;border-radius:8px;">' +
             'En contre-saison au prix de 1 200 FCFA/kg, le revenu brut estimé (semi-intensif) serait : <b>' + Math.round(totalSurface * 30000 * 1200 / 1000000).toFixed(1) + 'M FCFA</b>.' +
@@ -1451,7 +1452,7 @@ window.AgroPrix = window.AgroPrix || {};
     // Rendement
     if (q.match(/rendement|production|tonne|hectare|am\u00e9liorer|optimiser/)) {
       var totalSurface = data.parcelles.reduce(function(s, p) { return s + (p.surface || 0); }, 0);
-      var prixRef = PRIX_TOMATE[PRIX_TOMATE.length - 1].prix;
+      var prixRef = PRIX_TOMATE.length ? PRIX_TOMATE[PRIX_TOMATE.length - 1].prix : 0;
       return '<b>Niveaux de rendement tomate UEMOA :</b><br>' +
         '- Extensif (peu d\'intrants, pluvial) : <b>15-25 t/ha</b><br>' +
         '- Semi-intensif (semences certifiées, engrais, protection phyto) : <b>25-40 t/ha</b><br>' +

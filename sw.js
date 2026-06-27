@@ -11,7 +11,7 @@
 // MAIS en parallèle revalide le réseau et met à jour le cache → la version
 // suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = "v7.30.0";  // bump 26/06 : fix plantain — guard prix vide (onglet transfo / simuler) hors-ligne
+const CACHE_VERSION = "v7.31.0";  // bump 26/06 : hardening guards prix vide (cacao/tomate dossier+IA+rentabilité)
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 
