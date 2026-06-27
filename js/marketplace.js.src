@@ -434,13 +434,13 @@
       return '<div class="card" style="padding:12px;margin-bottom:14px;background:#D8F3DC;display:flex;align-items:center;gap:8px;"><i data-lucide="rosette-discount-check" class="lc" style="color:#1B4332;"></i><div style="font-size:12px;color:#1B4332;font-weight:600;">Compte vérifié — votre badge « Vérifié » est actif.</div></div>';
     }
     var html = '<div class="card" style="padding:14px;margin-bottom:14px;border:1px solid #E8862A55;background:#FEF3C7;">'
-      + '<div style="font-size:12px;font-weight:700;color:#92400E;margin-bottom:6px;"><i data-lucide="shield-check" class="lc" style="width:14px;height:14px;vertical-align:-2px;"></i> Vérifiez votre numéro pour obtenir le badge « Vérifié »</div>';
+      + '<div style="font-size:12px;font-weight:700;color:#92400E;margin-bottom:6px;"><i data-lucide="shield-check" class="lc" style="width:14px;height:14px;vertical-align:-2px;"></i> Vérifiez votre numéro WhatsApp pour obtenir le badge « Vérifié »</div>';
     if (_verifStep === 'idle') {
       html += '<div style="display:flex;gap:6px;">'
         + '<input id="mpVerifPhone" type="tel" placeholder="+229 ..." value="' + esc(_verifPhone) + '" style="flex:1;padding:8px 10px;border:1px solid #E0E0E0;border-radius:8px;font-size:13px;">'
         + '<button data-action="mkt-verif-request" style="padding:8px 12px;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">Recevoir le code</button></div>';
     } else {
-      html += '<div style="font-size:11px;color:#92400E;margin-bottom:6px;">Code envoyé au ' + esc(_verifPhone) + '.</div>'
+      html += '<div style="font-size:11px;color:#92400E;margin-bottom:6px;">Code envoyé par WhatsApp au ' + esc(_verifPhone) + '.</div>'
         + '<div style="display:flex;gap:6px;">'
         + '<input id="mpVerifCode" type="text" inputmode="numeric" placeholder="Code à 6 chiffres" style="flex:1;padding:8px 10px;border:1px solid #E0E0E0;border-radius:8px;font-size:13px;">'
         + '<button data-action="mkt-verif-confirm" style="padding:8px 12px;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">Valider</button></div>'
@@ -475,7 +475,7 @@
       if (!d) return;
       _verifStep = 'code-sent'; render();
       if (d.dev_code) { setTimeout(function() { var c = document.getElementById('mpVerifCode'); if (c) c.value = d.dev_code; }, 60); }
-      else if (!d.sent) { alert('Envoi SMS non configuré côté serveur — la vérification ne peut aboutir pour l\'instant.'); }
+      else if (!d.sent) { alert('Envoi WhatsApp non encore activé côté serveur — réessayez bientôt.'); }
     }).catch(function(e) { alert('Erreur : ' + (e && e.message ? String(e.message).slice(0, 120) : '')); });
   }
 
