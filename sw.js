@@ -11,7 +11,7 @@
 // MAIS en parallèle revalide le réseau et met à jour le cache → la version
 // suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = "v7.33.0";  // bump 27/06 : honnetete NDVI (retrait "valeurs simulees par defaut" — Sentinel-2 reel a la demande)
+const CACHE_VERSION = "v7.34.0";  // bump 27/06 : graphes prix sur /api/prices/history (tendance persistee, accumulation organique)
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 

@@ -148,30 +148,41 @@
 
   // ── Endpoints ─────────────────────────────────────────────────────────────
 
+  // Filtre une série mensuelle [{month:'YYYY-MM', ...}] à partir d'un mois de
+  // départ (startDate 'YYYY-MM-DD'). Le sélecteur de période s'applique ainsi
+  // côté client : /api/prices/history renvoie tout l'historique disponible.
+  function filterFromMonth(data, startDate) {
+    if (!startDate || !Array.isArray(data)) return data || [];
+    var fromMonth = String(startDate).slice(0, 7);
+    return data.filter(function(d) { return d && d.month && d.month >= fromMonth; });
+  }
+
   async function fetchPrices(country, commodity, periodKey) {
     // DB seed stocke les noms en FR sans accents (ex: "Mais", "Cafe", "Niebe").
     // cultureNames UI = avec accents ("Maïs", "Café"). On strip avant d'envoyer.
     // WFP sync reel viendra en Phase 2c avec mapping cote backend.
     var dbName = stripAccents(AP.cultureNames[commodity] || commodity);
     var startDate = periodToStartDate(periodKey);
-    var url = AP.API_BASE + '/api/prices/monthly?country=' + country
-            + '&commodity=' + encodeURIComponent(dbName)
-            + '&start_date=' + startDate;
+    // /history = série de tendance persistée (instantanés AgroPrix + moyennes
+    // WFP live fusionnés). Elle survit à la perte de profondeur WFP (ex. Cacao
+    // CI qui n'a qu'un mois récent) et s'enrichit à chaque consultation. Filtre
+    // de période appliqué côté client (cf. filterFromMonth).
+    var url = AP.API_BASE + '/api/prices/history?country=' + country
+            + '&commodity=' + encodeURIComponent(dbName);
     var cacheKey = 'prices_' + country + '_' + dbName + '_' + periodKey;
     var json = await fetchRobust(url, cacheKey);
-    return (json && json.data) ? json.data : [];
+    return filterFromMonth((json && json.data) ? json.data : [], startDate);
   }
 
   // ── Variante : fetchPrices avec nom DB direct (sans mapping cultureNames) ─
   // Utilisé par les modules Pro (Cacao/Tomate/Hevea/Plantain) qui ont des noms
   // DB spécifiques en BDD (ex: "Rubber" pour Hevea — pas dans cultureNames).
   async function fetchPricesByDbName(country, dbCommodity, startDate) {
-    var url = AP.API_BASE + '/api/prices/monthly?country=' + country
-            + '&commodity=' + encodeURIComponent(dbCommodity)
-            + (startDate ? '&start_date=' + startDate : '');
+    var url = AP.API_BASE + '/api/prices/history?country=' + country
+            + '&commodity=' + encodeURIComponent(dbCommodity);
     var cacheKey = 'prices_db_' + country + '_' + dbCommodity;
     var json = await fetchRobust(url, cacheKey);
-    return (json && json.data) ? json.data : [];
+    return filterFromMonth((json && json.data) ? json.data : [], startDate);
   }
 
   // ── Alertes Dashboard : top variations régionales sur cultures phares ─────
