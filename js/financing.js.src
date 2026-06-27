@@ -224,7 +224,10 @@
       + '<div style="font-size:48px;">' + countryFlag + '</div>'
       + '<h3 style="margin:8px 0 4px;color:var(--primary);">GPS Financement — ' + countryName + '</h3>'
       + '<p style="font-size:13px;color:var(--text-light);">Trouvez les financements auxquels vous etes eligible.</p>'
-      + '</div>';
+      + '</div>'
+      // L6 — demander un financement à une institution partenaire (opt-in).
+      // Rempli après coup par AP.institution.renderProducerApply (cf. ci-dessous).
+      + '<div id="finApplyBox"></div>';
 
     html += '<div class="card" style="padding:16px;">'
       + '<div class="card-title"><span class="icon"><i data-lucide="target" class="lc"></i></span> Votre profil producteur</div>';
@@ -305,6 +308,10 @@
 
     var container = document.getElementById('financingContent');
     if (container) container.innerHTML = html;
+    // L6 — injecte la section "Demander un financement" (institutions partenaires).
+    if (AP.institution && AP.institution.renderProducerApply) {
+      AP.institution.renderProducerApply(document.getElementById('finApplyBox'));
+    }
   }
 
   function renderStep3() {

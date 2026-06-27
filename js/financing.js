@@ -1,4 +1,4 @@
-/*! AgroPrix financing.js - generated from financing.js.src on 2026-06-26 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix financing.js - generated from financing.js.src on 2026-06-27 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){'use strict';var institutions=[];var matchResults=[];var currentStep=1;var selectedInstitution=null;var fProfile={country:'',crops:[],farmSize:null,age:null,gender:'',isCoop:false,coopName:'',farmerType:'individual',experience:null,hasBusinessPlan:false,amountNeeded:5000000};var countryToISO2={benin:'BJ',burkina_faso:'BF',cote_divoire:'CI',guinee_bissau:'GW',mali:'ML',niger:'NE',senegal:'SN',togo:'TG'};function loadInstitutions(){if(institutions.length>0)return Promise.resolve(institutions);return fetch('/data/institutions.json').then(function(r){return r.json();}).then(function(data){institutions=data;return data;}).catch(function(){console.warn('Could not load institutions.json');return[];});}
 function matchFinancing(){var userISO2=countryToISO2[fProfile.country]||'';matchResults=[];institutions.forEach(function(inst){if(inst.country!=='ALL'&&inst.country!==userISO2)return;inst.products.forEach(function(product){var checks=[];var elig=product.eligibility;checks.push({label:'Pays',match:true,critical:true});if(fProfile.amountNeeded>0&&product.maxAmount>0){var amountOk=fProfile.amountNeeded>=product.minAmount&&fProfile.amountNeeded<=product.maxAmount;checks.push({label:'Montant '+formatFCFA(product.minAmount)+' - '+formatFCFA(product.maxAmount),match:amountOk,critical:false});}
 if(elig.crops&&elig.crops.length>0){var cropMatch=fProfile.crops.length===0||elig.crops.some(function(c){return fProfile.crops.indexOf(c)>=0;});checks.push({label:'Culture(s): '+elig.crops.join(', '),match:cropMatch,critical:false});}
@@ -22,7 +22,8 @@ var html=scoreWidget
 +'<div style="font-size:48px;">'+countryFlag+'</div>'
 +'<h3 style="margin:8px 0 4px;color:var(--primary);">GPS Financement — '+countryName+'</h3>'
 +'<p style="font-size:13px;color:var(--text-light);">Trouvez les financements auxquels vous etes eligible.</p>'
-+'</div>';html+='<div class="card" style="padding:16px;">'
++'</div>'
++'<div id="finApplyBox"></div>';html+='<div class="card" style="padding:16px;">'
 +'<div class="card-title"><span class="icon"><i data-lucide="target" class="lc"></i></span> Votre profil producteur</div>';html+='<div class="form-group" style="margin-bottom:12px;">'
 +'<label class="form-label" style="font-weight:600;">Quelles cultures pratiquez-vous ?</label>'
 +'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">';cultures.forEach(function(c){var selected=fProfile.crops.indexOf(c)>=0;html+='<button type="button" class="crop-btn'+(selected?' active':'')+'" data-crop="'+c+'" data-action="fin-toggle-crop" data-crop="'+c+'" '
@@ -66,7 +67,7 @@ var html=scoreWidget
 +'style="flex:1;" data-action-input="fin-amount-input">'
 +'<span id="finAmountLabel" style="font-size:14px;font-weight:700;color:var(--green);min-width:80px;">'+formatFCFA(fProfile.amountNeeded)+' FCFA</span>'
 +'</div></div>';html+='<button class="btn-analyse" style="width:100%;font-size:15px;padding:14px;" data-action="fin-search">'
-+'<i data-lucide="search" class="lc"></i> Trouver mes financements</button>';html+='</div>';var container=document.getElementById('financingContent');if(container)container.innerHTML=html;}
++'<i data-lucide="search" class="lc"></i> Trouver mes financements</button>';html+='</div>';var container=document.getElementById('financingContent');if(container)container.innerHTML=html;if(AP.institution&&AP.institution.renderProducerApply){AP.institution.renderProducerApply(document.getElementById('finApplyBox'));}}
 function renderStep3(){var countryName=AP.countryMeta[fProfile.country]?AP.countryMeta[fProfile.country].name:fProfile.country;var advices=generateAdvice();var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">'
 +'<div>'
 +'<h3 style="margin:0;color:var(--primary);">Resultats — '+countryName+'</h3>'

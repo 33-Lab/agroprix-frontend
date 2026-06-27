@@ -223,6 +223,12 @@
       var appContainer = document.getElementById('appContainer');
       if (authScreen) authScreen.style.display = 'none';
       if (appContainer) appContainer.style.display = '';
+      // L4 — routage par rôle : un compte institution est dirigé vers son
+      // espace (banque/assureur) et voit l'entrée de nav dédiée ; un producteur
+      // la garde masquée. AP.institution.applyRole est idempotent.
+      if (AP.institution && AP.institution.applyRole) {
+        try { AP.institution.applyRole(user); } catch (e) {}
+      }
     }
   }
 
