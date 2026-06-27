@@ -202,6 +202,9 @@
     <a id="navFinancing" data-action="show-view" data-view="financing" data-nav="1"><span class="nav-icon"><i data-lucide="coins" class="lc"></i></span> GPS Financement</a>
     <a id="navNdvi" data-action="show-view" data-view="ndvi" data-nav="1"><span class="nav-icon"><i data-lucide="satellite" class="lc"></i></span> Sante Parcelle</a>
     <a id="navScoring" data-action="show-view" data-view="scoring" data-nav="1"><span class="nav-icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Mon Score Profil</a>
+    <!-- Espace institution : visible UNIQUEMENT pour les comptes role=institution
+         (revele par AP.institution.applyRole au login). Masque par defaut. -->
+    <a id="navInstitution" data-action="show-view" data-view="institution" data-nav="1" style="display:none;"><span class="nav-icon"><i data-lucide="landmark" class="lc"></i></span> Espace Institution</a>
 
     <!-- FILIERES -->
     <div class="nav-section-label">FILIERES <span class="pro-badge">PRO</span></div>
@@ -719,6 +722,16 @@
         <div style="text-align:center;padding:40px;">
           <div style="font-size:48px;margin-bottom:12px;"><i data-lucide="coins" class="lc"></i></div>
           <p style="color:var(--text-light);">Chargement du GPS Financement...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ VIEW: INSTITUTION (Espace banque/assureur — role=institution) ═══ -->
+    <div class="view-container" id="viewInstitution">
+      <div id="institutionContent">
+        <div style="text-align:center;padding:40px;">
+          <div style="font-size:48px;margin-bottom:12px;"><i data-lucide="landmark" class="lc"></i></div>
+          <p style="color:var(--text-light);">Chargement de l'espace institution...</p>
         </div>
       </div>
     </div>
@@ -1542,13 +1555,13 @@
 <!-- ap-namespace.js doit être chargé EN PREMIER (FE-B1) — initialise window.AgroPrix.{ui,api,data,utils} -->
 <script src="/js/ap-namespace.js?v=7.18"></script>
 <script src="/js/security.js?v=7.11"></script>
-<script src="/js/config.js?v=7.16"></script>
+<script src="/js/config.js?v=7.35"></script>
 <script src="/js/status.js?v=1.0"></script>
 <script src="/js/partner.js?v=1.0"></script>
 <script src="/js/data.js?v=6.6"></script>
 <script src="/js/data-sources.js?v=1.0"></script>
 <script src="/js/api.js?v=7.34"></script>
-<script src="/js/ui.js?v=7.25"></script>
+<script src="/js/ui.js?v=7.35"></script>
 <script src="/js/analysis.js?v=7.16"></script>
 <script src="/js/negoce.js?v=7.25"></script>
 <script src="/js/production.js?v=7.0"></script>
@@ -1556,8 +1569,9 @@
 <script src="/js/cgu.js?v=7.25"></script>
 <script src="/js/inputs.js?v=7.28"></script>
 <script src="/js/marketplace.js?v=7.28"></script>
-<script src="/js/financing.js?v=7.28"></script>
+<script src="/js/financing.js?v=7.35"></script>
 <script src="/js/scoring.js?v=7.25"></script>
+<script src="/js/institution.js?v=7.35"></script>
 <script src="/js/ndvi.js?v=7.33"></script>
 <script src="/js/carte.js?v=7.0"></script>
 <script src="/js/hevea.js?v=7.26"></script>
@@ -1565,7 +1579,7 @@
 <script src="/js/cacao.js?v=7.31"></script>
 <script src="/js/tomate.js?v=7.31"></script>
 <script src="/js/dashboard.js?v=7.25"></script>
-<script src="/js/auth.js?v=7.32"></script>
+<script src="/js/auth.js?v=7.35"></script>
 <script src="/js/app.js?v=7.25"></script>
 <script src="/js/actions.js?v=7.32"></script>
 

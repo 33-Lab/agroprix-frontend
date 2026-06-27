@@ -168,7 +168,8 @@ window.AgroPrix = window.AgroPrix || {};
     cacao:'Cacao Pro', tomate:'Tomate Pro',
     market:'Offres & Demandes', rapports:'Rapports', params:'Param\u00e8tres',
     offres:'Nos Offres', plus:'Plus', proprietaire:'Proprietaire',
-    partner:'Espace Partenaire'
+    partner:'Espace Partenaire',
+    institution:'Espace Institution'
   };
 
   // ============================================================
@@ -202,7 +203,8 @@ window.AgroPrix = window.AgroPrix || {};
     cacao:'viewCacao', tomate:'viewTomate',
     market:'viewMarket', rapports:'viewAnalyse', params:'viewParams',
     offres:'viewOffres', plus:'viewPlus', proprietaire:'viewProprietaire',
-    partner:'viewPartner'
+    partner:'viewPartner',
+    institution:'viewInstitution'
   };
 
 })(window.AgroPrix);
