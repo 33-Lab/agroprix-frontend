@@ -305,15 +305,37 @@
     var loc = esc(l.market_name || l.region || l.country_iso3 || '—');
     var deliv = (!isSell && l.delivery_date) ? ('<div style="font-size:10px;color:#E8862A;margin-top:2px;">Livraison : ' + esc(l.delivery_date) + '</div>') : '';
     var desc = l.description ? ('<div style="font-size:12px;color:#666;margin-top:6px;">' + esc(String(l.description).slice(0, 120)) + '</div>') : '';
+    // Date de publication ("depuis quand l'offre a été postée") + nombre de vues.
+    var posted = l.created_at ? timeAgo(l.created_at) : '';
+    var nViews = (typeof l.views === 'number') ? l.views : 0;
+    var viewsTxt = nViews > 0 ? (' · <i data-lucide="eye" class="lc" style="width:11px;height:11px;vertical-align:-1px;"></i> ' + nViews + ' vue' + (nViews > 1 ? 's' : '')) : '';
+    var meta = (posted || viewsTxt)
+      ? ('<div style="font-size:10px;color:#aaa;margin-top:3px;">' + (posted ? 'Publié ' + posted.toLowerCase() : '') + viewsTxt + '</div>')
+      : '';
     return '<div class="card" style="margin-bottom:12px;padding:14px;">'
       + '<div style="display:flex;justify-content:space-between;align-items:start;">'
       + '<div><div style="font-size:15px;font-weight:800;color:#333;"><i data-lucide="wheat" class="lc" style="width:16px;height:16px;vertical-align:-2px;"></i> ' + esc(_productName(l)) + '</div>'
-      + '<div style="font-size:11px;color:#888;margin-top:2px;">' + _qtyLabel(l.quantity_kg) + ' · ' + loc + '</div></div>'
+      + '<div style="font-size:11px;color:#888;margin-top:2px;">' + _qtyLabel(l.quantity_kg) + ' · ' + loc + '</div>' + meta + '</div>'
       + '<div style="text-align:right;">' + typeBadge + '<div style="font-size:14px;font-weight:800;color:#2D6A4F;margin-top:4px;">' + formatFCFA(l.unit_price_fcfa) + '/kg</div></div>'
       + '</div>' + deliv + desc
       + (verified ? ('<div style="margin-top:6px;">' + verified + '</div>') : '')
       + '<button data-action="mkt-contact" data-id="' + l.id + '" style="display:block;width:100%;margin-top:10px;padding:10px;background:#25D366;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;"><i data-lucide="message-circle" class="lc" style="width:15px;height:15px;vertical-align:-2px;"></i> Contacter</button>'
       + '</div>';
+  }
+
+  // Compteur de vues : on "ping" chaque annonce affichée UNE fois par session
+  // (dédup en mémoire) pour ne pas gonfler le compteur à chaque scroll/filtre.
+  // Fire-and-forget : aucune incidence sur l'affichage si l'appel échoue.
+  var _viewedPinged = {};
+  function _pingViews(items) {
+    (items || []).forEach(function(l) {
+      if (!l || l.id == null || _viewedPinged[l.id]) return;
+      _viewedPinged[l.id] = true;
+      try {
+        fetch(_apiBase() + '/api/marketplace/listings/' + l.id + '/view',
+              { method: 'POST', credentials: 'include' }).catch(function() {});
+      } catch (e) {}
+    });
   }
 
   function loadCatalogue() {
@@ -336,6 +358,7 @@
           box.innerHTML = '<div class="card" style="padding:28px;text-align:center;"><div style="font-size:40px;"><i data-lucide="store" class="lc"></i></div><h3 style="color:#666;">Aucune annonce</h3><p style="font-size:12px;color:#999;">Ajustez vos filtres ou publiez la première annonce.</p></div>';
         } else {
           box.innerHTML = items.map(_catCard).join('') + '<div style="text-align:center;padding:12px;font-size:12px;color:#999;">' + items.length + ' annonce(s)</div>';
+          _pingViews(items);
         }
         if (window.lucide) { try { window.lucide.createIcons(); } catch (e) {} }
       })
