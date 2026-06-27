@@ -339,7 +339,7 @@ window.souscrirePlan = function(plan, montant) {
     + '<div style="padding:14px;background:#FEF3C7;border-radius:12px;font-size:13px;color:#92400E;margin-bottom:16px;">'
     + '<strong>Paiement en ligne non encore active</strong><br>Mobile Money et carte bancaire seront disponibles prochainement. En attendant, souscrivez directement via WhatsApp ci-dessous.'
     + '</div>'
-    + '<a href="https://wa.me/22960000000?text=Je veux souscrire au Plan ' + plan + ' (' + fmt + ' FCFA/mois)" target="_blank" style="display:block;width:100%;padding:14px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:10px;"><i data-lucide="message-circle" class="lc" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> Payer via WhatsApp</a>'
+    + '<a href="https://wa.me/22996816868?text=Je veux souscrire au Plan ' + plan + ' (' + fmt + ' FCFA/mois)" target="_blank" style="display:block;width:100%;padding:14px;background:#25D366;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:10px;"><i data-lucide="message-circle" class="lc" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> Payer via WhatsApp</a>'
     + '<button data-action="remove-el" data-target="paymentOverlay" style="width:100%;padding:12px;background:none;border:1px solid #ddd;border-radius:12px;font-size:14px;color:#999;cursor:pointer;">Fermer</button>'
     + '</div>';
   document.body.appendChild(overlay);

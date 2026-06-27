@@ -51,11 +51,21 @@
     3: function() { souscrirePlan('Expert', 14900); }
   };
 
+  // Le bypass ?devplan ne doit JAMAIS être actif en production (red flag due diligence :
+  // n'importe qui deviendrait admin via l'URL). Restreint à localhost / *.vercel.app (staging).
+  function _devBypassAllowed() {
+    var h = window.location.hostname;
+    return h === 'localhost' || h === '127.0.0.1' || h === '' ||
+           (h.indexOf('.vercel.app') !== -1 && h !== 'app.agroprix.app');
+  }
+
   function getUserPlanLevel() {
-    // DEV BYPASS: ?devplan=admin|pro|expert|starter pour tester sans abonnement
-    var urlPlan = new URLSearchParams(window.location.search).get('devplan');
-    if (urlPlan && PLAN_LEVELS[urlPlan] !== undefined) return PLAN_LEVELS[urlPlan];
-    if (urlPlan === 'admin') return 99;
+    // DEV BYPASS: ?devplan=admin|pro|expert|starter pour tester sans abonnement (hors prod uniquement)
+    if (_devBypassAllowed()) {
+      var urlPlan = new URLSearchParams(window.location.search).get('devplan');
+      if (urlPlan === 'admin') return 99;
+      if (urlPlan && PLAN_LEVELS[urlPlan] !== undefined) return PLAN_LEVELS[urlPlan];
+    }
 
     var user = AP.auth ? AP.auth.getUser() : null;
     if (!user) return 0;

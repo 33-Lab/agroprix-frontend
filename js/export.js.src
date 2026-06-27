@@ -418,15 +418,25 @@
   }
 
   function eudrResultHtml(res, name) {
-    var colorMap = { green: '#2D6A4F', amber: '#E8862A', red: '#D32F2F' };
-    var labelMap = { green: 'Conforme (risque négligeable)', amber: 'À vérifier', red: 'Non conforme — risque déforestation' };
-    var st = res.status || 'amber';
-    var defo = res.deforestation && res.deforestation.loss_pct_post_2020_12_31;
+    var colorMap = { green: '#2D6A4F', amber: '#E8862A', red: '#D32F2F', incomplet: '#E8862A' };
+    var labelMap = {
+      green: 'Conforme (risque négligeable)', amber: 'À vérifier',
+      red: 'Non conforme — risque déforestation',
+      incomplet: 'Analyse incomplète — données déforestation indisponibles'
+    };
+    var defoObj = res.deforestation || {};
+    var defo = defoObj.loss_pct_post_2020_12_31;
     var dist = res.protected_areas && res.protected_areas.closest_distance_km;
+    // Honnêteté : si la couche Hansen n'a pas pu être lue (tuile absente / available=false),
+    // on NE déclare PAS "Conforme" — on affiche un état "analyse incomplète" explicite.
+    var defoUnavailable = (defoObj.available === false) || (defo == null);
+    var st = res.status || 'amber';
+    if (defoUnavailable && st === 'green') st = 'incomplet';
     return '<div style="padding:10px;border-radius:10px;background:#F7F7F9;border-left:4px solid ' + (colorMap[st] || '#999') + ';">'
       + '<div style="font-size:12px;font-weight:700;">' + esc(name) + ' — <span style="color:' + (colorMap[st] || '#999') + ';">' + (labelMap[st] || st) + '</span></div>'
-      + '<div style="font-size:11px;color:#555;margin-top:3px;">Déforestation post-2020 : ' + (defo != null ? defo.toFixed(2) + '%' : 'n/d') + ' · Aire protégée la plus proche : ' + (dist != null ? dist.toFixed(1) + ' km' : 'n/d') + ' · Risque pays : ' + esc(res.country_risk || 'n/d') + '</div>'
-      + '<div style="font-size:10px;color:#888;margin-top:4px;">Source : Hansen GFC-2023 + WDPA (moteur EUDR AgroPrix).</div>'
+      + '<div style="font-size:11px;color:#555;margin-top:3px;">Déforestation post-2020 : ' + (defo != null ? defo.toFixed(2) + '%' : 'non disponible') + ' · Aire protégée la plus proche : ' + (dist != null ? dist.toFixed(1) + ' km' : 'n/d') + ' · Risque pays : ' + esc(res.country_risk || 'n/d') + '</div>'
+      + (defoUnavailable ? '<div style="font-size:11px;color:#B45309;margin-top:4px;">⚠ La couche Hansen n\'a pas pu être analysée sur cette zone — vérification déforestation à refaire avant tout export UE.</div>' : '')
+      + '<div style="font-size:10px;color:#888;margin-top:4px;">Source : Hansen GFC-2023 + zones protégées (moteur EUDR AgroPrix).</div>'
       + '</div>';
   }
 
