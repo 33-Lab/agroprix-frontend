@@ -462,22 +462,28 @@
     if (window.lucide) { try { window.lucide.createIcons(); } catch (e) {} }
   }
 
-  // Fallback local (non connecté / serveur indisponible) — réutilise l'estimation localStorage.
-  function _renderLocalFallback(container, banner) {
-    var result = calculate();
-    var html = _header()
-      + '<div style="background:#fff3cd;color:#856404;border:1px solid #ffe69c;border-radius:8px;padding:8px 12px;font-size:12px;text-align:center;margin-bottom:16px;">' + banner + '</div>'
-      + '<div style="text-align:center;margin-bottom:16px;">' + renderGauge(result.total, 200) + '</div>'
-      + '<div class="card" style="padding:16px;margin-bottom:16px;"><div class="card-title"><span class="icon"><i data-lucide="bar-chart-3" class="lc"></i></span> Estimation locale (démo)</div>';
-    DIMENSIONS.forEach(function(d) {
-      var pts = result.dimensions[d.id] || 0, pct = Math.round((pts / d.max) * 100);
-      html += '<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;margin-bottom:3px;">'
-        + '<span style="font-size:12px;font-weight:600;">' + d.label + '</span>'
-        + '<span style="font-size:12px;font-weight:700;color:' + d.color + ';">' + pts + '/' + d.max + '</span></div>'
-        + '<div style="height:8px;background:#e9ecef;border-radius:4px;overflow:hidden;"><div style="height:100%;width:' + pct + '%;background:' + d.color + ';border-radius:4px;"></div></div></div>';
-    });
-    html += '</div>';
-    container.innerHTML = html;
+  // État honnête quand le score serveur n'est pas disponible. On NE fabrique PLUS
+  // de "score démo" local (ancien modèle 5 dimensions) qui contredisait le vrai
+  // calcul serveur 4-blocs et trompait l'utilisateur ("il n'y a que de la démo ?").
+  //   mode 'unauth' → invite à se connecter (pas de score).
+  //   mode 'error'  → indisponible temporaire + bouton réessayer (pas de score).
+  function _renderUnavailable(container, mode) {
+    var isUnauth = (mode === 'unauth');
+    var icon = isUnauth ? 'lock' : 'cloud-off';
+    var title = isUnauth ? 'Connectez-vous pour calculer votre score'
+                         : 'Score temporairement indisponible';
+    var msg = isUnauth
+      ? "Votre Score Profil Producteur est calculé par le serveur AgroPrix (paramétré par institution). Connectez-vous pour l'obtenir."
+      : "Le calcul serveur n'a pas répondu (réseau ou limite de requêtes atteinte). Réessayez dans un instant.";
+    var action = isUnauth
+      ? '<button class="btn-analyse" data-action="show-auth" data-mode="login" style="padding:10px 18px;">Se connecter</button>'
+      : '<button class="btn-analyse" data-action="scoring-retry" style="padding:10px 18px;"><i data-lucide="refresh-cw" class="lc"></i> Réessayer</button>';
+    container.innerHTML = _header()
+      + '<div class="card" style="padding:28px 18px;text-align:center;margin-bottom:16px;">'
+      + '<div style="font-size:34px;color:#94a3b8;margin-bottom:10px;"><i data-lucide="' + icon + '" class="lc"></i></div>'
+      + '<div style="font-weight:700;margin-bottom:6px;">' + title + '</div>'
+      + '<p style="font-size:12px;color:var(--text-light);max-width:340px;margin:0 auto 14px;">' + msg + '</p>'
+      + action + '</div>';
     if (window.lucide) { try { window.lucide.createIcons(); } catch (e) {} }
   }
 
@@ -489,10 +495,10 @@
       _institutions = (instRes && instRes.institutions) ? instRes.institutions : [];
       return _fetchCompute(_selectedSlug);
     }).then(function(score) {
-      if (score && score._unauth) { _renderLocalFallback(container, 'Connectez-vous pour obtenir votre score serveur officiel (estimation locale ci-dessous).'); return; }
-      if (!score || typeof score.total_score !== 'number') { _renderLocalFallback(container, 'Score serveur indisponible — estimation locale (démo).'); return; }
+      if (score && score._unauth) { _renderUnavailable(container, 'unauth'); return; }
+      if (!score || typeof score.total_score !== 'number') { _renderUnavailable(container, 'error'); return; }
       _renderBackend(container, score);
-    }).catch(function() { _renderLocalFallback(container, 'Score serveur indisponible — estimation locale (démo).'); });
+    }).catch(function() { _renderUnavailable(container, 'error'); });
   }
 
   // Changement d'institution depuis le sélecteur.
@@ -521,6 +527,7 @@
   // Délégation d'événements (CSP Phase 2) — data-slug = institution choisie.
   AP.actions = AP.actions || {};
   AP.actions['scoring-pick-institution'] = function(el) { window.scoringPickInstitution(el.getAttribute('data-slug')); };
+  AP.actions['scoring-retry'] = function() { render(); };
   AP.actions['scoring-pick-persona'] = function(el) {
     _persona = el.getAttribute('data-persona') || 'producteur';
     var c = document.getElementById('scoringContent');
