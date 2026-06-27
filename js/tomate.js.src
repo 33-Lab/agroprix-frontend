@@ -535,8 +535,8 @@ window.AgroPrix = window.AgroPrix || {};
                 '<div style="font-size:10px;color:#999;margin-top:2px;">' + (p.lat ? 'GPS: ' + p.lat.toFixed(4) + ', ' + p.lng.toFixed(4) : 'Pas de GPS') + '</div>' +
               '</div>' +
               '<div style="display:flex;gap:6px;">' +
-                '<button data-action="tomate-geoloc-parcelle" data-i="' + i + '" style="padding:6px 10px;background:' + COLOR_LIGHT + ';border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Géolocaliser">📍</button>' +
-                '<button data-action="tomate-delete-parcelle" data-i="' + i + '" style="padding:6px 10px;background:#FFEBEE;border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Supprimer">✕</button>' +
+                '<button data-action="tomate-geoloc-parcelle" data-i="' + i + '" style="padding:6px 10px;background:' + COLOR_LIGHT + ';border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Géolocaliser"><i data-lucide="map-pin" class="lc"></i></button>' +
+                '<button data-action="tomate-delete-parcelle" data-i="' + i + '" style="padding:6px 10px;background:#FFEBEE;border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Supprimer"><i data-lucide="x" class="lc"></i></button>' +
               '</div>' +
             '</div>';
           }).join('') : '<p style="font-size:12px;color:#999;text-align:center;padding:12px;">Aucune parcelle enregistrée</p>') +
@@ -723,8 +723,8 @@ window.AgroPrix = window.AgroPrix || {};
                 '<div style="font-size:10px;color:#999;margin-top:1px;">' + m.pays + ' — ' + m.capacite + '</div>' +
               '</div>' +
             '</div>' +
-            '<div style="font-size:11px;color:' + COLOR + ';font-weight:600;margin-top:6px;">📞 ' + m.contact + '</div>' +
-            (m.email ? '<div style="font-size:10px;color:#666;margin-top:2px;">✉ ' + m.email + (m.site ? ' · <span style="color:' + COLOR + ';">🌐 ' + m.site + '</span>' : '') + '</div>' : '') +
+            '<div style="font-size:11px;color:' + COLOR + ';font-weight:600;margin-top:6px;"><i data-lucide="phone" class="lc"></i> ' + m.contact + '</div>' +
+            (m.email ? '<div style="font-size:10px;color:#666;margin-top:2px;"><i data-lucide="mail" class="lc"></i> ' + m.email + (m.site ? ' · <span style="color:' + COLOR + ';"><i data-lucide="globe" class="lc"></i> ' + m.site + '</span>' : '') + '</div>' : '') +
             '<div style="font-size:11px;color:#555;margin-top:6px;line-height:1.5;">' + m.conseils + '</div>' +
           '</div>';
         }).join('') +
@@ -907,7 +907,7 @@ window.AgroPrix = window.AgroPrix || {};
         '</div>' +
         pieces.map(function(p) {
           return '<div style="padding:8px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #f0f0f0;">' +
-            '<span style="font-size:14px;">' + (p.ok ? '✅' : '⬜') + '</span>' +
+            '<span style="font-size:14px;">' + (p.ok ? '<i data-lucide="check-square" class="lc" style="color:#2D6A4F;"></i>' : '<i data-lucide="square" class="lc" style="color:#bbb;"></i>') + '</span>' +
             '<div style="flex:1;">' +
               '<div style="font-size:12px;font-weight:600;color:' + (p.ok ? '#2D6A4F' : '#999') + ';">' + p.nom + '</div>' +
               (p.action ? '<div style="font-size:10px;color:#E8862A;">' + p.action + '</div>' : '') +
@@ -1240,7 +1240,7 @@ window.AgroPrix = window.AgroPrix || {};
               '<span style="font-size:11px;color:' + COLOR + ';font-weight:700;">Diagnostic Photo</span>' +
               '<span style="background:' + COLOR + ';color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;">PlantNet \u00d7 IA</span>' +
             '</div>' +
-            '<div style="font-weight:700;margin-bottom:4px;">🍅 ' + top.common_name + ' (' + top.scientific_name + ')</div>' +
+            '<div style="font-weight:700;margin-bottom:4px;"><i data-lucide="cherry" class="lc"></i> ' + top.common_name + ' (' + top.scientific_name + ')</div>' +
             '<div style="color:#666;font-size:11px;margin-bottom:8px;">Confiance : ' + score + '%</div>' +
             alts + advice +
             '<div style="font-size:9px;color:#999;margin-top:8px;font-style:italic;">Diagnostic IA \u2014 confirmer avec un technicien agréé ANADER/WorldVeg</div>' +

@@ -492,8 +492,8 @@ window.AgroPrix = window.AgroPrix || {};
                 '</div>' +
               '</div>' +
               '<div style="display:flex;gap:6px;">' +
-                '<button data-action="cacao-geoloc-parcelle" data-i="' + i + '" style="padding:6px 10px;background:' + COLOR_LIGHT + ';border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Géolocaliser">📍</button>' +
-                '<button data-action="cacao-delete-parcelle" data-i="' + i + '" style="padding:6px 10px;background:#FFEBEE;border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Supprimer">✕</button>' +
+                '<button data-action="cacao-geoloc-parcelle" data-i="' + i + '" style="padding:6px 10px;background:' + COLOR_LIGHT + ';border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Géolocaliser"><i data-lucide="map-pin" class="lc"></i></button>' +
+                '<button data-action="cacao-delete-parcelle" data-i="' + i + '" style="padding:6px 10px;background:#FFEBEE;border:none;border-radius:8px;font-size:11px;cursor:pointer;" title="Supprimer"><i data-lucide="x" class="lc"></i></button>' +
               '</div>' +
             '</div>';
           }).join('') : '<p style="font-size:12px;color:#999;text-align:center;padding:12px;">Aucune parcelle enregistrée</p>') +
@@ -836,7 +836,7 @@ window.AgroPrix = window.AgroPrix || {};
         '</div>' +
         pieces.map(function(p) {
           return '<div style="padding:8px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #f0f0f0;">' +
-            '<span style="font-size:14px;">' + (p.ok ? '✅' : '⬜') + '</span>' +
+            '<span style="font-size:14px;">' + (p.ok ? '<i data-lucide="check-square" class="lc" style="color:#2D6A4F;"></i>' : '<i data-lucide="square" class="lc" style="color:#bbb;"></i>') + '</span>' +
             '<div style="flex:1;">' +
               '<div style="font-size:12px;font-weight:600;color:' + (p.ok ? '#2D6A4F' : '#999') + ';">' + p.nom + '</div>' +
               (p.action ? '<div style="font-size:10px;color:#E8862A;">' + p.action + '</div>' : '') +
@@ -864,7 +864,7 @@ window.AgroPrix = window.AgroPrix || {};
           if (c.id === 'fermentSeche')    val = data.journalCulture.some(function(e) { return e.type === 'fermentation'; });
           if (c.id === 'surfaceDeclaree') val = data.parcelles.some(function(p) { return p.surface > 0; });
           return '<div style="padding:10px;display:flex;align-items:flex-start;gap:8px;border-bottom:1px solid #f0f0f0;">' +
-            '<span style="font-size:14px;margin-top:1px;">' + (val ? '✅' : '⬜') + '</span>' +
+            '<span style="font-size:14px;margin-top:1px;">' + (val ? '<i data-lucide="check-square" class="lc" style="color:#2D6A4F;"></i>' : '<i data-lucide="square" class="lc" style="color:#bbb;"></i>') + '</span>' +
             '<div style="flex:1;">' +
               '<div style="display:flex;justify-content:space-between;">' +
                 '<span style="font-size:12px;font-weight:600;color:' + (val ? '#2D6A4F' : '#999') + ';">' + c.label + '</span>' +
@@ -914,7 +914,7 @@ window.AgroPrix = window.AgroPrix || {};
   function eudrToggleBtn(key, label, val) {
     return '<button data-action="cacao-toggle-eudr" data-key="' + key + '" ' +
       'style="padding:10px;background:' + (val ? COLOR : '#f0f0f0') + ';color:' + (val ? '#fff' : '#666') + ';border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;">' +
-      (val ? '✅ ' : '⬜ ') + label +
+      (val ? '<i data-lucide="check-square" class="lc" style="color:#2D6A4F;"></i> ' : '<i data-lucide="square" class="lc" style="color:#bbb;"></i> ') + label +
     '</button>';
   }
 
@@ -1192,12 +1192,12 @@ window.AgroPrix = window.AgroPrix || {};
         '<div style="font-size:11px;color:' + COLOR + ';font-weight:600;margin-top:2px;">' + c.type + '</div>' +
         '<div style="font-size:11px;color:#666;margin-top:4px;">' + c.spec + '</div>' +
         '<div style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:11px;color:#555;">' +
-          '<span style="font-weight:700;">📞</span> ' + c.contact +
+          '<span style="font-weight:700;"><i data-lucide="phone" class="lc"></i></span> ' + c.contact +
           (c.site ? ' · <a href="https://' + c.site + '" target="_blank" style="color:' + COLOR + ';text-decoration:underline;">' + c.site + '</a>' : '') +
         '</div>' +
         '<div style="display:flex;gap:8px;margin-top:8px;">' +
-          '<a href="tel:' + c.contact + '" style="flex:1;padding:8px;background:' + COLOR + ';color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;">📞 Appeler</a>' +
-          (c.site ? '<a href="https://' + c.site + '" target="_blank" style="flex:1;padding:8px;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;">🌐 Site web</a>' : '') +
+          '<a href="tel:' + c.contact + '" style="flex:1;padding:8px;background:' + COLOR + ';color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;"><i data-lucide="phone" class="lc"></i> Appeler</a>' +
+          (c.site ? '<a href="https://' + c.site + '" target="_blank" style="flex:1;padding:8px;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;"><i data-lucide="globe" class="lc"></i> Site web</a>' : '') +
         '</div>' +
       '</div>';
     }).join('') + '</div>';
@@ -1295,7 +1295,7 @@ window.AgroPrix = window.AgroPrix || {};
               '<span style="font-size:11px;color:' + COLOR + ';font-weight:700;">Diagnostic Photo Cacao</span>' +
               '<span style="background:' + COLOR + ';color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;">PlantNet × IA</span>' +
             '</div>' +
-            '<div style="font-weight:700;margin-bottom:4px;">🍫 ' + top.common_name + ' (' + top.scientific_name + ')</div>' +
+            '<div style="font-weight:700;margin-bottom:4px;"><i data-lucide="bean" class="lc"></i> ' + top.common_name + ' (' + top.scientific_name + ')</div>' +
             '<div style="color:#666;font-size:11px;margin-bottom:8px;">Confiance : ' + score + '%</div>' +
             alts + advice +
             '<div style="font-size:9px;color:#999;margin-top:8px;font-style:italic;">Diagnostic IA — confirmer avec un technicien CNRA/ANADER agréé</div>' +
