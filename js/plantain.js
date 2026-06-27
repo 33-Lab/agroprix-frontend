@@ -396,7 +396,7 @@ window.AgroPrix = window.AgroPrix || {};
           '<div><label style="font-size:11px;font-weight:600;">Quantite (kg)</label>' +
           '<input type="number" id="plantain-transfo-qty" placeholder="100" min="1" value="100" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;"></div>' +
           '<div><label style="font-size:11px;font-weight:600;">Prix achat bord champ</label>' +
-          '<input type="number" id="plantain-transfo-prix" placeholder="150" min="0" value="' + PRIX_PLANTAIN[PRIX_PLANTAIN.length-1].bordChamp + '" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;"></div>' +
+          '<input type="number" id="plantain-transfo-prix" placeholder="150" min="0" value="' + (PRIX_PLANTAIN.length ? PRIX_PLANTAIN[PRIX_PLANTAIN.length-1].bordChamp : '') + '" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:13px;"></div>' +
         '</div>' +
         '<button data-action="plantain-simuler-transfo" style="width:100%;padding:12px;background:linear-gradient(135deg,#E8862A,#F5A623);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;">Simuler la marge</button>' +
         '<div id="plantain-transfo-results" style="margin-top:10px;"></div>' +
@@ -762,6 +762,7 @@ window.AgroPrix = window.AgroPrix || {};
     var prixAchat = parseFloat((document.getElementById('plantain-transfo-prix') || {}).value) || 150;
     var el = document.getElementById('plantain-transfo-results');
     if (!el) return;
+    if (!PRIX_PLANTAIN.length) { el.innerHTML = '<div style="padding:12px;color:#888;font-size:12px;">Prix en cours de chargement, réessayez dans un instant.</div>'; return; }
 
     var coutAchat = qty * prixAchat;
     // Vente frais
