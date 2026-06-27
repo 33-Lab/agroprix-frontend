@@ -1,4 +1,4 @@
-/*! AgroPrix api.js - generated from api.js.src on 2026-06-25 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix api.js - generated from api.js.src on 2026-06-27 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){var API_TIMEOUT_MS=8000;var CACHE_PREFIX='ap_cache_';var CACHE_TTL_MS=6*60*60*1000;function fetchWithTimeout(url,opts,ms){opts=opts||{};ms=(typeof ms==='number'&&ms>0)?ms:API_TIMEOUT_MS;var controller=new AbortController();var timedOut=false;var timer=setTimeout(function(){timedOut=true;controller.abort();},ms);var fetchOpts={};for(var k in opts){if(Object.prototype.hasOwnProperty.call(opts,k))fetchOpts[k]=opts[k];}
 fetchOpts.signal=controller.signal;return fetch(url,fetchOpts).then(function(res){clearTimeout(timer);return res;}).catch(function(err){clearTimeout(timer);if(timedOut){var e=new Error('Timeout '+ms+'ms: '+url);e.name='TimeoutError';throw e;}
 throw err;});}
@@ -16,12 +16,11 @@ return cached;}}
 return null;}
 function checkAPI(){fetchWithTimeout(AP.API_BASE+'/',{method:'GET'},3000).then(function(r){if(r.ok){AP.API_AVAILABLE=true;}}).catch(function(){AP.API_AVAILABLE=false;});}
 function periodToStartDate(periodKey){var now=new Date();var y=now.getFullYear(),m=now.getMonth()+1;switch(periodKey){case'12m':return(y-1)+'-'+String(m).padStart(2,'0')+'-01';case'3y':return(y-3)+'-'+String(m).padStart(2,'0')+'-01';case'5y':return(y-5)+'-'+String(m).padStart(2,'0')+'-01';case'10y':return(y-10)+'-'+String(m).padStart(2,'0')+'-01';default:return(y-1)+'-01-01';}}
-async function fetchPrices(country,commodity,periodKey){var dbName=stripAccents(AP.cultureNames[commodity]||commodity);var startDate=periodToStartDate(periodKey);var url=AP.API_BASE+'/api/prices/monthly?country='+country
-+'&commodity='+encodeURIComponent(dbName)
-+'&start_date='+startDate;var cacheKey='prices_'+country+'_'+dbName+'_'+periodKey;var json=await fetchRobust(url,cacheKey);return(json&&json.data)?json.data:[];}
-async function fetchPricesByDbName(country,dbCommodity,startDate){var url=AP.API_BASE+'/api/prices/monthly?country='+country
-+'&commodity='+encodeURIComponent(dbCommodity)
-+(startDate?'&start_date='+startDate:'');var cacheKey='prices_db_'+country+'_'+dbCommodity;var json=await fetchRobust(url,cacheKey);return(json&&json.data)?json.data:[];}
+function filterFromMonth(data,startDate){if(!startDate||!Array.isArray(data))return data||[];var fromMonth=String(startDate).slice(0,7);return data.filter(function(d){return d&&d.month&&d.month>=fromMonth;});}
+async function fetchPrices(country,commodity,periodKey){var dbName=stripAccents(AP.cultureNames[commodity]||commodity);var startDate=periodToStartDate(periodKey);var url=AP.API_BASE+'/api/prices/history?country='+country
++'&commodity='+encodeURIComponent(dbName);var cacheKey='prices_'+country+'_'+dbName+'_'+periodKey;var json=await fetchRobust(url,cacheKey);return filterFromMonth((json&&json.data)?json.data:[],startDate);}
+async function fetchPricesByDbName(country,dbCommodity,startDate){var url=AP.API_BASE+'/api/prices/history?country='+country
++'&commodity='+encodeURIComponent(dbCommodity);var cacheKey='prices_db_'+country+'_'+dbCommodity;var json=await fetchRobust(url,cacheKey);return filterFromMonth((json&&json.data)?json.data:[],startDate);}
 async function fetchDashboardAlerts(){var phareCommodities=['Mais','Riz','Tomate','Cacao','Plantain'];var allAlerts=[];for(var i=0;i<phareCommodities.length;i++){var commodity=phareCommodities[i];try{var compareUrl=AP.API_BASE+'/api/prices/compare?commodity='+commodity;var resp=await fetchWithTimeout(compareUrl,{},8000);if(!resp.ok)continue;var json=await resp.json();var rows=(json&&json.data)?json.data:[];var topCountries=rows.slice(0,2);for(var j=0;j<topCountries.length;j++){var country=topCountries[j].country;if(!country||country==='cote_ivoire'||country==='burkina')continue;try{var recoUrl=AP.API_BASE+'/api/recommendations/?country='+country
 +'&commodity='+commodity;var recoResp=await fetchWithTimeout(recoUrl,{},8000);if(!recoResp.ok)continue;var reco=await recoResp.json();var trend=reco&&reco.data&&reco.data.trend;if(!trend)continue;allAlerts.push({commodity:commodity,country:country,price:trend.current_price||topCountries[j].avg_price||null,change:trend.mom_change_pct||0,direction:trend.direction||'stable',months_available:trend.months_available||0,num_markets:topCountries[j].num_markets||0});}catch(e){}}}catch(e){}}
 allAlerts.sort(function(a,b){return Math.abs(b.change)-Math.abs(a.change);});return allAlerts.slice(0,8);}
