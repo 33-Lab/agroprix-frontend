@@ -56,7 +56,8 @@
   // Prix de référence (baseline backend /api/inputs/prices) — non bloquant.
   function loadRefPrices() {
     var base = (AP.API_BASE || '').replace(/\/$/, '');
-    return fetch(base + '/api/inputs/prices?country=' + encodeURIComponent(getUserCountry()), { signal: AbortSignal.timeout(8000) })
+    var _ac = new AbortController(); setTimeout(function(){ _ac.abort(); }, 8000);
+    return fetch(base + '/api/inputs/prices?country=' + encodeURIComponent(getUserCountry()), { signal: _ac.signal })
       .then(function(r) { return r.ok ? r.json() : null; })
       .then(function(data) {
         refPrices = {};
@@ -70,7 +71,8 @@
   // Non bloquant : si vide ou indisponible, on n'affiche simplement pas la colonne.
   function loadCrowdStats() {
     var base = (AP.API_BASE || '').replace(/\/$/, '');
-    return fetch(base + '/api/inputs/prices/stats?country=' + encodeURIComponent(getUserCountry()), { signal: AbortSignal.timeout(8000) })
+    var _ac2 = new AbortController(); setTimeout(function(){ _ac2.abort(); }, 8000);
+    return fetch(base + '/api/inputs/prices/stats?country=' + encodeURIComponent(getUserCountry()), { signal: _ac2.signal })
       .then(function(r) { return r.ok ? r.json() : null; })
       .then(function(data) {
         crowdStats = {};
@@ -85,6 +87,7 @@
   function syncContribution(entry) {
     if (!AP.auth || !AP.auth.isLoggedIn || !AP.auth.isLoggedIn()) return Promise.resolve(false);
     var base = (AP.API_BASE || '').replace(/\/$/, '');
+    var _ac3 = new AbortController(); setTimeout(function(){ _ac3.abort(); }, 8000);
     return fetch(base + '/api/inputs/prices/contribute', {
       method: 'POST',
       credentials: 'include',
@@ -100,7 +103,7 @@
         supplier: entry.supplier,
         observed_date: entry.date
       }),
-      signal: AbortSignal.timeout(8000)
+      signal: _ac3.signal
     }).then(function(r) {
       if (r && r.ok) { entry.synced = true; return true; }
       return false;

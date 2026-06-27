@@ -120,7 +120,7 @@
       method: 'POST',
       body: JSON.stringify(body)
     }).then(function(r) {
-      if (!r.ok) return r.json().then(function(e) { throw e; });
+      if (!r.ok) return r.text().then(function(t) { try { throw JSON.parse(t); } catch(e) { if (e instanceof SyntaxError) throw new Error('auth-error: ' + r.status); throw e; } });
       return r.json();
     }).then(function(data) {
       // Cookie httpOnly posé + token stocké pour fallback Bearer (cf. login).
@@ -136,7 +136,7 @@
       method: 'POST',
       body: JSON.stringify({ email: email, password: password })
     }).then(function(r) {
-      if (!r.ok) return r.json().then(function(e) { throw e; });
+      if (!r.ok) return r.text().then(function(t) { try { throw JSON.parse(t); } catch(e) { if (e instanceof SyntaxError) throw new Error('auth-error: ' + r.status); throw e; } });
       return r.json();
     }).then(function(data) {
       // Stocke le token pour le fallback Bearer (cookie tiers bloqué sur

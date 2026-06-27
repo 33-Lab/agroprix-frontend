@@ -52,6 +52,11 @@
   };
 
   function getUserPlanLevel() {
+    // DEV BYPASS: ?devplan=admin|pro|expert|starter pour tester sans abonnement
+    var urlPlan = new URLSearchParams(window.location.search).get('devplan');
+    if (urlPlan && PLAN_LEVELS[urlPlan] !== undefined) return PLAN_LEVELS[urlPlan];
+    if (urlPlan === 'admin') return 99;
+
     var user = AP.auth ? AP.auth.getUser() : null;
     if (!user) return 0;
     // Admins / fondateurs whitelistés par email : accès illimité (robuste, sans dépendre du cookie)

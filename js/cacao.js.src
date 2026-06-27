@@ -1124,13 +1124,14 @@ window.AgroPrix = window.AgroPrix || {};
         body: JSON.stringify({ nom: p.nom || 'Parcelle cacao', culture: 'cacao', surface_ha: p.surface || null, lat: p.lat, lng: p.lng, pays: 'cote_divoire', region: p.zone || null, date_plantation: (p.anneeCreation ? (p.anneeCreation + '-01-01') : null) })
       }).then(function(r) {
         if (r.status === 401) throw new Error('auth');
+        if (r.status === 429) throw new Error('rate-limit');
         if (!r.ok) throw new Error('sync ' + r.status);
         return r.json();
       }).then(function(j) { p.backendId = j.id; saveData(data); return j.id; });
     }
     function checkOne(id) {
       return fetch(AP.API_BASE + '/api/eudr/parcelle/' + id + '/check', { method: 'GET', credentials: 'include' })
-        .then(function(r) { if (r.status === 401) throw new Error('auth'); if (!r.ok) throw new Error('check ' + r.status); return r.json(); });
+        .then(function(r) { if (r.status === 401) throw new Error('auth'); if (r.status === 429) throw new Error('rate-limit'); if (!r.ok) throw new Error('check ' + r.status); return r.json(); });
     }
 
     var results = [];
@@ -1155,7 +1156,11 @@ window.AgroPrix = window.AgroPrix || {};
       if (ddsBtn && _cacaoEudrLastId) { ddsBtn.disabled = false; ddsBtn.style.opacity = '1'; ddsBtn.style.cursor = 'pointer'; }
       if (window.refreshIcons) refreshIcons();
     }).catch(function(e) {
-      if (out) out.innerHTML = '<div style="font-size:12px;color:#e76f51;">' + (String(e.message) === 'auth' ? 'Connectez-vous pour lancer l\'analyse EUDR réelle.' : 'Analyse EUDR indisponible (' + e.message + ').') + '</div>';
+      var msg;
+      if (String(e.message) === 'auth') msg = 'Connectez-vous pour lancer l\'analyse EUDR réelle.';
+      else if (String(e.message) === 'rate-limit') msg = 'Limite de requêtes atteinte (50/heure). Réessayez dans quelques minutes.';
+      else msg = 'Analyse EUDR indisponible (' + e.message + ').';
+      if (out) out.innerHTML = '<div style="font-size:12px;color:#e76f51;">' + msg + '</div>';
     });
   };
 

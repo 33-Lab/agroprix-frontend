@@ -118,7 +118,7 @@
       market: item.market || '',
       description: item.description || '',
       phone: item.phone || '',
-      country: item.country || (AP.auth && AP.auth.getUser && (AP.auth.getUser().pays || AP.auth.getUser().country)) || 'benin'
+      country: item.country || (function() { var _u = (AP.auth && AP.auth.getUser) ? AP.auth.getUser() : null; return (_u && (_u.pays || _u.country)) || 'benin'; })()
     };
   }
 
@@ -774,11 +774,12 @@
       harvest_date: d,
       steps: [{ label: 'Mise en marché', actor: actor, date: d || '', location: item.market || '' }]
     };
+    var _ac = new AbortController(); setTimeout(function(){ _ac.abort(); }, 8000);
     return fetch((AP.API_BASE || '') + '/api/trace', {
       method: 'POST', credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(8000)
+      signal: _ac.signal
     }).then(function (r) {
       if (r.status === 401 || r.status === 403) return { _unauth: true };
       return r.ok ? r.json() : null;

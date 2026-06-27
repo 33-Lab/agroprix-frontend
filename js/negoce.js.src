@@ -369,7 +369,8 @@
 
   function loadBackendTransactions() {
     var base = (AP.API_BASE || '').replace(/\/$/, '');
-    return fetch(base + '/api/negoce/transactions', { credentials: 'include', signal: AbortSignal.timeout(8000) })
+    var _ac = new AbortController(); setTimeout(function(){ _ac.abort(); }, 8000);
+    return fetch(base + '/api/negoce/transactions', { credentials: 'include', signal: _ac.signal })
       .then(function(r) { return r.ok ? r.json() : null; })
       .then(function(d) { backendTx = (d && d.transactions) ? d.transactions : []; return backendTx; })
       .catch(function() { if (backendTx === null) backendTx = []; return backendTx; });
@@ -435,6 +436,7 @@
 
     if (negoceLoggedIn()) {
       var base = (AP.API_BASE || '').replace(/\/$/, '');
+      var _ac2 = new AbortController(); setTimeout(function(){ _ac2.abort(); }, 8000);
       fetch(base + '/api/negoce/transactions', {
         method: 'POST',
         credentials: 'include',
@@ -444,7 +446,7 @@
           qty: qty, prix_achat: prixAchat,
           prix_vente: prixVente, tx_date: date
         }),
-        signal: AbortSignal.timeout(8000)
+        signal: _ac2.signal
       }).then(function(r) {
         if (r.status === 201) {
           loadBackendTransactions().then(function() { finish('Transaction enregistree (synchronisee).'); });
@@ -465,7 +467,8 @@
     if (!negoceLoggedIn()) return;
     if (!window.confirm('Supprimer cette transaction ?')) return;
     var base = (AP.API_BASE || '').replace(/\/$/, '');
-    fetch(base + '/api/negoce/transactions/' + id, { method: 'DELETE', credentials: 'include', signal: AbortSignal.timeout(8000) })
+    var _ac3 = new AbortController(); setTimeout(function(){ _ac3.abort(); }, 8000);
+    fetch(base + '/api/negoce/transactions/' + id, { method: 'DELETE', credentials: 'include', signal: _ac3.signal })
       .then(function(r) {
         if (r.ok || r.status === 404) { loadBackendTransactions().then(function() { init(); }); }
         else { alert('Suppression impossible (' + r.status + ').'); }

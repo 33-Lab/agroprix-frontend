@@ -442,12 +442,13 @@
         body: JSON.stringify({ nom: 'Parcelle ' + p.label, culture: p.eudrKey, lat: coord.lat, lng: coord.lng, pays: EUDR_PAYS_DEFAUT })
       }).then(function(r) {
         if (r.status === 401) throw new Error('auth');
+        if (r.status === 429) throw new Error('rate-limit');
         if (!r.ok) throw new Error('parcelle ' + r.status);
         return r.json();
       }).then(function(j) {
         var id = j.id;
         return fetch(AP.API_BASE + '/api/eudr/parcelle/' + id + '/check', { method: 'GET', credentials: 'include' })
-          .then(function(r) { if (r.status === 401) throw new Error('auth'); if (!r.ok) throw new Error('check ' + r.status); return r.json(); })
+          .then(function(r) { if (r.status === 401) throw new Error('auth'); if (r.status === 429) throw new Error('rate-limit'); if (!r.ok) throw new Error('check ' + r.status); return r.json(); })
           .then(function(res) { return { id: id, res: res }; });
       }).then(function(o) {
         state.eudrIds[k] = o.id;
@@ -456,7 +457,11 @@
         if (dds) { dds.disabled = false; dds.style.opacity = '1'; dds.style.cursor = 'pointer'; }
         if (window.refreshIcons) refreshIcons();
       }).catch(function(e) {
-        if (out) out.innerHTML = '<div style="font-size:12px;color:#e76f51;">' + (String(e.message) === 'auth' ? 'Connectez-vous pour lancer l\'analyse EUDR réelle.' : 'Analyse EUDR indisponible (' + e.message + ').') + '</div>';
+        var msg;
+        if (String(e.message) === 'auth') msg = 'Connectez-vous pour lancer l\'analyse EUDR réelle.';
+        else if (String(e.message) === 'rate-limit') msg = 'Limite de requêtes atteinte (50/heure). Réessayez dans quelques minutes.';
+        else msg = 'Analyse EUDR indisponible (' + e.message + ').';
+        if (out) out.innerHTML = '<div style="font-size:12px;color:#e76f51;">' + msg + '</div>';
       });
     });
   }

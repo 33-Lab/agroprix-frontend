@@ -336,12 +336,14 @@
   function _apiBase() { return AP.API_BASE || ''; }
 
   function _fetchInstitutions() {
-    return fetch(_apiBase() + '/api/scoring/institutions', { signal: AbortSignal.timeout(8000) })
+    var _ac = new AbortController(); setTimeout(function(){ _ac.abort(); }, 8000);
+    return fetch(_apiBase() + '/api/scoring/institutions', { signal: _ac.signal })
       .then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
   }
   function _fetchCompute(slug) {
     var url = _apiBase() + '/api/scoring/compute' + (slug ? ('?institution_slug=' + encodeURIComponent(slug)) : '');
-    return fetch(url, { credentials: 'include', signal: AbortSignal.timeout(8000) })
+    var _ac2 = new AbortController(); setTimeout(function(){ _ac2.abort(); }, 8000);
+    return fetch(url, { credentials: 'include', signal: _ac2.signal })
       .then(function(r) {
         if (r.status === 401 || r.status === 403) return { _unauth: true };
         return r.ok ? r.json() : null;

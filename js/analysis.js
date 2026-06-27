@@ -158,6 +158,7 @@ var url=AP.API_BASE+'/api/rapports/'+format
 +'?country='+encodeURIComponent(country)
 +'&commodity='+encodeURIComponent(dbCommodity);function restore(){if(btn){btn.disabled=false;btn.innerHTML=prevHtml;if(window.lucide)try{window.lucide.createIcons();}catch(e){}}}
 fetch(url,{method:'GET',credentials:'include'}).then(function(resp){if(resp.status===401||resp.status===403){restore();alert('Connectez-vous pour generer un rapport (PDF/Excel).');return null;}
+if(resp.status===429){restore();alert('Limite atteinte (50 requêtes/heure). Réessayez dans quelques minutes.');return null;}
 if(!resp.ok){restore();alert('Rapport indisponible ('+resp.status+'). Reessayez plus tard.');return null;}
 return resp.blob();}).then(function(blob){if(!blob)return;if(blob.size===0){restore();alert('Aucune donnee pour '+dbCommodity+' ('+country+').');return;}
 var ext=(format==='excel')?'xlsx':'pdf';var fname='AgroPrix_Rapport_'+dbCommodity+'_'+new Date().toISOString().slice(0,10)+'.'+ext;var dlUrl=URL.createObjectURL(blob);var a=document.createElement('a');a.href=dlUrl;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(dlUrl);},4000);restore();}).catch(function(err){restore();console.warn('[Rapports] download failed:',err);alert('Rapport indisponible (reseau). Reessayez plus tard.');});}

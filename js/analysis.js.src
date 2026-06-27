@@ -1206,6 +1206,11 @@ window.AgroPrix = window.AgroPrix || {};
         alert('Connectez-vous pour generer un rapport (PDF/Excel).');
         return null;
       }
+      if (resp.status === 429) {
+        restore();
+        alert('Limite atteinte (50 requêtes/heure). Réessayez dans quelques minutes.');
+        return null;
+      }
       if (!resp.ok) {
         restore();
         alert('Rapport indisponible (' + resp.status + '). Reessayez plus tard.');
