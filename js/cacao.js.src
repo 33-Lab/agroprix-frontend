@@ -667,7 +667,8 @@ window.AgroPrix = window.AgroPrix || {};
 
       '<div class="card" style="padding:16px;border-radius:14px;">' +
         '<div style="font-size:15px;font-weight:700;margin-bottom:12px;">Comparatif variétés cacao</div>' +
-        '<table style="width:100%;font-size:11px;border-collapse:collapse;">' +
+        '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">' +
+        '<table style="width:100%;font-size:12px;border-collapse:collapse;min-width:340px;">' +
           '<tr style="background:' + COLOR_LIGHT + ';"><th style="padding:8px;text-align:left;">Variété</th><th>KOR %</th><th>Rendement (kg/ha)</th><th>Notes</th></tr>' +
           Object.keys(VARIETES).map(function(k) {
             var v = VARIETES[k];
@@ -677,6 +678,7 @@ window.AgroPrix = window.AgroPrix || {};
               '<td style="font-size:10px;color:#666;">' + v.aromes + '</td></tr>';
           }).join('') +
         '</table>' +
+        '</div>' +
       '</div>';
 
     renderCacaoPrixChart();

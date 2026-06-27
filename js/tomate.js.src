@@ -656,19 +656,21 @@ window.AgroPrix = window.AgroPrix || {};
       // Calendrier saisonnalité
       '<div class="card" style="padding:16px;border-radius:14px;margin-bottom:12px;">' +
         '<div style="font-size:15px;font-weight:700;margin-bottom:12px;">Calendrier cultural tomate</div>' +
-        '<table style="width:100%;font-size:11px;border-collapse:collapse;">' +
+        '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">' +
+        '<table style="width:100%;font-size:12px;border-collapse:collapse;min-width:340px;">' +
           '<tr style="background:' + COLOR_LIGHT + ';"><th style="padding:8px;text-align:left;">Saison</th><th>Semis</th><th>Récolte</th><th>Prix</th></tr>' +
           Object.keys(CALENDRIER).map(function(k) {
             var c = CALENDRIER[k];
             var bgColor = c.alerte === 'success' ? '#F0FFF4' : c.alerte === 'danger' ? '#FFF5F5' : c.alerte === 'warning' ? '#FFFBF0' : '#fff';
             return '<tr style="border-bottom:1px solid #f0f0f0;background:' + bgColor + ';">' +
-              '<td style="padding:8px;font-weight:700;font-size:10px;">' + k + '</td>' +
-              '<td style="text-align:center;font-size:10px;">' + c.semis + '</td>' +
-              '<td style="text-align:center;font-size:10px;">' + c.recolte + '</td>' +
-              '<td style="font-size:9px;color:#555;">' + c.prix + '</td>' +
+              '<td style="padding:8px;font-weight:700;font-size:12px;">' + k + '</td>' +
+              '<td style="text-align:center;font-size:12px;">' + c.semis + '</td>' +
+              '<td style="text-align:center;font-size:12px;">' + c.recolte + '</td>' +
+              '<td style="font-size:11px;color:#555;">' + c.prix + '</td>' +
             '</tr>';
           }).join('') +
         '</table>' +
+        '</div>' +
       '</div>' +
 
       // Journal de vente
