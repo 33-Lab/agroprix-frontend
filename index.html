@@ -426,7 +426,9 @@
         </div>
 
         <div class="section-sep"><h3><i data-lucide="map" class="lc"></i> Carte des Prix</h3></div>
-        <div class="card"><div id="priceMap"></div></div>
+        <!-- height OBLIGATOIRE : une carte Leaflet sans hauteur explicite rend à
+             0px → "encart blanc" vide. Cf. #fullMap (vue Carte) qui a sa hauteur. -->
+        <div class="card"><div id="priceMap" style="height:min(360px, 52vh);border-radius:10px;"></div></div>
 
         <div class="section-sep"><h3><i data-lucide="alert-triangle" class="lc"></i> Facteurs d'Influence</h3></div>
         <div class="factors-grid" id="factorsGrid"></div>
