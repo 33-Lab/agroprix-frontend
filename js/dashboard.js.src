@@ -100,14 +100,17 @@
     return meta ? meta.name : slug.charAt(0).toUpperCase() + slug.slice(1).replace(/_/g, ' ');
   }
 
-  // Fraîcheur des données : "Maj < 30j" / "Maj 1-3 mois" / "Maj > 3 mois"
+  // Profondeur de la série : nombre de relevés mensuels de prix derrière la
+  // variation affichée (= nombre de points de comparaison). On dit "relevés
+  // mensuels" et non "mois d'historique" : ce dernier laissait croire à une
+  // donnée ancienne, alors qu'il s'agit du NOMBRE de points de mesure (plus il
+  // y en a, plus la tendance est fiable). Note : ce chiffre grossit au fil du
+  // temps grâce aux instantanés mensuels persistés (price_snapshots).
   function freshnessLabel(monthsAvailable) {
-    // monthsAvailable = nb de mois d'historique en BDD pour cette série.
-    // Pas de date directe, mais on peut afficher "Données mensuelles"
-    // ou un indicateur du nb de mois.
-    if (!monthsAvailable || monthsAvailable === 0) return 'Donnees indisponibles';
-    if (monthsAvailable < 2) return 'Historique limite';
-    return monthsAvailable + ' mois d\'historique';
+    var n = monthsAvailable || 0;
+    if (n === 0) return 'Donnees a venir';        // WFP ne couvre pas (encore) cette filiere ici
+    if (n < 2) return '1 releve mensuel';          // 1 seul point -> tendance non calculable
+    return n + ' releves mensuels';
   }
 
   function generateAlerts() {

@@ -13,7 +13,7 @@ var liveAlerts=null;function loadRealPrices(callback){if(liveAlerts){callback({d
 if(!AP.api||!AP.api.fetchDashboardAlerts){callback(null);return;}
 AP.api.fetchDashboardAlerts().then(function(alerts){liveAlerts=alerts;callback({data:alerts});}).catch(function(){callback(null);});}
 function countryLabel(slug){if(!slug)return'';var meta=AP.countryMeta&&AP.countryMeta[slug];return meta?meta.name:slug.charAt(0).toUpperCase()+slug.slice(1).replace(/_/g,' ');}
-function freshnessLabel(monthsAvailable){if(!monthsAvailable||monthsAvailable===0)return'Donnees indisponibles';if(monthsAvailable<2)return'Historique limite';return monthsAvailable+' mois d\'historique';}
+function freshnessLabel(monthsAvailable){var n=monthsAvailable||0;if(n===0)return'Donnees a venir';if(n<2)return'1 releve mensuel';return n+' releves mensuels';}
 function generateAlerts(){if(!liveAlerts){return[];}
 return liveAlerts.map(function(a){var change=Math.round(a.change);return{crop:a.commodity,market:countryLabel(a.country),change:change,price:Math.round(a.price||0),time:freshnessLabel(a.months_available),isUp:change>0,num_markets:a.num_markets||0};});}
 var cachedWeather=null;function fetchRealWeather(callback){if(cachedWeather){callback(cachedWeather);return;}
