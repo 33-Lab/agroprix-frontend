@@ -11,7 +11,7 @@
 // MAIS en parallèle revalide le réseau et met à jour le cache → la version
 // suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = "v7.41.0";  // bump 27/06 : fix carte des prix (Leaflet double-init) + label "releves mensuels" au lieu de "mois d historique"
+const CACHE_VERSION = "v7.42.0";  // bump 27/06 : fix carte des prix vide (hauteur priceMap manquante -> Leaflet rendait a 0px)
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 
