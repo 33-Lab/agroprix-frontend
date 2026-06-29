@@ -577,6 +577,12 @@ window.AgroPrix = window.AgroPrix || {};
     var meta = AP.countryMeta[country];
     if (!meta) return;
 
+    // Leaflet n'autorise qu'UNE carte par conteneur : relancer une analyse
+    // rappelait L.map('priceMap') sur un div d\u00e9j\u00e0 initialis\u00e9 \u2192 exception
+    // "Map container is already initialized" qui cassait la carte (et stoppait
+    // le rendu). On d\u00e9truit l'instance pr\u00e9c\u00e9dente avant d'en recr\u00e9er une.
+    if (mapInst) { try { mapInst.remove(); } catch (e) {} mapInst = null; }
+    mapMarkers = [];
     mapInst = L.map('priceMap').setView([meta.lat, meta.lng], meta.zoom);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '\u00a9 OpenStreetMap', maxZoom: 18
@@ -612,6 +618,10 @@ window.AgroPrix = window.AgroPrix || {};
     var meta = AP.countryMeta[country];
     if (!meta) return;
 
+    // Idem buildMapAPI : d\u00e9truire la carte existante avant d'en recr\u00e9er une
+    // (sinon "Map container is already initialized" au 2e rendu).
+    if (mapInst) { try { mapInst.remove(); } catch (e) {} mapInst = null; }
+    mapMarkers = [];
     mapInst = L.map('priceMap').setView([meta.lat, meta.lng], meta.zoom);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '\u00a9 OpenStreetMap', maxZoom: 18
