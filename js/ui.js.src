@@ -8,7 +8,7 @@
   // Email de Kolawolé Ogounchi (Ambassadeur Commercial) — accès illimité
   var KOLA_EMAIL = 'kolawoleogounchi@outlook.com';
   // Emails à accès illimité (admins / fondateurs) — niveau 99, indépendant du backend.
-  var ADMIN_EMAILS = ['noveadg@gmail.com', 'lolognonlonfoun@gmail.com', KOLA_EMAIL.toLowerCase()];
+  var ADMIN_EMAILS = ['noveadg@gmail.com', 'lolognonlonfoun@gmail.com', 'lolognonlonfoun+admin@gmail.com', KOLA_EMAIL.toLowerCase()];
 
   // Niveaux de plan : 0=Gratuit/Démo | 1=Starter | 2=Pro | 3=Expert | 99=Admin
   var PLAN_LEVELS = {
