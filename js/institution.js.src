@@ -76,7 +76,7 @@
       ? "Connectez-vous avec un compte institution pour accéder à cet espace."
       : (err && err.code === 403)
         ? "Cet espace est réservé aux comptes institution (banque, microfinance, assureur)."
-        : "Espace institution indisponible : " + ((err && err.detail) || 'erreur');
+        : "Cet espace est réservé aux institutions partenaires (banque, microfinance, assureur). Connectez-vous avec un compte institution pour y accéder.";
     c.innerHTML = '<div class="card" style="padding:24px;text-align:center;">'
       + '<div style="font-size:40px;margin-bottom:8px;"><i data-lucide="landmark" class="lc"></i></div>'
       + '<p style="color:var(--text-light);">' + esc(msg) + '</p></div>';
