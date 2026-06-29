@@ -223,7 +223,8 @@
     <a id="navMarket" data-action="show-view" data-view="market" data-nav="1"><span class="nav-icon"><i data-lucide="handshake" class="lc"></i></span> Offres & Demandes</a>
 
     <div class="nav-separator"></div>
-    <a id="navPartner" data-action="show-view" data-view="partner" data-nav="1"><span class="nav-icon"><i data-lucide="users" class="lc"></i></span> Espace Partenaire</a>
+    <!-- Espace Partenaire masqué temporairement : endpoint /api/partner/me/dashboard renvoie 500 (table payments incompatible PostgreSQL). Réactiver après déploiement du fix backend. -->
+    <a id="navPartner" data-action="show-view" data-view="partner" data-nav="1" style="display:none;"><span class="nav-icon"><i data-lucide="users" class="lc"></i></span> Espace Partenaire</a>
     <a id="navParams" data-action="show-view" data-view="params" data-nav="1"><span class="nav-icon"><i data-lucide="settings" class="lc"></i></span> Parametres</a>
     <a data-action="logout" style="color:#e76f51;"><span class="nav-icon"><i data-lucide="log-out" class="lc"></i></span> Deconnexion</a>
   </nav>
