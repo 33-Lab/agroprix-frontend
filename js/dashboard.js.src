@@ -308,7 +308,10 @@
       html += '</div>';
     });
 
-    html += '<button data-action="show-view" data-view="analyse" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#E8862A,#F0A050);color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;min-height:48px;box-shadow:0 2px 8px rgba(232,134,42,0.25);"><i data-lucide="search" class="lc"></i> Analyser ces tendances</button>';
+    // Le dashboard vit DANS viewAnalyse (juste au-dessus du formulaire). Un
+    // show-view "analyse" était donc un no-op (on y est déjà) → le bouton
+    // semblait cassé. On descend vers le formulaire de configuration (#formCard).
+    html += '<button data-action="scroll-to" data-target="formCard" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#E8862A,#F0A050);color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;min-height:48px;box-shadow:0 2px 8px rgba(232,134,42,0.25);"><i data-lucide="search" class="lc"></i> Analyser ces tendances</button>';
     html += '</div>';
 
     // ─── 3. GAMIFICATION CARD ───
