@@ -11,18 +11,19 @@
   'use strict';
 
   var USER_KEY = 'agroprix_user';
-  // Token de session, stocké pour le fallback Bearer. Le cookie httpOnly reste
-  // la voie préférée, MAIS comme backend (railway.app) et frontend
-  // (app.agroprix.app) sont sur des domaines différents, ce cookie est TIERS et
-  // bloqué par Safari/iOS/Brave/Firefox → déconnexions. Le token en Bearer
-  // contourne ce blocage. Risque XSS atténué par la CSP durcie (H5).
+  // Clé de l'ancien token Bearer (migration). On ne le STOCKE ni ne l'ENVOIE
+  // plus : l'auth passe 100% par le cookie de session FIRST-PARTY
+  // (Domain=.agroprix.app, SameSite=lax, Secure) depuis que l'API est sur
+  // api.agroprix.app (même site que app.agroprix.app) — plus de cookie tiers
+  // bloqué par Safari/iOS/Brave. On garde la clé uniquement pour PURGER les
+  // anciens tokens au boot/logout.
   var LEGACY_TOKEN_KEY = 'agroprix_token';
 
-  // ── Intercepteur fetch global : injecte Authorization: Bearer sur TOUTES les
-  // requêtes vers le backend (pas seulement authFetch), pour que les modules qui
-  // utilisent fetch() directement (diagnostic photo, EUDR, négoce, intrants,
-  // scoring, ndvi…) s'authentifient même quand le cookie tiers est bloqué.
-  (function installBearerInterceptor() {
+  // ── Intercepteur fetch global : force credentials:'include' sur TOUTES les
+  // requêtes vers le backend, pour que les modules qui utilisent fetch()
+  // directement (diagnostic photo, EUDR, négoce, intrants, scoring, ndvi…)
+  // joignent bien le cookie de session (sinon ils seraient non authentifiés).
+  (function installCredentialsInterceptor() {
     if (typeof window === 'undefined' || window.__agpxFetchPatched || typeof window.fetch !== 'function') return;
     window.__agpxFetchPatched = true;
     var _fetch = window.fetch.bind(window);
@@ -30,12 +31,8 @@
       try {
         var url = (typeof input === 'string') ? input : (input && input.url) || '';
         var base = (AP && AP.API_BASE) || '';
-        var token = localStorage.getItem(LEGACY_TOKEN_KEY);
-        if (token && base && url.indexOf(base) === 0) {
+        if (base && url.indexOf(base) === 0) {
           init = init || {};
-          var headers = new Headers((init && init.headers) || {});
-          if (!headers.has('Authorization')) headers.set('Authorization', 'Bearer ' + token);
-          init.headers = headers;
           if (!init.credentials) init.credentials = 'include';
         }
       } catch (e) { /* ne jamais casser un fetch à cause de l'intercepteur */ }
@@ -95,14 +92,8 @@
     // meme en cross-origin (Vercel <-> Railway). Requiert CORS
     // allow_credentials=true + origin explicite (pas de wildcard) cote API.
     options.credentials = 'include';
-    // Migration : si un ancien token tra ne en localStorage, on l'envoie
-    // une derniere fois pour permettre au backend de poser le cookie via
-    // la requete suivante (login refait), puis on le purge des que /me
-    // repondra 200.
-    var legacyToken = localStorage.getItem(LEGACY_TOKEN_KEY);
-    if (legacyToken && !options.headers['Authorization']) {
-      options.headers['Authorization'] = 'Bearer ' + legacyToken;
-    }
+    // Auth 100% cookie first-party (Domain=.agroprix.app) — plus d'injection
+    // de token Bearer.
     return fetch(AP.API_BASE + url, options);
   }
 
@@ -123,9 +114,8 @@
       if (!r.ok) return r.text().then(function(t) { try { throw JSON.parse(t); } catch(e) { if (e instanceof SyntaxError) throw new Error('auth-error: ' + r.status); throw e; } });
       return r.json();
     }).then(function(data) {
-      // Cookie httpOnly posé + token stocké pour fallback Bearer (cf. login).
-      if (data && data.access_token) localStorage.setItem(LEGACY_TOKEN_KEY, data.access_token);
-      else localStorage.removeItem(LEGACY_TOKEN_KEY);
+      // Auth via cookie first-party posé par le backend — on ne stocke aucun token.
+      localStorage.removeItem(LEGACY_TOKEN_KEY);
       saveSession(data.utilisateur);
       return data;
     });
@@ -139,10 +129,8 @@
       if (!r.ok) return r.text().then(function(t) { try { throw JSON.parse(t); } catch(e) { if (e instanceof SyntaxError) throw new Error('auth-error: ' + r.status); throw e; } });
       return r.json();
     }).then(function(data) {
-      // Stocke le token pour le fallback Bearer (cookie tiers bloqué sur
-      // Safari/iOS/mobile car backend et frontend sur des domaines différents).
-      if (data && data.access_token) localStorage.setItem(LEGACY_TOKEN_KEY, data.access_token);
-      else localStorage.removeItem(LEGACY_TOKEN_KEY);
+      // Auth via cookie first-party posé par le backend — on ne stocke aucun token.
+      localStorage.removeItem(LEGACY_TOKEN_KEY);
       saveSession(data.utilisateur);
       return data;
     });
