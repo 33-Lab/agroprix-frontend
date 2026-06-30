@@ -49,7 +49,19 @@ function applicantCard(a){var sc=a.score||{};var elig=sc.eligible;var badgeColor
 +'<div style="font-size:10px;font-weight:700;color:'+badgeColor+';">'
 +(elig===true?'✓ Éligible':elig===false?'✗ Non éligible':'—')+'</div>'
 +'</div></div></div>';}
-function showApplicantDetail(uid){var el=document.getElementById('instTabContent');if(!el)return;el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-light);">Chargement du dossier…</div>';apiFetch('/applicants/'+uid).then(function(d){var sc=d.score||{};var dims=sc.dimensions||{};var prof=d.profile||{};var app=d.application||{};var st=app.status||'pending';var dimRows=Object.keys(DIM_LABELS).map(function(k){var dd=dims[k]||{};if(dd.excluded){return'<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">'
+function creditDossierHtml(sig){sig=sig||{};var par=sig.parcelles||{},ndvi=sig.ndvi||{},eudr=sig.eudr||{},rep=sig.repayment||{};var eMap={green:['#2D6A4F','Conforme (green)'],amber:['#b45309','À vérifier (amber)'],red:['#b91c1c','Risque (red)'],non_verifie:['#94a3b8','Non vérifié']};var e=eMap[eudr.status]||eMap.non_verifie;var eudrTxt=e[1]+(eudr.checked?' · '+eudr.checked+'/'+eudr.total+' parcelle(s)':'');var ndviTxt=(ndvi.mean_ndvi!=null)?ndvi.mean_ndvi.toFixed(2)+' · '+(ndvi.label||'')+' ('+ndvi.parcelles_analysees+' mesure(s))':'<span style="color:#94a3b8;">Non analysé (lancer une analyse satellite)</span>';var ndviCol=(ndvi.mean_ndvi==null)?'#94a3b8':(ndvi.mean_ndvi>=0.6?'#2D6A4F':ndvi.mean_ndvi>=0.4?'#b45309':'#b91c1c');var parTxt=(par.count||0)+' parcelle(s) · '+(par.surface_totale_ha||0)+' ha'
++((par.cultures&&par.cultures.length)?' · '+par.cultures.map(esc).join(', '):'');var repTxt=(rep.revenu_estime_fcfa!=null)?fcfa(rep.revenu_estime_fcfa)+' <span style="font-size:10px;color:var(--text-light);">(prod. ~'+(rep.production_attendue_kg||0)+' kg)</span>':'—';function row(icon,label,val,col){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);gap:10px;">'
++'<span style="font-size:12px;"><i data-lucide="'+icon+'" class="lc" style="width:14px;height:14px;vertical-align:-2px;"></i> '+label+'</span>'
++'<span style="font-size:12px;font-weight:700;text-align:right;'+(col?'color:'+col+';':'')+'">'+val+'</span></div>';}
+return'<div class="card" style="padding:16px;margin-bottom:12px;">'
++'<div class="card-title"><span class="icon"><i data-lucide="folder-check" class="lc"></i></span> Dossier crédit (signaux satellites & terrain)</div>'
++row('coins','<b>Capacité de remboursement</b> (revenu estimé)',repTxt,'#2D6A4F')
++row('trees','<b>EUDR</b> (conformité export UE)',eudrTxt,e[0])
++row('satellite','<b>NDVI</b> (santé végétation)',ndviTxt,ndviCol)
++row('map-pin','<b>Parcelles</b>',esc(parTxt),null)
++'<p style="font-size:10px;color:var(--text-light);margin:8px 0 0;font-style:italic;">Données dérivées (sans coordonnées exactes ni contact). Revenu = surface × rendement de réf. × prix de réf. (indicatif).</p>'
++'</div>';}
+function showApplicantDetail(uid){var el=document.getElementById('instTabContent');if(!el)return;el.innerHTML='<div style="text-align:center;padding:24px;color:var(--text-light);">Chargement du dossier…</div>';apiFetch('/applicants/'+uid).then(function(d){var sc=d.score||{};var dims=sc.dimensions||{};var prof=d.profile||{};var app=d.application||{};var sig=d.signals||{};var st=app.status||'pending';var dimRows=Object.keys(DIM_LABELS).map(function(k){var dd=dims[k]||{};if(dd.excluded){return'<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">'
 +'<span style="font-size:12px;">'+DIM_LABELS[k]+'</span>'
 +'<span style="font-size:11px;color:#94a3b8;font-style:italic;">Non fourni</span></div>';}
 var raw=dd.raw!=null?dd.raw:'—';var col=(dd.passes_min===false)?'#b91c1c':'#2D6A4F';return'<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">'
@@ -68,6 +80,7 @@ var raw=dd.raw!=null?dd.raw:'—';var col=(dd.passes_min===false)?'#b91c1c':'#2D
 +'<div style="margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;font-size:12px;">'
 +'<span><b>Éligibilité :</b> '+(sc.eligible?'<span style="color:#2D6A4F;font-weight:700;">✓ Éligible</span>':'<span style="color:#b91c1c;font-weight:700;">✗ Non éligible</span>')+'</span>'
 +'<span><b>Prêt max :</b> '+fcfa(sc.max_loan_fcfa)+'</span></div></div>'
++creditDossierHtml(sig)
 +'<div class="card" style="padding:16px;margin-bottom:12px;">'
 +'<div class="card-title"><span class="icon"><i data-lucide="layout-grid" class="lc"></i></span> Détail du score (4 blocs)</div>'
 +dimRows+'</div>'
