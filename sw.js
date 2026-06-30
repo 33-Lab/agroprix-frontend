@@ -11,7 +11,7 @@
 // MAIS en parallèle revalide le réseau et met à jour le cache → la version
 // suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = "v7.43.0";  // bump 30/06 : bascule API -> api.agroprix.app (cookie first-party) + retrait fallback Bearer
+const CACHE_VERSION = "v7.44.0";  // hotfix 30/06 : CSP connect-src manquait api.agroprix.app -> appels bloqués (Erreur de connexion)
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 
