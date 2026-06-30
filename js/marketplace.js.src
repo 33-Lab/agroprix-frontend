@@ -66,13 +66,9 @@
   }
 
   function _authHeaders() {
-    // Auth passe par le cookie httpOnly (refactor securite) — pas de token
-    // en Bearer. On garde un fallback pour les vieux clients qui auraient
-    // encore un token en localStorage le temps que la migration se purge.
-    var h = { 'Content-Type': 'application/json' };
-    var legacy = localStorage.getItem('agroprix_token');
-    if (legacy) h['Authorization'] = 'Bearer ' + legacy;
-    return h;
+    // Auth 100% cookie first-party (Domain=.agroprix.app) joint via
+    // _fetchOpts -> credentials:'include'. Plus de token Bearer.
+    return { 'Content-Type': 'application/json' };
   }
   // Toutes les fetch() vers l'API authentifiee DOIVENT passer credentials:'include'
   // pour que le navigateur joigne le cookie httpOnly (cross-origin Vercel <-> Railway).

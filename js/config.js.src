@@ -6,7 +6,11 @@ window.AgroPrix = window.AgroPrix || {};
   // Backend Railway Hobby (ex-Render supprime le 23 avril 2026).
   // To use local backend for dev, uncomment the next line:
   // AP.API_BASE = 'http://localhost:8000';
-  AP.API_BASE = 'https://web-production-46fb2.up.railway.app'; // Railway Hobby — actif
+  // Domaine propre api.agroprix.app : MEME site que app.agroprix.app -> le cookie
+  // de session (Domain=.agroprix.app, SameSite=lax, Secure) est FIRST-PARTY,
+  // donc jamais bloque par Safari/iOS/Brave (fin des deconnexions). Plus de
+  // fallback Bearer necessaire.
+  AP.API_BASE = 'https://api.agroprix.app'; // domaine propre — cookie first-party
   // Default true : backend Railway est prod live. checkAPI() confirmera au boot.
   // Si le backend tombe, cache localStorage + fetchWithFallback gèrent le dégradé.
   AP.API_AVAILABLE = true;
