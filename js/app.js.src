@@ -290,7 +290,7 @@ window.chercherTechniciens = function() {
 // ============================================================
 window.souscrirePlan = function(plan, montant) {
   var AP = window.AgroPrix;
-  var user = JSON.parse(localStorage.getItem('agroprix_user') || '{}');
+  var user; try { user = JSON.parse(localStorage.getItem('agroprix_user') || '{}'); } catch (e) { user = {}; }
   var fedapayKey = AP && AP.FEDAPAY_KEY;
   var keyReady = fedapayKey && fedapayKey !== 'VOTRE_CLE_PUBLIQUE_FEDAPAY_ICI';
 
@@ -350,7 +350,7 @@ function onFedapaySuccess(plan, montant, response) {
   var transactionId = response && response.transaction && response.transaction.id
     ? response.transaction.id
     : (response && response.id ? response.id : 'N/A');
-  var user = JSON.parse(localStorage.getItem('agroprix_user') || '{}');
+  var user; try { user = JSON.parse(localStorage.getItem('agroprix_user') || '{}'); } catch (e) { user = {}; }
   var previousRole = user.role || 'free';
 
   // IMPORTANT : le backend n'upgrade le role qu'apres reception du webhook

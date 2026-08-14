@@ -1,13 +1,16 @@
-/*! AgroPrix dashboard.js - generated from dashboard.js.src on 2026-06-29 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+/*! AgroPrix dashboard.js - generated from dashboard.js.src on 2026-08-14 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
 (function(AP){'use strict';function getUserName(){var user=AP.auth?AP.auth.getUser():null;return(user&&(user.nom||user.name))||'Producteur';}
 function getUserCountry(){var user=AP.auth?AP.auth.getUser():null;return(user&&(user.pays||user.country))||'benin';}
 function getGreeting(){var h=new Date().getHours();if(h<12)return'Bonjour';if(h<18)return'Bon apres-midi';return'Bonsoir';}
-function getStreak(){var data=JSON.parse(localStorage.getItem('agroprix_streak')||'{"count":0,"lastDate":""}');var today=new Date().toISOString().split('T')[0];if(data.lastDate===today)return data.count;var yesterday=new Date(Date.now()-86400000).toISOString().split('T')[0];if(data.lastDate===yesterday){data.count++;}else{data.count=1;}
+function getStreak(){var data;try{data=JSON.parse(localStorage.getItem('agroprix_streak')||'{"count":0,"lastDate":""}');}
+catch(e){data={count:0,lastDate:''};}
+var today=new Date().toISOString().split('T')[0];if(data.lastDate===today)return data.count;var yesterday=new Date(Date.now()-86400000).toISOString().split('T')[0];if(data.lastDate===yesterday){data.count++;}else{data.count=1;}
 data.lastDate=today;localStorage.setItem('agroprix_streak',JSON.stringify(data));return data.count;}
 function getPoints(){return parseInt(localStorage.getItem('agroprix_points')||'0');}
 function addPoints(pts){var total=getPoints()+pts;localStorage.setItem('agroprix_points',total.toString());return total;}
 function getLevel(pts){if(pts>=2000)return{name:'Expert Marche',emoji:'<i data-lucide="crown" class="lc"></i>',next:null,progress:100};if(pts>=1000)return{name:'Negociant Pro',emoji:'<i data-lucide="gem" class="lc"></i>',next:2000,progress:Math.round((pts-1000)/10)};if(pts>=500)return{name:'Analyste Confirme',emoji:'<i data-lucide="award" class="lc"></i>',next:1000,progress:Math.round((pts-500)/5)};if(pts>=200)return{name:'Producteur Actif',emoji:'<i data-lucide="sparkles" class="lc"></i>',next:500,progress:Math.round((pts-200)/3)};if(pts>=50)return{name:'Debutant Motive',emoji:'<i data-lucide="sprout" class="lc"></i>',next:200,progress:Math.round((pts-50)/1.5)};return{name:'Nouveau',emoji:'<i data-lucide="badge-plus" class="lc"></i>',next:50,progress:Math.round(pts/0.5)};}
-function getBadges(){return JSON.parse(localStorage.getItem('agroprix_badges')||'[]');}
+function getBadges(){try{return JSON.parse(localStorage.getItem('agroprix_badges')||'[]');}
+catch(e){return[];}}
 function checkBadge(id,label){var badges=getBadges();if(!badges.find(function(b){return b.id===id;})){badges.push({id:id,label:label,date:new Date().toISOString()});localStorage.setItem('agroprix_badges',JSON.stringify(badges));}}
 var liveAlerts=null;function loadRealPrices(callback){if(liveAlerts){callback({data:liveAlerts});return;}
 if(!AP.api||!AP.api.fetchDashboardAlerts){callback(null);return;}

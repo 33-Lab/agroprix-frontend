@@ -21,7 +21,9 @@
     return 'Bonsoir';
   }
   function getStreak() {
-    var data = JSON.parse(localStorage.getItem('agroprix_streak') || '{"count":0,"lastDate":""}');
+    var data;
+    try { data = JSON.parse(localStorage.getItem('agroprix_streak') || '{"count":0,"lastDate":""}'); }
+    catch (e) { data = { count: 0, lastDate: '' }; }
     var today = new Date().toISOString().split('T')[0];
     if (data.lastDate === today) return data.count;
     var yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
@@ -51,7 +53,8 @@
     return { name: 'Nouveau', emoji: '<i data-lucide="badge-plus" class="lc"></i>', next: 50, progress: Math.round(pts/0.5) };
   }
   function getBadges() {
-    return JSON.parse(localStorage.getItem('agroprix_badges') || '[]');
+    try { return JSON.parse(localStorage.getItem('agroprix_badges') || '[]'); }
+    catch (e) { return []; }
   }
   function checkBadge(id, label) {
     var badges = getBadges();
