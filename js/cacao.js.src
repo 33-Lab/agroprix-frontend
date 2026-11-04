@@ -109,7 +109,7 @@ window.AgroPrix = window.AgroPrix || {};
       PRIX_CACAO_ERROR = 'API non disponible';
       return Promise.resolve();
     }
-    return AP.api.fetchPricesByDbName('cote_divoire', 'Cacao', '2024-01-01').then(function(rows) {
+    return AP.api.fetchPricesByDbName('cote_divoire', 'Cocoa', '2024-01-01').then(function(rows) {
       PRIX_CACAO.length = 0;
       (rows || []).forEach(function(r) {
         PRIX_CACAO.push({

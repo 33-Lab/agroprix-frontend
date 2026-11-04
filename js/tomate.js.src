@@ -94,7 +94,7 @@ window.AgroPrix = window.AgroPrix || {};
       PRIX_TOMATE_ERROR = 'API non disponible';
       return Promise.resolve();
     }
-    return AP.api.fetchPricesByDbName('benin', 'Tomate', '2024-01-01').then(function(rows) {
+    return AP.api.fetchPricesByDbName('benin', 'Tomatoes', '2024-01-01').then(function(rows) {
       PRIX_TOMATE.length = 0;
       (rows || []).forEach(function(r) {
         // Inférer la saison à partir du mois (les WFP n'ont pas ce flag — on calcule)
