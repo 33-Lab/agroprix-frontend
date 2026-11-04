@@ -11,7 +11,8 @@
 // MAIS en parallèle revalide le réseau et met à jour le cache → la version
 // suivante du chargement aura le nouveau code, sans attendre une expiration.
 
-const CACHE_VERSION = "v7.46.0";  // 30/06 : dossier crédit institution (EUDR + NDVI + parcelles + revenu dans le détail demandeur)
+const CACHE_VERSION = "v7.47.0";  // 04/11 : honnêteté d'affichage (LIVE, dates, reco)
+// précédent : v7.46.0  // 30/06 : dossier crédit institution (EUDR + NDVI + parcelles + revenu dans le détail demandeur)
 const CACHE_NAME = 'agroprix-' + CACHE_VERSION;
 const CDN_CACHE = 'agroprix-cdn-' + CACHE_VERSION;
 
