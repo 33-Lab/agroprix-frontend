@@ -157,21 +157,35 @@
     return data.filter(function(d) { return d && d.month && d.month >= fromMonth; });
   }
 
+  // Noms de culture à essayer en base, dans l'ordre. Les séries WFP réelles
+  // (HDX, des années d'historique) sont stockées sous le nom anglais WFP
+  // ("Maize", "Tomatoes"…) ; le nom FR sans accent ("Mais", "Tomate") ne porte
+  // que d'anciens instantanés de 2 points (fév.–mars 2026). On interroge donc
+  // d'abord le nom WFP, puis le nom FR en secours (filières hors WFP).
+  function dbNamesFor(commodity) {
+    var names = [];
+    var wfp = AP.cultureToWFP && AP.cultureToWFP[commodity];
+    if (wfp) names.push(wfp);
+    var fr = stripAccents(AP.cultureNames[commodity] || commodity);
+    if (names.indexOf(fr) === -1) names.push(fr);
+    return names;
+  }
+
   async function fetchPrices(country, commodity, periodKey) {
-    // DB seed stocke les noms en FR sans accents (ex: "Mais", "Cafe", "Niebe").
-    // cultureNames UI = avec accents ("Maïs", "Café"). On strip avant d'envoyer.
-    // WFP sync reel viendra en Phase 2c avec mapping cote backend.
-    var dbName = stripAccents(AP.cultureNames[commodity] || commodity);
     var startDate = periodToStartDate(periodKey);
     // /history = série de tendance persistée (instantanés AgroPrix + moyennes
-    // WFP live fusionnés). Elle survit à la perte de profondeur WFP (ex. Cacao
-    // CI qui n'a qu'un mois récent) et s'enrichit à chaque consultation. Filtre
-    // de période appliqué côté client (cf. filterFromMonth).
-    var url = AP.API_BASE + '/api/prices/history?country=' + country
-            + '&commodity=' + encodeURIComponent(dbName);
-    var cacheKey = 'prices_' + country + '_' + dbName + '_' + periodKey;
-    var json = await fetchRobust(url, cacheKey);
-    return filterFromMonth((json && json.data) ? json.data : [], startDate);
+    // WFP live fusionnés). Filtre de période appliqué côté client
+    // (cf. filterFromMonth).
+    var names = dbNamesFor(commodity);
+    var data = [];
+    for (var i = 0; i < names.length; i++) {
+      var url = AP.API_BASE + '/api/prices/history?country=' + country
+              + '&commodity=' + encodeURIComponent(names[i]);
+      var json = await fetchRobust(url, 'prices_' + country + '_' + names[i] + '_' + periodKey);
+      data = (json && json.data) ? json.data : [];
+      if (data.length) break;
+    }
+    return filterFromMonth(data, startDate);
   }
 
   // ── Variante : fetchPrices avec nom DB direct (sans mapping cultureNames) ─
@@ -199,12 +213,18 @@
   // En cas d'échec d'un appel : on dégrade gracieusement (l'alerte est
   // omise). JAMAIS de fallback à des données hardcodées (anti-mensonge).
   async function fetchDashboardAlerts() {
-    var phareCommodities = ['Mais', 'Riz', 'Tomate', 'Cacao', 'Plantain'];
+    // Noms WFP (séries réelles à jour), libellé FR pour l'affichage.
+    var phareCommodities = [
+      { db: 'Maize', label: 'Maïs' }, { db: 'Rice', label: 'Riz' },
+      { db: 'Tomatoes', label: 'Tomate' }, { db: 'Cocoa', label: 'Cacao' },
+      { db: 'Plantain', label: 'Plantain' }
+    ];
     var allAlerts = [];
 
     // 1. Pour chaque culture phare, récupérer les pays avec données
     for (var i = 0; i < phareCommodities.length; i++) {
-      var commodity = phareCommodities[i];
+      var commodity = encodeURIComponent(phareCommodities[i].db);
+      var commodityLabel = phareCommodities[i].label;
       try {
         var compareUrl = AP.API_BASE + '/api/prices/compare?commodity=' + commodity;
         var resp = await fetchWithTimeout(compareUrl, {}, 8000);
@@ -230,7 +250,7 @@
 
             // Date du dernier observation (récupérée via avg_price disponible)
             allAlerts.push({
-              commodity: commodity,
+              commodity: commodityLabel,
               country: country,
               price: trend.current_price || topCountries[j].avg_price || null,
               change: trend.mom_change_pct || 0,
@@ -257,10 +277,15 @@
   }
 
   async function fetchCompare(commodity) {
-    var dbName = stripAccents(AP.cultureNames[commodity] || commodity);
-    var url = AP.API_BASE + '/api/prices/compare?commodity=' + encodeURIComponent(dbName);
-    var json = await fetchRobust(url, 'compare_' + dbName);
-    return (json && json.data) ? json.data : [];
+    var names = dbNamesFor(commodity);
+    var data = [];
+    for (var i = 0; i < names.length; i++) {
+      var url = AP.API_BASE + '/api/prices/compare?commodity=' + encodeURIComponent(names[i]);
+      var json = await fetchRobust(url, 'compare_' + names[i]);
+      data = (json && json.data) ? json.data : [];
+      if (data.length) break;
+    }
+    return data;
   }
 
   async function fetchForecast(country) {
@@ -270,11 +295,15 @@
   }
 
   async function fetchRecommendations(country, commodity) {
-    var dbName = stripAccents(AP.cultureNames[commodity] || commodity);
-    var url = AP.API_BASE + '/api/recommendations/?country=' + country
-            + '&commodity=' + encodeURIComponent(dbName);
-    var json = await fetchRobust(url, 'reco_' + country + '_' + dbName);
-    return json || {};
+    var names = dbNamesFor(commodity);
+    var json = {};
+    for (var i = 0; i < names.length; i++) {
+      var url = AP.API_BASE + '/api/recommendations/?country=' + country
+              + '&commodity=' + encodeURIComponent(names[i]);
+      json = (await fetchRobust(url, 'reco_' + country + '_' + names[i])) || {};
+      if ((json.recommendation && json.recommendation.action) || (json.data && json.data.trend)) break;
+    }
+    return json;
   }
 
   // ── Expose ────────────────────────────────────────────────────────────────
