@@ -1,0 +1,55 @@
+/*! AgroPrix admin.js - generated from admin.js.src on 2026-11-04 - DO NOT EDIT; edit the .src file and run `python build_js.py` */
+(function(AP){'use strict';var ROLE_LABELS={free:'Gratuit',starter:'Starter',pro:'Pro',expert:'Expert',admin:'Admin',institution:'Institution'};var STATUS_LABELS={approved:'Payé',pending_webhook:'En attente',declined:'Refusé',canceled:'Annulé',failed:'Échec'};var _state={tab:'overview',q:''};function apiBase(){return(AP.API_BASE||'').replace(/\/$/,'');}
+function apiFetch(path){return fetch(apiBase()+'/api/admin/dashboard'+path,{credentials:'include'}).then(function(r){if(r.status===401)throw{code:401};if(r.status===403)throw{code:403};return r.json().then(function(body){if(!r.ok)throw{code:r.status,detail:(body&&body.detail)||'Erreur'};return body;});});}
+function icons(){if(window.lucide)try{window.lucide.createIcons();}catch(e){}}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function fcfa(n){return Number(n||0).toLocaleString('fr-FR')+' FCFA';}
+function day(iso){if(!iso)return'—';var d=new Date(iso);return isNaN(d)?'—':d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});}
+function container(){return document.getElementById('adminContent');}
+function isAdmin(user){if(!user)return false;if(user.role==='admin')return true;return!!(AP.ui&&AP.ui.isAdminEmail&&AP.ui.isAdminEmail(user.email));}
+function applyRole(user){var nav=document.getElementById('navAdmin');if(nav)nav.style.display=isAdmin(user)?'':'none';}
+function message(html){var c=container();if(c)c.innerHTML='<div class="card" style="padding:24px;text-align:center;">'+html+'</div>';icons();}
+function renderError(err){if(err&&err.code===401)return message('<p>Connectez-vous pour accéder au tableau de bord.</p>');if(err&&err.code===403){return message('<p style="font-weight:700;margin-bottom:6px;">Accès admin non activé sur le serveur</p>'
++'<p style="font-size:13px;color:var(--text-light);">Votre compte doit avoir le rôle « admin » en base de données, '
++'puis il faut se reconnecter. Demandez à l\'administrateur technique de l\'activer.</p>');}
+message('<p>Tableau de bord indisponible : '+esc((err&&err.detail)||'erreur réseau')+'</p>');}
+function shell(inner){var tabs=[['overview','Vue d\'ensemble','gauge'],['users','Utilisateurs','users'],['payments','Paiements','credit-card']];var bar=tabs.map(function(t){var on=_state.tab===t[0];return'<button data-action="admin-tab" data-tab="'+t[0]+'" style="flex:1;min-width:110px;padding:10px 8px;border:none;'
++'border-bottom:3px solid '+(on?'var(--primary)':'transparent')+';background:'+(on?'#F0FDF4':'transparent')
++';color:'+(on?'var(--primary)':'var(--text-light)')+';font-weight:'+(on?'700':'500')
++';font-size:12px;cursor:pointer;border-radius:8px 8px 0 0;"><i data-lucide="'+t[2]
++'" class="lc" style="width:14px;height:14px;vertical-align:-2px;"></i> '+t[1]+'</button>';}).join('');return'<div style="margin-bottom:8px;"><h3 style="margin:0;color:var(--primary);"><i data-lucide="shield-check" class="lc"></i> Tableau de bord admin</h3>'
++'<p style="font-size:12px;color:var(--text-light);margin:2px 0 0;">Inscriptions, abonnements et revenus en temps réel.</p></div>'
++'<div style="display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--border);margin-bottom:14px;">'+bar+'</div>'
++inner;}
+function kpi(label,value,sub){return'<div class="card" style="padding:14px;border-radius:14px;">'
++'<div style="font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;">'+esc(label)+'</div>'
++'<div style="font-size:24px;font-weight:800;color:var(--primary);margin-top:4px;">'+esc(value)+'</div>'
++(sub?'<div style="font-size:11px;color:var(--text-light);margin-top:2px;">'+esc(sub)+'</div>':'')+'</div>';}
+function table(head,rows){if(!rows.length)return'<p style="color:var(--text-light);font-size:13px;padding:12px;">Aucune donnée.</p>';return'<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">'
++'<tr>'+head.map(function(h){return'<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border);color:var(--text-light);">'+esc(h)+'</th>';}).join('')+'</tr>'
++rows.map(function(r){return'<tr>'+r.map(function(v){return'<td style="padding:8px;border-bottom:1px solid #f0f0f0;">'+v+'</td>';}).join('')+'</tr>';}).join('')
++'</table></div>';}
+function renderOverview(d){var u=d.users||{},p=d.payments||{};var roles=Object.keys(u.by_role||{}).map(function(r){return esc(ROLE_LABELS[r]||r)+' : <b>'+esc(u.by_role[r])+'</b>';}).join(' · ');var plans=Object.keys(p.by_plan||{}).map(function(k){return esc(k)+' : <b>'+esc(p.by_plan[k])+'</b>';}).join(' · ')||'aucun';var html='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px;">'
++kpi('Utilisateurs',u.total||0,'+'+(u.new_7d||0)+' en 7 j · +'+(u.new_30d||0)+' en 30 j')
++kpi('Actifs 30 j',u.active_30d||0,'connectés ce mois')
++kpi('Abonnés payants',u.paying||0,'Starter + Pro + Expert')
++kpi('Paiements validés',p.approved||0,(p.pending||0)+' en attente')
++kpi('Revenu total',fcfa(p.revenue_total_fcfa),fcfa(p.revenue_30d_fcfa)+' sur 30 j')
++'</div>'
++'<div class="card" style="padding:14px;border-radius:14px;margin-bottom:14px;font-size:13px;line-height:1.7;">'
++'<div><b>Répartition par rôle</b> — '+(roles||'—')+'</div>'
++'<div><b>Paiements par plan</b> — '+plans+'</div></div>';if(p.pending>0){html+='<div class="card" style="padding:12px 14px;border-radius:14px;margin-bottom:14px;background:#FFFBEB;border:1px solid #F59E0B;font-size:13px;">'
++'<i data-lucide="alert-triangle" class="lc"></i> '+esc(p.pending)+' paiement(s) en attente de confirmation FedaPay : vérifiez qu\'ils ont bien été activés.</div>';}
+(d.notes||[]).forEach(function(n){html+='<p style="font-size:11px;color:var(--text-light);margin:0 0 12px;"><i data-lucide="info" class="lc"></i> '+esc(n)+'</p>';});html+='<div class="card" style="padding:14px;border-radius:14px;"><div style="font-weight:700;margin-bottom:8px;">Dernières inscriptions</div>'
++table(['Date','Nom','Email','Rôle','Profil','Pays'],(d.latest_signups||[]).map(function(s){return[day(s.created_at),esc(s.name),esc(s.email),esc(ROLE_LABELS[s.role]||s.role),esc(s.profil_type||'—'),esc(s.country||'—')];}))+'</div>';return html;}
+function renderUsers(d){var search='<div style="display:flex;gap:8px;margin-bottom:12px;">'
++'<input id="adminSearch" type="search" placeholder="Nom, email ou téléphone" value="'+esc(_state.q)+'" data-action-enter="admin-search" style="flex:1;">'
++'<button data-action="admin-search" class="btn-analyse" style="min-height:40px;padding:0 16px;">Rechercher</button></div>';return search+'<p style="font-size:12px;color:var(--text-light);margin:0 0 8px;">'+esc(d.total)+' utilisateur(s)</p>'
++'<div class="card" style="padding:8px;border-radius:14px;">'
++table(['Inscrit','Nom','Email','Téléphone','Rôle','Profil','Dernière connexion'],(d.users||[]).map(function(x){return[day(x.created_at),esc(x.name),esc(x.email),esc(x.phone||'—'),esc(ROLE_LABELS[x.role]||x.role),esc(x.profil_type||'—'),day(x.last_login)];}))+'</div>';}
+function renderPayments(d){return'<p style="font-size:12px;color:var(--text-light);margin:0 0 8px;">'+esc(d.total)+' paiement(s)</p>'
++'<div class="card" style="padding:8px;border-radius:14px;">'
++table(['Date','Utilisateur','Plan','Montant','Statut','Transaction'],(d.payments||[]).map(function(x){var st=STATUS_LABELS[x.status]||x.status||'—';var color=x.status==='approved'?'#2D6A4F':(x.status==='pending_webhook'?'#92400E':'#b91c1c');return[day(x.confirmed_at||x.created_at),esc(x.name||'—')+'<br><span style="color:var(--text-light);">'+esc(x.email||'')+'</span>',esc(x.plan||'—'),fcfa(x.amount),'<span style="color:'+color+';font-weight:700;">'+esc(st)+'</span>',esc(x.transaction_id||'—')];}))+'</div>';}
+function load(){var c=container();if(!c)return;c.innerHTML=shell('<div style="text-align:center;padding:32px;color:var(--text-light);">Chargement…</div>');icons();var path=_state.tab==='users'?'/users?limit=100'+(_state.q?'&q='+encodeURIComponent(_state.q):''):_state.tab==='payments'?'/payments':'/overview';apiFetch(path).then(function(d){var body=_state.tab==='users'?renderUsers(d):_state.tab==='payments'?renderPayments(d):renderOverview(d);c.innerHTML=shell(body);icons();}).catch(renderError);}
+function init(){load();}
+AP.actions=AP.actions||{};AP.actions['admin-tab']=function(el){_state.tab=el.getAttribute('data-tab')||'overview';load();};AP.actions['admin-search']=function(){var input=document.getElementById('adminSearch');_state.q=input?input.value.trim():'';_state.tab='users';load();};AP.adminDashboard={init:init,applyRole:applyRole};})(window.AgroPrix);

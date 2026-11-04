@@ -187,7 +187,7 @@
     if (user) {
       if (nameEl) nameEl.textContent = user.nom || user.name || 'Utilisateur';
       if (roleEl) {
-        var roleLabels = { free: 'Plan Gratuit', pro: 'Plan Pro', expert: 'Plan Expert', admin: 'Administrateur' };
+        var roleLabels = { free: 'Plan Gratuit', starter: 'Plan Starter', pro: 'Plan Pro', expert: 'Plan Expert', admin: 'Administrateur' };
         roleEl.textContent = roleLabels[user.role] || 'Plan Gratuit';
       }
       if (avatarEl) {
@@ -203,7 +203,7 @@
       if (profileEmail) profileEmail.textContent = user.email || '—';
       if (profileCountry) profileCountry.textContent = user.pays || user.country || '—';
       if (profilePlan) {
-        var planLabels = { free: 'Gratuit', pro: 'Pro · 2 900 FCFA/mois', expert: 'Expert · 14 900 FCFA/mois', admin: 'Administrateur' };
+        var planLabels = { free: 'Gratuit', starter: 'Starter · 990 FCFA/mois', pro: 'Pro · 2 900 FCFA/mois', expert: 'Expert · 14 900 FCFA/mois', admin: 'Administrateur' };
         profilePlan.textContent = planLabels[user.role] || 'Gratuit';
       }
       // Hide auth screen, show app
@@ -216,6 +216,10 @@
       // la garde masquée. AP.institution.applyRole est idempotent.
       if (AP.institution && AP.institution.applyRole) {
         try { AP.institution.applyRole(user); } catch (e) {}
+      }
+      // Tableau de bord admin : entrée de nav visible pour les comptes admin.
+      if (AP.adminDashboard && AP.adminDashboard.applyRole) {
+        try { AP.adminDashboard.applyRole(user); } catch (e) {}
       }
     }
   }
