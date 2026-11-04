@@ -235,7 +235,7 @@
 
     html += '<div style="background:#1B4332;border-radius:10px;margin-bottom:12px;overflow:hidden;position:relative;height:36px;">';
     html += '<div style="position:absolute;left:0;top:0;bottom:0;width:6px;background:linear-gradient(180deg,#E8862A,#E8862A);z-index:2;"></div>';
-    html += '<div style="position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:3;background:#E8862A;color:#1B4332;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:800;letter-spacing:0.5px;">LIVE</div>';
+    html += '<div style="position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:3;background:#E8862A;color:#1B4332;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:800;letter-spacing:0.5px;">PRIX</div>';
     html += '<div style="overflow:hidden;margin-left:58px;height:100%;display:flex;align-items:center;">';
     html += '<div class="ticker-scroll" style="white-space:nowrap;color:white;font-size:12px;animation:tickerScroll 25s linear infinite;">';
     html += tickerContent;
@@ -297,7 +297,7 @@
     html += '<div style="background:linear-gradient(90deg, #FEF3C7, #FDE68A);border-radius:14px;padding:14px 16px;margin-bottom:16px;border:1px solid #E8862A33;">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
     html += '<div style="font-size:13px;font-weight:700;color:#92400E;"><i data-lucide="radio" class="lc"></i> ALERTES MARCHE</div>';
-    html += '<div style="font-size:11px;color:#B45309;background:linear-gradient(180deg,#fff,#FAFCFB);padding:3px 10px;border-radius:8px;">En direct</div>';
+    html += '<div style="font-size:11px;color:#B45309;background:linear-gradient(180deg,#fff,#FAFCFB);padding:3px 10px;border-radius:8px;">Derniers relevés</div>';
     html += '</div>';
 
     alerts.forEach(function(a) {

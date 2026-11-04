@@ -29,7 +29,7 @@
       border: '#E8A33D',
       text: '#6B4A12',
       icon: '⚠️', // ⚠️
-      title: 'Prix en cours d’actualisation'
+      title: 'Mise à jour des prix en retard'
     },
     critical: {
       bg: '#FDECEC',
@@ -68,7 +68,7 @@
         + '. Ils ne reflètent plus le marché actuel — à ne pas utiliser pour une décision de vente.'
       : 'Dernière mise à jour des prix : <strong>' + when + '</strong>'
         + (age ? ' (' + age + ' jours)' : '')
-        + '. Une actualisation est en cours.';
+        + '. La mise à jour des prix est en retard.';
 
     var bar = document.createElement('div');
     bar.id = 'dataFreshnessBanner';
