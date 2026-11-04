@@ -173,7 +173,8 @@ window.AgroPrix = window.AgroPrix || {};
     market:'Offres & Demandes', rapports:'Rapports', params:'Param\u00e8tres',
     offres:'Nos Offres', plus:'Plus', proprietaire:'Proprietaire',
     partner:'Espace Partenaire',
-    institution:'Espace Institution'
+    institution:'Espace Institution',
+    admin:'Tableau de bord admin'
   };
 
   // ============================================================
@@ -208,7 +209,8 @@ window.AgroPrix = window.AgroPrix || {};
     market:'viewMarket', rapports:'viewAnalyse', params:'viewParams',
     offres:'viewOffres', plus:'viewPlus', proprietaire:'viewProprietaire',
     partner:'viewPartner',
-    institution:'viewInstitution'
+    institution:'viewInstitution',
+    admin:'viewAdmin'
   };
 
 })(window.AgroPrix);

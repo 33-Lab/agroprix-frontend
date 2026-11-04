@@ -35,7 +35,9 @@
     // Assistant Export : gratuit (acquisition — aide le producteur à se lancer)
     'export': 0,
     // Expert (3)
-    'conformite': 3
+    'conformite': 3,
+    // Admin (99) — tableau de bord de pilotage
+    'admin': 99
   };
 
   var PLAN_LABELS = {
@@ -133,6 +135,7 @@
     if (viewId === 'financing') { if (AP.financing && AP.financing.init) AP.financing.init(); }
     if (viewId === 'scoring') { if (AP.scoring && AP.scoring.render) AP.scoring.render(); }
     if (viewId === 'institution') { if (AP.institution && AP.institution.init) AP.institution.init(); }
+    if (viewId === 'admin') { if (AP.adminDashboard && AP.adminDashboard.init) AP.adminDashboard.init(); }
     if (viewId === 'ndvi') { if (AP.ndvi && AP.ndvi.init) AP.ndvi.init(); }
     // Modules cultures Pro — leur init peuple les sections de la vue. Sans cet
     // appel, les vues s'affichaient vides (init défini mais jamais invoqué).
@@ -264,7 +267,8 @@
     updateMarkets: updateMarkets,
     toggleAllMarkets: toggleAllMarkets,
     toggleMobileMenu: toggleMobileMenu,
-    closeMobileMenu: closeMobileMenu
+    closeMobileMenu: closeMobileMenu,
+    isAdminEmail: function(email) { return !!email && ADMIN_EMAILS.indexOf(String(email).toLowerCase()) !== -1; }
   };
 
   // Also expose as globals for onclick handlers in HTML
